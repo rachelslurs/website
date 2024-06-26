@@ -25,10 +25,24 @@
       "",
       "${2: Introductory Sentence}",
       "",
-      "## Table of contents",
+      "## Table of Contents",
       "",
       "## ${3: heading 1}",
     ],
     "description": "Adds the template for the AstroPaper Blog post. You will need to trigger the snippet modal on the 'frontmatter' line to insert the other snipper."
+  },
+  "Work Template": {
+    "scope": "markdown",
+    "prefix": "template",
+    "body": [
+      "${1:frontmatter}",
+      "",
+      "${2: Introductory Sentence}",
+      "",
+      "## Table of Contents",
+      "",
+      "## ${3: heading 1}",
+    ],
+    "description": "Adds the template for the work example. You will need to trigger the snippet modal on the 'frontmatter' line to insert the other snipper."
   }
 }
