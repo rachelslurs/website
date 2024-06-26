@@ -31,7 +31,7 @@ export default defineConfig({
       {
         name: "post",
         label: "Posts",
-        path: "content/posts",
+        path: "src/content/blog",
         fields: [
           {
             type: "string",
@@ -39,6 +39,101 @@ export default defineConfig({
             label: "Title",
             isTitle: true,
             required: true,
+          },
+          {
+            type: 'string',
+            name: 'description',
+            label: 'Description',
+            required: false
+          },
+          {
+            type: 'boolean',
+            name: 'featured',
+            label: 'Featured',
+            required: true
+          },
+          {
+            type: 'boolean',
+            name: 'draft',
+            label: 'Draft',
+            required: true
+          },
+          {
+            type: "string",
+            name: "author",
+            label: "Author",
+            isTitle: false,
+            required: true,
+          },
+          {
+            type: "datetime",
+            name: "pubDatetime",
+            label: "Date",
+            required: true,
+          },
+          {
+            label: 'Tags',
+            name: 'tags',
+            type: 'string',
+            list: true
+          },
+          {
+            type: "rich-text",
+            name: "body",
+            label: "Body",
+            isBody: true,
+          },
+        ],
+      },
+      {
+        name: "work",
+        label: "Work",
+        path: "src/content/work",
+        fields: [
+          {
+            type: "string",
+            name: "title",
+            label: "Title",
+            isTitle: true,
+            required: true,
+          },
+          {
+            type: 'string',
+            name: 'description',
+            label: 'Description',
+            required: false
+          },
+          {
+            type: 'boolean',
+            name: 'featured',
+            label: 'Featured',
+            required: true
+          },
+          {
+            type: 'boolean',
+            name: 'draft',
+            label: 'Draft',
+            required: true
+          },
+          {
+            type: "string",
+            name: "author",
+            label: "Author",
+            isTitle: false,
+            required: true,
+          },
+          {
+            type: "string",
+            name: "pubDatetime",
+            label: "Completed",
+            isTitle: false,
+            required: false,
+          },
+          {
+            label: 'Tags',
+            name: 'tags',
+            type: 'string',
+            list: true
           },
           {
             type: "rich-text",
