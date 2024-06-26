@@ -1,6 +1,6 @@
 ---
 slug: why-confirming-choices-matters
-title: 'Why Confirming Choices Matters: Lessons from an Instacart Experience'
+title: "Why Confirming Choices Matters: Lessons from an Instacart Experience"
 description: >-
   Accessibility isn't just about aiding users with disabilities; it helps
   everyone feel safe browsing the web without fear of doing something
@@ -18,7 +18,7 @@ tags:
 
 Have you ever thought you clicked on something thinking it would give you more details, only to have been surprised by a surprise charge? This is what happened to me recently while using Instacart. I wanted to subscribe to their monthly rate and by tapping the Instacart+ info, it automatically charged me for the full year without a confirmation step, and I only had learned I had become a member thanks to their email receipt; no in-app confirmation whatsoever.
 
-![An image of an email from Instacart saying “Your member benefits starts now.”](https://media.licdn.com/dms/image/D4E12AQGbzeXgfQvlkg/article-inline_image-shrink_1000_1488/0/1718145441282?e=1724889600\&v=beta\&t=F3RR4T_8XvPD4nbSr0IRKdwktP1LE_RC4kg3rJQYCzU)
+![An image of an email from Instacart saying “Your member benefits starts now."](/uploads/instacart_email.png)
 
 <figcaption class='text-center'>Thank you for letting me know. 🫠</figcaption>
 

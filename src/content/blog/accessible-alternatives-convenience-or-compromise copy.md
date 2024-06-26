@@ -1,23 +1,25 @@
 ---
-author: Rachel Cantor
-pubDatetime: 2024-06-23T15:22:00Z
-title: "Accessibility Alternatives: Convenience or Compromise?"
 slug: accessible-alternatives-convenience-or-compromise
+title: "Accessibility Alternatives: Convenience or Compromise?"
+description: >-
+  Come for the education, stay for the low-key dragging of luxury retailer
+  Maison Alaïa's alternate version.
 featured: true
 draft: false
+author: Rachel Cantor
+pubDatetime: 2024-06-23T15:22:00.000Z
 tags:
   - web accessibility
   - a11y
   - section 508
   - user experience
-description: Come for the education, stay for the low-key dragging of luxury retailer Maison Alaïa's alternate version.
 ---
 
 You are likely familiar with these overlay tools that claim to effortlessly render your website accessible to all individuals. While it is true that they can provide some utility, an over-reliance on third-party scripts can inadvertently create even greater barriers for certain individuals with disabilities, but that’s not what I am going to discuss for this post.
 
 Another accessibility alternative is to create a different set of HTML for users needing assistive technologies. I’ve seen these used on many Shopify websites and they tend to be what I like to call “the ugly stepchild” version of a store, because they tend to be automatically generated either by a theme or plugin and ignored by designers. _Next time you’re shopping online, ⌘F, “accessib”, click, and prepare to be horrified._
 
-![A gif scrolling luxury retailer Alaïa’s “accessible” version of their website, showing broken images, and ugly blue all caps text.](https://media.licdn.com/dms/image/D5612AQFFvJ8H54q8Ng/article-inline_image-shrink_1500_2232/0/1719259942547?e=1724889600&v=beta&t=B84_QSsH7hO34KCMLf9MGi4bVVCC7cDI3xDiYBJnkq0)
+![A gif scrolling luxury retailer Alaïa’s “accessible” version of their website, showing broken images, and ugly blue all caps text.](/uploads/accessible_alaia.gif)
 
 <figcaption class='text-center'>Luxury retailer Alaïa’s alternate version, complete with broken images, and that eggplant visited link color á la the web of yesteryear.</figcaption>
 
