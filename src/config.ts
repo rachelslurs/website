@@ -1,9 +1,9 @@
 import type { Site, SocialObjects } from "./types";
 
 export const SITE: Site = {
-  website: "https://astro-paper.pages.dev/", // replace this with your deployed domain
+  website: "https://rachel.fyi", // replace this with your deployed domain
   author: "Rachel Cantor",
-  desc: "A minimal, responsive and SEO-friendly Astro blog theme.",
+  desc: "A senior engineer with a background spanning the full stack of web development; passionate about delivering exceptional UI/UX.",
   title: "Rachel Cantor",
   ogImage: "astropaper-og.jpg",
   lightAndDarkMode: true,
@@ -38,8 +38,8 @@ export const SOCIALS: SocialObjects = [
   },
   {
     name: "CodePen",
-    href: "https://github.com/satnaing/astro-paper",
+    href: "https://codepen.io/rachelslurs",
     linkTitle: `${SITE.title} on CodePen`,
-    active: false,
+    active: true,
   },
 ];

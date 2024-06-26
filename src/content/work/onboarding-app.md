@@ -16,8 +16,6 @@ description: Supporting diverse user journeys in one Next.js app.
 
 Develop an onboarding app that caters to multiple distinct user journeys while maintaining a seamless and intuitive user experience.
 
-![Sat Naing's Terminal Portfolio](https://satnaing.dev/_ipx/w_2048,q_75/https%3A%2F%2Fres.cloudinary.com%2Fnoezectz%2Fimage%2Fupload%2Fv1654754125%2FSatNaing%2Fterminal-screenshot_gu3kkc.png?url=https%3A%2F%2Fres.cloudinary.com%2Fnoezectz%2Fimage%2Fupload%2Fv1654754125%2FSatNaing%2Fterminal-screenshot_gu3kkc.png&w=2048&q=75)
-
 ## Table of Contents
 
 ## Summary
