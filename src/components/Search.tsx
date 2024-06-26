@@ -6,6 +6,7 @@ import type { CollectionEntry } from "astro:content";
 export type SearchItem = {
   title: string;
   description: string;
+  tags: string[];
   data: CollectionEntry<"blog">["data"];
   slug: string;
 };
@@ -33,7 +34,7 @@ export default function SearchBar({ searchList }: Props) {
   const fuse = useMemo(
     () =>
       new Fuse(searchList, {
-        keys: ["title", "description"],
+        keys: ["title", "description", "tags"],
         includeMatches: true,
         minMatchCharLength: 2,
         threshold: 0.5,

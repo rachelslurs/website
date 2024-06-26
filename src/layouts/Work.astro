@@ -5,25 +5,26 @@ import Main from "@layouts/Main.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import Pagination from "@components/Pagination.astro";
-import Card from "@components/Card";
+import WorkCard from "@components/WorkCard";
 import { SITE } from "@config";
 
 export interface Props {
   currentPage: number;
   totalPages: number;
-  paginatedPosts: CollectionEntry<"blog">[];
+  paginatedWork: CollectionEntry<"work">[];
 }
 
-const { currentPage, totalPages, paginatedPosts } = Astro.props;
+const { currentPage, totalPages, paginatedWork } = Astro.props;
+console.log({ paginatedWork });
 ---
 
-<Layout title={`Posts | ${SITE.title}`}>
-  <Header activeNav="posts" />
-  <Main pageTitle="Posts" pageDesc="All of the posts." includeRss={true}>
+<Layout title={`Work | ${SITE.title}`}>
+  <Header activeNav="work" />
+  <Main pageTitle="Work" pageDesc="My work">
     <ul>
       {
-        paginatedPosts.map(({ data, slug }) => (
-          <Card href={`/posts/${slug}/`} frontmatter={data} />
+        paginatedWork.map(({ data, slug }) => (
+          <WorkCard href={`/work/${slug}/`} frontmatter={data} />
         ))
       }
     </ul>
@@ -32,8 +33,8 @@ const { currentPage, totalPages, paginatedPosts } = Astro.props;
   <Pagination
     {currentPage}
     {totalPages}
-    prevUrl={`/posts${currentPage - 1 !== 1 ? "/" + (currentPage - 1) : ""}/`}
-    nextUrl={`/posts/${currentPage + 1}/`}
+    prevUrl={`/work${currentPage - 1 !== 1 ? "/" + (currentPage - 1) : ""}/`}
+    nextUrl={`/work/${currentPage + 1}/`}
   />
 
   <Footer noMarginTop={totalPages > 1} />

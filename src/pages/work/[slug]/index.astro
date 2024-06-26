@@ -1,0 +1,41 @@
+---
+import { type CollectionEntry, getCollection } from "astro:content";
+import Work from "@layouts/Work.astro";
+import WorkDetails from "@layouts/WorkDetails.astro";
+import getSortedWork from "@utils/getSortedWork";
+import getPageNumbers from "@utils/getPageNumbers";
+import getWorkPagination from "@utils/getWorkPagination";
+
+export interface Props {
+  work: CollectionEntry<"work">;
+}
+
+export async function getStaticPaths() {
+  const works = await getCollection("work", ({ data }) => !data.draft);
+
+  const workResult = works.map(work => ({
+    params: { slug: work.slug },
+    props: { work },
+  }));
+
+  const pagePaths = getPageNumbers(works.length).map(pageNum => ({
+    params: { slug: String(pageNum) },
+  }));
+
+  return [...workResult, ...pagePaths];
+}
+
+const { slug } = Astro.params;
+const { work } = Astro.props;
+
+const works = await getCollection("work");
+
+const sortedWorks = getSortedWork(works);
+
+const pagination = getWorkPagination({
+  work: sortedWorks,
+  page: slug,
+});
+---
+
+{work ? <WorkDetails work={work} /> : <Work {...pagination} />}
