@@ -16,7 +16,7 @@ description: Supporting diverse user journeys in one Next.js app.
 
 Develop an onboarding app that caters to multiple distinct user journeys while maintaining a seamless and intuitive user experience.
 
-## Table of Contents
+### Table of Contents
 
 ## Summary
 
