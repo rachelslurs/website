@@ -50,13 +50,13 @@ export default defineConfig({
             type: 'boolean',
             name: 'featured',
             label: 'Featured',
-            required: true
+            required: false
           },
           {
             type: 'boolean',
             name: 'draft',
             label: 'Draft',
-            required: true
+            required: false
           },
           {
             type: "string",
