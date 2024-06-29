@@ -19,10 +19,10 @@ export interface Props {
 const { currentPage, totalPages, paginatedItems, tag, tagName } = Astro.props;
 ---
 
-<Layout title={`Tag: ${tagName} | ${SITE.title}`}>
+<Layout title={`Tech: ${tagName} | ${SITE.title}`}>
   <Header activeNav="work" />
   <Main
-    pageTitle={[`Tag:`, `${tagName}`]}
+    pageTitle={[`Tech:`, `${tagName}`]}
     titleTransition={tag}
     pageDesc={`All the work with the tag "${tagName}".`}
   >
@@ -39,10 +39,10 @@ const { currentPage, totalPages, paginatedItems, tag, tagName } = Astro.props;
   <Pagination
     {currentPage}
     {totalPages}
-    prevUrl={`/tags/${tag}${
+    prevUrl={`/tech/${tag}${
       currentPage - 1 !== 1 ? "/" + (currentPage - 1) : ""
     }/`}
-    nextUrl={`/tags/${tag}/${currentPage + 1}/`}
+    nextUrl={`/tech/${tag}/${currentPage + 1}/`}
   />
 
   <Footer noMarginTop={totalPages > 1} />
