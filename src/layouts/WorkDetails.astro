@@ -22,6 +22,7 @@ const {
   canonicalURL,
   pubDatetime,
   modDatetime,
+  year,
   tags,
 } = work.data;
 
@@ -65,8 +66,8 @@ const layoutProps = {
     </button>
   </div>
   <main id="main-content">
-    <h1 transition:name={slugifyStr(title)} class="post-title">{title}</h1>
-    <WorkYear pubDatetime={pubDatetime} size="lg" className="my-2" />
+    <h1 transition:name={slugifyStr(title)} class="work-title">{title}</h1>
+    {year && <WorkYear year={year} size="lg" className="my-2" />}
     <article id="article" role="article" class="prose mx-auto mt-8 max-w-3xl">
       <Content />
     </article>
@@ -98,7 +99,7 @@ const layoutProps = {
   main {
     @apply mx-auto w-full max-w-3xl px-4 pb-12;
   }
-  .post-title {
+  .work-title {
     @apply text-2xl font-semibold text-skin-accent;
   }
 </style>

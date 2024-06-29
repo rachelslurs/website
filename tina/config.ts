@@ -123,10 +123,15 @@ export default defineConfig({
             required: true,
           },
           {
-            type: "string",
+            type: "datetime",
             name: "pubDatetime",
-            label: "Completed",
-            isTitle: false,
+            label: "Date",
+            required: true,
+          },
+          {
+            type: "string",
+            name: "year",
+            label: "Year",
             required: false,
           },
           {

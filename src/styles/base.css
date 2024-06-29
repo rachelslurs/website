@@ -5,12 +5,12 @@
 @layer base {
   :root,
   html[data-theme="light"] {
-    --color-fill: 251, 254, 251;
-    --color-text-base: 40, 39, 40;
-    --color-accent: 16, 80, 85;
+    --color-fill: 251, 248, 241;
+    --color-text-base: 37, 36, 34;
+    --color-accent: 209, 60, 0;
     --color-card: 230, 230, 230;
-    --color-card-muted: 205, 205, 205;
-    --color-border: 236, 233, 233;
+    --color-card-muted: 204, 197, 185;
+    --color-border: 64, 61, 57;
   }
   html[data-theme="dark"] {
     --color-fill: 21, 54, 54;
@@ -29,7 +29,7 @@
     display: block;
   }
   body {
-    @apply flex min-h-[100svh] flex-col bg-skin-fill font-mono text-skin-base 
+    @apply flex min-h-[100svh] flex-col bg-skin-fill text-skin-base 
     selection:bg-skin-accent selection:bg-opacity-70 selection:text-skin-inverted;
   }
   section,
@@ -50,11 +50,11 @@
   }
   .prose {
     @apply prose-headings:!mb-3 prose-headings:!text-skin-base 
-    prose-h3:italic prose-p:!text-skin-base 
-    prose-a:!text-skin-base prose-a:!decoration-dashed prose-a:underline-offset-8
+    prose-p:!text-skin-base 
+    prose-a:!text-skin-base prose-a:font-bold hover:prose-a:!decoration-dashed prose-a:underline-offset-4
     hover:prose-a:text-skin-accent prose-blockquote:!border-l-skin-accent
-    prose-blockquote:border-opacity-50 prose-blockquote:opacity-80
-    prose-figcaption:!text-skin-base prose-figcaption:opacity-70
+    prose-blockquote:border-opacity-50 prose-blockquote:opacity-100
+    prose-figcaption:!text-skin-base prose-figcaption:opacity-90
     prose-strong:!text-skin-base
 
     
@@ -66,7 +66,7 @@
     prose-table:text-skin-base prose-th:border
     prose-th:border-skin-line prose-td:border 
     prose-td:border-skin-line prose-img:!my-2 
-    prose-img:mx-auto prose-img:border-2 
+    prose-img:mx-auto prose-img:border-2 prose-img:rounded-xl 
     prose-img:border-skin-line prose-hr:!border-skin-line;
   }
   .prose a {

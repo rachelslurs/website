@@ -1,5 +1,5 @@
 interface WorkYearProps {
-  pubDatetime: string;
+  year?: string;
 }
 
 interface Props extends WorkYearProps {
@@ -7,15 +7,11 @@ interface Props extends WorkYearProps {
   className?: string;
 }
 
-export default function WorkYear({
-  pubDatetime,
-  size = "sm",
-  className,
-}: Props) {
+export default function WorkYear({ year, size = "sm", className }: Props) {
   return (
-    <div className={`flex items-center space-x-2 opacity-80 ${className}`}>
+    <div className={`flex items-center space-x-1 opacity-80 ${className}`}>
       <span className={`${size === "sm" ? "text-sm" : "text-base"}`}>
-        <span className="text-nowrap">{pubDatetime}</span>
+        <span className="text-nowrap">{year}</span>
       </span>
     </div>
   );

@@ -1,5 +1,6 @@
 import { slugifyStr } from "@utils/slugify";
 import type { CollectionEntry } from "astro:content";
+import WorkYear from "./WorkYear";
 
 export interface Props {
   href?: string;
@@ -7,8 +8,12 @@ export interface Props {
   secHeading?: boolean;
 }
 
-export default function Card({ href, frontmatter, secHeading = true }: Props) {
-  const { title, pubDatetime, description } = frontmatter;
+export default function WorkCard({
+  href,
+  frontmatter,
+  secHeading = true,
+}: Props) {
+  const { title, year, description } = frontmatter;
 
   const headerProps = {
     style: { viewTransitionName: slugifyStr(title) },
@@ -30,9 +35,7 @@ export default function Card({ href, frontmatter, secHeading = true }: Props) {
             <h3 {...headerProps}>{title}</h3>
           )}
         </a>
-        <span className={`text-base`}>
-          <span className="text-nowrap">{pubDatetime}</span>
-        </span>
+        <WorkYear year={year} />
       </div>
       <p>{description}</p>
     </li>

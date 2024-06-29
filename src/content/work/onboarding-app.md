@@ -1,7 +1,8 @@
 ---
 title: Onboarding App
 author: Rachel Cantor
-pubDatetime: "2023"
+pubDatetime: 2024-06-11T12:21:00.000Z
+year: "2023"
 slug: onboarding-app
 featured: true
 draft: false
