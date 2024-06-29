@@ -11,10 +11,10 @@ import { SITE } from "@config";
 export interface Props {
   currentPage: number;
   totalPages: number;
-  paginatedPosts: CollectionEntry<"blog">[];
+  paginatedItems: CollectionEntry<"blog">[];
 }
 
-const { currentPage, totalPages, paginatedPosts } = Astro.props;
+const { currentPage, totalPages, paginatedItems } = Astro.props;
 ---
 
 <Layout title={`Posts | ${SITE.title}`}>
@@ -22,7 +22,7 @@ const { currentPage, totalPages, paginatedPosts } = Astro.props;
   <Main pageTitle="Posts" pageDesc="All of the posts." includeRss={true}>
     <ul>
       {
-        paginatedPosts.map(({ data, slug }) => (
+        paginatedItems.map(({ data, slug }) => (
           <Card href={`/posts/${slug}/`} frontmatter={data} />
         ))
       }

@@ -1,5 +1,5 @@
 import type { CollectionEntry } from "astro:content";
-import workFilter from "./workFilter";
+import { workFilter } from "./filters";
 
 const getSortedWork = (work: CollectionEntry<"work">[]) => {
   return work

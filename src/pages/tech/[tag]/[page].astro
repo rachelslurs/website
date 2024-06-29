@@ -1,25 +1,25 @@
 ---
 import { type CollectionEntry, getCollection } from "astro:content";
-import TagPosts from "@layouts/TagPosts.astro";
-import { getUniquePostTags } from "@utils/getUniqueTags";
-import { getPostsByTag } from "@utils/getItemsByTag";
+import TagWork from "@layouts/TagWork.astro";
+import { getUniqueWorkTags } from "@utils/getUniqueTags";
+import { getWorkByTag } from "@utils/getItemsByTag";
 import getPageNumbers from "@utils/getPageNumbers";
 import getPagination from "@utils/getPagination";
 
 export interface Props {
-  post: CollectionEntry<"blog">;
+  work: CollectionEntry<"work">;
   tag: string;
   tagName: string;
 }
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog");
+  const work = await getCollection("work");
 
-  const tags = getUniquePostTags(posts);
+  const tags = getUniqueWorkTags(work);
 
   return tags.flatMap(({ tag, tagName }) => {
-    const tagPosts = getPostsByTag(posts, tag);
-    const totalPages = getPageNumbers(tagPosts.length);
+    const tagWork = getWorkByTag(work, tag);
+    const totalPages = getPageNumbers(tagWork.length);
 
     return totalPages.map(page => ({
       params: { tag, page },
@@ -31,14 +31,14 @@ export async function getStaticPaths() {
 const { page } = Astro.params;
 const { tag, tagName } = Astro.props;
 
-const posts = await getCollection("blog", ({ data }) => !data.draft);
+const work = await getCollection("work", ({ data }) => !data.draft);
 
-const postsByTag = getPostsByTag(posts, tag);
+const worksByTag = getWorkByTag(work, tag);
 
 const pagination = getPagination({
-  items: postsByTag,
+  items: worksByTag,
   page,
 });
 ---
 
-<TagPosts {...pagination} {tag} {tagName} />
+<TagWork {...pagination} {tag} {tagName} />

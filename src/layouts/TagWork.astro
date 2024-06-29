@@ -11,16 +11,16 @@ import { SITE } from "@config";
 export interface Props {
   currentPage: number;
   totalPages: number;
-  paginatedWork: CollectionEntry<"work">[];
+  paginatedItems: CollectionEntry<"work">[];
   tag: string;
   tagName: string;
 }
 
-const { currentPage, totalPages, paginatedWork, tag, tagName } = Astro.props;
+const { currentPage, totalPages, paginatedItems, tag, tagName } = Astro.props;
 ---
 
 <Layout title={`Tag: ${tagName} | ${SITE.title}`}>
-  <Header activeNav="tags" />
+  <Header activeNav="work" />
   <Main
     pageTitle={[`Tag:`, `${tagName}`]}
     titleTransition={tag}
@@ -29,7 +29,7 @@ const { currentPage, totalPages, paginatedWork, tag, tagName } = Astro.props;
     <h1 slot="title" transition:name={tag}>{`Tag:${tag}`}</h1>
     <ul>
       {
-        paginatedWork.map(({ data, slug }) => (
+        paginatedItems.map(({ data, slug }) => (
           <WorkCard href={`/work/${slug}/`} frontmatter={data} />
         ))
       }

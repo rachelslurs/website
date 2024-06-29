@@ -2,8 +2,7 @@
 import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
-import Tag from "@components/Tag.astro";
-import WorkYear from "@components/WorkYear";
+import WorkTag from "@components/WorkTag.astro";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import { SITE } from "@config";
@@ -22,9 +21,9 @@ const {
   canonicalURL,
   pubDatetime,
   modDatetime,
-  year,
   tags,
 } = work.data;
+console.log(work.data);
 
 const { Content } = await work.render();
 
@@ -67,13 +66,13 @@ const layoutProps = {
   </div>
   <main id="main-content">
     <h1 transition:name={slugifyStr(title)} class="work-title">{title}</h1>
-    {year && <WorkYear year={year} size="lg" className="my-2" />}
+    <!-- {year && <WorkYear year={year} size="lg" className="my-2" />} -->
     <article id="article" role="article" class="prose mx-auto mt-8 max-w-3xl">
       <Content />
     </article>
 
     <ul class="my-8">
-      {tags.map(tag => <Tag tag={slugifyStr(tag)} />)}
+      {tags.map(tag => <WorkTag tag={slugifyStr(tag)} />)}
     </ul>
 
     <div

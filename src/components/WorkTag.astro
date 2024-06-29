@@ -2,10 +2,9 @@
 export interface Props {
   tag: string;
   size?: "sm" | "lg";
-  urlBase?: "tags" | "tech";
 }
 
-const { tag, size = "sm", urlBase = "tags" } = Astro.props;
+const { tag, size = "sm" } = Astro.props;
 ---
 
 <li
@@ -14,7 +13,7 @@ const { tag, size = "sm", urlBase = "tags" } = Astro.props;
   }`}
 >
   <a
-    href={`/${urlBase}/${tag}/`}
+    href={`/tech/${tag}/`}
     transition:name={tag}
     class={`${size === "sm" ? "text-sm" : "text-lg"} pr-2 group`}
   >

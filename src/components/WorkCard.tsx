@@ -35,7 +35,7 @@ export default function WorkCard({
             <h3 {...headerProps}>{title}</h3>
           )}
         </a>
-        <WorkYear year={year} />
+        {/* <WorkYear year={year} /> */}
       </div>
       <p>{description}</p>
     </li>
