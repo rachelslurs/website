@@ -40,7 +40,7 @@ Make a system extendable enough that later on we could use the the data model fo
 
 ### Layered flow
 
-#### ![Layered flow diagram showing the translation of serializing the content in the database, to presenting the preview to the user, and giving the user notifications upon saving.](/uploads/page_customization_layered_flow.png)
+![Layered flow diagram showing the translation of serializing the content in the database, to presenting the preview to the user, and giving the user notifications upon saving.](/uploads/page_customization_layered_flow.png)
 
 ### Database schema
 
