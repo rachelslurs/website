@@ -54,14 +54,13 @@ Creators will be able to use the Dashboard Page Editor to achieve the following:
 2. Be able to override the theme customizations with their page customizations (fonts, block borders, page background color, gradient).
 3. We will be able to dynamically determine font color based on background type/value.
 
-| Entity | Value Object  | Purpose                 |
-| ------ | ------------- | ----------------------- |
-| Themes | Name, display | - Provides a theme name |
+| Entity              | Value Object                | Purpose                                                                                                                                                                             |
+| ------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Themes              | Name                        | - Provides a theme name                                                                                                                                                             |
+| ThemeCustomizations | Theme ID, name, value, type | - A preset group of various customization choices                                                                                                                                   |
+| Forms               | Name                        | - Gives pages a user friendly and editable name that is for ease of Creator to be able to identify in list if they have Design Pro (because Design Pro includes more than one page) |
+| FormCustomizations  | Form ID, name, value, type  | - Things customized on the page level: ie a background with an image, a hover effect that animates for any linkable elements, etc.                                                  |
 
-* Whether or not theme gets displayed (in case we find one isn’t performing well enough to want to deprecate but don’t want to disturb users already using theme) |
-  \| ThemeCustomizations | Theme ID, name, value, type | - A preset group of various customization choices |
-  \| Forms | Name | - Gives pages a user friendly and editable name that is for ease of Creator to be able to identify in list if they have Design Pro (because Design Pro includes more than one page) |
-  \| FormCustomizations | Form ID, name, value, type | - Things customized on the page level: ie a background with an image, a hover effect that animates for any linkable elements, etc.
 * 1 form\_id:many form customizations |
   \| FormThemes | Form ID theme ID | - Gives the ability to override the PublisherTheme
 * Should only apply 1 per form\_id |
