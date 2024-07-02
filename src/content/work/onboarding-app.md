@@ -17,7 +17,7 @@ tags:
 
 Develop an onboarding app that caters to multiple distinct user journeys while maintaining a seamless and intuitive user experience.
 
-!\[Screen recording showing signup and login toggle]\([https://assets.tina.io/58eba99a-699f-495f-9515-719c6eb8ec87/signup\_login\_toggle.gif](https://assets.tina.io/58eba99a-699f-495f-9515-719c6eb8ec87/signup_login_toggle.gif) =250x)
+![Screen recording showing signup and login toggle](/uploads/signup_login_toggle_medium.gif)
 
 ### Table of Contents
 
