@@ -3,6 +3,7 @@ import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import WorkTag from "@components/WorkTag.astro";
+import DeviceScreenshots from "@components/Features/DeviceScreenshot.astro";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import { SITE } from "@config";
@@ -22,8 +23,9 @@ const {
   pubDatetime,
   modDatetime,
   tags,
+  deviceScreenshots,
 } = work.data;
-console.log(work.data);
+console.log(deviceScreenshots);
 
 const { Content } = await work.render();
 
@@ -68,6 +70,16 @@ const layoutProps = {
     <h1 transition:name={slugifyStr(title)} class="work-title">{title}</h1>
     <!-- {year && <WorkYear year={year} size="lg" className="my-2" />} -->
     <article id="article" role="article" class="prose mx-auto mt-8 max-w-3xl">
+      {
+        deviceScreenshots &&
+          deviceScreenshots.map(screenshot => (
+            <DeviceScreenshots
+              src={screenshot.src}
+              alt={screenshot.alt}
+              caption={screenshot.caption}
+            />
+          ))
+      }
       <Content />
     </article>
 

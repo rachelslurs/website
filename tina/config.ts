@@ -146,6 +146,32 @@ export default defineConfig({
             label: "Body",
             isBody: true,
           },
+          {
+            label: 'Device screenshot',
+            name: 'deviceScreenshots',
+            type: 'object',
+            list: true,
+            required: false,
+            fields: [
+              {
+                type: 'image',
+                name: 'src',
+                label: 'Image',
+                required: true
+              },
+              {
+                type: 'string',
+                name: 'alt',
+                label: 'Alt',
+                required: true
+              },
+              {
+                type: 'string',
+                name: 'caption',
+                label: 'Caption',
+              }
+            ]
+          },
         ],
       },
     ],

@@ -35,6 +35,15 @@ const work = defineCollection({
       draft: z.boolean().optional(),
       year: z.string().optional(),
       tags: z.array(z.string()).default(["others"]),
+      deviceScreenshots: z
+        .array(
+          z.object({
+            src: z.string(),
+            alt: z.string(),
+            caption: z.string().optional(),
+          })
+        )
+        .optional(),
       ogImage: image()
         .refine(img => img.width >= 1200 && img.height >= 630, {
           message: "OpenGraph image must be at least 1200 X 630 pixels!",

@@ -1,6 +1,5 @@
 import { slugifyStr } from "@utils/slugify";
 import type { CollectionEntry } from "astro:content";
-import WorkYear from "./WorkYear";
 
 export interface Props {
   href?: string;

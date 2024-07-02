@@ -6,13 +6,17 @@ featured: true
 draft: false
 author: Rachel Cantor
 pubDatetime: 2024-06-11T12:21:00.000Z
-year: '2023'
+year: "2023"
 tags:
   - Next.js
   - ReactJS
   - Redux
   - Figma
   - TypeScript
+deviceScreenshots:
+  - src: /uploads/signup_login_toggle.gif
+    alt: Screen recording showing signup and login toggle
+    caption: Sign up and log in toggle
 ---
 
 Develop an onboarding app that caters to multiple distinct user journeys while maintaining a seamless and intuitive user experience.
@@ -51,17 +55,17 @@ I translated designs from our product designer in Figma for each of the flows.
 
 ## Tech Stack
 
-* Frontend: [ReactJS](https://reactjs.org/ "React"), [TypeScript](https://www.typescriptlang.org/ "TypeScript")
-* Styling: [Tailwind CSS](https://tailwindcss.com "Tailwind CSS")
-* UI/UX: [Figma and Figjam](https://figma.com/ "Figma")
-* State Management: [Redux](https://redux.js.org "Redux")
-* Deployment: [Cloudflare Workers](https://workers.cloudflare.com/ "Cloudflare Workers")
+- Frontend: [ReactJS](https://reactjs.org/ "React"), [TypeScript](https://www.typescriptlang.org/ "TypeScript")
+- Styling: [Tailwind CSS](https://tailwindcss.com "Tailwind CSS")
+- UI/UX: [Figma and Figjam](https://figma.com/ "Figma")
+- State Management: [Redux](https://redux.js.org "Redux")
+- Deployment: [Cloudflare Workers](https://workers.cloudflare.com/ "Cloudflare Workers")
 
 ## Conclusion
 
-* The comprehensive onboarding process reduced the number of support inquiries related to onboarding, indicating a smooth and efficient onboarding journey.
-* We were able to track various flows and their success rate using Datadog RUM and a custom funneling dashboard.
+- The comprehensive onboarding process reduced the number of support inquiries related to onboarding, indicating a smooth and efficient onboarding journey.
+- We were able to track various flows and their success rate using Datadog RUM and a custom funneling dashboard.
 
 ### Product
 
-* Website: [https://hype.co/signup](https://hype.co/signup "https://hype.co/signup")
+- Website: [https://hype.co/signup](https://hype.co/signup "https://hype.co/signup")

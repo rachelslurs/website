@@ -9,6 +9,7 @@ function withOpacity(variableName) {
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode:  ['selector', '[data-theme="dark"]'],
   content: ["./src/**/*.{astro,html,js,jsx,md,mdx,ts,tsx}"],
   theme: {
     // Remove the following screen breakpoint or add other breakpoints
