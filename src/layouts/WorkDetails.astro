@@ -3,7 +3,7 @@ import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import WorkTag from "@components/WorkTag.astro";
-import DeviceScreenshots from "@components/Features/DeviceScreenshot.astro";
+import Features from "@components/Features";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import { SITE } from "@config";
@@ -23,9 +23,9 @@ const {
   pubDatetime,
   modDatetime,
   tags,
-  deviceScreenshots,
+  features,
+  summary,
 } = work.data;
-console.log(deviceScreenshots);
 
 const { Content } = await work.render();
 
@@ -69,17 +69,13 @@ const layoutProps = {
   <main id="main-content">
     <h1 transition:name={slugifyStr(title)} class="work-title">{title}</h1>
     <!-- {year && <WorkYear year={year} size="lg" className="my-2" />} -->
+    {summary && <p class="text-xl my-6 leading-7">{summary}</p>}
+    {
+      features && features.length > 0 && (
+        <Features features={features} client:load />
+      )
+    }
     <article id="article" role="article" class="prose mx-auto mt-8 max-w-3xl">
-      {
-        deviceScreenshots &&
-          deviceScreenshots.map(screenshot => (
-            <DeviceScreenshots
-              src={screenshot.src}
-              alt={screenshot.alt}
-              caption={screenshot.caption}
-            />
-          ))
-      }
       <Content />
     </article>
 
@@ -159,6 +155,7 @@ const layoutProps = {
    *  allowing sharing of sections easily */
   function addHeadingLinks() {
     let headings = Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"));
+
     for (let heading of headings) {
       heading.classList.add("group");
       let link = document.createElement("a");
