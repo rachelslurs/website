@@ -1,5 +1,3 @@
-import { motion } from "framer-motion";
-
 function DeviceScreenshot({
   children,
   className,
@@ -19,4 +17,4 @@ function DeviceScreenshot({
   );
 }
 
-export default motion(DeviceScreenshot);
+export default DeviceScreenshot;

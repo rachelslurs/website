@@ -26,6 +26,7 @@ const {
   modDatetime,
   scrollSmooth = false,
 } = Astro.props;
+
 const isPost = Astro.url.toString().includes("/posts/");
 
 const socialImageURL = new URL(

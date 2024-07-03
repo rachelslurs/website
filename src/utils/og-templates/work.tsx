@@ -71,20 +71,9 @@ export default (work: CollectionEntry<"work">) => {
               fontSize: 28,
             }}
           >
-            <span>
-              by{" "}
-              <span
-                style={{
-                  color: "transparent",
-                }}
-              >
-                "
-              </span>
-              <span style={{ overflow: "hidden", fontWeight: "bold" }}>
-                {work.data.author}
-              </span>
+            <span style={{ overflow: "hidden", fontWeight: "bold" }}>
+              {work.data.description}
             </span>
-
             <span style={{ overflow: "hidden", fontWeight: "bold" }}>
               {SITE.title}
             </span>

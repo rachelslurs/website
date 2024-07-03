@@ -65,7 +65,7 @@ export default (post: CollectionEntry<"blog">) => {
           <div
             style={{
               display: "flex",
-              justifyContent: "space-between",
+              justifyContent: "start",
               width: "100%",
               marginBottom: "8px",
               fontSize: 28,
@@ -83,10 +83,6 @@ export default (post: CollectionEntry<"blog">) => {
               <span style={{ overflow: "hidden", fontWeight: "bold" }}>
                 {post.data.author}
               </span>
-            </span>
-
-            <span style={{ overflow: "hidden", fontWeight: "bold" }}>
-              {SITE.title}
             </span>
           </div>
         </div>
