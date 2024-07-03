@@ -7,27 +7,29 @@ draft: false
 author: Rachel Cantor
 pubDatetime: 2024-06-11T12:21:00.000Z
 year: "2023"
+summary: "Build an onboarding app that caters to multiple distinct user journeys while maintaining a seamless and intuitive user experience."
 tags:
   - Next.js
   - ReactJS
   - Redux
   - Figma
   - TypeScript
-deviceScreenshots:
-  - src: /uploads/signup_login_toggle.gif
+features:
+  - src: /uploads/trial.gif
+    alt: >-
+      Onboarding process for creating an account and opting in for a free trial
+      using Stripe
+    caption: >-
+      Onboarding process for creating an account and opting in for a free trial
+      using Stripe
+  - src: /uploads/sign_up_log_in.gif
     alt: Screen recording showing signup and login toggle
     caption: Sign up and log in toggle
 ---
 
-Develop an onboarding app that caters to multiple distinct user journeys while maintaining a seamless and intuitive user experience.
-
 ### Table of Contents
 
-## Summary
-
-Build an onboarding app that caters to multiple distinct user journeys while maintaining a seamless and intuitive user experience.
-
-### Client
+## Client
 
 Hype is an all-in-one marketing and payments platform for anyone using social media to grow their business. The software enables creators to build a website in minutes, earn revenue from subscriptions and tips, send message blasts to followers, and track key business analytics.
 
@@ -43,9 +45,15 @@ The approach involved mapping out a range of flows to determine how to isolate e
 
 #### Sign up: initial registration process
 
+![](/uploads/signup.png)
+
 #### Linking a Hype Card: Connecting an NFC card or sticker to a user’s account
 
+![](/uploads/linking.png)
+
 #### Claiming a page: User claiming ownership of a pre-existing page
+
+![](/uploads/claiming.png)
 
 ## Solution
 

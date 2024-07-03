@@ -35,7 +35,7 @@ const work = defineCollection({
       draft: z.boolean().optional(),
       year: z.string().optional(),
       tags: z.array(z.string()).default(["others"]),
-      deviceScreenshots: z
+      features: z
         .array(
           z.object({
             src: z.string(),
@@ -51,6 +51,7 @@ const work = defineCollection({
         .or(z.string())
         .optional(),
       description: z.string().optional(),
+      summary: z.string(),
       canonicalURL: z.string().optional(),
     }),
 });

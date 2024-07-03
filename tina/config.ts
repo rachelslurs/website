@@ -104,6 +104,12 @@ export default defineConfig({
             required: false
           },
           {
+            type: 'string',
+            name: 'summary',
+            label: 'Summary',
+            required: true
+          },
+          {
             type: 'boolean',
             name: 'featured',
             label: 'Featured',
@@ -147,8 +153,8 @@ export default defineConfig({
             isBody: true,
           },
           {
-            label: 'Device screenshot',
-            name: 'deviceScreenshots',
+            label: 'Features',
+            name: 'features',
             type: 'object',
             list: true,
             required: false,
@@ -169,7 +175,7 @@ export default defineConfig({
                 type: 'string',
                 name: 'caption',
                 label: 'Caption',
-              }
+              },
             ]
           },
         ],
