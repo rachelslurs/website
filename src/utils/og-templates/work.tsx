@@ -65,18 +65,16 @@ export default (work: CollectionEntry<"work">) => {
           <div
             style={{
               display: "flex",
-              justifyContent: "space-between",
+              flexDirection: "column",
               width: "100%",
               marginBottom: "8px",
               fontSize: 28,
             }}
           >
-            <span style={{ overflow: "hidden", fontWeight: "bold" }}>
-              {work.data.description}
-            </span>
-            <span style={{ overflow: "hidden", fontWeight: "bold" }}>
+            <p style={{ fontWeight: "bold" }}>{work.data.description}</p>
+            <p style={{ overflow: "hidden", fontWeight: "bold" }}>
               {SITE.title}
-            </span>
+            </p>
           </div>
         </div>
       </div>
