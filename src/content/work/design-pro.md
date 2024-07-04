@@ -32,7 +32,7 @@ features:
     caption: Using the theme picker and theme preview to select a theme
 ---
 
-### Table of Contents
+## Table of Contents
 
 ## Client
 

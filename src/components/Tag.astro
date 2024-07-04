@@ -18,7 +18,7 @@ const { tag, size = "sm", urlBase = "tags" } = Astro.props;
     transition:name={tag}
     class={`${size === "sm" ? "text-sm" : "text-lg"} pr-2 group`}
   >
-    <span>{tag}</span>
+    {tag}
   </a>
 </li>
 
