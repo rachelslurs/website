@@ -9,7 +9,7 @@ import Container from "@components/Container.tsx";
 type FeatureProps = {
   src: string;
   alt: string;
-  caption: string;
+  caption?: string;
 };
 
 function usePrevious<T>(value: T) {
@@ -26,7 +26,7 @@ type FeaturesProps = {
   features: FeatureProps[];
 };
 
-function classNames(...classes) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
@@ -82,9 +82,6 @@ function FeaturesDesktop(props: FeaturesProps) {
         ))}
       </TabList>
       <div className="relative col-span-6">
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <p className="animate-spin-slower">Hello</p>
-        </div>
         <Device>
           <TabPanels as={Fragment}>
             <AnimatePresence
@@ -156,7 +153,7 @@ function FeaturesMobile(props: FeaturesProps) {
             className="w-full flex-none snap-center"
           >
             <div className="relative transform overflow-hidden p-0">
-              <Device className="relative mx-auto w-full max-w-[366px]">
+              <Device className="relative mx-auto max-w-[366px]">
                 <img src={feature.src} alt={feature.alt} />
               </Device>
               <div className="text-skin-base p-4">
