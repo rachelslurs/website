@@ -95,7 +95,11 @@ function FeaturesDesktop(props: FeaturesProps) {
                     static
                     className="col-start-1 row-start-1 flex focus:outline-offset-[32px] ui-not-focus-visible:outline-none"
                   >
-                    <img src={feature.src} alt={feature.alt} />
+                    <img
+                      src={feature.src}
+                      alt={feature.alt}
+                      loading={selectedIndex === 0 ? "eager" : "lazy"}
+                    />
                   </TabPanel>
                 ) : null
               )}
