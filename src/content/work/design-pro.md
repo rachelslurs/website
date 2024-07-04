@@ -3,12 +3,15 @@ title: Design Pro
 description: >-
   Give users the ability to change the look and feel of their page using themes
   and customizations.
+summary: >-
+  Offer appearance customization features in our existing link-in-bio Page
+  Editor as a way to increase revenue by enticing users that might not see value
+  in subscribing to a paid plan.
 featured: true
 draft: false
 author: Rachel Cantor
 pubDatetime: 2024-06-30T04:00:00.000Z
 year: "2023"
-summary: "Offer appearance customization features in our existing link-in-bio Page Editor as a way to increase revenue by enticing users that might not see value in subscribing to a paid plan."
 tags:
   - Github Actions
   - CSS Variables
@@ -17,6 +20,16 @@ tags:
   - Node.js
   - Figma
   - TypeScript
+features:
+  - src: /uploads/editing_border_styles.gif
+    alt: User editing border styles and previewing them
+    caption: Editing border styles and previewing them
+  - src: /uploads/theme_browsing.gif
+    alt: User browsing themes
+    caption: Browsing themes using the theme picker
+  - src: /uploads/theme_selection.gif
+    alt: User deciding between various themes using theme picker and selecting one
+    caption: Using the theme picker and theme preview to select a theme
 ---
 
 ### Table of Contents
