@@ -73,7 +73,6 @@ export default function SearchBar({ searchList }: Props) {
       history.replaceState(history.state, "", window.location.pathname);
     }
   }, [inputVal]);
-  console.log({ searchResults });
 
   return (
     <>
