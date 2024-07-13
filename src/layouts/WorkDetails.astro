@@ -74,7 +74,11 @@ const layoutProps = {
         <Features features={features} client:load />
       )
     }
-    <article id="article" role="article" class="prose mx-auto mt-8 max-w-3xl">
+    <article
+      id="article"
+      role="article"
+      class="prose mx-auto mt-8 max-w-3xl relative"
+    >
       <Content />
     </article>
 
@@ -150,19 +154,43 @@ const layoutProps = {
   }
   document.addEventListener("scroll", updateScrollProgress);
 
+  function wrap(el, wrapper) {
+    console.log({ el, wrapper });
+    if (el && el.parentNode) {
+      el.parentNode.insertBefore(wrapper, el);
+      wrapper.appendChild(el);
+    }
+  }
+
+  function shortcutLink() {
+    // create a span
+    // add a class to the span
+    // add a text to the span
+    const span = document.createElement("span");
+    span.className =
+      "absolute -ml-8 items-center border-0 opacity-0 group-hover:opacity-100 group-focus:opacity-100 lg:flex";
+    span.innerHTML =
+      "&ZeroWidthSpace;<span class='flex h-6 w-6 items-center justify-center rounded-md text-slate-400 shadow-sm ring-1 ring-slate-900/5 hover:text-slate-700 hover:shadow hover:ring-slate-900/10 dark:bg-slate-800 dark:text-slate-400 dark:shadow-none dark:ring-0 dark:hover:bg-slate-700 dark:hover:text-slate-200'><svg width='12' height='12' fill='none' aria-hidden='true'><path d='M3.75 1v10M8.25 1v10M1 3.75h10M1 8.25h10' stroke='currentColor' stroke-width='1.5' stroke-linecap='round'></path></svg></span>";
+    return span;
+  }
   /** Attaches links to headings in the document,
    *  allowing sharing of sections easily */
   function addHeadingLinks() {
     let headings = Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"));
 
     for (let heading of headings) {
-      heading.classList.add("group");
+      const text = document.createTextNode(heading.textContent);
+      heading.removeChild(heading.firstChild);
+      heading.classList.add("whitespace-pre-wrap");
+      heading.classList.add("relative");
+      heading.classList.add("flex");
       let link = document.createElement("a");
-      link.innerText = "#";
-      link.className = "heading-link hidden group-hover:inline-block ml-2";
+      link.className = "group relative border-none lg:-ml-2 lg:pl-2";
       link.href = "#" + heading.id;
-      link.ariaHidden = "true";
+      link.appendChild(text);
+      link.appendChild(shortcutLink());
       heading.appendChild(link);
+      // wrap(heading, link);
     }
   }
   addHeadingLinks();

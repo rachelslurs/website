@@ -152,13 +152,20 @@ const layoutProps = {
    *  allowing sharing of sections easily */
   function addHeadingLinks() {
     let headings = Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"));
+
     for (let heading of headings) {
       heading.classList.add("group");
       let link = document.createElement("a");
-      link.innerText = "#";
-      link.className = "heading-link hidden group-hover:inline-block ml-2";
+      link.className = "ml-2 heading-link";
+      let linkSpan = document.createElement("span");
+      linkSpan.innerText = "#";
+      // linkSpan.className = "hidden group-hover:inline-block";
+      let ariaText = document.createElement("span");
+      ariaText.className = "sr-only focus:not-sr-only";
+      ariaText.innerText = `Link to section titled: ${heading.textContent}`;
       link.href = "#" + heading.id;
-      link.ariaHidden = "true";
+      link.appendChild(ariaText);
+      link.appendChild(linkSpan);
       heading.appendChild(link);
     }
   }
