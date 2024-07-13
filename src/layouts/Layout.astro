@@ -122,7 +122,7 @@ const socialImageURL = new URL(
   <script type="text/partytown">
     window.dataLayer = window.dataLayer || [];
     window.gtag = function () {
-      dataLayer.push(arguments);
+      window.dataLayer.push(arguments);
     };
     window.gtag("js", new Date());
 
