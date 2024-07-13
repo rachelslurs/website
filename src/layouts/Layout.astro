@@ -121,12 +121,12 @@ const socialImageURL = new URL(
     src="https://www.googletagmanager.com/gtag/js?id=G-M74HNHY1PX"></script>
   <script type="text/partytown">
     window.dataLayer = window.dataLayer || [];
-    function gtag() {
+    window.gtag = function () {
       dataLayer.push(arguments);
-    }
-    gtag("js", new Date());
+    };
+    window.gtag("js", new Date());
 
-    gtag("config", "G-M74HNHY1PX");
+    window.gtag("config", "G-M74HNHY1PX");
   </script>
   <body>
     <slot />
