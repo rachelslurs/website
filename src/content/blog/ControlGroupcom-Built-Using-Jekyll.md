@@ -4,7 +4,10 @@ description: Using a static-site generator led to huge performance gains
 author: Rachel Cantor
 pubDatetime: 2012-10-19T04:00:00.000Z
 tags:
-  - 'jekyll, static-site generator, ruby'
+  - github pages
+  - ruby
+  - static-site generator
+  - jekyll
 ---
 
 Originally published on [ControlGroup.com](https://web.archive.org/web/20121023054417/http://blog.controlgroup.com/2012/10/19/controlgroup-com-built-using-jekyll/)
