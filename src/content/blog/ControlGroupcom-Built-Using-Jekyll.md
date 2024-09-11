@@ -10,7 +10,7 @@ tags:
   - jekyll
 ---
 
-Originally published on [ControlGroup.com](https://web.archive.org/web/20121023054417/http://blog.controlgroup.com/2012/10/19/controlgroup-com-built-using-jekyll/)
+Originally published on [controlgroup.com](https://web.archive.org/web/20121023054417/http://blog.controlgroup.com/2012/10/19/controlgroup-com-built-using-jekyll/)
 
 If you’ve been to our website recently, you may have noticed there have been a lot of changes. There is no server or CMS powering our website anymore, with the exception of the blog, which will soon change.
 
