@@ -7,7 +7,7 @@ tags:
   - polymer
 ---
 
-I created the \<nutrition-facts> component during GDG New York DevFest as part of an exploration into using Polymer to build reusable, data-driven web components. The event was a great opportunity to understand how custom elements could be used to simplify complex data handling, like importing and displaying nutrition facts from JSON.
+I created the `<nutrition-facts>` component during GDG New York DevFest as part of an exploration into using Polymer to build reusable, data-driven web components. The event was a great opportunity to understand how custom elements could be used to simplify complex data handling, like importing and displaying nutrition facts from JSON.
 
 When building web components, we often need a way to handle data, especially for something like nutrition facts, where information must be structured and reusable. In this post, I’ll walk through how I built a nutrition facts component using Polymer, utilizing a custom service element `<nutrition-facts-service>` to import food data as JSON.
 
