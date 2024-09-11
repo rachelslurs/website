@@ -1,8 +1,15 @@
 ---
 title: Building a Nutrition Facts Web Component with Polymer
+author: Rachel Cantor
+pubDatetime: 2014-11-03T05:00:00.000Z
+tags:
+  - web components
+  - polymer
 ---
 
-When building web components, we often need a way to handle data, especially for something like nutrition facts, where information must be structured and reusable. In this post, I’ll walk through how I built a nutrition facts component using Polymer, utilizing a custom service element \<nutrition-facts-service> to import food data as JSON.
+I created the \<nutrition-facts> component during GDG New York DevFest as part of an exploration into using Polymer to build reusable, data-driven web components. The event was a great opportunity to understand how custom elements could be used to simplify complex data handling, like importing and displaying nutrition facts from JSON.
+
+When building web components, we often need a way to handle data, especially for something like nutrition facts, where information must be structured and reusable. In this post, I’ll walk through how I built a nutrition facts component using Polymer, utilizing a custom service element `<nutrition-facts-service>` to import food data as JSON.
 
 ## Why Polymer?
 
@@ -10,7 +17,7 @@ Polymer gives us the ability to create reusable components and taking advantage 
 
 ### Step 1: Creating the Nutrition Facts Service
 
-The core of this component revolves around \<nutrition-facts-service>. This service provides a simple API to access nutrition data and update it as needed. 
+The delivery of the data itself gets handled by the `<nutrition-facts-service>`. This service provides a simple API to access nutrition data and update it as needed.
 
 * facts: Returns the list of nutrition facts.
 * updateFacts: Retrieves a JSON file, allowing you to easily update or replace the facts.
@@ -51,7 +58,7 @@ With the service created, we can now build the UI to display the nutrition facts
 
 ### Step 3: Displaying the Data
 
-We need to create the \<nutrition-facts-display> component, which will present the fetched data in a user-friendly format. 
+We need to create the \<nutrition-facts-display> component, which will present the fetched data in a user-friendly format.
 
 ![](/uploads/NutritionFacts.png)
 
