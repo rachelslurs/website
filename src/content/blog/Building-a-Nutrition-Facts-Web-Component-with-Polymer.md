@@ -62,6 +62,6 @@ We need to create the \<nutrition-facts-display> component, which will present t
 
 ![](/uploads/NutritionFacts.png)
 
-You can view the full source code on GitHub: [Nutrition Facts](https://github.com/rachelslurs/nutrition-facts).
+Full source code on GitHub: [Nutrition Facts](https://github.com/rachelslurs/nutrition-facts)
 
-The demo is here: [Nutrition Facts Demo](https://rachelslurs.github.io/nutrition-facts/demo.html)
+And the demo: [Nutrition Facts Demo](https://rachelslurs.github.io/nutrition-facts/demo.html)
