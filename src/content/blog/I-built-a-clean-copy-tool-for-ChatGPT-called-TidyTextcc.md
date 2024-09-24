@@ -1,5 +1,5 @@
 ---
-title: I built a clean copy tool for ChatGPT called TidyText.cc
+title: I built a copy paste tool for ChatGPT and Google Docs called TidyText.cc
 description: >-
   After working with ChatGPT and other AI tools, I realized that copying and
   pasting responses into Google Docs often messed up the formatting.
