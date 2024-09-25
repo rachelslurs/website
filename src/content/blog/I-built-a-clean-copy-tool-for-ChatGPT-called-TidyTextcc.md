@@ -18,13 +18,15 @@ tags:
 
 After working with ChatGPT and other AI tools, I realized that copying and pasting responses into Google Docs often messed up the formatting. Markdown is great for structured content, but dealing with the formatting cleanup? Not so much. 😅
 
-![](/uploads/introducing-tidytext.png)
+![Introducing TidyText](/uploads/introducing-tidytext.png)
 
 ### Features
 
 1. You can paste any text from ChatGPT (or elsewhere).
 2. It instantly converts the content into HTML that’s compatible with Google Docs.
 3. It provides a clean preview and lets you copy the result directly to your clipboard with one click.
+
+### [Try it now](https://tidytext.cc "Try TidyText")
 
 I built it using React, Vite, Web Workers (to handle processing of the markdown in the background), and DOMPurify for sanitizing input. I used TailwindCSS for the styling and everything is using TypeScript. It’s hosted using Cloudflare Pages.
 
