@@ -117,4 +117,4 @@ A component that injects style tags in the view of the page.
 ### Product
 
 * Website: [https://app.hype.co](https://hype.co/signup "Dashboard App")
-* Architecture doc: [https://rcantor.notion.site](https://rcantor.notion.site/Design-Pro-392156c7f47b41c5b647f6563f4c6f0d)
+* Architecture doc: [https://rcantor.notion.site](https://rcantor.notion.site/Design-Pro-392156c7f47b41c5b647f6563f4c6f0d "Architecture Doc")
