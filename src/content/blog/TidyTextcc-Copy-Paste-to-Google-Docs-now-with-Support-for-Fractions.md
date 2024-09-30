@@ -58,15 +58,26 @@ img.onload = () => {
 };
 ```
 
-Much better!
+<figure>
+<img alt='Before and after, showing the uncrispy version in the before, and the crispy version in the after' src='https://assets.tina.io/58eba99a-699f-495f-9515-719c6eb8ec87/Want that text extra crispy.png'>
+<figcaption class='text-center'>Much better!</figcaption>
+</figure>
 
 I then tested it using dark mode and noticed given these are images, the text needed to appear to be white, even though when copying to Google Docs, we’d want them to be black, so I decided to use the TailwindCSS dark mode variant to use a [CSS filter](https://developer.mozilla.org/en-US/docs/Web/CSS/filter) to invert the text, that would then not carry over in the copied version.
 
-On the next episode of “Did you test it using dark mode?” 😅
+<figure>
+<img alt='An image showing the fraction with black text in dark mode' src='https://assets.tina.io/58eba99a-699f-495f-9515-719c6eb8ec87/Screenshot 2024-09-29 at 10.18.20 PM.png'>
+<figcaption class='text-center'>On the next episode of “Did you test it using dark mode?” 😅</figcaption>
+</figure>
 
 [TailwindCSS offers the filter ](https://tailwindcss.com/docs/invert)[invert](https://tailwindcss.com/docs/invert) and we can prepend it with dark: like so:
 
-const imageTag = \`\<img class="dark:invert" id="${uniqueId}" src="${pngDataUrl}" alt="LaTeX formula" style="width:${img.width}px; height:${img.height}px;" />\`;TailwindCSS dark:invert tada!
+const imageTag = \`\<img class="dark:invert" id="${uniqueId}" src="${pngDataUrl}" alt="LaTeX formula" style="width:${img.width}px; height:${img.height}px;" />\`;
+
+<figure>
+<img alt='An animated gif showing TidyText in dark mode, successfully copying correctly to Google Docs' src='https://assets.tina.io/58eba99a-699f-495f-9515-719c6eb8ec87/tada.gif'>
+<figcaption class='text-center'>TailwindCSS dark:invert tada!</figcaption>
+</figure>
 
 I did notice fractions don’t work in tables yet. Something for another day.
 
