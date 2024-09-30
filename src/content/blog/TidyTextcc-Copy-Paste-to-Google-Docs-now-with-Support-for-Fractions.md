@@ -31,9 +31,10 @@ The solution worked well visually within the app but fell short in Google Docs.
 
 Since SVGs wouldn’t render in Google Docs, I ended up thinking about using the Canvas API to convert the SVG to a format that could be pasted in Google Docs. I wanted something that wouldn’t look compressed, so I ended up deciding on PNG (as opposed to JPEG). I ended up creating it at first and testing it out only to notice the resulting PNG images were blurry.
 
-![](/uploads/text-uncrispy.gif)
-
-This fraction is not crispy!
+<figure>
+<img alt='An image of the uncrispy fraction in TidyText' src='https://assets.tina.io/58eba99a-699f-495f-9515-719c6eb8ec87/text-uncrispy.gif'>
+<figcaption class='text-center'>This fraction is not crispy!</figcaption>
+</figure>
 
 I realized that I could scale up the image and then scale it back down in order to generate something that would appear extra crispy.
 
