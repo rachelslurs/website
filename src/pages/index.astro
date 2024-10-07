@@ -24,16 +24,15 @@ const featuredWorks = sortedWorks.filter(({ data }) => data.featured);
   <Header />
   <main id="main-content">
     <section id="hero">
+      <h4>Hello there!</h4>
       <p>
-        Hello there. I am a senior engineer with a background spanning the full
-        stack of web development; passionate about delivering exceptional UI/UX.
-      </p>
-      <p>
-        <LinkButton
+        I’m a seasoned frontend engineer passionate about bridging the gap
+        between design and development—working closely with designers to turn
+        their visions into accessible, delightful user experiences. <LinkButton
           className="font-medium text-skin-accent decoration-dashed underline-offset-4 focus-visible:no-underline focus-visible:underline-offset-0"
-          href="https://rachelcantor.net"
+          href="/about"
         >
-          Just want to see my resumé?
+          Learn more.
         </LinkButton>
       </p>
     </section>
@@ -85,8 +84,8 @@ const featuredWorks = sortedWorks.filter(({ data }) => data.featured);
   #hero {
     @apply pb-6 pt-8;
   }
-  #hero h1 {
-    @apply my-4 inline-block text-3xl font-bold sm:my-8 sm:text-5xl;
+  #hero h4 {
+    @apply text-2xl font-bold mb-6;
   }
   #hero .rss-link {
     @apply mb-6;
