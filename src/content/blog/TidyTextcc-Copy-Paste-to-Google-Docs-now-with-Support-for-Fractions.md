@@ -1,5 +1,5 @@
 ---
-title: 'TidyText.cc, Copy Paste to Google Docs, Now With Support for Fractions'
+title: 'TidyText.cc, copy paste to Google Docs, now with support for fractions'
 description: Fractions aren't so simple
 featured: true
 author: Rachel Cantor
