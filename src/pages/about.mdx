@@ -3,20 +3,22 @@ layout: ../layouts/AboutLayout.astro
 title: "About"
 ---
 import LinkButton from '../components/LinkButton.astro';
+import Arrow from '../components/Arrow';
 
-I am a frontend engineer with advanced expertise in React, TypeScript, CSS, and a wide range of frontend frameworks. My passion lies in bridging the gap between design and development—collaborating closely with designers to translate their visions into accessible and delightful user experiences. My commitment to accessibility ensures that everyone can engage with the experiences I build.
+I am a Frontend Engineer with over 10 years of experience. My passion lies in bridging the gap between design and development; My greatest joy comes from collaborating closely with designers and product to translate their visions into delightful user experiences that everyone can enjoy.
 
-I enjoy using design tools like Figma for collaboration, ensuring that what gets deployed honors the designer’s vision without compromise.
+I’ve worked at startups, on political campaigns, and in tech consultancies, contributing to projects ranging from award-winning interactive museum exhibits to B2B and B2C SaaS companies.
 
-As both a creative and analytical thinker, I consider the user’s perspective in every decision, whether it’s solving complex technical challenges or refining the smallest UI elements.
+I have advanced expertise in React, TypeScript, CSS, and a wide range of frontend frameworks. I enjoy using design tools like Figma for collaboration, ensuring that what gets deployed honors the designer’s vision without compromise.
 
-If you’re looking for a frontend engineer with a remarkable ability to work in lock-step with designers and product teams, <LinkButton href="https://www.linkedin.com/in/rachelcantor/">let’s connect</LinkButton>!
+As both a creative and analytical thinker, I always consider the user’s perspective in every decision, whether I’m solving complex technical challenges or refining the smallest UI elements.
 
-<LinkButton href="https://rachelcantor.net">My resumé <svg xmlns="http://www.w3.org/2000/svg"><path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"></path></svg></LinkButton>
+If you’re looking for a Frontend Engineer with a remarkable ability to work in lock-step with designers and product teams, <LinkButton href="https://www.linkedin.com/in/rachelcantor/">let’s talk</LinkButton>!
 
-## Tech Stack
-
-<p><LinkButton href="https://github.com/rachelslurs/website">View source <svg xmlns="http://www.w3.org/2000/svg"><path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"></path></svg></LinkButton></p>
+<div className="flex justify-between items-end">
+    <h2>Tech Stack</h2>
+    <LinkButton href="https://github.com/rachelslurs/website" className='mt-8 mb-3 leading-5'>View source <Arrow/></LinkButton>
+</div>
 
 This site is a modified version of [AstroPaper](https://github.com/satnaing/astro-paper). It uses [TypeScript](https://www.typescriptlang.org), [ReactJS](https://reactjs.org) for components, [TailwindCSS](https://tailwindcss.com) for styling, and Markdown for blog/work content. It relies on the framework [Astro](https://astro.build) and uses [Fuse.js](https://www.fusejs.io) for search. CMS is [Tina](https://tina.io). 
 
@@ -25,3 +27,5 @@ This site is a modified version of [AstroPaper](https://github.com/satnaing/astr
 <p><LinkButton href="/accessibility">Accessibility Statement <svg xmlns="http://www.w3.org/2000/svg"><path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"></path></svg></LinkButton></p>
 
 <p><LinkButton href="/uses">Uses <svg xmlns="http://www.w3.org/2000/svg"><path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z"></path></svg></LinkButton></p>
+
+<p><LinkButton href="https://rachelcantor.net">My Resumé <Arrow /></LinkButton></p>

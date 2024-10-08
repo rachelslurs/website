@@ -26,17 +26,18 @@ const featuredWorks = sortedWorks.filter(({ data }) => data.featured);
     <section id="hero">
       <h4>Hello there!</h4>
       <p>
-        I’m a seasoned frontend engineer passionate about bridging the gap
-        between design and development—working closely with designers to turn
-        their visions into accessible, delightful user experiences. <LinkButton
-          className="font-medium text-skin-accent decoration-dashed underline-offset-4 focus-visible:no-underline focus-visible:underline-offset-0"
-          href="/about"
-        >
-          Learn more.
-        </LinkButton>
+        I am a Frontend Engineer with over 10 years of experience. My passion
+        lies in bridging the gap between design and development; My greatest joy
+        comes from collaborating closely with designers and product to translate
+        their visions into delightful user experiences that everyone can enjoy.
       </p>
+      <LinkButton
+        className="font-medium text-skin-accent decoration-dashed underline-offset-4 focus-visible:no-underline focus-visible:underline-offset-0"
+        href="/about"
+      >
+        Learn more
+      </LinkButton>
     </section>
-
     {
       featuredPosts.length > 0 && (
         <>
