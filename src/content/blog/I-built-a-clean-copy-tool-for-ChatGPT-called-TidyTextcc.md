@@ -7,6 +7,7 @@ featured: true
 author: Rachel Cantor
 pubDatetime: 2024-09-24T04:00:00.000Z
 tags:
+  - TidyText
   - Google Docs
   - ChatGPT
   - Web Workers
