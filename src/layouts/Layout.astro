@@ -15,17 +15,13 @@ export interface Props {
   modDatetime?: Date | null;
   scrollSmooth?: boolean;
 }
-let currentUrl = new URL(Astro.url.pathname, Astro.site).href;
-if (currentUrl.endsWith("/")) {
-  currentUrl = currentUrl.slice(0, -1);
-}
 
 const {
   title = SITE.title,
   author = SITE.author,
   description = SITE.desc,
   ogImage = SITE.ogImage,
-  canonicalURL = currentUrl,
+  canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
   pubDatetime,
   modDatetime,
   scrollSmooth = false,
