@@ -4,7 +4,7 @@ title: "Accessibility Alternatives: Convenience or Compromise?"
 description: >-
   Come for the education, stay for the low-key dragging of luxury retailer
   Maison Alaïa's alternate version.
-featured: true
+featured: false
 draft: false
 author: Rachel Cantor
 pubDatetime: 2024-06-23T15:22:00.000Z

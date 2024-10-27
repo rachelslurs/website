@@ -3,7 +3,7 @@ author: Rachel Cantor
 pubDatetime: 2024-06-07T09:42:00Z
 title: "The Importance of Independent Volume Control"
 slug: the-importance-of-independent-volume-control
-featured: true
+featured: false
 draft: false
 tags:
   - web accessibility
