@@ -61,7 +61,8 @@ const socialImageURL = new URL(
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
-    <meta property="og:image" content={socialImageURL} />
+    {isPost && <meta property="og:type" content="article" />}
+    {!isPost && <meta property="og:type" content="website" />}
 
     <!-- Article Published/Modified time -->
     {
