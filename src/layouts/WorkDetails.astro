@@ -66,9 +66,11 @@ const layoutProps = {
     </button>
   </div>
   <main id="main-content">
-    <h1 transition:name={slugifyStr(title)} class="work-title">{title}</h1>
+    <h1 transition:name={slugifyStr(title)} class="work-title inline-block">
+      {title}
+    </h1>
     <!-- {year && <WorkYear year={year} size="lg" className="my-2" />} -->
-    {summary && <p class="text-xl my-6 leading-7">{summary}</p>}
+    {summary && <p class="my-6 text-xl leading-7">{summary}</p>}
     {
       features && features.length > 0 && (
         <Features features={features} client:load />
