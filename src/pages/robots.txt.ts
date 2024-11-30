@@ -7,6 +7,7 @@ Disallow: /nogooglebot/
 
 User-agent: *
 Allow: /
+Disallow: '/cdn-cgi/zaraz/'
 
 Sitemap: ${new URL("sitemap-index.xml", SITE.website).href}
 `.trim();
