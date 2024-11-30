@@ -65,5 +65,10 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,md,mdx,json,astro}": [
+      "prettier --write --plugin=prettier-plugin-astro"
+    ]
   }
 }
