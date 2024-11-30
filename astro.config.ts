@@ -15,7 +15,12 @@ export default defineConfig({
       applyBaseStyles: false,
     }),
     react(),
-    sitemap(),
+    sitemap({
+      filter: page => {
+        // Exclude paginated pages ending with '/1'
+        return !/\/1\/?$/.test(page);
+      },
+    }),
     mdx(),
     partytown({
       config: {
@@ -36,4 +41,7 @@ export default defineConfig({
     },
   },
   scopedStyleStrategy: "where",
+  experimental: {
+    contentLayer: true,
+  },
 });

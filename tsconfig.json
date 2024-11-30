@@ -3,7 +3,6 @@
   "compilerOptions": {
     "baseUrl": "src",
     "jsx": "react-jsx",
-    "strictNullChecks": true,
     "paths": {
       "@assets/*": ["assets/*"],
       "@config": ["config.ts"],
@@ -12,7 +11,7 @@
       "@layouts/*": ["layouts/*"],
       "@pages/*": ["pages/*"],
       "@styles/*": ["styles/*"],
-      "@utils/*": ["utils/*"],
-    },
-  },
+      "@utils/*": ["utils/*"]
+    }
+  }
 }
