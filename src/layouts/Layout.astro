@@ -8,6 +8,7 @@ const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
 export interface Props {
   title?: string;
   author?: string;
+  profile?: string;
   description?: string;
   ogImage?: string;
   canonicalURL?: string;
@@ -19,6 +20,7 @@ export interface Props {
 const {
   title = SITE.title,
   author = SITE.author,
+  profile = SITE.profile,
   description = SITE.desc,
   ogImage = SITE.ogImage,
   canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
