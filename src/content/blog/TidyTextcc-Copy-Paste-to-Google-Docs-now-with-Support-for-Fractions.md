@@ -1,5 +1,5 @@
 ---
-title: 'TidyText.cc, copy paste to Google Docs, now with support for fractions'
+title: "TidyText.cc, copy paste to Google Docs, now with support for fractions"
 description: Fractions aren't so simple
 featured: true
 author: Rachel Cantor
@@ -15,7 +15,7 @@ I’ve been crowdsourcing feedback on my new app, [TidyText](https://tidytext.cc
 
 ### Attempt 1: Marked.js with KaTeX
 
-I use [Marked.js](https://marked.js.org/) for converting Markdown to HTML, I figured there was an extension that might meet my needs. I found[marked-katex-extension](https://github.com/UziTech/marked-katex-extension/), but soon after, I realized LaTeX does not render properly in Google Docs without using add-ons. That’s when I thought, “Maybe I should generate an image, like an SVG, so it would be lossless.” But then realized that [KaTeX doesn’t support SVG](https://github.com/KaTeX/KaTeX/issues/375). 
+I use [Marked.js](https://marked.js.org/) for converting Markdown to HTML, I figured there was an extension that might meet my needs. I found[marked-katex-extension](https://github.com/UziTech/marked-katex-extension/), but soon after, I realized LaTeX does not render properly in Google Docs without using add-ons. That’s when I thought, “Maybe I should generate an image, like an SVG, so it would be lossless.” But then realized that [KaTeX doesn’t support SVG](https://github.com/KaTeX/KaTeX/issues/375).
 
 This led me to use [MathJax](https://www.mathjax.org), which felt like overkill at first, but since it supports SVG, it turned out to be the necessary choice.
 
@@ -23,7 +23,7 @@ This led me to use [MathJax](https://www.mathjax.org), which felt like overkill 
 
 After the markdown attempt failed, I pivoted to MathJax to convert LaTeX into SVGs. The idea was that I could render the fractions as vector graphics and paste them into Google Docs. At least, that was the theory.
 
-The integration with MathJax was relatively smooth, and I was able to generate SVG images for the fractions, which looked great on TidyText. But there was another problem: SVGs didn’t render in Google Docs. 
+The integration with MathJax was relatively smooth, and I was able to generate SVG images for the fractions, which looked great on TidyText. But there was another problem: SVGs didn’t render in Google Docs.
 
 The solution worked well visually within the app but fell short in Google Docs.
 
@@ -40,11 +40,11 @@ I realized that I could scale up the image and then scale it back down in order 
 
 ```typescript
 const img = new Image();
-img.src = 'data:image/svg+xml;base64,' + btoa(svg);
+img.src = "data:image/svg+xml;base64," + btoa(svg);
 img.onload = () => {
   const scaleFactor = 3;
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
   canvas.width = img.width * scaleFactor;
@@ -53,7 +53,7 @@ img.onload = () => {
   ctx.drawImage(img, 0, 0, img.width, img.height);
 
   // Convert canvas to PNG data URL
-  const pngDataUrl = canvas.toDataURL('image/png');
+  const pngDataUrl = canvas.toDataURL("image/png");
   const imageTag = `<img src="${pngDataUrl}" alt="LaTeX formula" style="width:${img.width}px; height:${img.height}px;" />`;
 };
 ```
@@ -83,11 +83,11 @@ I did notice fractions don’t work in tables yet. Something for another day.
 
 ### TLDR; Lessons learned
 
-* Markdown and LaTeX: not supported by Google Docs
-* MathJax: good for rendering formulas in SVGs
-* SVGs don’t render in Google Docs
-* Canvas API for SVG -> PNG conversion with scaling to keep text extra crispy.
-* CSS dark mode: being able to dynamically invert the image without affecting what the fraction would look like in Google Docs.
+- Markdown and LaTeX: not supported by Google Docs
+- MathJax: good for rendering formulas in SVGs
+- SVGs don’t render in Google Docs
+- Canvas API for SVG -> PNG conversion with scaling to keep text extra crispy.
+- CSS dark mode: being able to dynamically invert the image without affecting what the fraction would look like in Google Docs.
 
 ### Next on the roadmap
 
