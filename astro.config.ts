@@ -5,7 +5,6 @@ import remarkToc from "remark-toc";
 import sitemap from "@astrojs/sitemap";
 import { SITE } from "./src/config";
 import mdx from "@astrojs/mdx";
-import partytown from "@astrojs/partytown";
 
 // https://astro.build/config
 export default defineConfig({
@@ -17,11 +16,6 @@ export default defineConfig({
     react(),
     sitemap(),
     mdx(),
-    partytown({
-      config: {
-        forward: ["dataLayer.push"],
-      },
-    }),
   ],
   markdown: {
     remarkPlugins: [remarkToc],
