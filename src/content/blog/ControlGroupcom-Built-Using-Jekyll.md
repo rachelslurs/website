@@ -1,5 +1,5 @@
 ---
-title: 'ControlGroup.com: Built Using Jekyll'
+title: "ControlGroup.com: Built Using Jekyll"
 description: Using a static-site generator led to huge performance gains
 author: Rachel Cantor
 pubDatetime: 2012-10-19T04:00:00.000Z
@@ -36,8 +36,8 @@ Sure, I can run Ruby plugins on my local machine (say, to generate category page
 
 ### Markdown is a fickle mistress.
 
-* I used the default markup interpreter engine for Jekyll which is [Maruku](https://web.archive.org/web/20121023030250/http://maruku.rubyforge.org/), but as far as I know, they all have their caveats. Just one seemingly harmless unencoded ampersand was enough to make Jekyll get all Hyde on you.
-* Another big markdown offender is allowfullscreen, something you probably never noticed is in every video embed code in existence. Including it will throw you an error. Removing the offending attribute is the simple enough solution, and fortunately, it doesn’t seem to remove the video’s ability to go fullscreen.
+- I used the default markup interpreter engine for Jekyll which is [Maruku](https://web.archive.org/web/20121023030250/http://maruku.rubyforge.org/), but as far as I know, they all have their caveats. Just one seemingly harmless unencoded ampersand was enough to make Jekyll get all Hyde on you.
+- Another big markdown offender is allowfullscreen, something you probably never noticed is in every video embed code in existence. Including it will throw you an error. Removing the offending attribute is the simple enough solution, and fortunately, it doesn’t seem to remove the video’s ability to go fullscreen.
 
 ## Recommended Documentation
 

@@ -30,10 +30,10 @@ The first step is to create your spreadsheet.
 
 ## Open your spreadsheet in Google Drive
 
-You can [make a copy of my spreadsheet as a template](https://web.archive.org/web/20160306135950/https://docs.google.com/spreadsheet/ccc?key=0Ar8T1bZPJyrVdGlCTU9USWl0V0pyYzZuMjNYbUQtUmc\&usp=sharing), or note the following when creating a spreadsheet from scratch:
+You can [make a copy of my spreadsheet as a template](https://web.archive.org/web/20160306135950/https://docs.google.com/spreadsheet/ccc?key=0Ar8T1bZPJyrVdGlCTU9USWl0V0pyYzZuMjNYbUQtUmc&usp=sharing), or note the following when creating a spreadsheet from scratch:
 
-* Use the first row as your column headers
-* Make sure you have a column with the dates you’d like the script to reference.
-* Add a tabbed sheet and name it Log
+- Use the first row as your column headers
+- Make sure you have a column with the dates you’d like the script to reference.
+- Add a tabbed sheet and name it Log
 
 Here's [the source on Github](https://github.com/rachelslurs/magic-ticket/) and the [spreadsheet template](https://docs.google.com/spreadsheets/d/15nsjHBojKfwoKhV089I2dsoe48jYGSAvXdw9CWI_6pM/edit?gid=0#gid=0).

@@ -11,7 +11,7 @@ featured: true
 draft: false
 author: Rachel Cantor
 pubDatetime: 2024-06-30T04:00:00.000Z
-year: '2023'
+year: "2023"
 tags:
   - Github Actions
   - CSS Variables
@@ -67,8 +67,8 @@ Creators will be able to use the Dashboard Page Editor to achieve the following:
 | Themes              | Name                        | Provides a theme name                                                                                                                                                             |
 | ThemeCustomizations | Theme ID, name, value, type | A preset group of various customization choices                                                                                                                                   |
 | Forms               | Name                        | Gives pages a user friendly and editable name that is for ease of Creator to be able to identify in list if they have Design Pro (because Design Pro includes more than one page) |
-| FormCustomizations  | Form ID, name, value, type  | Things customized on the page level: ie a background with an image, a hover effect that animates for any linkable elements, etc. 1 form\_id:many form customizations              |
-| FormThemes          | Form ID theme ID            | Gives the ability to override the PublisherTheme. Should only apply 1 per form\_id                                                                                                |
+| FormCustomizations  | Form ID, name, value, type  | Things customized on the page level: ie a background with an image, a hover effect that animates for any linkable elements, etc. 1 form_id:many form customizations               |
+| FormThemes          | Form ID theme ID            | Gives the ability to override the PublisherTheme. Should only apply 1 per form_id                                                                                                 |
 
 ### Form Service
 
@@ -96,25 +96,25 @@ A component that injects style tags in the view of the page.
 
 ### Customization Pickers
 
-* Should support the ability to visually gate/disable input and launch a CTA if gated
-* Should be agnostic of whether they are used on the page-level or the block-level
-* Should be able to handle if there’s no existing value or display if there’s an existing value
-* Should also offer the ability to reset the value to be unset
+- Should support the ability to visually gate/disable input and launch a CTA if gated
+- Should be agnostic of whether they are used on the page-level or the block-level
+- Should be able to handle if there’s no existing value or display if there’s an existing value
+- Should also offer the ability to reset the value to be unset
 
 ## Tech Stack
 
-* Frontend: [ReactJS](https://reactjs.org/ "React"), [TypeScript](https://www.typescriptlang.org/ "TypeScript")
-* Backend: [Node.js](https://nodejs.org "Node.js"), [Koa](https://koajs.com "Koa"), [Sequelize](https://sequelize.org "Sequelize")
-* Styling: [CSS Variables](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties "CSS variables")
-* UI/UX: [Figma and Figjam](https://figma.com/ "Figma")
-* State Management: [Custom React Hooks](https://react.dev/learn/reusing-logic-with-custom-hooks "Custom React Hooks")
-* Deployment: [Github Actions/Workflows](https://docs.github.com/en/actions "Github Actions"), [AWS](https://aws.amazon.com "AWS")
+- Frontend: [ReactJS](https://reactjs.org/ "React"), [TypeScript](https://www.typescriptlang.org/ "TypeScript")
+- Backend: [Node.js](https://nodejs.org "Node.js"), [Koa](https://koajs.com "Koa"), [Sequelize](https://sequelize.org "Sequelize")
+- Styling: [CSS Variables](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties "CSS variables")
+- UI/UX: [Figma and Figjam](https://figma.com/ "Figma")
+- State Management: [Custom React Hooks](https://react.dev/learn/reusing-logic-with-custom-hooks "Custom React Hooks")
+- Deployment: [Github Actions/Workflows](https://docs.github.com/en/actions "Github Actions"), [AWS](https://aws.amazon.com "AWS")
 
 ## Conclusion
 
-* Design Pro gave Hype the ability to compete with link-in-bio competitors while also providing flexibility for future customization offerings.
+- Design Pro gave Hype the ability to compete with link-in-bio competitors while also providing flexibility for future customization offerings.
 
 ### Product
 
-* Website: [https://app.hype.co](https://hype.co/signup "Dashboard App")
-* Architecture doc: [https://rcantor.notion.site](https://rcantor.notion.site/Design-Pro-392156c7f47b41c5b647f6563f4c6f0d "Architecture Doc")
+- Website: [https://app.hype.co](https://hype.co/signup "Dashboard App")
+- Architecture doc: [https://rcantor.notion.site](https://rcantor.notion.site/Design-Pro-392156c7f47b41c5b647f6563f4c6f0d "Architecture Doc")

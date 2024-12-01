@@ -1,6 +1,6 @@
 {
-  "name": "Website",
-  "version": "4.2.0",
+  "name": "rachel.fyi",
+  "version": "1.0.0",
   "private": false,
   "scripts": {
     "dev": "tinacms dev -c \"astro dev\"",

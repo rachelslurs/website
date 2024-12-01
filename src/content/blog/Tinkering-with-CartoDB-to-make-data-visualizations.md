@@ -9,7 +9,7 @@ tags:
   - cartodb
 ---
 
-I recently attended CartoDB’s #GeoJourNews conference and was inspired to try my hand at some prefab data visualizing solutions. I went ahead and cleaned up some really messy OSHA data limited to New York State since 1984, just shy of 150,000 records. 
+I recently attended CartoDB’s #GeoJourNews conference and was inspired to try my hand at some prefab data visualizing solutions. I went ahead and cleaned up some really messy OSHA data limited to New York State since 1984, just shy of 150,000 records.
 
 Here’s my pretty map with plenty of dangerous materials OSHA routinely monitors. I used OpenRefine for much of the data cleanup and the rest was a breeze with CartoDB. Enjoy!
 
