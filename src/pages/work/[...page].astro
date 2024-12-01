@@ -1,0 +1,16 @@
+---
+import { SITE } from "@config";
+import Work from "@layouts/Work.astro";
+import type { GetStaticPaths } from "astro";
+import { getCollection } from "astro:content";
+import getSortedWork from "@utils/getSortedWork";
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const work = await getCollection("work", ({ data }) => !data.draft);
+  return paginate(getSortedWork(work), { pageSize: SITE.postPerPage });
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+---
+
+<Work {page} />

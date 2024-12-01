@@ -1,5 +1,4 @@
 ---
-import type { CollectionEntry } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import Main from "@layouts/Main.astro";
 import Header from "@components/Header.astro";
@@ -7,14 +6,14 @@ import Footer from "@components/Footer.astro";
 import Pagination from "@components/Pagination.astro";
 import WorkCard from "@components/WorkCard";
 import { SITE } from "@config";
+import type { Page } from "astro";
+import type { CollectionEntry } from "astro:content";
 
 export interface Props {
-  currentPage: number;
-  totalPages: number;
-  paginatedWork: CollectionEntry<"work">[];
+  page: Page<CollectionEntry<"work">>;
 }
 
-const { currentPage, totalPages, paginatedWork } = Astro.props;
+const { page } = Astro.props;
 ---
 
 <Layout title={`Work | ${SITE.title}`}>
@@ -22,19 +21,14 @@ const { currentPage, totalPages, paginatedWork } = Astro.props;
   <Main pageTitle="Work" pageDesc="My work">
     <ul>
       {
-        paginatedWork.map(({ data, slug }) => (
+        page.data.map(({ data, slug }) => (
           <WorkCard href={`/work/${slug}/`} frontmatter={data} />
         ))
       }
     </ul>
   </Main>
 
-  <Pagination
-    {currentPage}
-    {totalPages}
-    prevUrl={`/work${currentPage - 1 !== 1 ? "/" + (currentPage - 1) : ""}/`}
-    nextUrl={`/work/${currentPage + 1}/`}
-  />
+  <Pagination {page} />
 
-  <Footer noMarginTop={totalPages > 1} />
+  <Footer noMarginTop={page.lastPage > 1} />
 </Layout>

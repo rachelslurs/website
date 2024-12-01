@@ -12,7 +12,7 @@ export default function WorkCard({
   frontmatter,
   secHeading = true,
 }: Props) {
-  const { title, year, description } = frontmatter;
+  const { title, description } = frontmatter;
 
   const headerProps = {
     style: { viewTransitionName: slugifyStr(title) },

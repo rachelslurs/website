@@ -6,9 +6,11 @@ import WorkTag from "@components/WorkTag.astro";
 import Features from "@components/Features";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
+import { SITE } from "@config";
 
 export interface Props {
   work: CollectionEntry<"work">;
+  works: CollectionEntry<"work">[];
 }
 
 const { work } = Astro.props;
@@ -35,7 +37,7 @@ const ogUrl = new URL(
 ).href;
 
 const layoutProps = {
-  title,
+  title: `${title} | ${SITE.title}`,
   author,
   description,
   pubDatetime,
