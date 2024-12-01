@@ -19,8 +19,8 @@ Polymer gives us the ability to create reusable components and taking advantage 
 
 The delivery of the data itself gets handled by the `<nutrition-facts-service>`. This service provides a simple API to access nutrition data and update it as needed.
 
-* facts: Returns the list of nutrition facts.
-* updateFacts: Retrieves a JSON file, allowing you to easily update or replace the facts.
+- facts: Returns the list of nutrition facts.
+- updateFacts: Retrieves a JSON file, allowing you to easily update or replace the facts.
 
 ```json
 {
@@ -53,7 +53,9 @@ With the service created, we can now build the UI to display the nutrition facts
 
 ```html
 <nutrition-facts-service id="nutritionService"></nutrition-facts-service>
-<nutrition-facts-display facts="[[nutritionService.facts]]"></nutrition-facts-display>
+<nutrition-facts-display
+  facts="[[nutritionService.facts]]"
+></nutrition-facts-display>
 ```
 
 ### Step 3: Displaying the Data
