@@ -8,6 +8,7 @@ import Card from "@components/Card";
 import WorkCard from "@components/WorkCard";
 import getSortedPosts from "@utils/getSortedPosts";
 import getSortedWork from "@utils/getSortedWork";
+import { SITE } from "@config";
 
 const posts = await getCollection("blog");
 
@@ -44,13 +45,16 @@ const featuredWorks = sortedWorks.filter(({ data }) => data.featured);
           <section id="featured-posts">
             <h2>Featured Posts</h2>
             <ul>
-              {featuredPosts.map(({ data, slug }) => (
-                <Card
-                  href={`/posts/${slug}/`}
-                  frontmatter={data}
-                  secHeading={false}
-                />
-              ))}
+              {featuredPosts.map(
+                ({ data, slug }, index) =>
+                  index < SITE.postPerIndex && (
+                    <Card
+                      href={`/posts/${slug}/`}
+                      frontmatter={data}
+                      secHeading={false}
+                    />
+                  )
+              )}
             </ul>
           </section>
         </>
@@ -63,13 +67,16 @@ const featuredWorks = sortedWorks.filter(({ data }) => data.featured);
           <section id="featured-work">
             <h2>Featured Work</h2>
             <ul>
-              {featuredWorks.map(({ data, slug }) => (
-                <WorkCard
-                  href={`/work/${slug}/`}
-                  frontmatter={data}
-                  secHeading={false}
-                />
-              ))}
+              {featuredWorks.map(
+                ({ data, slug }, index) =>
+                  index < SITE.postPerIndex && (
+                    <WorkCard
+                      href={`/work/${slug}/`}
+                      frontmatter={data}
+                      secHeading={false}
+                    />
+                  )
+              )}
             </ul>
           </section>
         </>
@@ -86,7 +93,7 @@ const featuredWorks = sortedWorks.filter(({ data }) => data.featured);
     @apply pb-6 pt-8;
   }
   #hero h4 {
-    @apply text-2xl font-bold mb-6;
+    @apply mb-6 text-2xl font-bold;
   }
   #hero .rss-link {
     @apply mb-6;

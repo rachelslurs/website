@@ -3,10 +3,12 @@ import type { Site, SocialObjects } from "./types";
 export const SITE: Site = {
   website: "https://rachel.fyi", // replace this with your deployed domain
   author: "Rachel Cantor",
-  desc: "A senior engineer with a background spanning the full stack of web development; passionate about delivering exceptional UI/UX.",
+  profile: "https://rachel.fyi",
+  desc: "An engineer with a background spanning the full stack of web development; passionate about delivering exceptional UI/UX.",
   title: "Rachel Cantor",
   ogImage: "og_image.png",
   lightAndDarkMode: true,
+  postPerIndex: 4,
   postPerPage: 3,
   scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
   showArchives: true,
