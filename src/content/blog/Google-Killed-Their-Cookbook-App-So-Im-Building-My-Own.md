@@ -20,6 +20,11 @@ Then— [Google discontinued the cookbook feature](https://www.reddit.com/r/goog
 
 I have a NYT Cooking subscription, but every time I want to look up a recipe on a different browser or device, I have to prove who I am all over again. On my Nest Hub, it’s even worse — the browser doesn’t have my saved passwords synced.
 
-So I started building Recipe Cast. The idea is simple: cast any recipe to your TV or Nest Hub from your phone and control it with your voice while you cook.![](</uploads/Screenshot 2025-02-22 at 5.50.44 PM.png>)
+So I started building Recipe Cast. The idea is simple: cast any recipe to your TV or Nest Hub from your phone and control it with your voice while you cook.
+
+<figure>
+<img alt='Recipe Cast' src='https://assets.tina.io/58eba99a-699f-495f-9515-719c6eb8ec87/Screenshot 2025-02-22 at 5.50.44 PM.png'>
+<figcaption class='text-center'>Try the demo at <a href='https://recipecast.app'>https://recipecast.app</a></figcaption>
+</figure>
 
 I made an interactive demo at [recipecast.app](https://recipecast.app) that shows how it works. I’d love to gauge interest and see if this frustration is as worthy of solving as I think it is. 🙏
