@@ -12,7 +12,7 @@ breadcrumbList[0] === "posts" &&
 
 // if breadcrumb is Home > Tags > [tag] > [page] <etc>
 // replace [tag] > [page] with [tag] (page number)
-console.log(breadcrumbList);
+
 (breadcrumbList[0] === "tags" || breadcrumbList[0] === "tech") &&
   !isNaN(Number(breadcrumbList[2])) &&
   breadcrumbList.splice(

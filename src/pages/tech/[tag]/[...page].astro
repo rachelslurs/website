@@ -8,7 +8,6 @@ import { SITE } from "@config";
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
   const work = await getCollection("work");
-
   const tags = getUniqueWorkTags(work);
 
   return tags.flatMap(({ tag, tagName }) => {
