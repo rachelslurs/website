@@ -1,11 +1,11 @@
 ---
 slug: why-confirming-choices-matters
-title: "Why Confirming Choices Matters: Lessons from an Instacart Experience"
+title: 'Why Confirming Choices Matters: Lessons from an Instacart Experience'
 description: >-
   Accessibility isn't just about aiding users with disabilities; it helps
   everyone feel safe browsing the web without fear of doing something
   irreversible.
-featured: true
+featured: false
 draft: false
 author: Rachel Cantor
 pubDatetime: 2024-06-11T12:21:00.000Z
