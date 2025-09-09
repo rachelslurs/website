@@ -16,7 +16,7 @@ tags:
   - ai
 ---
 
-I've been job searching lately ([reach out if you're hiring](https://linkedin.com/in/rachelcantor "reach out if you're hiring!")! 👋), and kept getting frustrated with overall maintenance tasks on personal projects. As a solo developer, I have to wear many hats beyond my usual frontend work — security auditing, performance optimization, TypeScript maintenance — and it was turning into code review whack-a-mole.
+I've been job searching lately ([reach out if you're hiring](https://linkedin.com/in/rachelcantor "reach out if you're hiring!")! 👋), and kept getting frustrated with overall maintenance tasks on personal projects. As a solo developer, I have to wear many hats beyond my usual frontend work — security auditing, performance optimization, keeping my TypeScript warning and error free — and it was turning into code review whack-a-mole.
 
 Then I stumbled across [this egghead lesson](https://egghead.io/courses/claude-code-automation-cookbook-recipes-for-ai-agents~tsilh "this egghead lesson") about creating AI agents with Bun and realized: what if I could build something that keeps my focus where it's actually needed?
 
