@@ -7,7 +7,7 @@ featured: true
 author: Rachel Cantor
 pubDatetime: 2025-02-22T05:00:00.000Z
 tags:
-  - Recipe Cast
+  - RecipeCast
   - Chromecast
   - Google Nest Hub
   - Google Smart Displays
