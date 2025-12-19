@@ -18,39 +18,37 @@ tags:
 
 Extending OpenSaaS Auth to Chrome Extensions & External Clients
 
-If you’ve built an app with OpenSaaS, the open-sourced SaaS template built using Wasp, you know how incredibly easy the authentication flow is to set up. But that smooth sailing often hits a wall when you try to leave the browser tab and authenticate with a different client than your web app.
+If you've built an app with [OpenSaaS](https://opensaas.sh), the open-sourced SaaS template built using [Wasp](https://wasp.sh), you know how incredibly easy the authentication flow is to set up. But that smooth sailing often hits a wall when you try to leave the browser tab and authenticate with a different client than your web app.
 
-When I started building the Chrome extension for RecipeCast, a web app that gives users the ability to cast a recipe to a TV or smart display, I ran into a classic problem: my extension needed to talk to my API, but my API only understood browser cookies. External clients live in a different world—they have isolated storage, strict origin policies, and no access to the convenient cookie jar that powers your web app’s session.
+When I started building the Chrome extension for **[RecipeCast](https://recipecast.app)**, a web app that gives users the ability to cast a recipe to a TV or smart display, I ran into a classic problem: my extension needed to talk to my API, but my API only understood browser cookies. External clients live in a different world—they have isolated storage, strict origin policies, and no access to the convenient cookie jar that powers your web app's session.
 
-To solve this, I had to architect a bridge between these two worlds. I came across this crucially helpful gist by a fellow Wasp user 🙏 that became my guide. The result is an OAuth 2.0-like authentication flow that allows the extension to securely mint its own portable tokens without compromising the main app’s security.
+To solve this, I had to architect a bridge between these two worlds. I came across this [crucially helpful gist by a fellow Wasp user](https://gist.github.com/NeroxTGC/80486aa3f992434332caad0e88302a81) 🙏 that became my guide. The result is an OAuth 2.0-like authentication flow that allows the extension to securely mint its own portable tokens without compromising the main app's security.
 
 This series is the blueprint of that system. I’m going to show you exactly how to implement it, starting today with the foundational architecture.
 
-The Architecture: Breaking Out of the Browser with OAuth
+### The Architecture: Breaking Out of the Browser with OAuth
 
-When your Wasp app runs in a browser (e.g., at https://recipecast.app), authentication is straightforward:
+When your Wasp app runs in a browser (e.g., at [https://recipecast.app](https://recipecast.app)), authentication is straightforward:
 
-You log in
+1. You log in
+2. Wasp creates a session cookie
+3. Browser automatically sends that cookie with every request on your web app
 
-Wasp creates a session cookie
+Chrome extensions have their own origin (chrome-extension://…) and can't share cookies with your domain.
 
-Browser automatically sends that cookie with every request on your web app
+What these clients need is something portable: a token they can store, send with each request to your Wasp app API, and refresh when it expires. In other words, you need to implement **OAuth 2.0-style authentication**.
 
-Chrome extensions have their own origin (chrome-extension://…) and can’t share cookies with your domain.
-
-What these clients need is something portable: a token they can store, send with each request to your Wasp app API, and refresh when it expires. In other words, you need to implement OAuth 2.0-style authentication.
-
-The Flow
+#### The Flow
 
 Here is the architecture we will implement today:
 
 ![OAuth Style Wasp External Authentication Diagram](/uploads/oauth-flow-diagram.png)
 
-The Vault: Database Schema
+### The Vault: Database Schema
 
 Before we can generate credentials, we need a safe place to store them. External client sessions need their own storage, separate from Wasp’s built-in session management.
 
-Add this to your schema.prisma:
+Add this to your `schema.prisma`:
 
 ```prisma
 model UserExternalSession {
@@ -67,7 +65,7 @@ model UserExternalSession {
 }
 ```
 
-Add to your User model:
+Add to your `User` model:
 
 ```prisma
 model User {
@@ -77,21 +75,19 @@ model User {
 }
 ```
 
-Key Design Decisions
+#### Key Design Decisions
 
-deviceId: This is the key to multi-device support. It allows users to have multiple devices authorized simultaneously and revoke access to specific devices without affecting others.
+1. **`deviceId`**: This is the key to multi-device support. It allows users to have multiple devices authorized simultaneously and revoke access to specific devices without affecting others.
+2. **`hashedRefreshToken`**: We treat refresh tokens like passwords.
+3. **`@@unique([userId, deviceId])`**: This constraint ensures each device gets exactly one session per user. If a user re-authorizes, we update the existing session rather than creating duplicates.
 
-hashedRefreshToken: We treat refresh tokens like passwords.
+> **Security Note:** Never store refresh tokens in plaintext. If your database is compromised, attackers could use plaintext tokens to impersonate users. By hashing them with `bcrypt`, leaked tokens are useless.
 
-@@unique([userId, deviceId]): This constraint ensures each device gets exactly one session per user. If a user re-authorizes, we update the existing session rather than creating duplicates.
+### The Mint: Backend Logic
 
-Security Note: Never store refresh tokens in plaintext. If your database is compromised, attackers could use plaintext tokens to impersonate users. By hashing them with bcrypt, leaked tokens are useless.
+We'll split our backend logic into three files to keep things organized and scalable: `core.ts` (logic), `operations.ts` (Wasp actions), and `endpoints.ts` (HTTP APIs).
 
-The Mint: Backend Logic
-
-We’ll split our backend logic into three files to keep things organized and scalable: core.ts (logic), operations.ts (Wasp actions), and endpoints.ts (HTTP APIs).
-
-1. Core logic (app/src/auth/external/core.ts)
+#### 1. Core logic (`app/src/auth/external/core.ts`)
 
 This file holds the pure business logic for minting tokens. It doesn't know about Wasp contexts or HTTP requests.
 
@@ -154,11 +150,11 @@ export async function generateTokenForUser(
 }
 ```
 
-Security Note: While JWT_SECRET works, in Part 3 we'll discuss using per-user JWT secrets for advanced revocation capabilities.
+> **Security Note:** While `JWT_SECRET` works, in Part 3 we'll discuss using **per-user JWT secrets** for advanced revocation capabilities.
 
-2. Wasp action
+#### 2. Wasp action
 
-This is the bridge between the frontend and our core logic. We use a Wasp Action because it automatically validates the session cookie (context.user) for us.
+This is the bridge between the frontend and our core logic. We use a [Wasp Action](https://wasp.sh/docs/data-model/operations/actions) because it automatically validates the session cookie (`context.user`) for us.
 
 ```typescript
 // app/src/auth/external/operations.ts
@@ -193,9 +189,9 @@ export const generateExternalTokenAction: GenerateExternalTokenAction = async (
 };
 ```
 
-3. API placeholders
+#### 3. API placeholders
 
-We'll implement the full API logic in Part 2, but we need to define these files now so our Wasp configuration will be valid.
+We'll implement the full API logic in **Part 2**, but we need to define these files now so our Wasp configuration will be valid.
 
 ```typescript
 // app/src/auth/external/api.ts
@@ -214,9 +210,9 @@ export const revokeExternalToken = async (req, res, context) => {
 };
 ```
 
-3. Middleware
+#### 3. Middleware
 
-We'll also need a basic middleware file to prevent compile errors. This file will later hold our CORS logic and any rate limiting:
+We'll also need a basic [middleware](https://wasp.sh/docs/advanced/middleware-config) file to prevent compile errors. This file will later hold our CORS logic and any rate limiting:
 
 ```typescript
 // app/src/auth/external/middleware.ts
@@ -227,9 +223,9 @@ export const externalApiMiddleware: MiddlewareConfigFn = middlewareConfig => {
 };
 ```
 
-The Routing Number: Wasp Configuration
+### The Routing Number: Wasp Configuration
 
-Now we include everything in main.wasp. This setup prepares us for both the UI-based auth flow (using the Action) and the background API flows (using the API endpoints).
+Now we include everything in `main.wasp`. This setup prepares us for both the UI-based auth flow (using the Action) and the background API flows (using the API endpoints).
 
 ```wasp
 // 1. API Namespace Configuration
@@ -279,11 +275,11 @@ page OAuthTokenGrantPage {
 }
 ```
 
-The Handshake: Authorization Page
+### The Handshake: Authorization Page
 
-Finally, we create the frontend component for our OAuthTokenGrantPage.
+Finally, we create the frontend component for our `OAuthTokenGrantPage`.
 
-Note that we disabled Wasp’s automatic authRequired redirect because if Wasp handles the redirect, it will lose the OAuth query parameters (client_id, redirect_uri, state). By checking auth manually, we can construct a login URL that brings the user right back with all necessary data intact.
+Note that we disabled Wasp's automatic `authRequired` redirect because if Wasp handles the redirect, it will lose the OAuth query parameters (`client_id`, `redirect_uri`, `state`). By checking auth manually, we can construct a login URL that brings the user right back with all necessary data intact.
 
 We'll be adding robust loop detection (verifyNoRedirectLoop) and extension ID validation (validateRedirectUriForExtension)—utilities we'll fully flesh out in Part 2, but placeholders are there for now.
 
@@ -634,15 +630,15 @@ export default function OAuthTokenGrantPage() {
 }
 ```
 
-Critical Step: Handling the Redirect with a Custom Hook
+### Critical Step: Handling the Redirect with a Custom Hook
 
-In many OpenSaaS apps, you may have a configured onAuthSucceededRedirectTo route (often /dashboard or similar) in your main.wasp. This means when a user logs in via your login page, Wasp will automatically send a user there.
+In many OpenSaaS apps, you may have a configured `onAuthSucceededRedirectTo` route (often `/dashboard` or similar) in your `main.wasp`. This means when a user logs in via your login page, Wasp will automatically send a user there.
 
-This will break your OAuth flow if you don’t handle it. The user will get stuck on that landing page instead of bouncing back to the OAuth authorization page.
+**This will break your OAuth flow** if you don't handle it. The user will get stuck on that landing page instead of bouncing back to the OAuth authorization page.
 
 To fix this cleanly, create a reusable custom hook. This hook detects if there is a pending redirect and forwards the user immediately.
 
-1. Create the hook (e.g. in app/src/client/hooks/useOAuthRedirect.ts):
+**1. Create the hook** (e.g. in `app/src/client/hooks/useOAuthRedirect.ts`):
 
 ```typescript
 import { useEffect } from "react";
@@ -692,13 +688,12 @@ export function useOAuthRedirect() {
 }
 ```
 
-Troubleshooting Tip: If you find yourself in an infinite redirect loop between /login and the authorize page, verify two things:
+**Troubleshooting Tip:** If you find yourself in an infinite redirect loop between `/login` and the authorize page, verify two things:
 
-Your validateRedirectUrl is correctly validating the stored URL (and returning it).
+1. Your `validateRedirectUrl` is correctly validating the stored URL (and returning it).
+2. `sessionStorage.removeItem` is being called before the navigation happens.
 
-sessionStorage.removeItem is being called before the navigation happens.
-
-2. Use it in your main App component (e.g. App.tsx):
+**2. Use it in your main App component** (e.g. `App.tsx`):
 
 ```tsx
 import { useOAuthRedirect } from "./hooks/useOAuthRedirect";
@@ -712,45 +707,37 @@ export default function App() {
 }
 ```
 
-Testing
+### Testing
 
-You now have a complete authorization loop. Let’s test it end-to-end to ensure the tokens are being generated correctly.
+You now have a complete authorization loop. Let's test it end-to-end to ensure the tokens are being generated correctly.
 
-Start Wasp: Ensure your development server is running: wasp start
-
-Construct a test URL using a dummy 32-character "Client ID" (simulating a Chrome Extension ID) and a matching redirect URI. You'll navigate here with your browser's dev tools open:
+1. **Start Wasp:** Ensure your development server is running: `wasp start`
+2. **Construct a test URL** using a dummy 32-character "Client ID" (simulating a Chrome Extension ID) and a matching redirect URI. You'll navigate here with your browser's dev tools open:
 
 ```
 http://localhost:3000/auth/external/authorize?client_id=abcdefabcdefabcdefabcdefabcdefab&redirect_uri=chrome-extension://abcdefabcdefabcdefabcdefabcdefab/auth/callback.html&state=test
 ```
 
-Authentication:
+3. **Authentication:**
 
-If you are not logged in: You will be redirected to your login page. Sign in. If you added the redirect logic correctly, check your console. You should see [App] Found OAuth redirect.
+   - **If you are not logged in:** You will be redirected to your login page. Sign in. If you added the redirect logic correctly, check your console. You should see `[App] Found OAuth redirect`.
+   - **If you are logged in:** You will see the loading message for a brief moment. While the loading message is visible (or just before the final redirect), check your **console**. You should see the success message we added: `[OAuth Token Grant] Token grant successful! Redirecting in 3 seconds...`
 
-If you are logged in: You will see the loading message for a brief moment. While the loading message is visible (or just before the final redirect), check your console. You should see the success message we added: [OAuth Token Grant] Token grant successful! Redirecting in 3 seconds...
-
-The “Success” State:
-
-After the console message appears, your browser will attempt to redirect you to chrome-extension://....
-
-Expect an Error Page: Since you (likely) don’t have a Chrome extension with the ID abcdefabcdefabcdefabcdefabcdefab installed, your browser won’t load anything, but hooray! 🎉 It means the flow completed successfully.
-
-Verify the Token: Look at the URL in your browser's address bar on that error page. It should look like this:
+4. **The "Success" State:**
+   - After the console message appears, your browser will attempt to redirect you to `chrome-extension://...`.
+   - **Expect an Error Page:** Since you (likely) don't have a Chrome extension with the ID `abcdefabcdefabcdefabcdefabcdefab` installed, your browser won't load anything, but hooray! 🎉 It means the flow completed successfully.
+   - **Verify the Token:** Look at the URL in your browser's address bar on that error page. It should look like this:
 
 ```
 chrome-extension://abcdefabcdefabcdefabcdefabcdefab/callback.html#access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...&refresh_token=...
 ```
 
-The presence of #access_token=... confirms that:
+- The presence of `#access_token=...` confirms that:
+  1.  Your backend successfully minted the tokens.
+  2.  Your database stored the session.
+  3.  Your frontend successfully handed them back to the "client."
 
-Your backend successfully minted the tokens.
-
-Your database stored the session.
-
-Your frontend successfully handed them back to the “client.”
-
-Optional: Verify the Database
+#### Optional: Verify the Database
 
 If you want double confirmation, query your database:
 
@@ -760,17 +747,15 @@ SELECT * FROM "UserExternalSession";
 
 You should see a new row with your User ID, a hashed refresh token, and an expiration date 7 days in the future.
 
-What’s Next?
+### What's Next?
 
-We’ve built the foundation. We have the vault for external sessions, a mint for tokens, and a handshake UI. But right now, our API endpoints (/api/external/...) are just placeholders.
+We've built the foundation. We have the vault for external sessions, a mint for tokens, and a handshake UI. But right now, our API endpoints (`/api/external/...`) are just placeholders.
 
-In Part 2, we will harden this for production:
+In **Part 2**, we will harden this for production:
 
-API Implementation: Filling in the api.ts logic to handle token generation and refreshing via HTTP.
-
-CORS Middleware: Locking down access so only your known origins can talk to the API.
-
-Token Usage: Building the API middleware to validate these tokens on incoming requests.
+- **API Implementation:** Filling in the `api.ts` logic to handle token generation and refreshing via HTTP.
+- **CORS Middleware:** Locking down access so only your known origins can talk to the API.
+- **Token Usage:** Building the API middleware to validate these tokens on incoming requests.
 
 ### About the Author
 
@@ -784,4 +769,4 @@ If you’re dealing with:
 - Chrome extensions or cross-platform integrations
 - Internal tools your team hasn’t had bandwidth to build properly
 
-Feel free to reach out to me on [LinkedIn](https://www.google.com/search?q=https://linkedin.com/in/rachelcantor) while I work on making a proper intake form. 🙌
+Feel free to reach out to me on [LinkedIn](https://linkedin.com/in/rachelcantor) while I work on making a proper intake form. 🙌
