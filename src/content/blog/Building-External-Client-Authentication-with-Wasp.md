@@ -16,7 +16,7 @@ tags:
   - wasp
 ---
 
-*If you’d like a hand in building this or anything like it, I’m open to taking on new clients. See the end of this article to learn more.*
+*If you’d like a hand in building this or anything like it, I’m open to taking on new clients. See [the end of this article]() to learn more.*
 
 ***
 
