@@ -16,7 +16,7 @@ tags:
   - wasp
 ---
 
-If you’d like a hand in building this or anything like it, I’m open to taking on new clients. See the end of this article to learn more.
+*If you’d like a hand in building this or anything like it, I’m open to taking on new clients. See the end of this article to learn more.*
 
 ***
 
@@ -28,7 +28,7 @@ To solve this, I had to architect a bridge between these two worlds. I came acro
 
 This series is the blueprint of that system. I’m going to show you exactly how to implement it, starting today with the foundational architecture.
 
-### The Architecture: Breaking Out of the Browser with OAuth
+## The Architecture: Breaking Out of the Browser with OAuth
 
 When your Wasp app runs in a browser (e.g., at [https://recipecast.app](https://recipecast.app)), authentication is straightforward:
 
@@ -40,13 +40,13 @@ Chrome extensions have their own origin (chrome-extension://…) and can't share
 
 What these clients need is something portable: a token they can store, send with each request to your Wasp app API, and refresh when it expires. In other words, you need to implement **OAuth 2.0-style authentication**.
 
-#### The Flow
+### The Flow
 
 Here is the architecture we will implement today:
 
 ![OAuth Style Wasp External Authentication Diagram](/uploads/oauth-flow-diagram.png)
 
-### The Vault: Database Schema
+## The Vault: Database Schema
 
 Before we can generate credentials, we need a safe place to store them. External client sessions need their own storage, separate from Wasp’s built-in session management.
 
@@ -85,11 +85,11 @@ model User {
 
 > **Security Note:** Never store refresh tokens in plaintext. If your database is compromised, attackers could use plaintext tokens to impersonate users. By hashing them with `bcrypt`, leaked tokens are useless.
 
-### The Mint: Backend Logic
+## The Mint: Backend Logic
 
 We'll split our backend logic into three files to keep things organized and scalable: `core.ts` (logic), `operations.ts` (Wasp actions), and `endpoints.ts` (HTTP APIs).
 
-#### 1. Core logic
+### 1. Core logic
 
 This file holds the pure business logic for minting tokens. It doesn't know about Wasp contexts or HTTP requests.
 
@@ -154,7 +154,7 @@ export async function generateTokenForUser(
 
 > **Security Note:** While `JWT_SECRET` works, in Part 3 we'll discuss using **per-user JWT secrets** for advanced revocation capabilities.
 
-#### 2. Wasp action
+### 2. Wasp action
 
 This is the bridge between the frontend and our core logic. We use a [Wasp Action](https://wasp.sh/docs/data-model/operations/actions) because it automatically validates the session cookie (`context.user`) for us.
 
@@ -191,7 +191,7 @@ export const generateExternalTokenAction: GenerateExternalTokenAction = async (
 };
 ```
 
-#### 3. API placeholders
+### 3. API placeholders
 
 We'll implement the full API logic in **Part 2**, but we need to define these files now so our Wasp configuration will be valid.
 
@@ -212,7 +212,7 @@ export const revokeExternalToken = async (req, res, context) => {
 };
 ```
 
-#### 3. Middleware
+### 3. Middleware
 
 We'll also need a basic [middleware](https://wasp.sh/docs/advanced/middleware-config) file to prevent compile errors. This file will later hold our CORS logic and any rate limiting:
 
@@ -225,7 +225,7 @@ export const externalApiMiddleware: MiddlewareConfigFn = middlewareConfig => {
 };
 ```
 
-### The Routing Number: Wasp Configuration
+## The Routing Number: Wasp Configuration
 
 Now we include everything in `main.wasp`. This setup prepares us for both the UI-based auth flow (using the action) and the background API flows (using the API endpoints).
 
@@ -277,7 +277,7 @@ page OAuthTokenGrantPage {
 }
 ```
 
-### The Handshake: Authorization Page
+## The Handshake: Authorization Page
 
 Finally, we create the frontend component for our `OAuthTokenGrantPage`.
 
@@ -632,7 +632,7 @@ export default function OAuthTokenGrantPage() {
 }
 ```
 
-### Critical Step: Handling the Redirect with a Custom Hook
+## Critical Step: Handling the Redirect with a Custom Hook
 
 In many OpenSaaS apps, you may have a configured `onAuthSucceededRedirectTo` route (often `/dashboard` or similar) in your `main.wasp`. This means when a user logs in via your login page, Wasp will automatically send a user there.
 
@@ -691,10 +691,9 @@ export function useOAuthRedirect() {
 }
 ```
 
-**Troubleshooting Tip:** If you find yourself in an infinite redirect loop between `/login` and the authorize page, verify two things:
-
-1. Your `validateRedirectUrl` is correctly validating the stored URL (and returning it).
-2. `sessionStorage.removeItem` is being called before the navigation happens.
+> **Troubleshooting Tip:** If you find yourself in an infinite redirect loop between `/login` and the authorize page, verify two things:\
+> 1\. Your `validateRedirectUrl` is correctly validating the stored URL (and returning it).\
+> 2\. `sessionStorage.removeItem` is being called before the navigation happens.
 
 **2. Use it in your main App component** (e.g. `App.tsx`):
 
@@ -710,7 +709,7 @@ export default function App() {
 }
 ```
 
-### Testing
+## Testing
 
 You now have a complete authorization loop. Let's test it end-to-end to ensure the tokens are being generated correctly.
 
@@ -738,7 +737,7 @@ chrome-extension://abcdefabcdefabcdefabcdefabcdefab/callback.html#access_token=e
   2. Your database stored the session.
   3. Your frontend successfully handed them back to the "client."
 
-#### Optional: Verify the Database
+### Optional: Verify the Database
 
 If you want double confirmation, query your database:
 
@@ -748,7 +747,7 @@ SELECT * FROM "UserExternalSession";
 
 You should see a new row with your User ID, a hashed refresh token, and an expiration date 7 days in the future.
 
-### What's Next?
+## What's Next?
 
 We've built the foundation. We have the vault for external sessions, a mint for tokens, and a handshake UI. But right now, our API endpoints (`/api/external/...`) are just placeholders.
 
@@ -760,7 +759,7 @@ In **Part 2**, we will harden this for production:
 
 ***
 
-### About the Author
+## About the Author
 
 I’m Rachel Cantor, a fullstack engineer with over 13 years of experience building production systems that scale.
 
