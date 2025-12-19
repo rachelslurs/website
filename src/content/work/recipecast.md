@@ -1,17 +1,17 @@
 ---
 title: RecipeCast
 description: >-
-  A full-stack SaaS platform for casting recipes from any website to a TV or
+  A full-stack SaaS platform for casting recipes to a TV or
   smart display.
 summary: >-
   Build a production-ready SaaS platform that fills the void left by Google
   Cookbook, allowing users to cast recipes from any site to their TV with
   reliable state management and a distraction-free cooking experience.
 featured: true
-draft: true
+draft: false
 author: Rachel Cantor
 pubDatetime: 2025-12-19T05:00:00.000Z
-year: '2025'
+year: "2025"
 tags:
   - SaaS
   - TypeScript
@@ -32,10 +32,10 @@ RecipeCast is a self-founded Micro-SaaS platform designed for home cooks. It pro
 
 Home cooks faced constant frustration following the discontinuation of Google's Cookbook app. I identified several key friction points that needed to be solved:
 
-* **Screen locks:** Devices locking during cooking required constant unlocking with messy hands.
-* **Ad-heavy content:** Finding actual recipe steps amidst ads on mobile sites was difficult.
-* **Hardware limitations:** Small phone screens were hard to read from a distance while cooking.
-* **Lack of alternatives:** No existing solution provided reliable casting to Google Cast-enabled devices.
+- **Screen locks:** Devices locking during cooking required constant unlocking with messy hands.
+- **Ad-heavy content:** Finding actual recipe steps amidst ads on mobile sites was difficult.
+- **Hardware limitations:** Small phone screens were hard to read from a distance while cooking.
+- **Lack of alternatives:** No existing solution provided reliable casting to Google Cast-enabled devices.
 
 ## Approach
 
@@ -45,7 +45,7 @@ I needed to architect a system that prioritized reliability and universality. Th
 
 To handle the complexity of the Cast SDK, I designed an architecture where the cast receiver device controls all state to ensure synchronization.
 
-![](/uploads/recipecast-flow.png)
+![Casting flow diagram](/uploads/recipecast-flow.png)
 
 ### Recipe Extraction
 
@@ -58,4 +58,4 @@ I built a production-ready SaaS platform using Wasp (React + Node.js) that integ
 The solution focused on two core technical achievements:
 
 1. Reliable Cast Integration: Implementing an authoritative receiver architecture to maintain synchronized state, handle network interruptions, and manage session timeouts gracefully.
-2. Universal Parsing: A plugin-based system that detects and extracts recipe data from over 100+ sites.
+2. Universal Parsing: A Cloudflare worker that behaves as a proxy that detects and extracts recipe data from over 200+ recipe sites and counting.
