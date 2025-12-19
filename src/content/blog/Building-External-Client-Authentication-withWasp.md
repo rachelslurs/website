@@ -225,7 +225,7 @@ export const externalApiMiddleware: MiddlewareConfigFn = middlewareConfig => {
 
 ### The Routing Number: Wasp Configuration
 
-Now we include everything in `main.wasp`. This setup prepares us for both the UI-based auth flow (using the Action) and the background API flows (using the API endpoints).
+Now we include everything in `main.wasp`. This setup prepares us for both the UI-based auth flow (using the action) and the background API flows (using the API endpoints).
 
 ```typescript
 // 1. API Namespace Configuration
@@ -281,7 +281,7 @@ Finally, we create the frontend component for our `OAuthTokenGrantPage`.
 
 Note that we disabled Wasp's automatic `authRequired` redirect because if Wasp handles the redirect, it will lose the OAuth query parameters (`client_id`, `redirect_uri`, `state`). By checking auth manually, we can construct a login URL that brings the user right back with all necessary data intact.
 
-We'll be adding robust loop detection (verifyNoRedirectLoop) and extension ID validation (validateRedirectUriForExtension)—utilities we'll fully flesh out in Part 2, but placeholders are there for now.
+We'll be adding robust loop detection (`verifyNoRedirectLoop`) and extension ID validation (`validateRedirectUriForExtension`)—utilities we'll fully flesh out in Part 2, but placeholders are there for now.
 
 ```typescript
 // app/src/auth/external/OAuthTokenGrantPage.tsx
