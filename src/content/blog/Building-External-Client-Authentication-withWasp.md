@@ -16,6 +16,8 @@ tags:
   - wasp
 ---
 
+![](/uploads/oauth-flow-diagram.png)
+
 ### About the Author
 
 I’m Rachel Cantor, a fullstack engineer with over 13 years of experience building production systems that scale.
