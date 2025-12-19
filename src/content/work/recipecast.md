@@ -10,7 +10,7 @@ summary: >-
 featured: true
 draft: true
 author: Rachel Cantor
-pubDatetime: '2025-12-19T05:00:00.000Z'
+pubDatetime: 2025-12-19T05:00:00.000Z
 year: '2025'
 tags:
   - SaaS
@@ -21,8 +21,6 @@ tags:
   - Cloudflare Workers
   - Node.js
 ---
-
-
 
 ## Table of Contents
 
@@ -46,6 +44,8 @@ I needed to architect a system that prioritized reliability and universality. Th
 ### Authoritative Receiver Pattern
 
 To handle the complexity of the Cast SDK, I designed an architecture where the cast receiver device controls all state to ensure synchronization.
+
+![](/uploads/recipecast-flow.png)
 
 ### Recipe Extraction
 
