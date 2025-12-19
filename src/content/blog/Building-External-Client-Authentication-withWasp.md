@@ -50,7 +50,7 @@ Before we can generate credentials, we need a safe place to store them. External
 
 Add this to your `schema.prisma`:
 
-```prisma
+```typescript
 model UserExternalSession {
   id                 String   @id @default(uuid())
   userId             String
@@ -67,7 +67,7 @@ model UserExternalSession {
 
 Add to your `User` model:
 
-```prisma
+```typescript
 model User {
   id        String   @id @default(uuid())
   // ... your existing User fields ...
@@ -227,7 +227,7 @@ export const externalApiMiddleware: MiddlewareConfigFn = middlewareConfig => {
 
 Now we include everything in `main.wasp`. This setup prepares us for both the UI-based auth flow (using the Action) and the background API flows (using the API endpoints).
 
-```wasp
+```typescript
 // 1. API Namespace Configuration
 apiNamespace external {
   middlewareConfigFn: import { externalApiMiddleware } from "@src/auth/external/middleware",
@@ -283,7 +283,7 @@ Note that we disabled Wasp's automatic `authRequired` redirect because if Wasp h
 
 We'll be adding robust loop detection (verifyNoRedirectLoop) and extension ID validation (validateRedirectUriForExtension)—utilities we'll fully flesh out in Part 2, but placeholders are there for now.
 
-```tsx
+```typescript
 // app/src/auth/external/OAuthTokenGrantPage.tsx
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useAuth } from "wasp/client/auth";
@@ -695,7 +695,7 @@ export function useOAuthRedirect() {
 
 **2. Use it in your main App component** (e.g. `App.tsx`):
 
-```tsx
+```typescript
 import { useOAuthRedirect } from "./hooks/useOAuthRedirect";
 
 export default function App() {
