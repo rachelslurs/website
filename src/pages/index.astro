@@ -31,7 +31,6 @@ const featuredDemos = sortedDemos.filter(({ data }) => data.featured);
   <Header />
   <main id="main-content">
     <section id="hero">
-      <h4>Hello there!</h4>
       <p>
         I'm a Software Engineer with 13+ years of experience building web,
         mobile, and cross-platform TV applications across startups, political
@@ -48,7 +47,7 @@ const featuredDemos = sortedDemos.filter(({ data }) => data.featured);
       featuredPosts.length > 0 && (
         <>
           <section id="featured-posts">
-            <h2>Recent Posts</h2>
+            <h3>Recent Posts</h3>
             <ul>
               {featuredPosts.map(({ data, slug }) => (
                 <Card
@@ -64,14 +63,14 @@ const featuredDemos = sortedDemos.filter(({ data }) => data.featured);
     }
 
     {
-      featuredWorks.length > 0 && (
+      featuredDemos.length > 0 && (
         <>
-          <section id="featured-work">
-            <h2>Featured Work</h2>
+          <section id="featured-demos">
+            <h3>Interactive Demos</h3>
             <ul>
-              {featuredWorks.map(({ data, slug }) => (
-                <WorkCard
-                  href={`/work/${slug}/`}
+              {featuredDemos.map(({ data, slug }) => (
+                <DemoCard
+                  href={`/demos/${slug}/`}
                   frontmatter={data}
                   secHeading={false}
                 />
@@ -83,14 +82,14 @@ const featuredDemos = sortedDemos.filter(({ data }) => data.featured);
     }
 
     {
-      featuredDemos.length > 0 && (
+      featuredWorks.length > 0 && (
         <>
-          <section id="featured-demos">
-            <h2>Interactive Demos</h2>
+          <section id="featured-work">
+            <h3>Featured Work</h3>
             <ul>
-              {featuredDemos.map(({ data, slug }) => (
-                <DemoCard
-                  href={`/demos/${slug}/`}
+              {featuredWorks.map(({ data, slug }) => (
+                <WorkCard
+                  href={`/work/${slug}/`}
                   frontmatter={data}
                   secHeading={false}
                 />
@@ -134,13 +133,13 @@ const featuredDemos = sortedDemos.filter(({ data }) => data.featured);
   #featured-work,
   #featured-demos,
   #recent-posts {
-    @apply pb-6 pt-12;
+    @apply pb-4 pt-6;
   }
-  #featured-posts h2,
-  #featured-work h2,
-  #featured-demos h2,
-  #recent-posts h2 {
-    @apply text-2xl font-bold;
+  #featured-posts h3,
+  #featured-work h3,
+  #featured-demos h3,
+  #recent-posts h3 {
+    @apply text-lg font-semibold;
   }
   .all-posts-btn-wrapper {
     @apply my-8 text-center;
