@@ -124,7 +124,9 @@ const layoutProps = {
    *  allowing sharing of sections easily */
   function addHeadingLinks() {
     let headings = Array.from(
-      document.querySelectorAll("h2:not(#table-of-contents), h3, h4, h5, h6")
+      document.querySelectorAll(
+        "h2:not(#table-of-contents), h3:not([data-exclude-heading-link]), h4:not([data-exclude-heading-link]), h5:not([data-exclude-heading-link]), h6:not([data-exclude-heading-link])"
+      )
     );
 
     for (let heading of headings) {

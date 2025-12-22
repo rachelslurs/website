@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, memo } from "react";
+import { useState, useCallback, useMemo, memo, forwardRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import DemoLayout from "@components/DemoLayout";
 
@@ -165,7 +165,9 @@ const KanbanColumn = memo(
         `}
       >
         <div className="flex items-baseline justify-between">
-          <h4 className="">{column.title}</h4>
+          <h4 className="" data-exclude-heading-link>
+            {column.title}
+          </h4>
           <span className="text-sm text-skin-base opacity-70 leading-none">
             {column.items.length}
           </span>
@@ -199,31 +201,34 @@ interface KanbanCardProps {
 }
 
 const KanbanCard = memo(
-  ({ item, columnId, onDragStart, onDragEnd }: KanbanCardProps) => {
-    const handleDragStartLocal = useCallback(() => {
-      onDragStart(item, columnId);
-    }, [item, columnId, onDragStart]);
+  forwardRef<HTMLDivElement, KanbanCardProps>(
+    ({ item, columnId, onDragStart, onDragEnd }, ref) => {
+      const handleDragStartLocal = useCallback(() => {
+        onDragStart(item, columnId);
+      }, [item, columnId, onDragStart]);
 
-    return (
-      <motion.div
-        layout
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        draggable
-        onDragStart={handleDragStartLocal}
-        onDragEnd={onDragEnd}
-        className="p-3 bg-skin-card border border-skin-line rounded-lg cursor-grab active:cursor-grabbing hover:border-skin-accent transition-colors shadow-sm"
-        whileDrag={{
-          scale: 1.05,
-          boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-          zIndex: 50,
-        }}
-      >
-        <p className="text-sm text-skin-base my-2">{item.text}</p>
-      </motion.div>
-    );
-  }
+      return (
+        <motion.div
+          ref={ref}
+          layout
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          draggable
+          onDragStart={handleDragStartLocal}
+          onDragEnd={onDragEnd}
+          className="p-3 bg-skin-card border border-skin-line rounded-lg cursor-grab active:cursor-grabbing hover:border-skin-accent transition-colors shadow-sm"
+          whileDrag={{
+            scale: 1.05,
+            boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+            zIndex: 50,
+          }}
+        >
+          <p className="text-sm text-skin-base my-2">{item.text}</p>
+        </motion.div>
+      );
+    }
+  )
 );
 
 KanbanCard.displayName = "KanbanCard";

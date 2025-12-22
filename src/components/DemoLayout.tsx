@@ -22,7 +22,12 @@ export default function DemoLayout({
     >
       <div className="mb-4">
         <div className="flex justify-between items-baseline">
-          <h3 className="text-lg mb-2 font-semibold text-skin-base">{title}</h3>
+          <h3
+            className="text-lg mb-2 font-semibold text-skin-base"
+            data-exclude-heading-link
+          >
+            {title}
+          </h3>
           <ViewSource filename={filename} />
         </div>
         {description && (

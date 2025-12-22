@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, forwardRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import Check from "./icons/Check";
 import AlertCircle from "./icons/AlertCircle";
@@ -18,12 +18,10 @@ interface ToastProps {
   onClose: () => void;
 }
 
-function ToastNotification({
-  message,
-  type = "info",
-  onClose,
-  reducedMotion = false,
-}: ToastProps & { reducedMotion?: boolean }) {
+const ToastNotification = forwardRef<
+  HTMLDivElement,
+  ToastProps & { reducedMotion?: boolean }
+>(({ message, type = "info", onClose, reducedMotion = false }, ref) => {
   const bgColor =
     type === "success"
       ? "bg-green-50 border-green-200"
@@ -49,6 +47,7 @@ function ToastNotification({
 
   return (
     <motion.div
+      ref={ref}
       layout={!reducedMotion}
       initial={
         reducedMotion ? { opacity: 0 } : { opacity: 0, y: 20, scale: 0.95 }
@@ -83,7 +82,9 @@ function ToastNotification({
       </button>
     </motion.div>
   );
-}
+});
+
+ToastNotification.displayName = "ToastNotification";
 
 interface ToastContainerProps {
   toasts: Array<{
