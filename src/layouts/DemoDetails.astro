@@ -2,6 +2,8 @@
 import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
+import CollectionEntryBack from "@components/CollectionEntryBack.astro";
+import CollectionEntryHeader from "@components/CollectionEntryHeader.astro";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import { SITE } from "@config";
@@ -45,25 +47,15 @@ const layoutProps = {
 ---
 
 <Layout {...layoutProps}>
-  <Header activeNav="work" />
+  <Header activeNav="demos" />
 
-  <div class="mx-auto flex w-full max-w-3xl justify-start px-2">
-    <button
-      class="focus-outline mb-2 mt-8 flex hover:opacity-75"
-      onclick="(() => (history.length === 1) ? window.location = '/' : history.back())()"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg"
-        ><path
-          d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
-        ></path>
-      </svg><span>Back</span>
-    </button>
-  </div>
+  <CollectionEntryBack />
   <main id="main-content">
-    <h1 transition:name={slugifyStr(title)} class="demo-title inline-block">
-      {title}
-    </h1>
-    {summary && <p class="my-6 text-xl leading-7">{summary}</p>}
+    <CollectionEntryHeader
+      title={title}
+      summary={summary}
+      slug={slugifyStr(title)}
+    />
     <article id="article" role="article" class="prose mx-auto mt-8 max-w-3xl">
       <Content />
     </article>
@@ -90,9 +82,6 @@ const layoutProps = {
 <style>
   main {
     @apply mx-auto w-full max-w-3xl px-4 pb-12;
-  }
-  .demo-title {
-    @apply text-2xl font-semibold text-skin-accent;
   }
 </style>
 

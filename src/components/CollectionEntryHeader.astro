@@ -1,0 +1,20 @@
+---
+interface Props {
+  title: string;
+  summary?: string;
+  slug: string;
+}
+
+const { title, summary, slug } = Astro.props;
+---
+
+<h1 transition:name={slug} class="collection-entry-title inline-block">
+  {title}
+</h1>
+{summary && <p class="my-6 text-lg leading-6">{summary}</p>}
+
+<style>
+  .collection-entry-title {
+    @apply text-2xl font-semibold text-skin-accent;
+  }
+</style>
