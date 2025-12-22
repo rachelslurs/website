@@ -1,0 +1,19 @@
+---
+title: Toast Notifications
+description: Ensuring performance and a clean UI with queuing and optional deduplication
+summary: Notifications with queuing and optional deduplication
+featured: true
+draft: false
+author: Rachel Cantor
+pubDatetime: 2025-12-22T00:00:00.000Z
+---
+
+import Toast from "@components/demo/Toast";
+
+1. Uses a single source of truth (using a Ref Map) to track all active timers. This allows for global cleanup and precise control over each toast’s lifecycle.
+2. Only render the max number of toasts; any extras are held in a background queue and "popped" into view only as space opens up.
+3. If an identical message is triggered within a 3-second window, the system resets the existing timer instead of spawning a new toast if deduplication is enabled.
+4. The logic accounts for the EXIT_ANIMATION_DURATION, ensuring the component stays in the DOM just long enough for a smooth Framer Motion fade-out.
+5. Honors `prefers-reduced-motion`
+
+<Toast client:load />
