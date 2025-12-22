@@ -24,6 +24,9 @@ module.exports = {
           base: withOpacity("--color-text-base"),
           accent: withOpacity("--color-accent"),
           inverted: withOpacity("--color-fill"),
+          "toast-success": withOpacity("--color-toast-success-icon"),
+          "toast-error": withOpacity("--color-toast-error-icon"),
+          "toast-info": withOpacity("--color-toast-info-icon"),
         },
       },
       backgroundColor: {
@@ -33,6 +36,9 @@ module.exports = {
           inverted: withOpacity("--color-text-base"),
           card: withOpacity("--color-card"),
           "card-muted": withOpacity("--color-card-muted"),
+          "toast-success": withOpacity("--color-toast-success-bg"),
+          "toast-error": withOpacity("--color-toast-error-bg"),
+          "toast-info": withOpacity("--color-toast-info-bg"),
         },
       },
       outlineColor: {
@@ -45,6 +51,9 @@ module.exports = {
           line: withOpacity("--color-border"),
           fill: withOpacity("--color-text-base"),
           accent: withOpacity("--color-accent"),
+          "toast-success": withOpacity("--color-toast-success-border"),
+          "toast-error": withOpacity("--color-toast-error-border"),
+          "toast-info": withOpacity("--color-toast-info-border"),
         },
       },
       fill: {

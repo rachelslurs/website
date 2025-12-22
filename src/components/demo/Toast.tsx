@@ -24,17 +24,17 @@ const ToastNotification = forwardRef<
 >(({ message, type = "info", onClose, reducedMotion = false }, ref) => {
   const bgColor =
     type === "success"
-      ? "bg-green-50 border-green-200"
+      ? "bg-skin-toast-success border-skin-toast-success"
       : type === "error"
-        ? "bg-red-50 border-red-200"
-        : "bg-blue-50 border-blue-200";
+        ? "bg-skin-toast-error border-skin-toast-error"
+        : "bg-skin-toast-info border-skin-toast-info";
 
   const iconColor =
     type === "success"
-      ? "text-green-600"
+      ? "text-skin-toast-success"
       : type === "error"
-        ? "text-red-600"
-        : "text-blue-600";
+        ? "text-skin-toast-error"
+        : "text-skin-toast-info";
 
   const icon =
     type === "success" ? (
@@ -73,10 +73,10 @@ const ToastNotification = forwardRef<
       }}
     >
       {icon}
-      <p className="text-sm text-gray-800 flex-1">{message}</p>
+      <p className="text-sm text-skin-base flex-1">{message}</p>
       <button
         onClick={onClose}
-        className="text-gray-500 hover:text-gray-700 flex-shrink-0"
+        className="text-skin-base opacity-70 hover:opacity-100 flex-shrink-0 transition-opacity"
       >
         <X className="w-4 h-4 !fill-none" />
       </button>
