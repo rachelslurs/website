@@ -14,3 +14,10 @@ export const workFilter = ({ data }: CollectionEntry<"work">) => {
     new Date(data.pubDatetime).getTime() - SITE.scheduledPostMargin;
   return !data.draft && (import.meta.env.DEV || isPublishTimePassed);
 };
+
+export const demoFilter = ({ data }: CollectionEntry<"demos">) => {
+  const isPublishTimePassed =
+    Date.now() >
+    new Date(data.pubDatetime).getTime() - SITE.scheduledPostMargin;
+  return !data.draft && (import.meta.env.DEV || isPublishTimePassed);
+};

@@ -6,8 +6,10 @@ import Footer from "@components/Footer.astro";
 import LinkButton from "@components/LinkButton.astro";
 import Card from "@components/Card";
 import WorkCard from "@components/WorkCard";
+import DemoCard from "@components/DemoCard";
 import getSortedPosts from "@utils/getSortedPosts";
 import getSortedWork from "@utils/getSortedWork";
+import getSortedDemos from "@utils/getSortedDemos";
 
 const posts = await getCollection("blog");
 
@@ -18,6 +20,11 @@ const works = await getCollection("work");
 
 const sortedWorks = getSortedWork(works);
 const featuredWorks = sortedWorks.filter(({ data }) => data.featured);
+
+const demos = await getCollection("demos");
+
+const sortedDemos = getSortedDemos(demos);
+const featuredDemos = sortedDemos.filter(({ data }) => data.featured);
 ---
 
 <Layout>
@@ -41,7 +48,7 @@ const featuredWorks = sortedWorks.filter(({ data }) => data.featured);
       featuredPosts.length > 0 && (
         <>
           <section id="featured-posts">
-            <h2>Featured Posts</h2>
+            <h2>Recent Posts</h2>
             <ul>
               {featuredPosts.map(({ data, slug }) => (
                 <Card
@@ -65,6 +72,25 @@ const featuredWorks = sortedWorks.filter(({ data }) => data.featured);
               {featuredWorks.map(({ data, slug }) => (
                 <WorkCard
                   href={`/work/${slug}/`}
+                  frontmatter={data}
+                  secHeading={false}
+                />
+              ))}
+            </ul>
+          </section>
+        </>
+      )
+    }
+
+    {
+      featuredDemos.length > 0 && (
+        <>
+          <section id="featured-demos">
+            <h2>Interactive Demos</h2>
+            <ul>
+              {featuredDemos.map(({ data, slug }) => (
+                <DemoCard
+                  href={`/demos/${slug}/`}
                   frontmatter={data}
                   secHeading={false}
                 />
@@ -106,11 +132,13 @@ const featuredWorks = sortedWorks.filter(({ data }) => data.featured);
   /* ===== Featured & Recent Posts Sections ===== */
   #featured-posts,
   #featured-work,
+  #featured-demos,
   #recent-posts {
     @apply pb-6 pt-12;
   }
   #featured-posts h2,
   #featured-work h2,
+  #featured-demos h2,
   #recent-posts h2 {
     @apply text-2xl font-bold;
   }

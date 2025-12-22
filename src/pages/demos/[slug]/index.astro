@@ -1,0 +1,28 @@
+---
+import { type CollectionEntry, getCollection } from "astro:content";
+import DemoDetails from "@layouts/DemoDetails.astro";
+import getSortedDemos from "@utils/getSortedDemos";
+
+export interface Props {
+  demo: CollectionEntry<"demos">;
+}
+
+export async function getStaticPaths() {
+  const demos = await getCollection("demos", ({ data }) => !data.draft);
+
+  const demoResult = demos.map(demo => ({
+    params: { slug: demo.slug },
+    props: { demo },
+  }));
+
+  return demoResult;
+}
+
+const { demo } = Astro.props;
+
+const demos = await getCollection("demos");
+
+const sortedDemos = getSortedDemos(demos);
+---
+
+<DemoDetails demo={demo} demos={sortedDemos} />
