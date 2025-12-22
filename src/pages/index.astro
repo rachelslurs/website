@@ -4,9 +4,7 @@ import Layout from "@layouts/Layout.astro";
 import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import LinkButton from "@components/LinkButton.astro";
-import Card from "@components/Card";
-import WorkCard from "@components/WorkCard";
-import DemoCard from "@components/DemoCard";
+import CollectionCard from "@components/CollectionCard";
 import getSortedPosts from "@utils/getSortedPosts";
 import getSortedWork from "@utils/getSortedWork";
 import getSortedDemos from "@utils/getSortedDemos";
@@ -50,10 +48,11 @@ const featuredDemos = sortedDemos.filter(({ data }) => data.featured);
             <h3>Recent Posts</h3>
             <ul>
               {featuredPosts.map(({ data, slug }) => (
-                <Card
+                <CollectionCard
                   href={`/posts/${slug}/`}
                   frontmatter={data}
                   secHeading={false}
+                  showDatetime={true}
                 />
               ))}
             </ul>
@@ -69,7 +68,7 @@ const featuredDemos = sortedDemos.filter(({ data }) => data.featured);
             <h3>Interactive Demos</h3>
             <ul>
               {featuredDemos.map(({ data, slug }) => (
-                <DemoCard
+                <CollectionCard
                   href={`/demos/${slug}/`}
                   frontmatter={data}
                   secHeading={false}
@@ -88,7 +87,7 @@ const featuredDemos = sortedDemos.filter(({ data }) => data.featured);
             <h3>Featured Work</h3>
             <ul>
               {featuredWorks.map(({ data, slug }) => (
-                <WorkCard
+                <CollectionCard
                   href={`/work/${slug}/`}
                   frontmatter={data}
                   secHeading={false}
@@ -109,8 +108,8 @@ const featuredDemos = sortedDemos.filter(({ data }) => data.featured);
   #hero {
     @apply pb-6 pt-8;
   }
-  #hero h4 {
-    @apply mb-6 text-2xl font-bold;
+  #main-content h3 {
+    @apply mb-6 text-xl font-semibold;
   }
   #hero .rss-link {
     @apply mb-6;
@@ -133,14 +132,9 @@ const featuredDemos = sortedDemos.filter(({ data }) => data.featured);
   #featured-work,
   #featured-demos,
   #recent-posts {
-    @apply pb-4 pt-6;
+    @apply py-4;
   }
-  #featured-posts h3,
-  #featured-work h3,
-  #featured-demos h3,
-  #recent-posts h3 {
-    @apply text-lg font-semibold;
-  }
+
   .all-posts-btn-wrapper {
     @apply my-8 text-center;
   }
