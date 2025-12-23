@@ -1,0 +1,27 @@
+---
+title: Optimistic UI
+description: Instant UI updates with background server synchronization
+summary: List operations with syncing, synced, and confirmed states
+featured: true
+draft: false
+author: Rachel Cantor
+pubDatetime: 2025-12-21T00:00:00.000Z
+---
+import AddDeleteItems from "@components/demo/AddDeleteItems";
+import ReorderableListOptimistic from "@components/demo/ReorderableListOptimistic";
+
+<AddDeleteItems client:load />
+
+
+- Items appear in the UI immediately when added, before server confirmation completes.
+- Each item shows its sync state: "Syncing..." with spinner while pending, "Synced!" with checkmark for 2 seconds after confirmation, then no indicator once fully synced.
+- Delete operations remove items from the UI instantly with an exit animation via AnimatePresence.
+- Uses Date.now() for unique IDs to avoid collisions when rapidly adding multiple items.
+
+<ReorderableListOptimistic client:load />
+
+- Updates the UI immediately when the user reorders without waiting for server confirmation.
+- Tracks sync state per item with three visual states: syncing (spinner), just synced (checkmark for 2 seconds), and confirmed (no indicator).
+- Uses Framer Motion's AnimatePresence for smooth enter/exit animations when items are added or removed.
+- For reorderable lists, shows a single sync indicator at the bottom rather than per-item to avoid visual clutter.
+- Clears the "Synced!" confirmation message after 2 seconds to prevent stale success indicators from cluttering the UI.
