@@ -1,0 +1,21 @@
+---
+title: Modal
+description: A modal dialog with smooth transitions and proper focus management
+summary: Modal implementation with backdrop, animations, and accessibility considerations
+featured: true
+draft: false
+author: Rachel Cantor
+pubDatetime: 2025-12-22T00:00:00.000Z
+---
+
+import Modal from "@components/demo/Modal";
+
+<Modal client:load />
+
+- Uses AnimatePresence to coordinate enter/exit animations for both the backdrop and modal content.
+- Modal scales in from 95% (0.95) with a fade-in effect, creating a subtle "pop" entrance.
+- Backdrop fades in separately to provide visual layering and depth.
+- Click outside the modal (on the backdrop) to dismiss, with stopPropagation preventing clicks inside the modal from closing it.
+- Proper z-index layering ensures the backdrop (z-40) sits behind the modal content (z-50).
+- Exit animations reverse the entrance: modal scales down and fades out simultaneously with the backdrop.
+- Integrates with toast notifications to confirm actions when the user clicks "Confirm".
