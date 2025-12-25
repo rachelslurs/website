@@ -385,29 +385,38 @@ Note that we disabled Wasp's automatic `authRequired` redirect because if Wasp h
 
 We'll be adding robust loop detection (`verifyNoRedirectLoop`) and extension ID validation (`validateRedirectUriForExtension`)—utilities we'll fully flesh out in Part 2, but placeholders are there for now.
 
+The authorization page uses React's standard cleanup pattern with a dedicated unmount effect. This ensures that any pending redirect timeouts are properly cleaned up when the component unmounts, preventing navigation attempts after the component is no longer rendered. The timeouts are allowed to execute normally during the component's lifecycle, ensuring redirects complete as expected.
+
 ```typescript
 // app/src/auth/external/OAuthTokenGrantPage.tsx
-import { useEffect, useState, useRef, useCallback } from "react";
-import { useAuth } from "wasp/client/auth";
-import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
-import { generateExternalTokenAction } from "wasp/client/operations";
-import { AuthPageLayout } from "../AuthPageLayout"; // Or your default layout
-// These are utilities we'll implement in Part 2
-import { verifyNoRedirectLoop } from "../../utils/redirectValidation";
-import { validateRedirectUriForExtension } from "../../utils/chromeExtensionValidation";
+/**
+ * OAuth Token Grant Page
+ * OAuth 2.0 token grant endpoint for external clients (Chrome extensions, mobile apps, etc.)
+ *
+ * Flow:
+ * 1. External client redirects user here with OAuth params (client_id, redirect_uri, state)
+ * 2. If user is not logged in, redirects to login first (preserving OAuth params)
+ * 3. If user is logged in, generates OAuth tokens and redirects back to client
+ */
+
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { useAuth } from 'wasp/client/auth';
+import { useSearchParams, useLocation } from 'react-router-dom';
+import { generateExternalTokenAction } from 'wasp/client/operations';
+import { AuthPageLayout } from '../AuthPageLayout';
+import { SerifH3 } from '../../client/components/ui/typography';
+import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { verifyNoRedirectLoop } from '../../utils/redirectValidation';
+import { validateRedirectUriForExtension } from '../../utils/chromeExtensionValidation';
 
 // Constants
-const LOGIN_REDIRECT_DELAY_MS = 3000;
-const SUCCESS_REDIRECT_DELAY_MS = 3000;
-const ACCESS_TOKEN_EXPIRY_SECONDS = "3600";
-const DEVICE_ID_STORAGE_PREFIX = "recipecast:deviceId:";
+const LOGIN_REDIRECT_DELAY_MS = 100; // Very short delay to show "redirecting" message
+const SUCCESS_REDIRECT_DELAY_MS = 3000; // Show success message for 3 seconds before redirecting
+const ACCESS_TOKEN_EXPIRY_SECONDS = '3600';
+const DEVICE_ID_STORAGE_PREFIX = 'recipecast:deviceId:';
 
 // Types
-type OAuthStatus =
-  | "authorizing"
-  | "authorized"
-  | "error"
-  | "redirecting_to_login";
+type OAuthStatus = 'authorizing' | 'authorized' | 'error' | 'redirecting_to_login';
 
 interface OAuthParams {
   clientId: string | null;
@@ -417,7 +426,6 @@ interface OAuthParams {
 }
 
 // Helper Functions
-
 function getOrCreateDeviceId(clientId: string): string {
   const storageKey = `${DEVICE_ID_STORAGE_PREFIX}${clientId}`;
 
@@ -429,10 +437,7 @@ function getOrCreateDeviceId(clientId: string): string {
     }
   } catch (error) {
     // localStorage might not be available (e.g., private browsing, disabled, quota exceeded)
-    console.warn(
-      "[OAuth Token Grant] localStorage not available, generating new device ID:",
-      error
-    );
+    console.warn('[OAuth Token Grant] localStorage not available, generating new device ID:', error);
     // Fall through to generate a new device ID
   }
 
@@ -445,22 +450,14 @@ function getOrCreateDeviceId(clientId: string): string {
   } catch (error) {
     // localStorage write failed (quota exceeded, private browsing, etc.)
     // Log warning but continue - device ID will be regenerated next time
-    console.warn(
-      "[OAuth Token Grant] Failed to store device ID in localStorage:",
-      error
-    );
-    console.warn(
-      "[OAuth Token Grant] Device ID will be regenerated on next authorization"
-    );
+    console.warn('[OAuth Token Grant] Failed to store device ID in localStorage:', error);
+    console.warn('[OAuth Token Grant] Device ID will be regenerated on next authorization');
   }
 
   return deviceId;
 }
 
-function buildLoginRedirectPath(
-  currentPath: string,
-  currentSearch: string
-): string {
+function buildLoginRedirectPath(currentPath: string, currentSearch: string): string {
   return `/login?redirect=${encodeURIComponent(currentPath + currentSearch)}`;
 }
 
@@ -473,96 +470,93 @@ function buildRedirectUrlWithTokens(
 ): string {
   const redirectUrl = new URL(redirectUri);
 
-  if (responseType === "token") {
+  if (responseType === 'token') {
     // Implicit flow: tokens in URL fragment (after #)
     redirectUrl.hash = new URLSearchParams({
       access_token: accessToken,
       refresh_token: refreshToken,
-      token_type: "Bearer",
+      token_type: 'Bearer',
       expires_in: ACCESS_TOKEN_EXPIRY_SECONDS,
       ...(state && { state }),
     }).toString();
   } else {
     // Authorization code flow: codes in query params (future enhancement)
-    redirectUrl.searchParams.set("code", accessToken);
-    if (state) redirectUrl.searchParams.set("state", state);
+    redirectUrl.searchParams.set('code', accessToken);
+    if (state) redirectUrl.searchParams.set('state', state);
   }
+
   return redirectUrl.toString();
 }
 
-function validateOAuthParams(params: OAuthParams): {
-  isValid: boolean;
-  error?: string;
-} {
+function validateOAuthParams(params: OAuthParams): { isValid: boolean; error?: string } {
   if (!params.clientId || !params.redirectUri) {
     return {
       isValid: false,
-      error:
-        "Missing required OAuth parameters: client_id and redirect_uri are required",
+      error: 'Missing required OAuth parameters: client_id and redirect_uri are required',
     };
   }
+
   if (!verifyNoRedirectLoop(params.redirectUri)) {
     return {
       isValid: false,
-      error:
-        "Invalid redirect_uri: cannot redirect to token grant page (would create infinite loop)",
+      error: 'Invalid redirect_uri: cannot redirect to token grant page (would create infinite loop)',
     };
   }
-  const validationResult = validateRedirectUriForExtension(
-    params.redirectUri,
-    params.clientId
-  );
+
+  const validationResult = validateRedirectUriForExtension(params.redirectUri, params.clientId);
   if (!validationResult.isValid) {
     return {
       isValid: false,
-      error: validationResult.error || "Invalid redirect_uri",
+      error: validationResult.error || 'Invalid redirect_uri',
     };
   }
+
   return { isValid: true };
 }
 
+// UI Components
 function LoadingView({ message }: { message: string }) {
   return (
     <>
-      <h3 className="mb-2">{message}</h3>
-      <p className="text-muted-foreground">Please wait.</p>
-    </>
-  );
+    <Loader2 className= "h-12 w-12 animate-spin text-primary mb-4" />
+    <SerifH3 className="mb-2" > { message } < /SerifH3>
+      < p className = "text-muted-foreground" > Please wait.< /p>
+        < />
+    );
 }
 
 function ErrorView({ error }: { error: string }) {
   return (
     <>
-      <h3 className="mb-2">Token Grant Failed</h3>
-      <p className="text-muted-foreground mb-4">{error}</p>
-      <p className="text-sm text-muted-foreground">
-        Please close this window and try again from the external client.
-      </p>
-    </>
-  );
+    <AlertCircle className= "h-12 w-12 text-red-500 mb-4" />
+    <SerifH3 className="mb-2" > Token Grant Failed < /SerifH3>
+      < p className = "text-muted-foreground mb-4" > { error } < /p>
+        < p className = "text-sm text-muted-foreground" >
+          Please close this window and try again from the external client.
+            < /p>
+            < />
+    );
 }
 
 function SuccessView() {
   return (
     <>
-      <h3 className="mb-2">Tokens Granted Successfully</h3>
-      <p className="text-muted-foreground mb-4">
-        <strong className="text-green-600 dark:text-green-400">
-          You're signed in!
-        </strong>
-        <br />
-        <span className="text-sm">Redirecting...</span>
-      </p>
-    </>
-  );
+    <CheckCircle2 className= "h-12 w-12 text-green-500 mb-4" />
+    <SerifH3 className="mb-2" > Tokens Granted Successfully < /SerifH3>
+      < p className = "text-muted-foreground mb-4" >
+        <strong className="text-green-600 dark:text-green-400" > You're signed in!</strong>
+          < br />
+          <span className="text-sm" > This window will close automatically...</span>
+            < /p>
+            < />
+    );
 }
 
 export default function OAuthTokenGrantPage() {
   const { data: user, isLoading: authLoading } = useAuth();
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const location = useLocation();
-  const [status, setStatus] = useState<OAuthStatus>("authorizing");
+  const [status, setStatus] = useState<OAuthStatus>('authorizing');
   const [error, setError] = useState<string | null>(null);
 
   const hasRedirected = useRef(false);
@@ -571,65 +565,60 @@ export default function OAuthTokenGrantPage() {
 
   // Extract OAuth parameters
   const oauthParams: OAuthParams = {
-    clientId: searchParams.get("client_id"),
-    redirectUri: searchParams.get("redirect_uri"),
-    state: searchParams.get("state"),
-    responseType: searchParams.get("response_type") || "token",
+    clientId: searchParams.get('client_id'),
+    redirectUri: searchParams.get('redirect_uri'),
+    state: searchParams.get('state'),
+    responseType: searchParams.get('response_type') || 'token',
   };
-
-  // Cleanup function for timeouts
-  const cleanupTimeout = useCallback(() => {
-    if (redirectTimeoutRef.current) {
-      clearTimeout(redirectTimeoutRef.current);
-      redirectTimeoutRef.current = null;
-    }
-  }, []);
 
   // Handle redirect to login
   const handleLoginRedirect = useCallback(() => {
     if (hasRedirected.current) {
       return;
     }
-    const loginPath = buildLoginRedirectPath(
-      location.pathname,
-      location.search
-    );
-    setStatus("redirecting_to_login");
+
+    const loginPath = buildLoginRedirectPath(location.pathname, location.search);
+    console.log('[OAuth Token Grant] Redirecting to login:', loginPath);
+    setStatus('redirecting_to_login');
     hasRedirected.current = true;
-    cleanupTimeout();
+
+    // Clear any existing timeout
+    if (redirectTimeoutRef.current) {
+      clearTimeout(redirectTimeoutRef.current);
+    }
+
+    // Use a short delay to show the "redirecting" message, then redirect
     redirectTimeoutRef.current = setTimeout(() => {
-      console.log("[OAuth Token Grant] Redirecting to login...");
-      navigate(loginPath, { replace: true });
+      console.log('[OAuth Token Grant] Executing redirect to login now...');
+      // Use window.location.replace for more reliable redirect (doesn't add to history)
+      window.location.replace(loginPath);
     }, LOGIN_REDIRECT_DELAY_MS);
-  }, [location.pathname, location.search, navigate, cleanupTimeout]);
+  }, [location.pathname, location.search]);
 
   // Handle token generation and redirect
   const handleTokenGeneration = useCallback(async () => {
-    if (
-      hasAttempted.current ||
-      !oauthParams.clientId ||
-      !oauthParams.redirectUri
-    ) {
+    if (hasAttempted.current || !oauthParams.clientId || !oauthParams.redirectUri) {
       return;
     }
+
     hasAttempted.current = true;
+
     try {
       const deviceId = getOrCreateDeviceId(oauthParams.clientId);
       const result = await generateExternalTokenAction({
         deviceId,
         clientId: oauthParams.clientId,
       } as any);
+
       if (hasRedirected.current) {
-        console.log(
-          "[OAuth Token Grant] Already redirected, ignoring duplicate redirect attempt"
-        );
+        console.log('[OAuth Token Grant] Already redirected, ignoring duplicate redirect attempt');
         return;
       }
+
       hasRedirected.current = true;
-      setStatus("authorized");
-      console.log(
-        "[OAuth Token Grant] Token grant successful! Redirecting in 3 seconds..."
-      );
+      setStatus('authorized');
+      console.log('[OAuth Token Grant] Token grant successful! Showing success message for 3 seconds...');
+
       const redirectUrl = buildRedirectUrlWithTokens(
         oauthParams.redirectUri,
         result.accessToken,
@@ -637,57 +626,78 @@ export default function OAuthTokenGrantPage() {
         oauthParams.state,
         oauthParams.responseType
       );
-      cleanupTimeout();
+
       redirectTimeoutRef.current = setTimeout(() => {
-        console.log("[OAuth Token Grant] Redirecting now...");
+        console.log('[OAuth Token Grant] Redirecting to extension (window will close automatically)...');
+        // Redirect to extension's redirect URI with tokens
+        // The extension's chrome.identity.launchWebAuthFlow will automatically close the window
         window.location.replace(redirectUrl);
       }, SUCCESS_REDIRECT_DELAY_MS);
     } catch (err: any) {
-      console.error("Token grant error:", err);
-      setError(err.message || "Failed to grant OAuth tokens");
-      setStatus("error");
+      console.error('[OAuth Token Grant] Token grant error:', err);
+      const errorMessage = err.message || 'Failed to grant OAuth tokens';
+
+      // Check if this is a migration error
+      if (errorMessage.includes('Database migration required')) {
+        setError('Server configuration error: Database migration required. Please contact support.');
+      } else {
+        setError(errorMessage);
+      }
+
+      setStatus('error');
+
+      // Don't redirect to login on error - show error message instead
+      // This prevents redirect loops
     }
-  }, [oauthParams, cleanupTimeout]);
+  }, [oauthParams]);
+
+  // Cleanup on unmount - clear any pending timeouts
+  useEffect(() => {
+    return () => {
+      // On unmount, always clear any pending timeouts
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+        redirectTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   // Main effect
   useEffect(() => {
     // Early return if already processed
-    if (
-      hasAttempted.current ||
-      hasRedirected.current ||
-      status === "authorized"
-    ) {
-      return cleanupTimeout;
+    if (hasAttempted.current || hasRedirected.current || status === 'authorized') {
+      return;
     }
+
     // Handle unauthenticated user
     if (!authLoading && !user) {
       handleLoginRedirect();
-      return cleanupTimeout;
+      return;
     }
+
     // Wait for auth to complete
     if (authLoading || !user) {
-      return cleanupTimeout;
+      return;
     }
+
     // Validate OAuth parameters
     const validation = validateOAuthParams(oauthParams);
     if (!validation.isValid) {
-      setError(validation.error || "Invalid OAuth parameters");
-      setStatus("error");
-      if (validation.error?.includes("Redirect loop")) {
-        console.error("[OAuth Token Grant] Redirect loop detected", {
-          redirectUri: oauthParams.redirectUri,
-        });
+      setError(validation.error || 'Invalid OAuth parameters');
+      setStatus('error');
+      if (validation.error?.includes('Redirect loop')) {
+        console.error('[OAuth Token Grant] Redirect loop detected', { redirectUri: oauthParams.redirectUri });
       } else {
-        console.error("[OAuth Token Grant] Invalid redirect_uri", {
+        console.error('[OAuth Token Grant] Invalid redirect_uri', {
           clientId: oauthParams.clientId,
           redirectUri: oauthParams.redirectUri,
         });
       }
-      return cleanupTimeout;
+      return;
     }
+
     // Generate tokens
     handleTokenGeneration();
-    return cleanupTimeout;
   }, [
     user,
     authLoading,
@@ -698,38 +708,39 @@ export default function OAuthTokenGrantPage() {
     oauthParams.responseType,
     handleLoginRedirect,
     handleTokenGeneration,
-    cleanupTimeout,
   ]);
 
   // Render UI based on status
   const renderContent = () => {
-    if (authLoading || status === "redirecting_to_login") {
+    if (authLoading || status === 'redirecting_to_login') {
       return (
         <LoadingView
-          message={
-            status === "redirecting_to_login"
-              ? "Redirecting to login..."
-              : "Checking authentication..."
-          }
-        />
-      );
+                    message= { status === 'redirecting_to_login' ? 'Redirecting to login...' : 'Checking authentication...'
     }
-    if (status === "authorizing") {
-      return <LoadingView message="Granting OAuth tokens..." />;
-    }
-    if (status === "error") {
-      return <ErrorView error={error || "An unknown error occurred"} />;
-    }
-    return <SuccessView />;
-  };
-  return (
-    <AuthPageLayout>
-      <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
-        {renderContent()}
-      </div>
-    </AuthPageLayout>
-  );
+    />
+            );
 }
+
+if (status === 'authorizing') {
+  return <LoadingView message="Granting OAuth tokens..." />;
+}
+
+if (status === 'error') {
+  return <ErrorView error={ error || 'An unknown error occurred' } />;
+}
+
+return <SuccessView />;
+    };
+
+return (
+  <AuthPageLayout>
+  <div className= "flex flex-col items-center justify-center min-h-[400px] text-center" >
+  { renderContent() }
+  < /div>
+  < /AuthPageLayout>
+    );
+}
+
 ```
 
 ## Critical Step: Handling the Redirect with a Custom Hook
