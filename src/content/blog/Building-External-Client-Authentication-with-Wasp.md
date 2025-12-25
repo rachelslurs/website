@@ -16,9 +16,9 @@ tags:
   - wasp
 ---
 
-*If you’d like a hand in building this or anything like it, I’m open to taking on new clients. See [the end of this article](https://rachel.fyi/posts/building-external-client-authentication-with-wasp/#about-the-author) to learn more.*
+_If you’d like a hand in building this or anything like it, I’m open to taking on new clients. See [the end of this article](https://rachel.fyi/posts/building-external-client-authentication-with-wasp/#about-the-author) to learn more._
 
-***
+---
 
 If you've built an app with [OpenSaaS](https://opensaas.sh), the open-sourced SaaS template built using [Wasp](https://wasp.sh), you know how incredibly easy the authentication flow is to set up. But that smooth sailing often hits a wall when you try to leave the browser tab and authenticate with a different client than your web app.
 
@@ -98,37 +98,75 @@ This file holds the pure business logic for minting tokens. It doesn't know abou
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import { HttpError } from "wasp/server";
 
-const JWT_SECRET = process.env.JWT_SECRET!;
 const ACCESS_TOKEN_EXPIRY = "1h";
 const REFRESH_TOKEN_EXPIRY_DAYS = 7;
 
+// JWT Payload type - this defines the structure of our access tokens
+export interface JwtPayload {
+  userId: string;
+  email: string;
+  deviceId: string;
+}
+
+/**
+ * Get JWT secret with validation
+ * Throws if not configured
+ */
+export function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new HttpError(500, "JWT_SECRET not configured");
+  }
+  return secret;
+}
+
+/**
+ * Generate access and refresh tokens for a user
+ * Returns tokens that can be used for external API authentication
+ */
 export async function generateTokenForUser(
   userId: string,
   deviceId: string,
   entities: any
 ) {
-  // 1. Generate short-lived access token (JWT)
-  const accessToken = jwt.sign(
-    {
-      userId,
-      deviceId,
-      type: "external_access",
-    },
-    JWT_SECRET,
-    { expiresIn: ACCESS_TOKEN_EXPIRY }
-  );
-  // 2. Generate long-lived refresh token (random bytes)
+  // 1. Get JWT secret
+  const jwtSecret = getJwtSecret();
+
+  // 2. Fetch user to get email
+  const user = await entities.User.findUnique({
+    where: { id: userId },
+    select: { email: true },
+  });
+
+  if (!user || !user.email) {
+    throw new HttpError(404, "User not found");
+  }
+
+  // 3. Create JWT payload (matches our JwtPayload type)
+  const jwtPayload: JwtPayload = {
+    userId,
+    email: user.email,
+    deviceId,
+  };
+
+  // 4. Generate short-lived access token (JWT)
+  const accessToken = jwt.sign(jwtPayload, jwtSecret, {
+    expiresIn: ACCESS_TOKEN_EXPIRY,
+  });
+
+  // 5. Generate long-lived refresh token (random bytes)
   const refreshToken = crypto.randomBytes(64).toString("hex");
 
-  // 3. Hash the refresh token before storing
+  // 6. Hash the refresh token before storing
   const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
 
-  // 4. Calculate expiration date
+  // 7. Calculate expiration date
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + REFRESH_TOKEN_EXPIRY_DAYS);
 
-  // 5. Upsert the session
+  // 8. Upsert the session
   await entities.UserExternalSession.upsert({
     where: {
       userId_deviceId: { userId, deviceId },
@@ -148,7 +186,69 @@ export async function generateTokenForUser(
   return {
     accessToken,
     refreshToken,
+    expiresIn: 3600, // 1 hour in seconds
   };
+}
+
+/**
+ * Verify and decode an external JWT token
+ * Validates signature, expiration, device ID, and session existence
+ *
+ * Note: This function will be used in Part 2 for token validation middleware
+ */
+export async function verifyExternalJwt(
+  token: string,
+  deviceId: string,
+  context: any
+): Promise<JwtPayload> {
+  try {
+    const jwtSecret = getJwtSecret();
+
+    // Verify token signature and expiration, returns typed payload
+    const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
+
+    // Verify device ID matches
+    if (decoded.deviceId !== deviceId) {
+      throw new HttpError(401, "Device ID mismatch");
+    }
+
+    // Verify session still exists (hasn't been revoked)
+    const session = await context.entities.UserExternalSession.findUnique({
+      where: {
+        userId_deviceId: {
+          userId: decoded.userId,
+          deviceId: decoded.deviceId,
+        },
+      },
+    });
+
+    if (!session) {
+      throw new HttpError(401, "Session not found or revoked");
+    }
+
+    // Check if session is expired
+    if (new Date() > session.expiresAt) {
+      // Clean up expired session
+      await context.entities.UserExternalSession.delete({
+        where: { id: session.id },
+      });
+      throw new HttpError(401, "Session expired");
+    }
+
+    return decoded;
+  } catch (error: any) {
+    if (error instanceof HttpError) {
+      throw error;
+    }
+    // Handle JWT-specific errors
+    if (error.name === "TokenExpiredError") {
+      throw new HttpError(401, "Access token expired");
+    }
+    if (error.name === "JsonWebTokenError") {
+      throw new HttpError(401, "Invalid token signature");
+    }
+    throw new HttpError(401, "Invalid or expired token");
+  }
 }
 ```
 
@@ -721,18 +821,18 @@ http://localhost:3000/auth/external/authorize?client_id=abcdefabcdefabcdefabcdef
 ```
 
 1. **Authentication:**
-   * **If you are not logged in:** You will be redirected to your login page. Sign in. If you added the redirect logic correctly, check your console. You should see `[App] Found OAuth redirect`.
-   * **If you are logged in:** You will see the loading message for a brief moment. While the loading message is visible (or just before the final redirect), check your **console**. You should see the success message we added: `[OAuth Token Grant] Token grant successful! Redirecting in 3 seconds...`
+   - **If you are not logged in:** You will be redirected to your login page. Sign in. If you added the redirect logic correctly, check your console. You should see `[App] Found OAuth redirect`.
+   - **If you are logged in:** You will see the loading message for a brief moment. While the loading message is visible (or just before the final redirect), check your **console**. You should see the success message we added: `[OAuth Token Grant] Token grant successful! Redirecting in 3 seconds...`
 2. **The "Success" State:**
-   * After the console message appears, your browser will attempt to redirect you to `chrome-extension://...`.
-   * **Expect an Error Page:** Since you (likely) don't have a Chrome extension with the ID `abcdefabcdefabcdefabcdefabcdefab` installed, your browser won't load anything, but hooray! 🎉 It means the flow completed successfully.
-   * **Verify the Token:** Look at the URL in your browser's address bar on that error page. It should look like this:
+   - After the console message appears, your browser will attempt to redirect you to `chrome-extension://...`.
+   - **Expect an Error Page:** Since you (likely) don't have a Chrome extension with the ID `abcdefabcdefabcdefabcdefabcdefab` installed, your browser won't load anything, but hooray! 🎉 It means the flow completed successfully.
+   - **Verify the Token:** Look at the URL in your browser's address bar on that error page. It should look like this:
 
 ```
 chrome-extension://abcdefabcdefabcdefabcdefabcdefab/callback.html#access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...&refresh_token=...
 ```
 
-* The presence of `#access_token=...` confirms that:
+- The presence of `#access_token=...` confirms that:
   1. Your backend successfully minted the tokens.
   2. Your database stored the session.
   3. Your frontend successfully handed them back to the "client."
@@ -753,11 +853,11 @@ We've built the foundation. We have the vault for external sessions, a mint for 
 
 In **Part 2**, we will harden this for production:
 
-* **API Implementation:** Filling in the `api.ts` logic to handle token generation and refreshing via HTTP.
-* **CORS Middleware:** Locking down access so only your known origins can talk to the API.
-* **Token Usage:** Building the API middleware to validate these tokens on incoming requests.
+- **API Implementation:** Filling in the `api.ts` logic to handle token generation and refreshing via HTTP.
+- **CORS Middleware:** Locking down access so only your known origins can talk to the API.
+- **Token Usage:** Building the API middleware to validate these tokens on incoming requests.
 
-***
+---
 
 ## About the Author
 
@@ -767,8 +867,8 @@ I am beginning to take on new consulting clients for any number of projects—au
 
 If you’re dealing with:
 
-* Design systems or component libraries that need to scale
-* Chrome extensions or cross-platform integrations
-* Internal tools your team hasn’t had bandwidth to build properly
+- Design systems or component libraries that need to scale
+- Chrome extensions or cross-platform integrations
+- Internal tools your team hasn’t had bandwidth to build properly
 
 Feel free to reach out to me on [LinkedIn](https://linkedin.com/in/rachelcantor) while I work on making a proper intake form. 🙌
