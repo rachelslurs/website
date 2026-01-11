@@ -4,6 +4,7 @@ description: >-
   After working with ChatGPT and other AI tools, I realized that copying and
   pasting responses into Google Docs often messed up the formatting.
 featured: false
+draft: false
 author: Rachel Cantor
 pubDatetime: 2024-09-24T04:00:00.000Z
 tags:
@@ -33,9 +34,9 @@ I built it using React, Vite, Web Workers (to handle processing of the markdown 
 
 ### 🔧 Why build this?
 
-* I saw a simple problem I could solve for myself and make it simple and delightful.
-* I love a good mini app as a way of trying out something new (like Vite) and brushing up on my Web Workers skills.
-* Also I want to get more contracting clients.
+- I saw a simple problem I could solve for myself and make it simple and delightful.
+- I love a good mini app as a way of trying out something new (like Vite) and brushing up on my Web Workers skills.
+- Also I want to get more contracting clients.
 
 ### 💡 What’s next?
 
