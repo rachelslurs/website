@@ -15,9 +15,9 @@ There are plenty of Chrome extensions that extract recipes from websites. So why
 
 Most Chrome extensions that remove the ads to give you just the recipe will either:
 
-* Request permission to read every website you visit, constantly monitoring in the background
-* Only work on a predefined list of popular recipe sites
-* Don’t work on websites with hard paywalls
+- Request permission to read every website you visit, constantly monitoring in the background
+- Only work on a predefined list of popular recipe sites
+- Don’t work on websites with hard paywalls
 
 For RecipeCast, I took a different approach: the extension only detects recipes when you click the icon in your browser toolbar. No background scanning. No monitoring your browsing. And it works on any recipe site, including paywalled ones.
 
@@ -33,18 +33,18 @@ I didn’t build casting directly into the extension (though I could have, since
 
 Another reason to build it: making it easier for users to use RecipeCast to cast recipes to a smart display or TV. Before, you needed to copy and paste the recipe URL to the website to be able to view it. Now, you can just click on the extension icon, select the “RecipeCast…” button, and you have the URL already loaded in.
 
-Here’s a video preview of the extension in action:
+Here's a video showing the extension in action:
 
-[https://www.youtube.com/watch?v=8QR3hi\_c24s](https://www.youtube.com/watch?v=8QR3hi_c24s)
+<iframe width="736" height="414" src="https://www.youtube.com/embed/8QR3hi_c24s?si=Ir2wYM40gaWmgrgt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ### The Result
 
 A Chrome extension that:
 
-* Only scans for recipes when you want it to
-* Works on any recipe site (not just a predefined list)
-* Works on paywalled sites without requiring you to sign in
-* Removes ads, life stories, and signup pressure
-* Makes it effortless to get recipes onto your TV or smart display
+- Only scans for recipes when you want it to
+- Works on any recipe site (not just a predefined list)
+- Works on paywalled sites without requiring you to sign in
+- Removes ads, life stories, and signup pressure
+- Makes it effortless to get recipes onto your TV or smart display
 
-Try it out and let me know what you think: [https://chromewebstore.google.com/detail/recipecast/jfblflmgkepdkfkkjdefbihembacdfog](https://chromewebstore.google.com/detail/recipecast/jfblflmgkepdkfkkjdefbihembacdfog?authuser=0\&hl=en)
+Try it out and let me know what you think: [https://chromewebstore.google.com/detail/recipecast/jfblflmgkepdkfkkjdefbihembacdfog](https://chromewebstore.google.com/detail/recipecast/jfblflmgkepdkfkkjdefbihembacdfog?authuser=0&hl=en)
