@@ -1,6 +1,6 @@
 ---
 title: The Missing Guide to Sentry Source Maps in Vite Web Workers
-featured: true
+featured: false
 author: Rachel Cantor
 pubDatetime: 2025-11-27T05:00:00.000Z
 tags:
@@ -38,8 +38,8 @@ I needed to configure the Sentry plugin for both the main build and the worker b
 ```typescript
 // vite.config.ts
 
-import { defineConfig, loadEnv } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig, loadEnv } from "vite";
+import react from "@vitejs/plugin-react";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 
 export default defineConfig(({ mode }) => {
@@ -47,13 +47,15 @@ export default defineConfig(({ mode }) => {
   const env = { ...process.env, ...loadEnv(mode, process.cwd()) };
 
   // Skip Sentry in development and during Lighthouse runs
-  const shouldUseSentry = mode !== 'development' && !env.VITE_LIGHTHOUSE;
+  const shouldUseSentry = mode !== "development" && !env.VITE_LIGHTHOUSE;
 
-  const sentryPlugin = shouldUseSentry ? sentryVitePlugin({
-    org: env.VITE_SENTRY_ORG,
-    project: env.VITE_SENTRY_PROJECT,
-    authToken: env.SENTRY_AUTH_TOKEN,
-  }) : [];
+  const sentryPlugin = shouldUseSentry
+    ? sentryVitePlugin({
+        org: env.VITE_SENTRY_ORG,
+        project: env.VITE_SENTRY_PROJECT,
+        authToken: env.SENTRY_AUTH_TOKEN,
+      })
+    : [];
 
   return {
     plugins: [
@@ -61,14 +63,15 @@ export default defineConfig(({ mode }) => {
       ...sentryPlugin, // (5) Spread for main bundle
     ],
     build: {
-      sourcemap: shouldUseSentry ? 'hidden' : false, // (3)
+      sourcemap: shouldUseSentry ? "hidden" : false, // (3)
     },
-    worker: { // (2)
+    worker: {
+      // (2)
       plugins: () => [...sentryPlugin], // (5) Spread for worker bundles
-      format: 'es',
+      format: "es",
       rollupOptions: {
         output: {
-          format: 'es', // (4)
+          format: "es", // (4)
         },
       },
     },
@@ -94,11 +97,11 @@ In the main application file, I defer Sentry loading until after the page loads 
 // main.tsx
 
 // I include Sentry in production, but not when running Lighthouse audits
-if (import.meta.env.MODE === 'production' && !import.meta.env.VITE_LIGHTHOUSE) {
+if (import.meta.env.MODE === "production" && !import.meta.env.VITE_LIGHTHOUSE) {
   const loadSentry = () => {
-    import('@sentry/react').then((Sentry) => {
+    import("@sentry/react").then(Sentry => {
       const webWorkerIntegration = Sentry.webWorkerIntegration({
-        worker: []  // intentionally left empty; we will add to this later
+        worker: [], // intentionally left empty; we will add to this later
       });
 
       Sentry.init({
@@ -117,14 +120,17 @@ if (import.meta.env.MODE === 'production' && !import.meta.env.VITE_LIGHTHOUSE) {
   };
 
   // Use requestIdleCallback for better performance
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     const win = window as Window & {
-      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => void
+      requestIdleCallback?: (
+        cb: () => void,
+        opts?: { timeout: number }
+      ) => void;
     };
     if (win.requestIdleCallback) {
       win.requestIdleCallback(loadSentry, { timeout: 2000 });
     } else {
-      win.addEventListener('load', () => {
+      win.addEventListener("load", () => {
         setTimeout(loadSentry, 0);
       });
     }
@@ -149,7 +155,7 @@ if (import.meta.env.MODE === 'production' && !import.meta.env.VITE_LIGHTHOUSE) {
   }
 }
 
-// after adding the worker to the Sentry integration, 
+// after adding the worker to the Sentry integration,
 // you can add your worker.onmessage, worker.onerror, etc.
 ```
 
@@ -191,7 +197,7 @@ Sentry.init({
     if (event.breadcrumbs) {
       event.breadcrumbs = event.breadcrumbs.map(breadcrumb => {
         if (breadcrumb.data?.input) {
-          breadcrumb.data.input = '[REDACTED]';
+          breadcrumb.data.input = "[REDACTED]";
         }
         return breadcrumb;
       });

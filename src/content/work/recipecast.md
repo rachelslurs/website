@@ -14,6 +14,8 @@ pubDatetime: 2025-12-19T05:00:00.000Z
 year: "2025"
 tags:
   - SaaS
+  - Python
+  - FastAPI
   - TypeScript
   - React
   - Google Cast SDK
@@ -49,7 +51,18 @@ To handle the complexity of the Cast SDK, I designed an architecture where the c
 
 ### Recipe Extraction
 
-I built a priority-based extraction system deployed on Cloudflare Workers to handle the variance in recipe website structures.
+I built a two-tier recipe extraction pipeline: a FastAPI service (primary) and a Cloudflare Worker (fallback). The Wasp backend calls the Python API first; if it fails (timeout, 5xx, or site block), it falls back to the proxy worker. Both return normalized Schema.org-style recipe data so the rest of the app stays unchanged.
+
+#### Primary: FastAPI
+
+Stack: Python, FastAPI, deployed on Railway
+Features: JWT auth, per-user rate limiting, URL validation and SSRF protection, Datadog APM.
+Why primary: Better structure, validation, and observability; easier to extend and harden.
+
+#### Fallback: Cloudflare Worker
+
+Role: Original extraction layer; used only when the FastAPI call fails at runtime.
+Coverage: Handles 200+ recipe sites as a proxy that detects and extracts recipe data.
 
 ## Solution
 
@@ -58,4 +71,4 @@ I built a production-ready SaaS platform using Wasp (React + Node.js) that integ
 The solution focused on two core technical achievements:
 
 1. Reliable Cast Integration: Implementing an authoritative receiver architecture to maintain synchronized state, handle network interruptions, and manage session timeouts gracefully.
-2. Universal Parsing: A Cloudflare worker that behaves as a proxy that detects and extracts recipe data from over 200+ recipe sites and counting.
+2. Universal Parsing: A two-tier extraction pipeline—FastAPI as the primary service, with a Cloudflare Worker as fallback when the API fails. The worker continues to support 200+ recipe sites; the Wasp backend tries the API first, then the worker.

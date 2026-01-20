@@ -1,7 +1,6 @@
 ---
 title: >-
-  Per-User JWT Secrets: Enterprise-Grade Token Revocation for External Clients
-  in Wasp
+  Per-User JWT Secrets: Enterprise-Grade Token Revocation for External Clients in Wasp
 description: >-
   Secure your OpenSaaS with per-user JWT secrets, encrypted storage, and surgical token revocation for external clients.
 featured: true

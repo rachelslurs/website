@@ -1,9 +1,9 @@
 ---
-title: 'Google Killed Their Cookbook App, So I’m Building My Own'
+title: "Google Killed Their Cookbook App, So I’m Building My Own"
 description: >-
   After Google discontinued their Nest Hub cookbook feature, I needed a way to
   display recipes without a printer or messing up my phone.
-featured: true
+featured: false
 author: Rachel Cantor
 pubDatetime: 2025-02-22T05:00:00.000Z
 tags:
