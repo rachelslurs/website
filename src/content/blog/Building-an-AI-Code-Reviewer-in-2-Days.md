@@ -4,7 +4,7 @@ description: >-
   Tired of playing code review whack-a-mole on solo projects? I built an AI tool
   that handles the systematic stuff (security, performance, TypeScript issues)
   so you can focus elsewhere.
-featured: true
+featured: false
 draft: false
 author: Rachel Cantor
 pubDatetime: 2025-09-09T04:00:00.000Z
