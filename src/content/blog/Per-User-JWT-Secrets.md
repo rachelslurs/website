@@ -5,7 +5,6 @@ title: >-
 description: >-
   Secure your OpenSaaS with per-user JWT secrets, encrypted storage, and surgical token revocation for external clients.
 featured: true
-draft: true
 author: Rachel Cantor
 pubDatetime: 2026-01-20T05:00:00.000Z
 tags:
@@ -97,8 +96,6 @@ function deriveCombinedKey(globalSecret: string, userSecret: string): string {
 }
 ```
 
-**Why HMAC instead of concatenation?** Simple concatenation can create collisions. If `globalSecret = "foo"` and `userSecret = "bar"` gives `"foobar"`, but so does `globalSecret = "foob"` and `userSecret = "ar"`. HMAC ensures different inputs always produce different outputs through proper cryptographic mixing.
-
 ## Implementation
 
 ### 1. Encryption Layer
@@ -146,8 +143,6 @@ export function decryptSecret(encrypted: string, masterSecret: string): string {
   ]).toString("utf8");
 }
 ```
-
-We use PBKDF2 with 100,000 iterations to derive the encryption key, making brute-force attacks computationally expensive. The authentication tag from GCM mode prevents tampering.
 
 ### 2. Per-User Secret Management
 
@@ -312,7 +307,7 @@ export const changePassword = async ({ newPassword }, context) => {
 };
 ```
 
-This rotates the user's secret and deletes all their sessions. All existing access and refresh tokens immediately become invalid, even ones that haven't expired yet. Other users are completely unaffected.
+This rotates the user's secret and deletes all their sessions. All existing access and refresh tokens immediately become invalid, even ones that haven't expired yet. Other users are completely unaffected. 🎉
 
 ## Migration Strategy
 
@@ -378,7 +373,7 @@ Check database for exactly one `UserJwtSecret` row (unique constraint prevented 
 - Rotation timestamps
 - Encryption failures (without values)
 
-**Key management:** Store `JWT_SECRET` in a secure secret manager (AWS Secrets Manager, HashiCorp Vault), not committed `.env` files. Rotate periodically with coordinated re-encryption.
+**Key management:** Store `JWT_SECRET` in a secure secret manager, not committed `.env` files and rotate periodically.
 
 **Defense in depth:** Per-user secrets are one layer. Combined with CORS policies, client allowlists, device IDs, and refresh token rotation, you create a robust system where no single layer's failure compromises security.
 
@@ -387,17 +382,14 @@ Check database for exactly one `UserJwtSecret` row (unique constraint prevented 
 Consider per-user secrets when:
 
 - You have enterprise customers requiring granular revocation
-- You're subject to compliance requirements (SOC 2, HIPAA)
 - You serve multiple untrusted external clients
 - Users handle particularly sensitive data
 
-For MVPs or small user bases, the basic system from Parts 1 and 2 is sufficient. But plan for this early so migration is smooth.
+For MVPs or small user bases, the basic system from Parts 1 and 2 is sufficient.
 
 ## Conclusion
 
-We've evolved from a basic OAuth-like flow to an enterprise-grade system with surgical revocation. This is the system running in production for RecipeCast, handling Chrome extensions, automatic token refresh, per-device sessions, millisecond per-user revocation, and encrypted secrets at rest.
-
-The key insight is layered security. CORS, client allowlists, device sessions, refresh token rotation, and per-user secrets all work together. No single layer is perfect, but together they create a robust system.
+We've evolved from a basic OAuth-like flow to an enterprise-grade system with surgical revocation. This is the system running in production for [RecipeCast](https://recipecast.app) and for external auth handling in my [Chrome extension](https://chromewebstore.google.com/detail/recipecast/jfblflmgkepdkfkkjdefbihembacdfog).
 
 **Three final pieces of advice:**
 
@@ -421,4 +413,4 @@ If you're dealing with:
 - Chrome extensions or cross-platform integrations
 - Internal tools your team hasn't had bandwidth to build properly
 
-Feel free to reach out to me on [LinkedIn](https://linkedin.com/in/rachelcantor) while I work on making a proper intake form. 🙌
+Feel free to reach out to me on [bear.ink](https://bear.ink). 🙌
