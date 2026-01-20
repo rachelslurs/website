@@ -3,8 +3,7 @@ title: >-
   Per-User JWT Secrets: Enterprise-Grade Token Revocation for External Clients
   in Wasp
 description: >-
-  If you're building an OpenSaaS app and want to extend it beyond the browser
-  tab, this is the blueprint.
+  Secure your OpenSaaS with per-user JWT secrets, encrypted storage, and surgical token revocation for external clients.
 featured: true
 draft: true
 author: Rachel Cantor
@@ -18,9 +17,9 @@ tags:
   - wasp
 ---
 
-*If you'd like a hand in building this or anything like it, I'm open to taking on new clients. See [the end of this article](#about-the-author) to learn more.*
+_If you'd like a hand in building this or anything like it, I'm open to taking on new clients. See [the end of this article](#about-the-author) to learn more._
 
-***
+---
 
 In Parts 1 and 2, we built a complete OAuth-style authentication system for external clients: Chrome extensions, mobile apps, or any client that can't share your web app's cookie jar. We covered the database schema, token generation, CORS policies, and refresh flows.
 
@@ -368,16 +367,16 @@ Check database for exactly one `UserJwtSecret` row (unique constraint prevented 
 
 **Never log:**
 
-* Plaintext per-user secrets
-* Decrypted values
-* Combined keys
-* Tokens
+- Plaintext per-user secrets
+- Decrypted values
+- Combined keys
+- Tokens
 
 **Safe to log:**
 
-* User ID
-* Rotation timestamps
-* Encryption failures (without values)
+- User ID
+- Rotation timestamps
+- Encryption failures (without values)
 
 **Key management:** Store `JWT_SECRET` in a secure secret manager (AWS Secrets Manager, HashiCorp Vault), not committed `.env` files. Rotate periodically with coordinated re-encryption.
 
@@ -387,10 +386,10 @@ Check database for exactly one `UserJwtSecret` row (unique constraint prevented 
 
 Consider per-user secrets when:
 
-* You have enterprise customers requiring granular revocation
-* You're subject to compliance requirements (SOC 2, HIPAA)
-* You serve multiple untrusted external clients
-* Users handle particularly sensitive data
+- You have enterprise customers requiring granular revocation
+- You're subject to compliance requirements (SOC 2, HIPAA)
+- You serve multiple untrusted external clients
+- Users handle particularly sensitive data
 
 For MVPs or small user bases, the basic system from Parts 1 and 2 is sufficient. But plan for this early so migration is smooth.
 
@@ -408,7 +407,7 @@ The key insight is layered security. CORS, client allowlists, device sessions, r
 
 You now have the complete blueprint for external client authentication in Wasp, from basic OAuth flows to enterprise-grade token management.
 
-***
+---
 
 ## About the Author
 
@@ -418,8 +417,8 @@ I am beginning to take on new consulting clients for any number of projects: aut
 
 If you're dealing with:
 
-* Design systems or component libraries that need to scale
-* Chrome extensions or cross-platform integrations
-* Internal tools your team hasn't had bandwidth to build properly
+- Design systems or component libraries that need to scale
+- Chrome extensions or cross-platform integrations
+- Internal tools your team hasn't had bandwidth to build properly
 
 Feel free to reach out to me on [LinkedIn](https://linkedin.com/in/rachelcantor) while I work on making a proper intake form. 🙌
