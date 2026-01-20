@@ -1,6 +1,7 @@
 ---
 title: >-
-  Per-User JWT Secrets: Enterprise-Grade Token Revocation for External Clients in Wasp
+  Per-User JWT Secrets: Enterprise-Grade Token Revocation for External Clients
+  in Wasp
 description: >-
   If you're building an OpenSaaS app and want to extend it beyond the browser
   tab, this is the blueprint.
@@ -17,9 +18,9 @@ tags:
   - wasp
 ---
 
-_If you'd like a hand in building this or anything like it, I'm open to taking on new clients. See [the end of this article](#about-the-author) to learn more._
+*If you'd like a hand in building this or anything like it, I'm open to taking on new clients. See [the end of this article](#about-the-author) to learn more.*
 
----
+***
 
 In Parts 1 and 2, we built a complete OAuth-style authentication system for external clients: Chrome extensions, mobile apps, or any client that can't share your web app's cookie jar. We covered the database schema, token generation, CORS policies, and refresh flows.
 
@@ -52,9 +53,7 @@ Every user's external JWT is signed with the same key. This creates two limitati
 
 ## The Solution: Per-User Cryptographic Secrets
 
-The fix is simple: give each user their own secret, then derive a combined signing key. To revoke all of a user's tokens, rotate their secret.
-
-Here's the trust chain:
+The fix is simple: give each user their own secret, then derive a combined signing key. To revoke all of a user's tokens, rotate their secret.![](/uploads/per-user-diagram.png)
 
 When you rotate a user's secret, all tokens signed with the old combined key immediately become invalid without affecting any other user.
 
@@ -369,16 +368,16 @@ Check database for exactly one `UserJwtSecret` row (unique constraint prevented 
 
 **Never log:**
 
-- Plaintext per-user secrets
-- Decrypted values
-- Combined keys
-- Tokens
+* Plaintext per-user secrets
+* Decrypted values
+* Combined keys
+* Tokens
 
 **Safe to log:**
 
-- User ID
-- Rotation timestamps
-- Encryption failures (without values)
+* User ID
+* Rotation timestamps
+* Encryption failures (without values)
 
 **Key management:** Store `JWT_SECRET` in a secure secret manager (AWS Secrets Manager, HashiCorp Vault), not committed `.env` files. Rotate periodically with coordinated re-encryption.
 
@@ -388,10 +387,10 @@ Check database for exactly one `UserJwtSecret` row (unique constraint prevented 
 
 Consider per-user secrets when:
 
-- You have enterprise customers requiring granular revocation
-- You're subject to compliance requirements (SOC 2, HIPAA)
-- You serve multiple untrusted external clients
-- Users handle particularly sensitive data
+* You have enterprise customers requiring granular revocation
+* You're subject to compliance requirements (SOC 2, HIPAA)
+* You serve multiple untrusted external clients
+* Users handle particularly sensitive data
 
 For MVPs or small user bases, the basic system from Parts 1 and 2 is sufficient. But plan for this early so migration is smooth.
 
@@ -404,14 +403,12 @@ The key insight is layered security. CORS, client allowlists, device sessions, r
 **Three final pieces of advice:**
 
 1. **Start simple, evolve deliberately**: Parts 1 and 2 are sufficient for most apps. Add per-user secrets when you need them.
-
 2. **Plan for migration early**: Structure your code so adding per-user secrets later is a clean evolution, not a rewrite.
-
 3. **Document your security model**: Write down what each layer protects against and what the migration path looks like.
 
 You now have the complete blueprint for external client authentication in Wasp, from basic OAuth flows to enterprise-grade token management.
 
----
+***
 
 ## About the Author
 
@@ -421,8 +418,8 @@ I am beginning to take on new consulting clients for any number of projects: aut
 
 If you're dealing with:
 
-- Design systems or component libraries that need to scale
-- Chrome extensions or cross-platform integrations
-- Internal tools your team hasn't had bandwidth to build properly
+* Design systems or component libraries that need to scale
+* Chrome extensions or cross-platform integrations
+* Internal tools your team hasn't had bandwidth to build properly
 
 Feel free to reach out to me on [LinkedIn](https://linkedin.com/in/rachelcantor) while I work on making a proper intake form. 🙌
