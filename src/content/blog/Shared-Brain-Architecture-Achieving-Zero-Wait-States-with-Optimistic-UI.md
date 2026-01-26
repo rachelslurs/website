@@ -20,7 +20,7 @@ Eventually, you end up with a blurry UI. By "blurry," I mean a user interface wh
 
 The fix is logic parity: running the exact same code on both the frontend and the backend. Here is how I use a shared brain to create a zero-wait state where the UI reacts instantly, backed by the total confidence of a backend-verified system.
 
-## The Blueprint: The Universal Socket
+## The Interface: Decoupling Rules
 
 The core of this strategy is treating your business logic like a universal socket.
 
