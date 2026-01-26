@@ -3,7 +3,7 @@ title: Implementing External Client Authentication with Wasp
 description: >-
   If you're building an OpenSaaS app and want to extend it beyond the browser
   tab, this is the blueprint.
-featured: true
+featured: false
 author: Rachel Cantor
 pubDatetime: 2025-12-19T05:00:00.000Z
 tags:

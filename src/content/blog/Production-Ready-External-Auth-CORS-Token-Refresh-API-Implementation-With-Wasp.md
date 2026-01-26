@@ -5,7 +5,7 @@ title: >-
 description: >-
   From prototype to production: strict CORS policies, efficient token refresh,
   and battle-tested patterns that keep your external auth system secure.
-featured: true
+featured: false
 draft: false
 author: Rachel Cantor
 pubDatetime: 2025-12-30T05:00:00.000Z
