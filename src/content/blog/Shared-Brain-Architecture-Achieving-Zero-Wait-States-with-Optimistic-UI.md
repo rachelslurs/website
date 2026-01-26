@@ -28,7 +28,7 @@ Imagine if every time you bought a new hair dryer, you had to call an electricia
 
 In code, soldering your business logic directly creates the same mess. Instead, we use an interface, a universal socket, that defines the shape of the data we need. The logic shouldn't care if it's plugged into a real production database or a local frontend cache.
 
-### What is a shared brain?
+### What is a Shared Brain?
 
 A shared brain is not a microservice. If you put this logic in a microservice, the frontend still has to call it over a network, which introduces the exact latency and uncertain loading states we’re trying to avoid.
 
