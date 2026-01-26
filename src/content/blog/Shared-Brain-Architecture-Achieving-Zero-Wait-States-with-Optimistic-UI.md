@@ -1,5 +1,5 @@
 ---
-title: "Shared Brain Architecture: Achieving Zero-Wait States with Optimistic UI"
+title: "Shared Brain: Achieving Zero-Wait States with Optimistic UI"
 description: Achieve high-fidelity feedback by mirroring your backend logic in the browser
 featured: true
 draft: false
