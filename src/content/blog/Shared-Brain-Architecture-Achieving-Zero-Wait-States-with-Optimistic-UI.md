@@ -1,6 +1,6 @@
 ---
 title: "Shared Brain: Achieving Zero-Wait States with Optimistic UI"
-description: Achieve high-fidelity feedback by mirroring your backend logic in the browser
+description: Achieve high-fidelity feedback by mirroring your backend logic in the browser. Learn how to eliminate logic drift and create zero-wait states with a shared brain architecture.
 featured: true
 draft: false
 author: Rachel Cantor
