@@ -1,18 +1,17 @@
 ---
-title: 'Auto-Cancel Old GitHub Actions Runs: Save CI Minutes with 3 Lines of Code'
+title: 'Your CI Is Running Tests on Old Code: How to Auto-Cancel GitHub Actions'
 description: >-
   Pushing multiple commits quickly? You're probably paying for 3-4 parallel test
   runs testing outdated code. Here's a 3-line fix that automatically cancels old
   GitHub Actions runs and cuts your CI costs.
 featured: true
 author: Rachel Cantor
-pubDatetime: '2026-01-25T05:00:00.000Z'
+pubDatetime: 2026-01-25T05:00:00.000Z
 tags:
   - github workflows
   - github actions
   - github
 ---
-
 
 Here's a scenario you've probably experienced: You push a commit to your pull request and GitHub Actions starts running your tests. Two minutes later, you spot a typo and push another commit. Now you have two test runs executing in parallel—one testing code you've already replaced.
 
