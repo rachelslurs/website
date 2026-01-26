@@ -1,7 +1,7 @@
 ---
-title: "TidyText.cc, copy paste to Google Docs, now with support for fractions"
+title: 'TidyText.cc, copy paste to Google Docs, now with support for fractions'
 description: Fractions aren't so simple
-featured: true
+featured: false
 author: Rachel Cantor
 pubDatetime: 2024-09-30T04:00:00.000Z
 tags:
@@ -83,11 +83,11 @@ I did notice fractions don’t work in tables yet. Something for another day.
 
 ### TLDR; Lessons learned
 
-- Markdown and LaTeX: not supported by Google Docs
-- MathJax: good for rendering formulas in SVGs
-- SVGs don’t render in Google Docs
-- Canvas API for SVG -> PNG conversion with scaling to keep text extra crispy.
-- CSS dark mode: being able to dynamically invert the image without affecting what the fraction would look like in Google Docs.
+* Markdown and LaTeX: not supported by Google Docs
+* MathJax: good for rendering formulas in SVGs
+* SVGs don’t render in Google Docs
+* Canvas API for SVG -> PNG conversion with scaling to keep text extra crispy.
+* CSS dark mode: being able to dynamically invert the image without affecting what the fraction would look like in Google Docs.
 
 ### Next on the roadmap
 
