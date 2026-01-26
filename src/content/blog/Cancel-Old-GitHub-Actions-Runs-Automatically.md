@@ -17,7 +17,7 @@ Here's a scenario you've probably experienced: You push a commit to your pull re
 
 By default, GitHub Actions doesn't cancel old runs when you push new commits. If you're iterating quickly during development, you might have 3-4 runs stacking up, all testing outdated code. You're paying for all of them.
 
-## The Fix: Four Lines of YAML
+## The Fix: Three Lines of YAML
 
 Add this to the top of your workflow file, right after the on: section:
 
