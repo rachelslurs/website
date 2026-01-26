@@ -2,7 +2,7 @@
 title: 'Auto-Cancel Old GitHub Actions Runs: Save CI Minutes with 3 Lines of Code'
 description: >-
   Pushing multiple commits quickly? You're probably paying for 3-4 parallel test
-  runs testing outdated code. Here's a 4-line fix that automatically cancels old
+  runs testing outdated code. Here's a 3-line fix that automatically cancels old
   GitHub Actions runs and cuts your CI costs.
 featured: true
 author: Rachel Cantor
