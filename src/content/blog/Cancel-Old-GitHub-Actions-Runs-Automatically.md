@@ -45,7 +45,7 @@ The concurrency configuration creates a group for your workflow runs. When a new
 2. If yes, it cancels the old run
 3. Only the most recent run continues
 
-![](/uploads/github-actions-cancel-in-progress.png)
+!['GitHub actions cancel in progress diagram](/uploads/github-actions-cancel-in-progress.png)
 
 ## Why the group Key Looks Like That
 
@@ -93,4 +93,4 @@ jobs:
         run: npm test
 ```
 
-This is the easiest GitHub Actions optimization you can make. Four lines of configuration, zero complexity, immediate savings on your GitHub Actions bill.
+This is the easiest GitHub Actions optimization you can make. Three lines of configuration, zero complexity, immediate savings on your GitHub Actions bill.
