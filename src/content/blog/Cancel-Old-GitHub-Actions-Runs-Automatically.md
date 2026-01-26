@@ -1,5 +1,5 @@
 ---
-title: Cancel Old GitHub Actions Runs Automatically
+title: 'Auto-Cancel Old GitHub Actions Runs: Save CI Minutes with 3 Lines of Code'
 description: >-
   Pushing multiple commits quickly? You're probably paying for 3-4 parallel test
   runs testing outdated code. Here's a 4-line fix that automatically cancels old
@@ -47,7 +47,7 @@ The concurrency configuration creates a group for your workflow runs. When a new
 
 !['GitHub actions cancel in progress diagram](/uploads/github-actions-cancel-in-progress.png)
 
-## Why the group Key Looks Like That
+## Why the `group` Key Looks Like That
 
 ```yaml
 group: ${ { github.workflow } } -${ { github.event.pull_request.number || github.ref } }
