@@ -19,7 +19,7 @@ By default, GitHub Actions doesn't cancel old runs when you push new commits. If
 
 ## The Fix: Three Lines of YAML
 
-Add this to the top of your workflow file, right after the on: section:
+Add this to the top of your workflow file, right after the `on:` section:
 
 ```yaml
 name: Tests
