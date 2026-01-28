@@ -22,6 +22,7 @@ module.exports = {
       textColor: {
         skin: {
           base: withOpacity("--color-text-base"),
+          foreground: withOpacity("--color-text-base"),
           accent: withOpacity("--color-accent"),
           inverted: withOpacity("--color-fill"),
           "toast-success": withOpacity("--color-toast-success-icon"),

@@ -1,12 +1,15 @@
 export default function Loader({
   className = "w-5 h-5",
+  size,
 }: {
   className?: string;
+  size?: number;
 }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       className={className}
+      style={size != null ? { width: size, height: size } : undefined}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"

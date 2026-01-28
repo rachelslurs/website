@@ -220,9 +220,15 @@ const nextPost =
   document.addEventListener("scroll", updateScrollProgress);
 
   /** Attaches links to headings in the document,
-   *  allowing sharing of sections easily */
+   *  allowing sharing of sections easily.
+   *  Excludes headings with data-exclude-heading-link (e.g. inside client islands)
+   *  so we don't mutate DOM that React will hydrate. */
   function addHeadingLinks() {
-    let headings = Array.from(document.querySelectorAll("h2, h3, h4, h5, h6"));
+    let headings = Array.from(
+      document.querySelectorAll(
+        "h2, h3:not([data-exclude-heading-link]), h4:not([data-exclude-heading-link]), h5:not([data-exclude-heading-link]), h6:not([data-exclude-heading-link])"
+      )
+    );
 
     for (let heading of headings) {
       heading.classList.add("group");
