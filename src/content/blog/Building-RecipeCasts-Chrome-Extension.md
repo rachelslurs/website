@@ -3,7 +3,7 @@ title: Building RecipeCast's Chrome Extension
 description: >-
   There are plenty of Chrome extensions that extract recipes from websites. So
   why build another one?
-featured: true
+featured: false
 author: Rachel Cantor
 pubDatetime: 2026-01-11T05:00:00.000Z
 tags:
