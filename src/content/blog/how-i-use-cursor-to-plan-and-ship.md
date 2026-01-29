@@ -43,7 +43,7 @@ I can verify the database migration worked, test the API endpoint returns valid 
 
 Once a plan exists, I force the AI to challenge me:
 
-> Analyze this plan for gaps and unintended consequences. What am I missing? What could go wrong
+> Analyze this plan for gaps and unintended consequences. What am I missing? What could go wrong?
 
 For the authentication plan, Cursor flagged:
 
