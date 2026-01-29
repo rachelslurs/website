@@ -47,6 +47,25 @@ module.exports = {
           fill: withOpacity("--color-accent"),
         },
       },
+      ringOffsetColor: {
+        skin: withOpacity("--color-ring-offset"),
+      },
+      ringColor: {
+        skin: {
+          line: withOpacity("--color-border"),
+          accent: withOpacity("--color-accent"),
+          fill: withOpacity("--color-text-base"),
+        },
+      },
+      placeholderColor: {
+        skin: withOpacity("--color-placeholder"),
+      },
+      caretColor: {
+        skin: {
+          base: withOpacity("--color-text-base"),
+          accent: withOpacity("--color-accent"),
+        },
+      },
       borderColor: {
         skin: {
           line: withOpacity("--color-border"),
@@ -68,9 +87,21 @@ module.exports = {
         mono: ["IBM Plex Mono", "monospace"],
       },
 
+      boxShadow: {
+        skin: {
+          sm: "0 1px 2px 0 rgba(var(--color-shadow), 0.06)",
+          DEFAULT:
+            "0 1px 3px 0 rgba(var(--color-shadow), 0.1), 0 1px 2px -1px rgba(var(--color-shadow), 0.1)",
+          md: "0 4px 6px -1px rgba(var(--color-shadow), 0.1), 0 2px 4px -2px rgba(var(--color-shadow), 0.1)",
+          lg: "0 10px 15px -3px rgba(var(--color-shadow), 0.1), 0 4px 6px -4px rgba(var(--color-shadow), 0.1)",
+        },
+      },
+
       typography: {
         DEFAULT: {
           css: {
+            'blockquote p:first-of-type::before': false,
+            'blockquote p:first-of-type::after': false,
           },
         },
       },
