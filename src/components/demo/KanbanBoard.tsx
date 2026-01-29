@@ -1,4 +1,11 @@
-import { useState, useCallback, useMemo, memo, forwardRef } from "react";
+import {
+  useState,
+  useCallback,
+  useMemo,
+  memo,
+  forwardRef,
+  useEffect,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import DemoLayout from "@components/DemoLayout";
 
@@ -20,6 +27,22 @@ interface Columns {
 }
 
 export default function KanbanBoard() {
+  // Hydration fix states
+  const [hasMounted, setHasMounted] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+    const checkTouch = () => {
+      setIsTouchDevice(window.matchMedia("(pointer: coarse)").matches);
+    };
+    checkTouch();
+
+    const monitor = window.matchMedia("(pointer: coarse)");
+    monitor.addEventListener("change", checkTouch);
+    return () => monitor.removeEventListener("change", checkTouch);
+  }, []);
+
   const [columns, setColumns] = useState<Columns>({
     todo: {
       id: "todo",
@@ -75,27 +98,22 @@ export default function KanbanBoard() {
 
       setColumns(prev => {
         const newColumns = { ...prev };
-
-        // Remove from source
         newColumns[sourceColumn] = {
           ...newColumns[sourceColumn],
           items: newColumns[sourceColumn].items.filter(
             item => item.id !== draggedItem.id
           ),
         };
-
-        // Add to target
         newColumns[targetColumnId] = {
           ...newColumns[targetColumnId],
           items: [...newColumns[targetColumnId].items, draggedItem],
         };
-
         return newColumns;
       });
 
       handleDragEnd();
     },
-    [draggedItem, sourceColumn, columns, handleDragEnd]
+    [draggedItem, sourceColumn, handleDragEnd]
   );
 
   const columnArray = useMemo(() => Object.values(columns), [columns]);
@@ -106,15 +124,44 @@ export default function KanbanBoard() {
       description="Drag cards between columns to reorganize tasks"
       filename="KanbanBoard.tsx"
     >
-      <div className="grid grid-cols-3 gap-8">
+      <AnimatePresence>
+        {hasMounted && isTouchDevice && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="mb-6 p-4 border border-amber-500/50 bg-amber-500/10 rounded-lg text-sm text-amber-200">
+              <p className="font-bold mb-1">⚠️ Touch Device Detected</p>
+              <p>
+                This board uses the <strong>HTML5 Drag and Drop API</strong>,
+                which is not supported on most mobile browsers. For the best
+                experience, please use a desktop browser with a mouse.
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* FIXED LAYOUT:
+          - flex-col for mobile stacking
+          - md:flex-row for desktop horizontal
+          - items-stretch ensures all columns stay the same height
+      */}
+      <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-stretch">
         {columnArray.map(column => (
-          <KanbanColumn
-            key={column.id}
-            column={column}
-            onDrop={handleDrop}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-          />
+          /* md:min-w-0 is the "magic" fix that lets flex items shrink 
+             properly within the 48rem parent constraint.
+          */
+          <div key={column.id} className="w-full md:flex-1 min-w-0">
+            <KanbanColumn
+              column={column}
+              onDrop={handleDrop}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+            />
+          </div>
         ))}
       </div>
     </DemoLayout>
@@ -155,8 +202,11 @@ const KanbanColumn = memo(
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDropLocal}
+        /* Removed min-w-[250px] here to allow the column to shrink 
+           to 1/3 of the parent width on smaller desktop screens.
+        */
         className={`
-          flex-1 min-w-[250px] transition-colors rounded-lg border border-dashed p-4
+          h-full transition-colors rounded-lg border border-dashed p-4 min-w-[150px]
           ${
             isDragOver
               ? "border-skin-accent bg-skin-accent/10"
@@ -164,16 +214,19 @@ const KanbanColumn = memo(
           }
         `}
       >
-        <div className="flex items-baseline justify-between">
-          <h4 className="" data-exclude-heading-link>
+        <div className="flex items-baseline justify-between mb-4">
+          <h4
+            className="font-semibold text-skin-base"
+            data-exclude-heading-link
+          >
             {column.title}
           </h4>
-          <span className="text-sm text-skin-base opacity-70 leading-none">
+          <span className="text-xs font-mono opacity-60">
             {column.items.length}
           </span>
         </div>
 
-        <div className="space-y-2 min-h-[200px]">
+        <div className="space-y-2 min-h-[100px]">
           <AnimatePresence mode="popLayout">
             {column.items.map(item => (
               <KanbanCard
@@ -203,10 +256,6 @@ interface KanbanCardProps {
 const KanbanCard = memo(
   forwardRef<HTMLDivElement, KanbanCardProps>(
     ({ item, columnId, onDragStart, onDragEnd }, ref) => {
-      const handleDragStartLocal = useCallback(() => {
-        onDragStart(item, columnId);
-      }, [item, columnId, onDragStart]);
-
       return (
         <motion.div
           ref={ref}
@@ -215,7 +264,7 @@ const KanbanCard = memo(
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9 }}
           draggable
-          onDragStart={handleDragStartLocal}
+          onDragStart={() => onDragStart(item, columnId)}
           onDragEnd={onDragEnd}
           className="p-3 bg-skin-card border border-skin-line rounded-lg cursor-grab active:cursor-grabbing hover:border-skin-accent transition-colors shadow-sm"
           whileDrag={{

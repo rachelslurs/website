@@ -84,7 +84,8 @@ module.exports = {
         transparent: "transparent",
       },
       fontFamily: {
-        mono: ["IBM Plex Mono", "monospace"],
+        sans: ["Geist", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["IBM Plex Mono", "ui-monospace", "SFMono-Regular", "monospace"],
       },
 
       boxShadow: {
@@ -102,6 +103,104 @@ module.exports = {
           css: {
             'blockquote p:first-of-type::before': false,
             'blockquote p:first-of-type::after': false,
+            maxWidth: '68ch',
+            lineHeight: '1.75',
+            fontSize: '1.1rem',
+            color: 'var(--color-text-base)',
+            p: {
+              fontFamily: 'Geist, sans-serif',
+              marginBottom: '1.5em',
+            },
+            'ul, ol': {
+              fontFamily: 'Geist, sans-serif',
+              paddingLeft: '1.25em',
+            },
+            li: {
+              marginBottom: '0.5em',
+            },
+            'h1, h2, h3, h4, h5, h6': {
+              fontFamily: 'IBM Plex Mono, monospace',
+              fontWeight: '600',
+              letterSpacing: '-0.01em',
+              marginTop: '2em',
+              marginBottom: '0.8em',
+            },
+            code: {
+              fontFamily: 'IBM Plex Mono, monospace',
+              backgroundColor: 'rgba(var(--color-text-base), 0.05)',
+              padding: '0.2em 0.4em',
+              borderRadius: '4px',
+              fontWeight: '400',
+            },
+            strong: {
+              color: 'inherit',
+              fontWeight: '600',
+            },
+            'pre code': {
+              backgroundColor: 'transparent',
+              padding: '0',
+            },
+            'blockquote, blockquote > ul, blockquote > ol': {
+              fontStyle: 'normal',
+              paddingLeft: '1.5em',
+              paddingRight: '1.5em',
+              fontSize: '0.95rem',
+            },
+            'blockquote > p, blockquote > ul > li, blockquote > ol > li': {
+              fontFamily: 'IBM Plex Mono, monospace',
+            },
+
+            'hr': {
+              borderColor: 'rgba(var(--color-text-base), var(--tw-border-opacity))',
+              borderWidth: '1px',
+              marginTop: '2em',
+              marginBottom: '2em',
+            },
+            'img': {
+              marginTop: '1em',
+              marginBottom: '1em',
+            },
+            '.contains-task-list': {
+        listStyleType: 'none',
+        paddingLeft: '0',
+      },
+      // Target the li specifically to remove the pseudo-element bullet
+      '.task-list-item': {
+        listStyleType: 'none',
+        display: 'flex',
+        alignItems: 'flex-start',
+      },
+      '.task-list-item::before': {
+        content: 'none !important',
+      },
+      '.task-list-item input[type="checkbox"]': {
+        appearance: 'none',
+        backgroundColor: 'transparent',
+        margin: '0.3em 0.6em 0 0',
+        padding: '0',
+        width: '1rem',
+        height: '1rem',
+        border: '1px solid rgba(var(--color-text-base), 0.3)',
+        borderRadius: '3px',
+        position: 'relative',
+        cursor: 'pointer',
+      },
+      // Styling the checkmark itself
+      '.task-list-item input[type="checkbox"]:checked': {
+        backgroundColor: 'rgb(var(--color-accent))',
+        borderColor: 'rgb(var(--color-accent))',
+      },
+      '.task-list-item input[type="checkbox"]:checked::after': {
+        content: '""',
+        position: 'absolute',
+        top: '1px',
+        left: '4px',
+        width: '4px',
+        height: '8px',
+        border: 'solid white',
+        borderWidth: '0 2px 2px 0',
+        transform: 'rotate(45deg)',
+      },
           },
         },
       },
@@ -109,6 +208,7 @@ module.exports = {
   },
   plugins: [
     require("@tailwindcss/typography"),
-    require("@tailwindcss/forms")
+    require("@tailwindcss/forms"),
+    require("tailwindcss-animate"),
   ],
 };

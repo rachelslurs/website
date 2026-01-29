@@ -51,6 +51,7 @@ export default function CollectionCard({
             <Datetime
               pubDatetime={blogData.pubDatetime}
               modDatetime={blogData.modDatetime}
+              size="sm"
             />
           )}
           <p>{description}</p>

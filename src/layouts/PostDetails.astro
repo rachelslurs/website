@@ -72,12 +72,7 @@ const nextPost =
   <CollectionEntryBack />
   <main id="main-content">
     <CollectionEntryHeader title={title} slug={slugifyStr(title)} />
-    <Datetime
-      pubDatetime={pubDatetime}
-      modDatetime={modDatetime}
-      size="lg"
-      className="my-2"
-    />
+    <Datetime pubDatetime={pubDatetime} modDatetime={modDatetime} size="lg" />
     <article
       id="article"
       role="article"
