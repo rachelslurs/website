@@ -2,7 +2,6 @@
 import type { CollectionEntry } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import Main from "@layouts/Main.astro";
-import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import Pagination from "@components/Pagination.astro";
 import CollectionCard from "@components/CollectionCard";
@@ -16,9 +15,17 @@ export interface Props {
 const { page } = Astro.props;
 ---
 
-<Layout title={`Posts | ${SITE.title}`}>
-  <Header activeNav="posts" />
-  <Main pageTitle="Posts" pageDesc="All of the posts." includeRss={true}>
+<Layout
+  title={`Posts | ${SITE.title}`}
+  activeNav="posts"
+  footerNoMarginTop={page.lastPage > 1}
+>
+  <Main
+    pageTitle="Posts"
+    pageDesc="All of the posts."
+    includeRss={true}
+    activeNav="posts"
+  >
     <ul>
       {
         page.data.map(({ data, slug }) => (
@@ -33,6 +40,5 @@ const { page } = Astro.props;
   </Main>
 
   <Pagination {page} />
-
-  <Footer noMarginTop={page.lastPage > 1} />
+  <Footer />
 </Layout>

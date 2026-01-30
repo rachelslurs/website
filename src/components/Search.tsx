@@ -87,7 +87,7 @@ export default function SearchBar({ searchList }: Props) {
           className="block w-full rounded border border-skin-fill 
         border-opacity-40 bg-skin-fill py-3 pl-10
         pr-3 placeholder:italic placeholder:text-opacity-75 
-        focus:border-skin-accent focus:outline-none"
+        focus:border-skin-accent focus:outline-none focus:ring-0 focus:ring-offset-0"
           placeholder="Search for..."
           type="text"
           name="search"

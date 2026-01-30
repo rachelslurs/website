@@ -1,7 +1,6 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import Main from "@layouts/Main.astro";
-import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import Pagination from "@components/Pagination.astro";
 import CollectionCard from "@components/CollectionCard";
@@ -16,9 +15,16 @@ export interface Props {
 const { page } = Astro.props;
 ---
 
-<Layout title={`Demos | ${SITE.title}`}>
-  <Header activeNav="demos" />
-  <Main pageTitle="Demos" pageDesc="UI patterns and animations">
+<Layout
+  title={`Demos | ${SITE.title}`}
+  activeNav="demos"
+  footerNoMarginTop={page.lastPage > 1}
+>
+  <Main
+    pageTitle="Demos"
+    pageDesc="UI patterns and animations"
+    activeNav="demos"
+  >
     <ul>
       {
         page.data.map(({ data, slug }) => (
@@ -29,6 +35,5 @@ const { page } = Astro.props;
   </Main>
 
   <Pagination {page} />
-
-  <Footer noMarginTop={page.lastPage > 1} />
+  <Footer />
 </Layout>

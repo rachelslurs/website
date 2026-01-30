@@ -26,24 +26,27 @@ export default function CollectionCard({
 
   const headerProps = {
     style: { viewTransitionName: slugifyStr(title) },
-    className: "text-lg font-semibold decoration-dashed hover:underline",
   };
 
   const linkContent = (
     <a
       href={href}
-      className="inline-block text-lg font-medium text-skin-accent decoration-dashed underline-offset-4 focus-visible:no-underline focus-visible:underline-offset-0"
+      className="view-transition no-underline focus-visible:no-underline focus-visible:underline-offset-0"
     >
       {secHeading ? (
-        <h2 {...headerProps}>{title}</h2>
+        <h2 {...headerProps}>
+          <span className="highlight-wavy">{title}</span>
+        </h2>
       ) : (
-        <h3 {...headerProps}>{title}</h3>
+        <h3 {...headerProps}>
+          <span className="highlight-wavy">{title}</span>
+        </h3>
       )}
     </a>
   );
 
   return (
-    <li className="my-6">
+    <li className="ps-0 my-4 py-2">
       {showDatetime ? (
         <>
           {linkContent}
@@ -54,16 +57,16 @@ export default function CollectionCard({
               size="sm"
             />
           )}
-          <p>{description}</p>
+          <p className="my-2">{description}</p>
         </>
       ) : (
         <>
-          <div className="flex flex-nowrap flex-row justify-between items-center space-x-2 opacity-80">
+          <div className="flex flex-nowrap flex-row justify-between items-center space-x-2">
             <div className="flex items-center gap-2 flex-wrap">
               {linkContent}
             </div>
           </div>
-          {description && <p className="text-base">{description}</p>}
+          {description && <p className="text-base mt-1 mb-0">{description}</p>}
         </>
       )}
     </li>

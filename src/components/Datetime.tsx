@@ -18,7 +18,7 @@ export default function Datetime({
 }: Props) {
   return (
     <div
-      className={`flex items-center space-x-2 opacity-80 ${className} ${size === "sm" ? "mt-0 mb-2" : "my-6"}`}
+      className={`flex items-center space-x-2 opacity-80 font-mono ${className} ${size === "sm" ? "my-0" : "my-6"}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

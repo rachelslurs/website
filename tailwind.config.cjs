@@ -14,11 +14,12 @@ module.exports = {
   theme: {
     // Remove the following screen breakpoint or add other breakpoints
     // if one breakpoint is not enough for you
-    screens: {
-      sm: "640px",
-    },
+    
 
     extend: {
+      spacing: {
+        "spacing": "var(--spacing)",
+      },
       textColor: {
         skin: {
           base: withOpacity("--color-text-base"),
@@ -84,7 +85,7 @@ module.exports = {
         transparent: "transparent",
       },
       fontFamily: {
-        sans: ["Geist", "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ["Lato", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["IBM Plex Mono", "ui-monospace", "SFMono-Regular", "monospace"],
       },
 
@@ -103,23 +104,20 @@ module.exports = {
           css: {
             'blockquote p:first-of-type::before': false,
             'blockquote p:first-of-type::after': false,
-            maxWidth: '68ch',
+
             lineHeight: '1.75',
             fontSize: '1.1rem',
             color: 'var(--color-text-base)',
             p: {
-              fontFamily: 'Geist, sans-serif',
               marginBottom: '1.5em',
             },
             'ul, ol': {
-              fontFamily: 'Geist, sans-serif',
               paddingLeft: '1.25em',
             },
             li: {
               marginBottom: '0.5em',
             },
             'h1, h2, h3, h4, h5, h6': {
-              fontFamily: 'IBM Plex Mono, monospace',
               fontWeight: '600',
               letterSpacing: '-0.01em',
               marginTop: '2em',

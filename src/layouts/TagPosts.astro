@@ -2,12 +2,11 @@
 import { type CollectionEntry } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import Main from "@layouts/Main.astro";
-import Header from "@components/Header.astro";
-import Footer from "@components/Footer.astro";
 import CollectionCard from "@components/CollectionCard";
 import Pagination from "@components/Pagination.astro";
 import { SITE } from "@config";
 import type { Page } from "astro";
+import Footer from "@components/Footer.astro";
 
 export interface Props {
   page: Page<CollectionEntry<"blog">>;
@@ -18,12 +17,16 @@ export interface Props {
 const { page, tag, tagName } = Astro.props;
 ---
 
-<Layout title={`Tag: ${tagName} | ${SITE.title}`}>
-  <Header activeNav="posts" />
+<Layout
+  title={`Tag: ${tagName} | ${SITE.title}`}
+  activeNav="posts"
+  footerNoMarginTop={page.lastPage > 1}
+>
   <Main
     pageTitle={[`Tag:`, `${tagName}`]}
     titleTransition={tag}
     pageDesc={`All the posts with the tag "${tagName}".`}
+    activeNav="posts"
   >
     <h1 slot="title" transition:name={tag}>{`Tag:${tag}`}</h1>
     <ul>
@@ -40,6 +43,5 @@ const { page, tag, tagName } = Astro.props;
   </Main>
 
   <Pagination {page} />
-
-  <Footer noMarginTop={page.lastPage > 1} />
+  <Footer />
 </Layout>

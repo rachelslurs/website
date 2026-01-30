@@ -1,9 +1,11 @@
 ---
 import Breadcrumbs from "@components/Breadcrumbs.astro";
+import Header from "@components/Header.astro";
 
 interface StringTitleProp {
   pageTitle: string;
   pageDesc?: string;
+  activeNav?: "posts" | "about" | "search" | "work" | "demos";
   includeRss?: boolean;
 }
 
@@ -11,6 +13,7 @@ interface ArrayTitleProp {
   pageTitle: [string, string];
   titleTransition: string;
   pageDesc?: string;
+  activeNav?: "posts" | "about" | "search" | "work" | "demos";
   includeRss?: boolean;
 }
 
@@ -19,8 +22,9 @@ export type Props = StringTitleProp | ArrayTitleProp;
 const { props } = Astro;
 ---
 
+<Header activeNav={props.activeNav} />
 <Breadcrumbs />
-<main id="main-content">
+<main id="main-content" class="app-layout max-w-3xl">
   {
     "titleTransition" in props ? (
       <h1>
@@ -79,10 +83,10 @@ const { props } = Astro;
 
 <style>
   #main-content {
-    @apply mx-auto w-full max-w-3xl px-4 pb-4;
+    @apply pb-4;
   }
   #main-content h1 {
-    @apply text-2xl font-semibold sm:text-3xl;
+    @apply font-semibold;
   }
   #main-content p {
     @apply mb-6 mt-2 italic;

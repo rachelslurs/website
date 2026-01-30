@@ -12,6 +12,7 @@ import Modal from "@components/demo/Modal";
 
 <Modal client:load />
 
+<ul className='prose dark:prose-invert'>
 - Uses AnimatePresence to coordinate enter/exit animations for both the backdrop and modal content.
 - Modal scales in from 95% (0.95) with a fade-in effect, creating a subtle "pop" entrance.
 - Backdrop fades in separately to provide visual layering and depth.
@@ -19,3 +20,4 @@ import Modal from "@components/demo/Modal";
 - Proper z-index layering ensures the backdrop (z-40) sits behind the modal content (z-50).
 - Exit animations reverse the entrance: modal scales down and fades out simultaneously with the backdrop.
 - Integrates with toast notifications to confirm actions when the user clicks "Confirm".
+</ul>

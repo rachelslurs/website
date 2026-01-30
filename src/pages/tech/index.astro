@@ -1,20 +1,18 @@
 ---
 import { getCollection } from "astro:content";
-import Header from "@components/Header.astro";
-import Footer from "@components/Footer.astro";
 import Layout from "@layouts/Layout.astro";
 import Main from "@layouts/Main.astro";
 import WorkTag from "@components/WorkTag.astro";
 import { getUniqueWorkTags } from "@utils/getUniqueTags";
 import { SITE } from "@config";
+import Footer from "@components/Footer.astro";
 
 const work = await getCollection("work");
 
 let tech = getUniqueWorkTags(work);
 ---
 
-<Layout title={`Tech | ${SITE.title}`}>
-  <Header activeNav="work" />
+<Layout title={`Tech | ${SITE.title}`} activeNav="work">
   <Main pageTitle="Tech" pageDesc="All the work tagged by tech.">
     <ul>
       {tech.map(({ tag }) => <WorkTag {tag} size="lg" />)}

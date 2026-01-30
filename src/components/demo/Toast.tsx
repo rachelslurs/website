@@ -268,7 +268,7 @@ export default function Toast() {
               type="checkbox"
               checked={deduplicationEnabled}
               onChange={e => setDeduplicationEnabled(e.target.checked)}
-              className="w-4 h-4 text-skin-accent bg-skin-card border-skin-line rounded focus:ring-skin-accent focus:ring-2"
+              className="w-4 h-4 bg-skin-card"
             />
             <span className="text-sm text-skin-base">Enable Deduplication</span>
           </label>
@@ -285,7 +285,7 @@ export default function Toast() {
                   setMaxVisibleToasts(value);
                 }
               }}
-              className="w-16 px-2 py-1 text-sm bg-skin-card border border-skin-line rounded focus:ring-skin-accent focus:ring-2 focus:outline-none"
+              className="w-16 px-2 py-1 text-sm bg-skin-card"
             />
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
@@ -293,7 +293,7 @@ export default function Toast() {
               type="checkbox"
               checked={reducedMotion}
               onChange={e => setReducedMotionOverride(e.target.checked)}
-              className="w-4 h-4 text-skin-accent bg-skin-card border-skin-line rounded focus:ring-skin-accent focus:ring-2"
+              className="w-4 h-4 bg-skin-card"
             />
             <span className="text-sm text-skin-base">
               Prefers Reduced Motion{" "}

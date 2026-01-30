@@ -9,6 +9,7 @@ import CollectionEntryHeader from "@components/CollectionEntryHeader.astro";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import { SITE } from "@config";
+import BackToTop from "@components/BackToTop.astro";
 
 export interface Props {
   work: CollectionEntry<"work">;
@@ -47,65 +48,46 @@ const layoutProps = {
   canonicalURL,
   ogImage: ogUrl,
   scrollSmooth: true,
+  activeNav: "work" as const,
 };
 ---
 
 <Layout {...layoutProps}>
   <Header activeNav="work" />
-
   <!-- <div class="progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill">
     <div class="progress-bar h-1 w-0 bg-skin-accent" id="myBar"></div>
   </div> -->
-
-  <CollectionEntryBack />
-  <main id="main-content">
-    <CollectionEntryHeader
-      title={title}
-      summary={summary}
-      slug={slugifyStr(title)}
-    />
-    <!-- {year && <WorkYear year={year} size="lg" className="my-2" />} -->
-    {
-      features && features.length > 0 && (
-        <Features features={features} client:load />
-      )
-    }
+  <main id="main-content" class="app-layout">
+    <CollectionEntryBack />
     <article
       id="article"
       role="article"
-      class="prose mx-auto mt-8 max-w-3xl dark:prose-invert"
+      class="prose max-w-3xl dark:prose-invert prose-img:rounded prose-img:bg-white"
     >
+      <header>
+        <CollectionEntryHeader
+          title={title}
+          summary={summary}
+          slug={slugifyStr(title)}
+        />
+        <!-- {year && <WorkYear year={year} size="lg" className="my-2" />} -->
+      </header>
+      {
+        features && features.length > 0 && (
+          <Features features={features} client:load />
+        )
+      }
       <Content />
     </article>
 
-    <ul class="my-8">
+    <ul class="prose my-8">
       {tags.map(tag => <WorkTag tag={slugifyStr(tag)} />)}
     </ul>
 
-    <div
-      class="flex flex-col-reverse items-center justify-between gap-6 sm:flex-row-reverse sm:items-end sm:gap-4"
-    >
-      <button
-        id="back-to-top"
-        class="focus-outline whitespace-nowrap py-1 hover:opacity-75"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" class="rotate-90">
-          <path
-            d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z"
-          ></path>
-        </svg>
-        <span>Back to Top</span>
-      </button>
-    </div>
+    <BackToTop />
   </main>
-  <Footer />
 </Layout>
-
-<style>
-  main {
-    @apply mx-auto w-full max-w-3xl px-4 pb-12;
-  }
-</style>
+<Footer />
 
 <script is:inline>
   /** Create a progress indicator
@@ -212,14 +194,4 @@ const layoutProps = {
     }
   }
   attachCopyButtons();
-
-  /** Scrolls the document to the top when
-   * the "Back to Top" button is clicked. */
-  function backToTop() {
-    document.querySelector("#back-to-top")?.addEventListener("click", () => {
-      document.body.scrollTop = 0; // For Safari
-      document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-    });
-  }
-  backToTop();
 </script>
