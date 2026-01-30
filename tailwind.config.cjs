@@ -104,12 +104,16 @@ module.exports = {
           css: {
             'blockquote p:first-of-type::before': false,
             'blockquote p:first-of-type::after': false,
-
+            maxWidth: 'var(--max-3xl)',
             lineHeight: '1.75',
             fontSize: '1.1rem',
-            color: 'var(--color-text-base)',
+            color: 'rgb(var(--color-text-base))',
+            'a:hover': {
+              color: 'rgb(var(--color-accent))',
+            },
             p: {
-              marginBottom: '1.5em',
+              marginTop: '0.5em',
+              marginBottom: '1em',
             },
             'ul, ol': {
               paddingLeft: '1.25em',
@@ -119,9 +123,7 @@ module.exports = {
             },
             'h1, h2, h3, h4, h5, h6': {
               fontWeight: '600',
-              letterSpacing: '-0.01em',
-              marginTop: '2em',
-              marginBottom: '0.8em',
+              letterSpacing: '-0.003em',
             },
             code: {
               fontFamily: 'IBM Plex Mono, monospace',
@@ -149,7 +151,7 @@ module.exports = {
             },
 
             'hr': {
-              borderColor: 'rgba(var(--color-text-base), var(--tw-border-opacity))',
+              borderColor: 'rgba(var(--color-text-base), var(--tw-border-opacity/2))',
               borderWidth: '1px',
               marginTop: '2em',
               marginBottom: '2em',

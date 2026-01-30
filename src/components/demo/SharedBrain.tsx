@@ -15,10 +15,10 @@ import Checkbox from "@components/Checkbox";
  * - LEFT: Controls (Optimistic UI Toggle | Simulate Drift Toggle)
  * - RIGHT: Sequential Communication Logs
  * * [ MAIN STAGE ]
- * - MOBILE: Vertical flow (Client Top -> Stream -> Backend Bottom)
- * - DESKTOP: Horizontal flow (Client Left -> Stream -> Backend Right)
+ * - Always horizontal: Client (2/5) | Network stream (2/5) | Backend (1/5)
  */
 
+// --- 2. MAIN COMPONENT ---
 function SharedBrain() {
   const [isOptimistic, setIsOptimistic] = useState(true);
   const [simulateDrift, setSimulateDrift] = useState(false);
@@ -126,7 +126,7 @@ function SharedBrain() {
 
   return (
     <DemoLayout title="Shared Brain" filename="SharedBrain.tsx">
-      <div className="max-w-7xl w-full bg-skin-card rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden border-2 border-skin-line flex flex-col h-[820px] md:h-[600px]">
+      <div className="max-w-7xl w-full bg-skin-card rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden border-2 border-skin-line flex flex-col h-[540px]">
         {/* [ HEADER ] */}
         <div className="sharedbrain-header bg-skin-inverted border-b border-skin-line px-4 md:px-10 py-2 flex flex-col md:flex-row items-center justify-between shrink-0 gap-4 md:gap-0 min-h-[5.5rem] md:h-20">
           <div className="sharedbrain-header-controls flex items-center gap-6 md:gap-10">
@@ -156,7 +156,7 @@ function SharedBrain() {
             />
           </div>
 
-          {/* Header Communication Logs — current + 1 previous, spaced */}
+          {/* Header Communication Logs */}
           <div className="relative w-full md:w-[340px] min-h-20 flex flex-col justify-center overflow-visible">
             {log.map((entry, i) => {
               const opacity =
@@ -187,11 +187,11 @@ function SharedBrain() {
         </div>
 
         {/* [ MAIN STAGE ] */}
-        <div className="flex-1 flex flex-col md:flex-row bg-skin-card relative overflow-hidden">
+        <div className="flex-1 flex flex-row bg-skin-card relative overflow-hidden px-3 md:px-6">
           <div className="absolute inset-0 opacity-[0.06] pointer-events-none bg-[radial-gradient(currentColor_1px,transparent_1px)] [background-size:32px_32px] text-skin-base"></div>
 
-          {/* PRODUCT INTERFACE (LEFT) */}
-          <div className="flex-none md:flex-[0.55] flex flex-col items-center justify-center p-4 relative z-10">
+          {/* CLIENT (2/5) */}
+          <div className="flex-[2] min-w-0 flex flex-col items-center justify-center p-3 md:p-4 relative z-10">
             <div
               className={`w-full max-w-[420px] rounded-2xl shadow-xl relative overflow-hidden border-2 transition-all flex flex-col bg-skin-card h-[280px] md:h-[320px] ${isOptimistic ? "border-skin-accent ring-8 ring-skin-accent/10" : "border-skin-line shadow-md"}`}
             >
@@ -236,7 +236,6 @@ function SharedBrain() {
                         Click check delivery below...
                       </p>
                     )}
-                    {/* Optimistic: show Friday only after user clicks (step >= 1 or isPlaying); dimmed until backend verifies; Saturday when drift and step 6 */}
                     {isOptimistic && (step >= 1 || isPlaying) && (
                       <div className="relative min-h-[2rem] flex items-center w-full">
                         <p
@@ -298,7 +297,7 @@ function SharedBrain() {
                   ) : (
                     <Play size={18} />
                   )}
-                  <span className="uppercase tracking-widest whitespace-nowrap">
+                  <span className="uppercase whitespace-nowrap">
                     {step === 6
                       ? "Reset Simulation"
                       : step >= 2
@@ -312,41 +311,47 @@ function SharedBrain() {
             </div>
           </div>
 
-          {/* NETWORK TOPOLOGY (RIGHT) */}
-          <div className="flex-1 flex flex-col md:flex-row items-center justify-center p-4 md:p-12 md:pr-16 relative z-10">
-            <div className="flex-1 w-1 md:w-auto md:h-1 h-24 md:h-1 bg-skin-line rounded-full relative overflow-hidden">
+          {/* NETWORK STREAM (2/5) */}
+          <div className="flex-[2] min-w-0 flex items-center justify-center p-2 relative z-10">
+            <div className="w-full h-1 bg-skin-line rounded-full relative overflow-hidden">
               <div
                 className={`absolute inset-0 bg-skin-accent/20 dark:bg-skin-accent/35 transition-opacity duration-500 ${step === 3 || step === 5 ? "opacity-100" : "opacity-0"}`}
               ></div>
-
               {step === 3 && (
-                <div className="absolute bg-skin-accent stream-glow rounded-full animate-stream-dynamic-forward"></div>
+                <div className="absolute bg-skin-accent stream-glow rounded-full animate-stream-horizontal-forward"></div>
               )}
               {step === 5 && (
                 <div
-                  className={`absolute shadow-lg rounded-full animate-stream-dynamic-backward ${simulateDrift && isOptimistic ? "stream-dot-error" : "stream-dot-success"}`}
+                  className={`absolute shadow-lg rounded-full animate-stream-horizontal-backward ${simulateDrift && isOptimistic ? "stream-dot-error" : "stream-dot-success"}`}
                 ></div>
               )}
             </div>
+          </div>
 
-            <div className="flex flex-col items-center gap-3 shrink-0 py-6 md:py-0 md:pl-10">
+          {/* BACKEND (1/5) - UPDATED LAYOUT */}
+          <div className="flex-[1] min-w-0 flex flex-col items-center justify-center p-2 md:px-3 relative z-10">
+            {/* The wrapper is relative to anchor the text, but the div itself stays in flex flow to center vertically */}
+            <div className="relative flex flex-col items-center">
+              {/* Database Icon Container */}
               <div
-                className={`p-5 md:p-6 rounded-[2rem] border-2 transition-all duration-500 relative ${step === 4 ? "bg-skin-card border-skin-accent shadow-xl scale-105" : "bg-skin-card/50 dark:bg-skin-card/60 border-skin-line opacity-70 dark:opacity-80"}`}
+                className={`p-6 rounded-full border-2 transition-all duration-500 relative flex items-center justify-center ${step === 4 ? "bg-skin-card border-skin-accent shadow-xl scale-105" : "bg-skin-card/50 dark:bg-skin-card/60 border-skin-line opacity-70 dark:opacity-80"}`}
               >
                 <Database
                   size={28}
                   className={`${step === 4 ? "text-skin-accent" : "text-skin-base opacity-50"}`}
                 />
                 {step === 4 && (
-                  <div className="absolute -top-0.5 -right-0.5 flex h-3.5 w-3.5">
+                  <div className="absolute top-0 right-0 flex h-3.5 w-3.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-skin-accent opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-skin-accent"></span>
                   </div>
                 )}
               </div>
-              <div className="flex flex-col items-center gap-0.5 min-h-[2.25rem] justify-center">
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-skin-base opacity-70">
-                  Backend Logic
+
+              {/* Text Container - Absolute positioned to not affect vertical centering of the Icon */}
+              <div className="absolute top-full mt-4 flex flex-col items-center gap-0.5 w-32 justify-start pointer-events-none">
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-skin-base opacity-70 text-center">
+                  Backend
                 </span>
                 <span
                   className={`text-[8px] font-bold uppercase tracking-widest h-4 flex items-center justify-center ${step === 4 ? "text-skin-accent animate-pulse" : "invisible"}`}
@@ -367,26 +372,17 @@ function SharedBrain() {
       <style
         dangerouslySetInnerHTML={{
           __html: `
-        /* Header: bg-skin-inverted uses --color-text-base. Ensure controls and divider use --color-fill for contrast. */
-        .sharedbrain-header-controls label,
-        .sharedbrain-header-controls label *:not(input) { color: rgb(var(--color-fill)) !important; }
-        .sharedbrain-header .sharedbrain-header-divider { background-color: rgb(var(--color-fill)) !important; }
-        .stream-glow { box-shadow: 0 0 15px rgb(var(--color-accent)); }
-        .stream-dot-success { background-color: rgb(var(--color-toast-success-icon)); }
-        .stream-dot-error { background-color: rgb(var(--color-toast-error-icon)); }
-        @media (min-width: 768px) {
-          .animate-stream-dynamic-forward { width: 8rem; height: 100%; top: 0; left: -8rem; animation: stream-right 1.4s linear forwards; }
-          .animate-stream-dynamic-backward { width: 8rem; height: 100%; top: 0; right: -8rem; animation: stream-left 1.4s linear forwards; }
-        }
-        @media (max-width: 767px) {
-          .animate-stream-dynamic-forward { width: 100%; height: 3rem; left: 0; top: -3rem; animation: stream-down 1.4s linear forwards; }
-          .animate-stream-dynamic-backward { width: 100%; height: 3rem; left: 0; bottom: -3rem; animation: stream-up 1.4s linear forwards; }
-        }
-        @keyframes stream-right { 0% { left: -30%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
-        @keyframes stream-left { 0% { right: -30%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { right: 100%; opacity: 0; } }
-        @keyframes stream-down { 0% { top: -30%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
-        @keyframes stream-up { 0% { bottom: -30%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { bottom: 100%; opacity: 0; } }
-      `,
+          .sharedbrain-header-controls label,
+          .sharedbrain-header-controls label *:not(input) { color: rgb(var(--color-fill)) !important; }
+          .sharedbrain-header .sharedbrain-header-divider { background-color: rgb(var(--color-fill)) !important; }
+          .stream-glow { box-shadow: 0 0 15px rgb(var(--color-accent)); }
+          .stream-dot-success { background-color: rgb(var(--color-toast-success-icon)); }
+          .stream-dot-error { background-color: rgb(var(--color-toast-error-icon)); }
+          .animate-stream-horizontal-forward { width: 30%; height: 100%; top: 0; left: -30%; animation: stream-right 1.4s linear forwards; }
+          .animate-stream-horizontal-backward { width: 30%; height: 100%; top: 0; right: -30%; animation: stream-left 1.4s linear forwards; }
+          @keyframes stream-right { 0% { left: -30%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+          @keyframes stream-left { 0% { right: -30%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { right: 100%; opacity: 0; } }
+        `,
         }}
       />
     </DemoLayout>

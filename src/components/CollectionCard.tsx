@@ -34,9 +34,9 @@ export default function CollectionCard({
       className="view-transition no-underline focus-visible:no-underline focus-visible:underline-offset-0"
     >
       {secHeading ? (
-        <h2 {...headerProps}>
+        <h3 {...headerProps}>
           <span className="highlight-wavy">{title}</span>
-        </h2>
+        </h3>
       ) : (
         <h3 {...headerProps}>
           <span className="highlight-wavy">{title}</span>

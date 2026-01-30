@@ -1,4 +1,5 @@
-export default function Database({
+// --- 1. UPDATED DATABASE COMPONENT (Clearer Stroke) ---
+function Database({
   className = "w-5 h-5",
   size,
 }: {
@@ -13,7 +14,8 @@ export default function Database({
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      // Reduced stroke width for better clarity
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -23,3 +25,5 @@ export default function Database({
     </svg>
   );
 }
+
+export default Database;

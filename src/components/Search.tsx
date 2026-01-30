@@ -109,7 +109,7 @@ export default function SearchBar({ searchList }: Props) {
         </div>
       )}
 
-      <ul>
+      <ul className="list-none pl-0">
         {searchResults &&
           searchResults.map(({ item, refIndex }) => (
             <CollectionCard

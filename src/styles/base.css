@@ -24,6 +24,7 @@
     --color-shadow: 37, 36, 34;
     --color-ring-offset: 204, 197, 185;
     --color-placeholder: 115, 108, 102;
+    --max-3xl: 48rem;
   }
   html[data-theme="dark"] {
     --spacing: .25rem;
@@ -73,10 +74,9 @@
 
   .view-transition {
     @apply inline-block text-lg font-medium no-underline text-skin-accent focus-visible:no-underline;
-    h3 {
+    h2, h3 {
       @apply m-0 p-0 leading-tight;
       margin-bottom: 0 !important;
-
     }
   }
 

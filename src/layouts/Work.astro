@@ -21,7 +21,7 @@ const { page } = Astro.props;
   footerNoMarginTop={page.lastPage > 1}
 >
   <Main pageTitle="Work" pageDesc="My work" activeNav="work">
-    <ul>
+    <ul class="list-none pl-0">
       {
         page.data.map(({ data, slug }) => (
           <CollectionCard href={`/work/${slug}/`} frontmatter={data} />

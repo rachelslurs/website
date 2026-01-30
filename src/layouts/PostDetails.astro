@@ -75,14 +75,14 @@ const nextPost =
     <article
       id="article"
       role="article"
-      class="prose mt-6 max-w-3xl dark:prose-invert prose-img:rounded prose-img:bg-white"
+      class="prose max-w-3xl dark:prose-invert prose-img:rounded prose-img:bg-white"
     >
       <header>
         <CollectionEntryHeader title={title} slug={slugifyStr(title)} />
         <Datetime
           pubDatetime={pubDatetime}
           modDatetime={modDatetime}
-          size="sm"
+          size="lg"
         />
       </header>
       <Content />

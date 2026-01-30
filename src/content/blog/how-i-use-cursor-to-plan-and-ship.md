@@ -1,6 +1,6 @@
 ---
 title: "How I Use Cursor to Plan and Ship"
-description: How I use Cursor's planning tool and Composer to build production apps with testable deliverables and proper sequencing
+description: How I use Cursor's planning tool and Composer to build production apps with testable deliverables and proper sequencing.
 featured: true
 author: Rachel Cantor
 pubDatetime: 2026-01-29T05:00:00.000Z
@@ -71,7 +71,7 @@ I’ve configured Cursor to avoid open-ended questions. Instead of asking "How s
 
 <blockquote>
 <p>How should we handle pagination for collection?</p>
-<ol class="prose list-[upper-alpha]">
+<ol class="list-[upper-alpha]">
 <li>Cursor-based (better for real-time updates)</li>
 <li>Offset-based (simpler implementation)</li>
 <li>Load all at once (fine for MVP, paginate later)</li>
@@ -81,11 +81,11 @@ I just type "B," add any additional context, and we keep moving.
 
 ## What This Actually Looks Like
 
-### Step 1: Create the master plan and save to workspace
+### Step 1: Create the plan and save to workspace
 
 I tell Cursor in plan mode:
 
-> Create a master plan for implementing external client authentication. Think about sequencing so I can test deliverables one by one, and clearly identify which tracks can be worked on in parallel to minimize downtime.
+> Create a plan for implementing external client authentication. Think about sequencing so I can test deliverables one by one, and clearly identify which tracks can be worked on in parallel to minimize downtime.
 
 Make sure to press the "Save to workspace" button in order to persist the plan to your codebase.
 

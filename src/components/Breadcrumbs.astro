@@ -30,12 +30,12 @@ breadcrumbList[0] === "posts" &&
   <ul>
     <li>
       <a href="/">Home</a>
-      <span aria-hidden="true">&gt;</span>
+      <span class="ml-2" aria-hidden="true">&gt;</span>
     </li>
     {
       breadcrumbList.map((breadcrumb, index) =>
         index + 1 === breadcrumbList.length ? (
-          <li>
+          <li class="ml-2">
             <span
               class={`${index > 0 && breadcrumb !== "tech" ? "lowercase" : "capitalize"}`}
               aria-current="page"
@@ -45,9 +45,11 @@ breadcrumbList[0] === "posts" &&
             </span>
           </li>
         ) : (
-          <li>
+          <li class="ml-2">
             <a href={`/${breadcrumb}/`}>{breadcrumb}</a>
-            <span aria-hidden="true">&gt;</span>
+            <span class="ml-2" aria-hidden="true">
+              &gt;
+            </span>
           </li>
         )
       )

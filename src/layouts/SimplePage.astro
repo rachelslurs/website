@@ -23,7 +23,7 @@ const { frontmatter } = Astro.props;
   <Header activeNav={frontmatter.activeNav} />
   <Breadcrumbs />
   <main id="main-content" class="app-layout prose max-w-3xl dark:prose-invert">
-    <h1>{frontmatter.title}</h1>
+    <h1 class="mb-4">{frontmatter.title}</h1>
     <section class="mb-28 mt-4 prose-img:border-0">
       <slot />
     </section>

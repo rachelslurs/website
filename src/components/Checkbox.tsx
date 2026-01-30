@@ -25,7 +25,7 @@ const Checkbox = ({
         checked={checked}
         onChange={e => onChange(e.target.checked)}
         disabled={disabled}
-        className="w-4 h-4 rounded border-skin-line text-skin-base dark:text-skin-accent cursor-pointer bg-skin-fill focus:outline-none focus-visible:ring-2 focus-visible:ring-skin-accent focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[rgb(var(--color-fill))] disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-4 h-4 rounded cursor-pointer text-skin-base dark:text-skin-accent"
       />
       <div className="flex flex-col">
         <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-skin-foreground">

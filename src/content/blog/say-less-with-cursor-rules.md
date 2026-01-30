@@ -1,6 +1,6 @@
 ---
 title: "Say Less with Cursor Rules"
-description: How I use .cursor/rules and glob patterns to enforce standards without cluttering context
+description: How I use .cursor/rules and glob patterns to enforce standards without cluttering context.
 featured: true
 author: Rachel Cantor
 pubDatetime: 2026-01-28T05:00:00.000Z

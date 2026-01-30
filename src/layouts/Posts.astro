@@ -26,7 +26,7 @@ const { page } = Astro.props;
     includeRss={true}
     activeNav="posts"
   >
-    <ul>
+    <ul class="list-none pl-0">
       {
         page.data.map(({ data, slug }) => (
           <CollectionCard
