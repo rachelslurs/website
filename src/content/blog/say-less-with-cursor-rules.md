@@ -34,8 +34,8 @@ I use individual `.mdc` files instead of a single `.cursorrules` file. This help
 
 Rules can be applied in three ways:
 
-1. **`alwaysApply: true`** - Loaded automatically in every session
-2. **`glob: pattern`** - Applied automatically when working with files matching the pattern
+1. **alwaysApply: true** - Loaded automatically in every session
+2. **glob: pattern** - Applied automatically when working with files matching the pattern
 3. **Manual reference** - I explicitly reference them when needed
 
 Here's my structure:
@@ -43,7 +43,7 @@ Here's my structure:
 ```
 .cursor/
   rules/
-    commit-style.mdc          (alwaysApply: true)
+    commit-style.mdc           (alwaysApply: true)
     engagement-preferences.mdc (manual reference)
     documentation.mdc          (manual reference)
     project-structure.mdc      (manual reference)
@@ -60,7 +60,7 @@ Here are the rules I use in every project:
 
 #### Engagement Preferences
 
-**`.cursor/rules/engagement-preferences.mdc`**
+`.cursor/rules/engagement-preferences.mdc`
 
 ```markdown
 # How to Work With Me
@@ -98,7 +98,7 @@ This changes AI from being a "code generator" into a "collaborator who knows I n
 
 #### Commit Style
 
-**`.cursor/rules/commit-style.mdc`**
+`.cursor/rules/commit-style.mdc`
 
 ```markdown
 ---
@@ -123,7 +123,7 @@ When Cursor generates code, it suggests commit messages that match this format. 
 
 #### Documentation Maintenance
 
-**`.cursor/rules/documentation.mdc`**
+`.cursor/rules/documentation.mdc`
 
 ```markdown
 # Documentation Maintenance
@@ -140,7 +140,7 @@ I reference this manually or could use a glob like `glob: src/**` to apply it ac
 
 #### Project Structure
 
-**`.cursor/rules/project-structure.mdc`**
+`.cursor/rules/project-structure.mdc`
 
 ```markdown
 # Project Structure Overview
@@ -161,7 +161,7 @@ I reference this manually when starting new features or could use `glob: src/**`
 
 #### Accessibility Standards
 
-**`.cursor/rules/accessibility.mdc`**
+`.cursor/rules/accessibility.mdc`
 
 ```markdown
 ---
@@ -203,7 +203,7 @@ Not every rule needs to apply everywhere. Some are only relevant in specific con
 
 #### Testing Requirements
 
-**`.cursor/rules/testing.mdc`**
+`.cursor/rules/testing.mdc`
 
 ```markdown
 ---
