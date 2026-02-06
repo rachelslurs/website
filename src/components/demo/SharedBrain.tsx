@@ -12,7 +12,8 @@ import ExpressDeliveryForm from "@components/demo/ExpressDeliveryForm";
  * - LEFT: Controls (Optimistic UI Toggle | Simulate Drift Toggle)
  * - RIGHT: Sequential Communication Logs
  * * [ MAIN STAGE ]
- * - Always horizontal: Client (2/5) | Network stream (2/5) | Backend (1/5)
+ * - Desktop: horizontal Client (3) | Network stream (2) | Backend (1)
+ * - Mobile: stacked Client → Arrow (stream direction) → Backend
  */
 
 // --- 2. MAIN COMPONENT ---
@@ -127,10 +128,10 @@ function SharedBrain() {
       filename="SharedBrain.tsx"
       showHeader={false}
     >
-      <div className="max-w-7xl w-full bg-skin-card rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden border-2 border-skin-line flex flex-col h-[540px]">
-        {/* [ HEADER ] - 50% width each side with center divider */}
-        <div className="sharedbrain-header w-full bg-skin-inverted border-b border-skin-line flex shrink-0 min-h-[5.5rem] md:min-h-[5rem]">
-          <div className="sharedbrain-header-controls flex-1 flex items-center justify-center md:justify-end md:pr-6 py-4 px-4 min-w-0">
+      <div className="max-w-7xl w-full bg-skin-card rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden border-2 border-skin-line flex flex-col h-[540px] md:h-[620px]">
+        {/* [ HEADER ] - compact on mobile with reserved space so it never covers content */}
+        <div className="sharedbrain-header relative z-20 w-full bg-skin-inverted border-b border-skin-line flex shrink-0 min-h-[3.25rem] py-2 md:py-0 md:min-h-[5rem]">
+          <div className="sharedbrain-header-controls flex-1 flex items-center justify-center md:justify-end md:pr-6 py-2 md:py-4 px-2 md:px-4 min-w-0">
             <Toggle
               label="Optimistic UI"
               description={isOptimistic ? "Active" : "Inactive"}
@@ -142,7 +143,7 @@ function SharedBrain() {
             className="sharedbrain-header-divider w-px bg-skin-line shrink-0 self-stretch my-2 hidden md:block"
             aria-hidden
           />
-          <div className="sharedbrain-header-controls flex-1 flex items-center justify-center md:justify-start md:pl-6 py-4 px-4 min-w-0">
+          <div className="sharedbrain-header-controls flex-1 flex items-center justify-center md:justify-start md:pl-6 py-2 md:py-4 px-2 md:px-4 min-w-0">
             <Checkbox
               label="Simulate Drift"
               description="Trigger Conflict"
@@ -156,25 +157,62 @@ function SharedBrain() {
           </div>
         </div>
 
-        {/* [ MAIN STAGE ] */}
-        <div className="flex-1 flex flex-row bg-skin-card relative overflow-hidden px-4 md:px-6">
+        {/* [ MAIN STAGE ] - stacked on mobile, row on desktop; z-0 so header stays on top */}
+        <div className="flex-1 flex flex-col md:flex-row bg-skin-card relative z-0 overflow-hidden px-4 md:px-6 min-h-0">
           <div className="absolute inset-0 opacity-[0.06] pointer-events-none bg-[radial-gradient(currentColor_1px,transparent_1px)] [background-size:32px_32px] text-skin-base"></div>
 
-          {/* CLIENT (widest) */}
-          <div className="flex-[3] min-w-0 flex flex-col items-center justify-center p-4 md:p-6 relative z-10">
-            <ExpressDeliveryForm
-              step={step}
-              isOptimistic={isOptimistic}
-              simulateDrift={simulateDrift}
-              isPlaying={isPlaying}
-              showDriftNotification={showDriftNotification}
-              onAction={handleAction}
-            />
+          {/* CLIENT - fixed proportion on desktop; overflow only on mobile if needed */}
+          <div className="flex-1 md:flex-[3] min-w-0 min-h-0 flex flex-col items-center justify-center md:justify-center p-4 md:px-6 relative z-10 overflow-y-auto md:overflow-visible">
+            <div className="w-full flex flex-col items-center md:my-5 shrink-0">
+              <ExpressDeliveryForm
+                step={step}
+                isOptimistic={isOptimistic}
+                simulateDrift={simulateDrift}
+                isPlaying={isPlaying}
+                showDriftNotification={showDriftNotification}
+                onAction={handleAction}
+              />
+            </div>
           </div>
 
-          {/* NETWORK STREAM */}
-          <div className="flex-[2] min-w-0 flex items-center justify-center p-4 relative z-10">
-            <div className="w-full h-1 bg-skin-line rounded-full relative overflow-hidden">
+          {/* NETWORK: arrow on mobile (only when sending/receiving), horizontal bar on desktop */}
+          <div className="flex-none md:flex-[2] min-w-0 flex items-center justify-center py-2 md:py-4 md:px-4 relative z-10">
+            {/* Mobile: arrow down = sending (step 3), arrow up = receiving (step 5); hidden when idle */}
+            <div
+              className="flex flex-col items-center justify-center md:hidden min-h-[2rem] transition-opacity duration-300"
+              aria-hidden
+            >
+              {step === 3 && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-8 h-8 text-skin-accent stream-glow-mobile"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden
+                >
+                  <path
+                    d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"
+                    transform="rotate(90 12 12)"
+                  />
+                </svg>
+              )}
+              {step === 5 && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={`w-8 h-8 ${simulateDrift && isOptimistic ? "text-[rgb(var(--color-toast-error-icon))]" : "text-[rgb(var(--color-toast-success-icon))]"}`}
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden
+                >
+                  <path
+                    d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"
+                    transform="rotate(-90 12 12)"
+                  />
+                </svg>
+              )}
+            </div>
+            {/* Desktop: horizontal stream bar */}
+            <div className="hidden md:block w-full h-1 bg-skin-line rounded-full relative overflow-hidden">
               <div
                 className={`absolute inset-0 bg-skin-accent/20 dark:bg-skin-accent/35 transition-opacity duration-500 ${step === 3 || step === 5 ? "opacity-100" : "opacity-0"}`}
               ></div>
@@ -189,32 +227,29 @@ function SharedBrain() {
             </div>
           </div>
 
-          {/* BACKEND (narrowest) */}
-          <div className="flex-[1] min-w-0 flex flex-col items-center justify-center p-4 md:p-6 relative z-10">
-            {/* The wrapper is relative to anchor the text, but the div itself stays in flex flow to center vertically */}
+          {/* BACKEND - smaller on mobile */}
+          <div className="flex-none md:flex-[1] min-w-0 flex flex-col items-center justify-center p-2 md:p-6 relative z-10">
             <div className="relative flex flex-col items-center">
-              {/* Database Icon Container */}
               <div
-                className={`p-6 rounded-full border-2 transition-all duration-500 relative flex items-center justify-center ${step === 4 ? "bg-skin-card border-skin-accent shadow-xl scale-105" : "bg-skin-card/50 dark:bg-skin-card/60 border-skin-line opacity-70 dark:opacity-80"}`}
+                className={`p-3 md:p-6 rounded-full border-2 transition-all duration-500 relative flex items-center justify-center ${step === 4 ? "bg-skin-card border-skin-accent shadow-xl scale-105" : "bg-skin-card/50 dark:bg-skin-card/60 border-skin-line opacity-70 dark:opacity-80"}`}
               >
                 <CircleStackIcon
-                  className={`w-7 h-7 ${step === 4 ? "text-skin-accent" : "text-skin-base opacity-50"}`}
+                  className={`w-5 h-5 md:w-7 md:h-7 ${step === 4 ? "text-skin-accent" : "text-skin-base opacity-50"}`}
                 />
                 {step === 4 && (
-                  <div className="absolute top-0 right-0 flex h-3.5 w-3.5">
+                  <div className="absolute top-0 right-0 flex h-2.5 w-2.5 md:h-3.5 md:w-3.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-skin-accent opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-skin-accent"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 md:h-3.5 md:w-3.5 bg-skin-accent"></span>
                   </div>
                 )}
               </div>
 
-              {/* Text Container - Absolute positioned to not affect vertical centering of the Icon */}
-              <div className="absolute top-full mt-4 flex flex-col items-center gap-0.5 w-32 justify-start pointer-events-none">
-                <span className="text-xs font-black uppercase tracking-widest text-skin-base opacity-70 text-center">
+              <div className="absolute top-full mt-2 md:mt-4 flex flex-col items-center gap-0.5 w-24 md:w-32 justify-start pointer-events-none">
+                <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-skin-base opacity-70 text-center">
                   Backend
                 </span>
                 <span
-                  className={`text-xs font-bold uppercase tracking-widest h-4 flex items-center justify-center ${step === 4 ? "text-skin-accent animate-pulse" : "invisible"}`}
+                  className={`text-[10px] md:text-xs font-bold uppercase tracking-widest h-3 md:h-4 flex items-center justify-center ${step === 4 ? "text-skin-accent animate-pulse" : "invisible"}`}
                 >
                   Verifying
                 </span>
@@ -223,8 +258,8 @@ function SharedBrain() {
           </div>
         </div>
 
-        {/* [ FOOTER: Console ] - height fits ~5 log lines, rest scrolls */}
-        <div className="h-[10rem] shrink-0 flex flex-col min-h-0">
+        {/* [ FOOTER: Console ] - shorter on mobile to fit stacked stage */}
+        <div className="h-[6rem] md:h-[10rem] shrink-0 flex flex-col min-h-0">
           <Console
             log={log}
             visibleId={visibleId}
@@ -241,6 +276,7 @@ function SharedBrain() {
           .sharedbrain-header-controls label *:not(input) { color: rgb(var(--color-fill)) !important; }
           .sharedbrain-header .sharedbrain-header-divider { background-color: rgb(var(--color-fill)) !important; }
           .stream-glow { box-shadow: 0 0 15px rgb(var(--color-accent)); }
+          .stream-glow-mobile { filter: drop-shadow(0 0 8px rgb(var(--color-accent))); }
           .stream-dot-success { background-color: rgb(var(--color-toast-success-icon)); }
           .stream-dot-error { background-color: rgb(var(--color-toast-error-icon)); }
           .animate-stream-horizontal-forward { width: 30%; height: 100%; top: 0; left: -30%; animation: stream-right 1.4s linear forwards; }
