@@ -170,7 +170,7 @@
     @apply cursor-not-allowed opacity-60;
   }
 
-  svg {
+  svg.inline {
     @apply inline-block h-6 w-6 fill-skin-base group-hover:fill-skin-accent;
   }
   svg.icon-tabler {
@@ -224,6 +224,26 @@
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-skin-card-muted;
+  }
+
+  /* Console (inverted) scrollbar – track always visible on idle */
+  .console-scroll-inverted {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--color-accent)) rgba(var(--color-accent), 0.2);
+  }
+  .console-scroll-inverted::-webkit-scrollbar {
+    @apply w-3;
+  }
+  .console-scroll-inverted::-webkit-scrollbar-track {
+    background: rgba(var(--color-accent), 0.2);
+    border-radius: 4px;
+  }
+  .console-scroll-inverted::-webkit-scrollbar-thumb {
+    background: rgb(var(--color-fill));
+    border-radius: 4px;
+  }
+  .console-scroll-inverted::-webkit-scrollbar-thumb:hover {
+    background: rgba(var(--color-fill), 0.9);
   }
 
   code,

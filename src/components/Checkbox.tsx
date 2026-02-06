@@ -27,13 +27,15 @@ const Checkbox = ({
         disabled={disabled}
         className="w-4 h-4 rounded cursor-pointer text-skin-base dark:text-skin-accent"
       />
-      <div className="flex flex-col">
-        <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-skin-foreground">
+      <div className="flex flex-col items-start shrink-0">
+        <span className="text-xs font-black uppercase tracking-widest text-skin-foreground">
           {label}
         </span>
-        <span className="checkbox-desc text-[9px] md:text-[10px] font-bold uppercase transition-colors text-skin-foreground">
-          {description}
-        </span>
+        {description && (
+          <span className="checkbox-desc text-xs font-bold transition-colors text-skin-foreground">
+            {description}
+          </span>
+        )}
       </div>
     </label>
   );

@@ -7,6 +7,7 @@ interface DemoLayoutProps {
   filename: string;
   children: ReactNode;
   className?: string;
+  showHeader?: boolean;
 }
 
 export default function DemoLayout({
@@ -15,6 +16,7 @@ export default function DemoLayout({
   filename,
   children,
   className = "",
+  showHeader = true,
 }: DemoLayoutProps) {
   return (
     <div
@@ -22,13 +24,17 @@ export default function DemoLayout({
     >
       <div className="mb-4">
         <div className="flex justify-between items-baseline">
-          <h3
-            className="text-lg mb-2 font-semibold text-skin-base"
-            data-exclude-heading-link
-          >
-            {title}
-          </h3>
-          <ViewSource filename={filename} />
+          {showHeader && (
+            <>
+              <h3
+                className="text-lg mb-2 font-semibold text-skin-base"
+                data-exclude-heading-link
+              >
+                {title}
+              </h3>
+              <ViewSource filename={filename} />
+            </>
+          )}
         </div>
         {description && (
           <p className="text-sm mt-0 mb-6 text-skin-base opacity-70">

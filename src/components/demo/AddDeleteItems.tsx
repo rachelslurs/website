@@ -1,10 +1,12 @@
 import { useState, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import DemoLayout from "@components/DemoLayout";
-import Loader from "./icons/Loader";
-import Plus from "./icons/Plus";
-import Trash2 from "./icons/Trash2";
-import Check from "./icons/Check";
+import {
+  ArrowPathIcon,
+  PlusIcon,
+  TrashIcon,
+  CheckIcon,
+} from "@heroicons/react/24/outline";
 
 interface Item {
   id: number;
@@ -77,7 +79,7 @@ export default memo(function AddDeleteItems() {
           onClick={addItem}
           className="px-4 py-2 bg-skin-accent text-white rounded-lg hover:opacity-90 transition-colors flex items-center justify-center"
         >
-          <Plus className="w-5 h-5" />
+          <PlusIcon className="w-5 h-5" />
         </button>
       </div>
 
@@ -95,13 +97,13 @@ export default memo(function AddDeleteItems() {
                 <span className="text-skin-base">{item.text}</span>
                 {!item.synced && (
                   <span className="flex items-center gap-1 text-xs text-skin-base opacity-70">
-                    <Loader className="w-3 h-3 animate-spin" />
+                    <ArrowPathIcon className="w-3 h-3 animate-spin" />
                     Syncing...
                   </span>
                 )}
                 {item.synced && item.justSynced && (
                   <span className="flex items-center gap-1 text-xs text-skin-toast-success">
-                    <Check className="w-3 h-3 !fill-none" />
+                    <CheckIcon className="w-3 h-3" />
                     Synced!
                   </span>
                 )}
@@ -110,7 +112,7 @@ export default memo(function AddDeleteItems() {
                 onClick={() => deleteItem(item.id)}
                 className="text-skin-base opacity-50 hover:text-skin-toast-error hover:opacity-100 transition-colors"
               >
-                <Trash2 className="w-4 h-4 !fill-none" />
+                <TrashIcon className="w-4 h-4" />
               </button>
             </motion.div>
           ))}

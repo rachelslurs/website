@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback, useRef, forwardRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import Check from "./icons/Check";
-import AlertCircle from "./icons/AlertCircle";
-import X from "./icons/X";
+import {
+  CheckIcon,
+  ExclamationCircleIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/outline";
 import DemoLayout from "@components/DemoLayout";
 
 interface ToastItem {
@@ -38,11 +40,9 @@ const ToastNotification = forwardRef<
 
   const icon =
     type === "success" ? (
-      <Check className={`w-5 h-5 ${iconColor} flex-shrink-0 !fill-none`} />
+      <CheckIcon className={`w-5 h-5 ${iconColor} flex-shrink-0`} />
     ) : (
-      <AlertCircle
-        className={`w-5 h-5 ${iconColor} flex-shrink-0 !fill-none`}
-      />
+      <ExclamationCircleIcon className={`w-5 h-5 ${iconColor} flex-shrink-0`} />
     );
 
   return (
@@ -78,7 +78,7 @@ const ToastNotification = forwardRef<
         onClick={onClose}
         className="text-skin-base opacity-70 hover:opacity-100 flex-shrink-0 transition-opacity"
       >
-        <X className="w-4 h-4 !fill-none" />
+        <XMarkIcon className="w-4 h-4" />
       </button>
     </motion.div>
   );

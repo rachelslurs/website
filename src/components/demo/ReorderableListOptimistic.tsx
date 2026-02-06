@@ -1,8 +1,7 @@
 import { useState, memo } from "react";
 import { Reorder } from "framer-motion";
 import DemoLayout from "@components/DemoLayout";
-import Loader from "./icons/Loader";
-import Check from "./icons/Check";
+import { ArrowPathIcon, CheckIcon } from "@heroicons/react/24/outline";
 import GripVertical from "./GripVertical";
 
 interface ReorderableItem {
@@ -70,13 +69,13 @@ export default memo(function ReorderableListOptimistic() {
           <div className="flex justify-center items-center min-h-[20px]">
             {isReordering && (
               <span className="flex items-center gap-2 text-xs text-skin-base opacity-70">
-                <Loader className="w-3 h-3 animate-spin" />
+                <ArrowPathIcon className="w-3 h-3 animate-spin" />
                 Syncing...
               </span>
             )}
             {justReordered && (
               <span className="flex items-center gap-2 text-xs text-skin-toast-success">
-                <Check className="w-3 h-3 !fill-none" />
+                <CheckIcon className="w-3 h-3" />
                 Synced!
               </span>
             )}

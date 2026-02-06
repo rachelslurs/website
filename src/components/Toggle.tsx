@@ -18,13 +18,13 @@ function Toggle({
       className="flex items-center gap-4 cursor-pointer group select-none [&:has(input:not(:checked))_.toggle-desc]:opacity-75"
     >
       <div className="flex flex-col items-start shrink-0">
-        <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-skin-foreground">
+        <span className="text-xs font-black uppercase tracking-widest text-skin-foreground">
           {label}
         </span>
         {description && (
           <span
             id="toggle-description"
-            className="toggle-desc text-[9px] md:text-[10px] font-bold transition-colors text-skin-foreground"
+            className="toggle-desc text-xs font-bold transition-colors text-skin-foreground"
           >
             {description}
           </span>
