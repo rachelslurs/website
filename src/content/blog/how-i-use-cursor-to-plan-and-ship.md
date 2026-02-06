@@ -15,6 +15,8 @@ Tech leads have always thought about sequencing: identifying critical paths, man
 
 Here is how I’ve adapted my tech lead mental model to orchestrate a high-velocity AI workflow.
 
+![Diagram showing the order of Plan, Audit, Execute, Verify](/uploads/plan-audit-execute-verify.png)
+
 > **Quick Note**: I'll be referencing my preset rules throughout this post. If you want the full context on how those work, check out my previous post on [how I set up Cursor rules](/posts/say-less-with-cursor-rules/).
 
 ## Breaking Down Work Into Agent-Appropriate Tasks
