@@ -30,6 +30,12 @@ tags:
 
 RecipeCast is a self-founded Micro-SaaS platform designed for home cooks. It provides a modern solution for casting recipes to TVs and smart displays, offering a hands-free cooking experience that works with any recipe site.
 
+<iframe id="ytplayer" type="text/html" width="720" height="405" style='max-width: 100%; height: auto; aspect-ratio: 16/9;'
+src="https://www.youtube.com/embed/jL_aHcyLy7Q?modestbranding=1&color=white"
+frameborder="0" allowfullscreen>
+
+&nbsp;
+
 ## Challenge
 
 Home cooks faced constant frustration following the discontinuation of Google's Cookbook app. I identified several key friction points that needed to be solved:
