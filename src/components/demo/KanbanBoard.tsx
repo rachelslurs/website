@@ -132,7 +132,7 @@ export default function KanbanBoard() {
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="mb-6 p-4 border border-amber-500/50 bg-amber-500/10 rounded-lg text-sm text-amber-200">
+            <div className="mb-6 p-4 border border-amber-500/50 bg-amber-400/10 rounded-lg text-sm text-amber-800 dark:bg-amber-900/25 dark:text-amber-200">
               <p className="font-bold mb-1">⚠️ Touch Device Detected</p>
               <p>
                 This board uses the <strong>HTML5 Drag and Drop API</strong>,
