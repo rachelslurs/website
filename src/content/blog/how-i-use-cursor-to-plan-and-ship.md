@@ -11,6 +11,8 @@ tags:
   - how i work
 ---
 
+## Table of Contents
+
 Tech leads have always thought about sequencing: identifying critical paths, managing blockers, and isolating tasks. With AI, a new question emerges: What can I safely delegate?
 
 Here is how I’ve adapted my tech lead mental model to orchestrate a high-velocity AI workflow.
