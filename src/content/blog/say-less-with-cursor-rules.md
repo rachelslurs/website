@@ -11,6 +11,8 @@ tags:
   - how i work
 ---
 
+## Table of Contents
+
 When I started using Cursor to build [RecipeCast](https://recipecast.app), I noticed I was repeating myself constantly.
 
 "Make sure this is accessible."

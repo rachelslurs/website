@@ -14,6 +14,8 @@ tags:
   - Recipes
 ---
 
+## Table of Contents
+
 A few years ago, I was excited to get a Google Nest Hub after reading [a Wirecutter article](https://www.nytimes.com/wirecutter/blog/cooking-with-google-nest-hub-max/) about how perfect it was for following recipes while cooking. Finally, a solution to my phone screen constantly locking while my hands were covered in [a delicious cookie dough recipe Eric Kim has me hooked on](https://cooking.nytimes.com/recipes/1023675-gochujang-caramel-cookies).
 
 Then— [Google discontinued the cookbook feature](https://www.reddit.com/r/googlehome/comments/1bkccrh/cookbook_no_longer_available_on_google_hub/). Just like that, my smart display became an overpriced timer.

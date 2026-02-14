@@ -1,5 +1,5 @@
 ---
-title: 'Your CI Is Running Tests on Old Code: How to Auto-Cancel GitHub Actions'
+title: "Your CI Is Running Tests on Old Code: How to Auto-Cancel GitHub Actions"
 description: >-
   Pushing multiple commits quickly? You're probably paying for 3-4 parallel test
   runs testing outdated code.
@@ -11,6 +11,8 @@ tags:
   - github actions
   - github
 ---
+
+## Table of Contents
 
 Here's a scenario you've probably experienced: You push a commit to your pull request and GitHub Actions starts running your tests. Two minutes later, you spot a typo and push another commit. Now you have two test runs executing in parallel—one testing code you've already replaced.
 
@@ -54,8 +56,8 @@ group: ${ { github.workflow } } -${ { github.event.pull_request.number || github
 
 This creates a unique group for each PR by combining:
 
-* The workflow name (so different workflows don't interfere with each other)
-* The PR number (or branch name as a fallback for non-PR triggers)
+- The workflow name (so different workflows don't interfere with each other)
+- The PR number (or branch name as a fallback for non-PR triggers)
 
 ## Time = Money
 
@@ -67,9 +69,9 @@ After adding concurrency cancelation: only one run at a time. Immediate savings.
 
 There are a few cases where you might not want automatic cancelation:
 
-* Deploy workflows: If you're deploying to production, you probably want every commit to deploy sequentially, not cancel previous deploys
-* Scheduled workflows: Nightly jobs or cron tasks should run independently
-* Workflows that create artifacts you need: If each run produces something you want to keep, cancelation might end up removing a needed artifact in the process.
+- Deploy workflows: If you're deploying to production, you probably want every commit to deploy sequentially, not cancel previous deploys
+- Scheduled workflows: Nightly jobs or cron tasks should run independently
+- Workflows that create artifacts you need: If each run produces something you want to keep, cancelation might end up removing a needed artifact in the process.
 
 ## Copy-Paste Template
 

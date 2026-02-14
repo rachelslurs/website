@@ -11,6 +11,8 @@ tags:
   - RecipeCast
 ---
 
+## Table of Contents
+
 There are plenty of Chrome extensions that extract recipes from websites. So why build another one?
 
 Most Chrome extensions that remove the ads to give you just the recipe will either:

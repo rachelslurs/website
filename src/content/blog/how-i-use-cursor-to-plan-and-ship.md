@@ -11,7 +11,7 @@ tags:
   - how i work
 ---
 
-## Table of Contents
+### Table of Contents
 
 Tech leads have always thought about sequencing: identifying critical paths, managing blockers, and isolating tasks. With AI, a new question emerges: What can I safely delegate?
 

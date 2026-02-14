@@ -18,6 +18,8 @@ tags:
   - React
 ---
 
+## Table of Contents
+
 After working with ChatGPT and other AI tools, I realized that copying and pasting responses into Google Docs often messed up the formatting. Markdown is great for structured content, but dealing with the formatting cleanup? Not so much. 😅
 
 ![Introducing TidyText](/uploads/introducing-tidytext.png)
