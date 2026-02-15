@@ -67,8 +67,68 @@
       @apply w-full flex flex-col;
     }
   }
+
+  /* Layout for pages with TOC sidebar */
+  .app-layout-with-toc {
+    @apply mx-auto w-full;
+    padding-inline: calc(var(--spacing) * 4);
+    max-width: 48rem; /* Same as standard .app-layout - content stays in same position */
+  }
+
+  /* Grid container for TOC + content */
+  .toc-layout-grid {
+    @apply grid gap-8;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "toc"
+      "content";
+
+    /* Desktop: content stays in normal flow, TOC positioned to the left */
+    @media (min-width: 1280px) {
+      display: block;
+      position: relative;
+    }
+  }
+
+  /* TOC sidebar */
+  .toc-sidebar {
+    grid-area: toc;
+
+    /* Hide on mobile, show on xl+ screens */
+    display: none;
+
+    /* Desktop: sticky, positioned to the left of content */
+    @media (min-width: 1280px) {
+      display: block;
+      position: sticky;
+      top: 5rem; /* Account for header */
+      float: left;
+      width: 180px; /* Narrower to fit at 1280px breakpoint */
+      margin-left: calc(-180px - 3rem); /* Extend into left margin */
+      margin-right: 3rem;
+    }
+  }
+
+  /* Article stays in normal flow */
+  .toc-layout-grid > article {
+    grid-area: content;
+    max-width: 48rem; /* max-w-3xl */
+    width: 100%;
+  }
+
+  /* Hide inline remark-toc on xl+ screens when sidebar TOC is showing */
+  @media (min-width: 1280px) {
+    .toc-layout-grid article #table-of-contents {
+      display: none;
+    }
+    /* Hide the ul that follows the table-of-contents heading */
+    .toc-layout-grid article #table-of-contents + ul {
+      display: none;
+    }
+  }
+
   a {
-    @apply outline-2 outline-offset-1 outline-skin-fill 
+    @apply outline-2 outline-offset-1 outline-skin-fill
     focus-visible:no-underline focus-visible:outline-dashed;
   }
 

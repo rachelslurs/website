@@ -4,6 +4,7 @@ import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import Tag from "@components/Tag.astro";
 import Datetime from "@components/Datetime";
+import TableOfContents from "@components/TableOfContents";
 import CollectionEntryBack from "@components/CollectionEntryBack.astro";
 import CollectionEntryHeader from "@components/CollectionEntryHeader.astro";
 import type { CollectionEntry } from "astro:content";
@@ -70,28 +71,40 @@ const nextPost =
 
   <Header activeNav="posts" />
 
-  <main id="main-content" class="app-layout">
+  <main id="main-content" class="app-layout-with-toc">
     <CollectionEntryBack />
-    <article
-      id="article"
-      role="article"
-      class="prose max-w-3xl dark:prose-invert prose-img:rounded dark:prose-img:bg-white"
-    >
-      <header>
-        <CollectionEntryHeader title={title} slug={slugifyStr(title)} />
-        <Datetime
-          pubDatetime={pubDatetime}
-          modDatetime={modDatetime}
-          size="lg"
-        />
-      </header>
-      <Content />
-      <ul class="my-8 list-none pl-0 text-sm">
-        Tags: {tags.map(tag => <Tag tag={slugifyStr(tag)} />)}
-      </ul>
-      <BackToTop />
-    </article>
 
+    <div class="toc-layout-grid">
+      <!-- TOC Sidebar -->
+      <aside class="toc-sidebar">
+        <TableOfContents client:load />
+      </aside>
+
+      <!-- Main Content -->
+      <article
+        id="article"
+        role="article"
+        class="prose max-w-3xl dark:prose-invert prose-img:rounded dark:prose-img:bg-white"
+      >
+        <header>
+          <CollectionEntryHeader title={title} slug={slugifyStr(title)} />
+          <Datetime
+            pubDatetime={pubDatetime}
+            modDatetime={modDatetime}
+            size="lg"
+          />
+        </header>
+        <Content />
+
+        <ul class="my-8 list-none pl-0 text-sm">
+          Tags: {tags.map(tag => <Tag tag={slugifyStr(tag)} />)}
+        </ul>
+
+        <BackToTop />
+      </article>
+    </div>
+
+    <!-- Previous/Next navigation stays outside grid, below -->
     <hr class="my-6 border-dashed" />
 
     <!-- Previous/Next Post Buttons -->

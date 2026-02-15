@@ -4,6 +4,7 @@ import Header from "@components/Header.astro";
 import Footer from "@components/Footer.astro";
 import WorkTag from "@components/WorkTag.astro";
 import Features from "@components/Features";
+import TableOfContents from "@components/TableOfContents";
 import CollectionEntryBack from "@components/CollectionEntryBack.astro";
 import CollectionEntryHeader from "@components/CollectionEntryHeader.astro";
 import type { CollectionEntry } from "astro:content";
@@ -57,34 +58,43 @@ const layoutProps = {
   <!-- <div class="progress-container fixed top-0 z-10 h-1 w-full bg-skin-fill">
     <div class="progress-bar h-1 w-0 bg-skin-accent" id="myBar"></div>
   </div> -->
-  <main id="main-content" class="app-layout">
+  <main id="main-content" class="app-layout-with-toc">
     <CollectionEntryBack />
-    <article
-      id="article"
-      role="article"
-      class="prose max-w-3xl dark:prose-invert prose-img:rounded prose-img:bg-white"
-    >
-      <header>
-        <CollectionEntryHeader
-          title={title}
-          summary={summary}
-          slug={slugifyStr(title)}
-        />
-        <!-- {year && <WorkYear year={year} size="lg" className="my-2" />} -->
-      </header>
-      {
-        features && features.length > 0 && (
-          <Features features={features} client:load />
-        )
-      }
-      <Content />
-    </article>
 
-    <ul class="prose my-8 dark:prose-invert">
-      {tags.map(tag => <WorkTag tag={slugifyStr(tag)} />)}
-    </ul>
+    <div class="toc-layout-grid">
+      <!-- TOC Sidebar -->
+      <aside class="toc-sidebar">
+        <TableOfContents client:load />
+      </aside>
 
-    <BackToTop />
+      <!-- Main Content -->
+      <article
+        id="article"
+        role="article"
+        class="prose max-w-3xl dark:prose-invert prose-img:rounded prose-img:bg-white"
+      >
+        <header>
+          <CollectionEntryHeader
+            title={title}
+            summary={summary}
+            slug={slugifyStr(title)}
+          />
+          <!-- {year && <WorkYear year={year} size="lg" className="my-2" />} -->
+        </header>
+        {
+          features && features.length > 0 && (
+            <Features features={features} client:load />
+          )
+        }
+        <Content />
+
+        <ul class="prose my-8 dark:prose-invert">
+          {tags.map(tag => <WorkTag tag={slugifyStr(tag)} />)}
+        </ul>
+
+        <BackToTop />
+      </article>
+    </div>
   </main>
 </Layout>
 <Footer />
