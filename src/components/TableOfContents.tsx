@@ -73,68 +73,70 @@ export default function TableOfContents() {
     setTocItems(items);
   }, []);
 
-  // Set up IntersectionObserver to track active section
+  // Simple scroll spy: track which section is currently active
   useEffect(() => {
     if (tocItems.length === 0) return;
 
-    const observer = new IntersectionObserver(
-      entries => {
-        // Skip updates if we're in the middle of programmatic scrolling
-        if (isScrollingRef.current) return;
-
-        // Find all intersecting entries
-        const intersecting = entries
-          .filter(entry => entry.isIntersecting)
-          .sort((a, b) => {
-            // Sort by position in viewport (topmost first)
-            return a.boundingClientRect.top - b.boundingClientRect.top;
-          });
-
-        // Set the topmost intersecting heading as active
-        if (intersecting.length > 0) {
-          const target = intersecting[0].target;
-          if (target instanceof HTMLElement) {
-            setActiveId(target.id);
-          }
-        }
-      },
-      {
-        rootMargin: "-80px 0px -80% 0px",
-        threshold: [0, 1],
-      }
-    );
-
-    // Observe all headings
-    tocItems.forEach(item => {
-      const element = document.getElementById(item.id);
-      if (element) {
-        observer.observe(element);
-      }
-    });
-
-    // Handle scrolling to bottom - activate last section even if heading isn't at top
     const handleScroll = () => {
+      // Skip updates if we're in the middle of programmatic scrolling
+      if (isScrollingRef.current) return;
+
+      // Use same offset as click handler for consistency
+      const header = document.querySelector("header");
+      const headerOffset = header ? header.offsetHeight + 20 : 80;
+      const scrollPosition = window.scrollY + headerOffset;
+
+      // Find which section we're currently in
+      let currentSectionId = tocItems[0].id; // Default to first section
+
+      for (const item of tocItems) {
+        const element = document.getElementById(item.id);
+        if (!element) continue;
+
+        const offsetTop = element.offsetTop;
+
+        // If we've scrolled past this heading, it becomes the current section
+        if (scrollPosition >= offsetTop) {
+          currentSectionId = item.id;
+        } else {
+          // We haven't reached this heading yet, so stop
+          break;
+        }
+      }
+
+      // Check if we're at the bottom of the page - always highlight last section
       const scrollHeight = document.documentElement.scrollHeight;
       const scrollTop =
         document.documentElement.scrollTop || document.body.scrollTop;
       const clientHeight = document.documentElement.clientHeight;
 
-      // Check if we're at or near the bottom of the page (within 100px)
-      if (scrollTop + clientHeight >= scrollHeight - 100) {
-        // Activate the last TOC item
-        if (tocItems.length > 0) {
-          setActiveId(tocItems[tocItems.length - 1].id);
-        }
+      if (scrollTop + clientHeight >= scrollHeight - 50) {
+        currentSectionId = tocItems[tocItems.length - 1].id;
+      }
+
+      setActiveId(currentSectionId);
+    };
+
+    // Run once on mount to set initial active section
+    handleScroll();
+
+    // Add scroll listener with throttling for performance
+    let ticking = false;
+    const scrollListener = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
-    // Add scroll listener
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", scrollListener, { passive: true });
 
     // Cleanup
     return () => {
-      observer.disconnect();
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", scrollListener);
     };
   }, [tocItems]);
 
@@ -164,8 +166,9 @@ export default function TableOfContents() {
     // Use double RAF to ensure all layout/paint is complete
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        // Calculate offset for sticky header + buffer = 5.25rem = 84px
-        const headerOffset = 84;
+        // Calculate offset based on actual sticky header height
+        const header = document.querySelector("header");
+        const headerOffset = header ? header.offsetHeight + 20 : 80; // +20px breathing room
 
         // Get fresh position after layout settles
         const elementPosition =
