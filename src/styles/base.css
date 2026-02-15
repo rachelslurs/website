@@ -83,7 +83,7 @@
       "toc"
       "content";
 
-    /* Desktop: content stays in normal flow, TOC positioned to the left */
+    /* Desktop: content only, TOC positioned separately */
     @media (min-width: 1280px) {
       display: block;
       position: relative;
@@ -97,13 +97,13 @@
     /* Hide on mobile, show on xl+ screens */
     display: none;
 
-    /* Desktop: sticky, positioned to the left of content */
+    /* Desktop: sticky positioning in left margin */
     @media (min-width: 1280px) {
       display: block;
       position: sticky;
       top: 5rem; /* Account for header */
       float: left;
-      width: 180px; /* Narrower to fit at 1280px breakpoint */
+      width: 180px;
       margin-left: calc(-180px - 3rem); /* Extend into left margin */
       margin-right: 3rem;
     }

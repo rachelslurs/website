@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface TocItem {
   id: string;
@@ -11,6 +11,7 @@ export default function TableOfContents() {
     typeof window !== "undefined" ? window.location.hash.slice(1) : ""
   );
   const [tocItems, setTocItems] = useState<TocItem[]>([]);
+  const isScrollingRef = useRef(false);
 
   // Extract headings on mount
   useEffect(() => {
@@ -78,6 +79,9 @@ export default function TableOfContents() {
 
     const observer = new IntersectionObserver(
       entries => {
+        // Skip updates if we're in the middle of programmatic scrolling
+        if (isScrollingRef.current) return;
+
         // Find all intersecting entries
         const intersecting = entries
           .filter(entry => entry.isIntersecting)
@@ -145,21 +149,42 @@ export default function TableOfContents() {
     const heading = document.getElementById(id);
     if (!heading) return;
 
+    // Set active immediately for better visual feedback
+    setActiveId(id);
+
+    // Block IntersectionObserver updates during programmatic scroll
+    isScrollingRef.current = true;
+
     // Check if user prefers reduced motion
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     ).matches;
 
-    // Calculate offset for sticky header + buffer = 5.25rem = 84px
-    const headerOffset = 84;
-    const elementPosition = heading.getBoundingClientRect().top;
-    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+    // Wait for layout to settle before calculating position
+    // Use double RAF to ensure all layout/paint is complete
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        // Calculate offset for sticky header + buffer = 5.25rem = 84px
+        const headerOffset = 84;
 
-    // Scroll to heading with offset
-    window.scrollTo({
-      top: offsetPosition,
-      behavior: prefersReducedMotion ? "auto" : "smooth",
+        // Get fresh position after layout settles
+        const elementPosition =
+          heading.getBoundingClientRect().top + window.scrollY;
+        const offsetPosition = elementPosition - headerOffset;
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: prefersReducedMotion ? "auto" : "smooth",
+        });
+      });
     });
+
+    // Re-enable IntersectionObserver after scroll completes
+    // For smooth scroll, wait ~1 second; for instant scroll, wait 100ms
+    const scrollDuration = prefersReducedMotion ? 100 : 1000;
+    setTimeout(() => {
+      isScrollingRef.current = false;
+    }, scrollDuration);
 
     // Move focus to heading for screen reader context
     heading.setAttribute("tabindex", "-1");
@@ -168,12 +193,6 @@ export default function TableOfContents() {
     // Update URL hash without adding to history (use replaceState)
     // This keeps URLs shareable but doesn't pollute browser history
     window.history.replaceState(null, "", `#${id}`);
-
-    // If this is the last section, immediately activate it
-    // (handles case where section is too short to trigger IntersectionObserver)
-    if (tocItems.length > 0 && id === tocItems[tocItems.length - 1].id) {
-      setActiveId(id);
-    }
   };
 
   return (
