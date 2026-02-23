@@ -35,7 +35,7 @@ It hit me that this is exactly how accessibility works on the web, too. Sometime
 
 ## The Smart Home Advantage
 
-Before any of this happened, I'd already invested in making my house a Google Assistant-activated smart home. The thermostat, the lights, the TVs, the robot vacuum, all voice-controlled. I did it because I like gadgets and convenience. But when my mom moved in to recover, all of that infrastructure suddenly became assistive technology.
+Before any of this happened, I'd already invested in making my house a Google Assistant-activated smart home. The thermostat, the lights, the TVs, the robot vacuum I affectionately named Zelda, all voice-controlled. I did it because I like gadgets and convenience. But when my mom moved in to recover, all of that infrastructure suddenly became assistive technology.
 
 She could adjust the temperature without getting up. She could turn off the lights from bed. The robot vacuum meant one less reason for either of us to navigate around cords or furniture. None of this was built _for_ her recovery, but it worked seamlessly for it.
 
@@ -67,7 +67,7 @@ The small size of the room ended up being a feature, not a bug. Between the grab
 ### Other
 
 - I recommend [night-light-enabled outlets](https://amzn.to/3OvO0bG) in hallways too, just don't add them in your bedroom. They're too bright when you're trying to sleep.
-- My front patio door has no threshold, just a smooth transition from inside to out. My front door does have one. Guess which door became the preferred entrance?
+- My front patio door has no threshold, just a smooth transition from inside to out. My front door does have one. Guess which door became her preferred entrance?
 - Google Assistant on the thermostat, lights, TVs, and robot vacuum. What started as a smart home hobby became genuine independence for someone in recovery. My mom could say "Okay Google, have Zelda vacuum the kitchen" without getting up from the couch.
 
 ## The Same Lesson, Every Time
