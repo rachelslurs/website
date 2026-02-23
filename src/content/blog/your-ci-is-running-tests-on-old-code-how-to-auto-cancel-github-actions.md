@@ -3,7 +3,7 @@ title: "Your CI Is Running Tests on Old Code: How to Auto-Cancel GitHub Actions"
 description: >-
   Pushing multiple commits quickly? You're probably paying for 3-4 parallel test
   runs testing outdated code.
-featured: true
+featured: false
 author: Rachel Cantor
 pubDatetime: 2026-01-25T05:00:00.000Z
 tags:
