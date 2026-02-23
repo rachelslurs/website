@@ -60,7 +60,7 @@ Here's the practical stuff, for anyone who finds themselves in a similar situati
 - [Grab bars](https://amzn.to/46oB11p), installed after I noticed the threshold issue.
   - A 24-inch installed horizontally for the tiled wall of the shower (at the ADA recommended height between 33 and 36 inches).
   - A 12-inch one installed vertically for grabbing while getting over the threshold (at a higher height than the other one)
-- A [non-slip shower mat](https://amzn.to/4rBCnyu) used inside of the shower floor.
+- A [non-slip shower mat](https://amzn.to/4rBCnyu) used for inside of the shower floor.
 
 The small size of the room ended up being a feature, not a bug. Between the grab bars and the close walls, she always had stability.
 
