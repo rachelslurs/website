@@ -140,9 +140,11 @@ export default function TableOfContents() {
     };
   }, [tocItems]);
 
-  // Don't render if no headings found
+  // Don't render if no headings found.
+  // Return fragment instead of null to avoid Astro SSR "Invalid hook call" bug
+  // (https://github.com/withastro/astro/issues/12283)
   if (tocItems.length === 0) {
-    return null;
+    return <></>;
   }
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {

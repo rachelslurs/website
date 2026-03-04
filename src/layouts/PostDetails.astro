@@ -218,14 +218,14 @@ const nextPost =
 
   /** Attaches links to headings in the document,
    *  allowing sharing of sections easily.
-   *  Excludes headings with data-exclude-heading-link (e.g. inside client islands)
+   *  Excludes headings with data-exclude-heading-link or inside astro-island
    *  so we don't mutate DOM that React will hydrate. */
   function addHeadingLinks() {
     let headings = Array.from(
       document.querySelectorAll(
         "h2, h3:not([data-exclude-heading-link]), h4:not([data-exclude-heading-link]), h5:not([data-exclude-heading-link]), h6:not([data-exclude-heading-link])"
       )
-    );
+    ).filter(h => !h.closest("astro-island"));
 
     for (let heading of headings) {
       heading.classList.add("group");

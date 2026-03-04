@@ -9,7 +9,7 @@
     --color-fill: 251, 248, 241;
     --color-text-base: 37, 36, 34;
     --color-accent: 203, 54, 0;
-    --color-card: 230, 230, 230;
+    --color-card: 238, 235, 230;
     --color-card-muted: 204, 197, 185;
     --color-border: 64, 61, 57;
     --color-toast-success-bg: 240, 253, 244;
@@ -23,7 +23,10 @@
     --color-toast-info-icon: 59, 130, 246;
     --color-shadow: 37, 36, 34;
     --color-ring-offset: 204, 197, 185;
-    --color-placeholder: 115, 108, 102;
+    --color-placeholder: 90, 85, 80;
+    --color-chart-1: 203, 54, 0;
+    --color-chart-2: 37, 99, 170;
+    --color-chart-3: 22, 120, 80;
     --max-3xl: 48rem;
   }
   html[data-theme="dark"] {
@@ -31,7 +34,7 @@
     --color-fill: 21, 54, 54;
     --color-text-base: 234, 237, 243;
     --color-accent: 215, 171, 255;
-    --color-card: 82, 115, 115;
+    --color-card: 65, 95, 95;
     --color-card-muted: 129, 173, 173;
     --color-border: 215, 171, 255;
     --color-toast-success-bg: 34, 85, 85;
@@ -45,7 +48,10 @@
     --color-toast-info-icon: 171, 215, 255;
     --color-shadow: 0, 0, 0;
     --color-ring-offset: 21, 54, 54;
-    --color-placeholder: 129, 173, 173;
+    --color-placeholder: 170, 195, 195;
+    --color-chart-1: 255, 160, 120;
+    --color-chart-2: 100, 170, 255;
+    --color-chart-3: 80, 200, 160;
   }
   #sun-svg,
   html[data-theme="dark"] #moon-svg {
@@ -322,6 +328,16 @@
   }
   .focus-outline {
     @apply outline-2 outline-offset-1 outline-skin-fill focus-visible:no-underline focus-visible:outline-dashed;
+  }
+  /* Chart/diagram glow shadows (themeable) */
+  .shadow-chart-1 {
+    box-shadow: 0 0 12px rgba(var(--color-chart-1), 0.1);
+  }
+  .shadow-chart-2 {
+    box-shadow: 0 0 12px rgba(var(--color-chart-2), 0.1);
+  }
+  .shadow-chart-3 {
+    box-shadow: 0 0 12px rgba(var(--color-chart-3), 0.1);
   }
 }
 

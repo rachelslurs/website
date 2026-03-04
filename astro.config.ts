@@ -26,6 +26,7 @@ export default defineConfig({
   },
   vite: {
     optimizeDeps: {
+      include: ["framer-motion"],
       exclude: ["@resvg/resvg-js"],
     },
   },
