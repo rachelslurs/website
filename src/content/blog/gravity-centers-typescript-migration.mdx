@@ -74,7 +74,7 @@ This is the platform team as an enabler argument. You can't make `tsc` a require
 
 Patreon made `tsc` a required CI check only after their foundational infrastructure was typed. Once the platform team provides the types that product engineers need to succeed, the transition from "we encourage TypeScript" to "TypeScript is required" stops feeling punitive and starts feeling like a natural next step.
 
-## The Outer Orbits: What Infrastructure Can't Do For You
+## The Outer Orbits: When Tooling Takes Over
 
 With the foundation in place, the migration can scale beyond what any platform team can do manually — not through mechanical file-by-file work, but through *tooling-assisted* migration at scale. You can run batch codemods and get compilable output. You can write AI-generated transforms to handle specific legacy patterns that static analysis can't reliably touch. You can use localized fixes for files with contained, non-interacting errors. As AI workflows mature, you can run agentic pipelines across entire categories of files with CI validation at every step.
 
