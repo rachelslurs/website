@@ -1,0 +1,26 @@
+name: Sync posts to bear.ink
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/content/blog/**'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install gray-matter
+        run: npm install gray-matter
+
+      - name: Generate and push Writing.tsx update
+        env:
+          BEAR_INK_TOKEN: ${{ secrets.BEAR_INK_TOKEN }}
+        run: node .github/scripts/sync-writing.mjs
