@@ -320,6 +320,12 @@
   pre > code {
     white-space: pre;
   }
+
+  /* Remove backticks that Tailwind Typography adds to inline code */
+  .prose code::before,
+  .prose code::after {
+    content: none;
+  }
 }
 
 @layer components {
@@ -338,6 +344,10 @@
   }
   .shadow-chart-3 {
     box-shadow: 0 0 12px rgba(var(--color-chart-3), 0.1);
+  }
+  /* Footer shadow (themeable) */
+  .shadow-footer {
+    box-shadow: 0 -4px 16px rgba(var(--color-shadow), 0.08);
   }
 }
 

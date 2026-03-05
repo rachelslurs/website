@@ -1,0 +1,83 @@
+---
+title: "Gravity Centers: Where to Start a TypeScript Migration"
+description: >-
+  Here's what Patreon's seven-year, 11,000-file migration actually teaches us about doing it right.
+featured: true
+draft: false
+author: Rachel Cantor
+pubDatetime: 2026-03-05T05:00:00.000Z
+tags:
+  - TypeScript
+  - migration
+  - architecture
+  - engineering
+---
+
+import GravityTree from "@components/demo/GravityTree";
+
+**TL;DR:** The files that matter most in a TypeScript migration are *gravity centers* — the small number of core infrastructure files everything else depends on. Type those first, and type information flows down into the rest of the codebase automatically. Most migrations fail to gain traction because they start at the leaves instead of the roots.
+
+## How Migrations Usually Begin
+
+Most TypeScript migrations start the same way: call it the Friday Afternoon Rename. Someone on the team reads a blog post, gets excited, and spends a Friday afternoon renaming UserCard.js to UserCard.tsx. They add a few type annotations. It compiles. It feels like progress.
+
+And it is — just not the kind that compounds.
+
+What you've created is a type island: a file that knows about its own types and nobody else's. The component that passes data into `UserCard` is still untyped. The API response that shapes that data is still untyped. You've added syntax, but you haven't added safety. When `tsc` isn't a required CI check, those islands don't put pressure on anything. They just sit there, technically TypeScript, practically inert.
+
+There's value in a team getting comfortable with the language before it asks anything hard of them. The problem isn't starting this way. It's not knowing when this phase is over. By 2021, Patreon had their answer: less than 10% of their codebase was in TypeScript files, and even less of that was meaningfully typed. Type annotations were scattered everywhere without any shared types for core concepts like users, posts, or memberships. Every file that touched those concepts either defined its own ad-hoc types (often incorrectly) or reached for `any`. Voluntary adoption without a typed foundation doesn't produce type safety. It produces type safety debt.
+
+## What a Gravity Center Is
+
+A gravity center is a piece of code that many other files depend on. When you type it, that type information propagates throughout the codebase naturally — not because anyone pushed it there, but because every file that imports from it picks it up automatically.
+
+This is what file-by-file migration gets backwards. Starting with leaf components means pushing types upward against the direction dependencies actually flow. Starting with core infrastructure means types flow down into everything that touches it.
+
+The tree below shows what that looks like in practice: type a node near the root and watch how far the information reaches.
+<GravityTree client:load />
+
+## The Three Gravity Centers That Actually Matter
+
+When Patreon formed their frontend platform team in 2022 — [a migration they've since written about in detail](https://www.patreon.com/posts/seven-years-to-typescript-152144830) — they identified three layers of infrastructure that, once typed, pulled the rest of the codebase along.
+
+### The Data Layer
+
+Your API client is almost always the most important gravity center in a frontend codebase. Patreon typed their core domain models (users, creators, memberships, posts) at the point where data enters the application. Every component that displays that data is immediately working with real type information rather than any.
+The cost of not doing this first is easy to underestimate. When your API client returns any, every component that consumes that data has to invent its own story about what shape it received. You end up with a dozen slightly different User types scattered across the codebase, each one reflecting the mental model of whoever wrote that file. When the API changes, the compiler can't tell you what broke. You find out in production. Typing a single API response is a few hours of work, but it pays off across every file that touches that response — potentially dozens or hundreds of components — and it means there's one authoritative definition of what a User is instead of many approximations.
+
+### The Navigation Layer
+
+Typed routes and route parameters give the compiler visibility into what data is available on any given page. Without this, your routing layer is a blind spot: the application knows where to go, but the type system has no idea what a page receives when it gets there.
+The failure mode here is easy to miss because it doesn't announce itself. Without typed routes, page components have no way to declare what they need to render. Params get passed as strings, cast inside the component, and the connection between what a link sends and what a page expects exists only in someone's head. Rename a route parameter and the compiler shrugs. Type the routing layer and that entire class of mismatch — links that pass the wrong params, pages that expect params that no longer exist — becomes a compile error instead of a bug that reaches users.
+
+### The Analytics and Side-Effect Layer
+
+Global event systems are where silent failures live. An analytics call with a missing or mistyped property doesn't throw an error. It just sends wrong data quietly. Patreon wrapped their analytics systems with typed interfaces so event names and properties were checked at compile time.
+
+This one deserves emphasis because the cost of getting the order wrong is particularly high here. If your analytics wrapper is used across 500 files and you migrate those 500 files before the wrapper is typed, you end up writing 500 `@ts-expect-error` comments or `any` assertions, one per callsite, to make the compiler happy. You haven't *removed* the debt, you've just *distributed* it across the entire codebase. Fixing it later means a second pass through every file you already touched.
+
+Once in place, every file being migrated finally had something real to lean on.
+
+## How to Find Your Own Gravity Centers
+
+**Look at your import graph.** Which files are imported the most? In most frontend applications, this is your API client, a shared utilities module, or a theme or design token file. If typing one file would give the compiler visibility into twenty other files automatically, it belongs at the top of your list.
+
+**Follow the data.** Where does data enter your application? The API layer is almost always at the top of this chain. Work backwards from there: what does the API response flow into? What does that flow into? The critical path through your data is usually where the most type leverage lives.
+
+**Look for shared abstractions.** Higher-order components and custom hooks that wrap large parts of the application are gravity centers almost by definition. Patreon's codebase had deeply nested HOCs passing props through multiple layers. Typing one abstraction in that chain does a lot of work at once.
+
+## The Cultural Shift That Depends on This
+
+There's a sequencing problem that migrations run into: you want product teams to adopt TypeScript, but product teams don't want to adopt TypeScript if it means fighting with the type system every time they touch an untyped dependency.
+
+This is the platform team as an enabler argument. You can't make `tsc` a required CI check until the infrastructure is typed. If the API client is returning `any`, asking engineers to write fully typed components means asking them to do extra work for no immediate safety benefit. The friction is real, and it generates resistance.
+
+Patreon made `tsc` a required CI check only after their foundational infrastructure was typed. Once the platform team provides the types that product engineers need to succeed, the transition from "we encourage TypeScript" to "TypeScript is required" stops feeling punitive and starts feeling like a natural next step.
+
+## The Outer Orbits: What Infrastructure Can't Do For You
+
+With the foundation in place, the migration can scale beyond what any platform team can do manually — not through mechanical file-by-file work, but through *tooling-assisted* migration at scale. You can run batch codemods and get compilable output. You can write AI-generated transforms to handle specific legacy patterns that static analysis can't reliably touch. You can use localized fixes for files with contained, non-interacting errors. As AI workflows mature, you can run agentic pipelines across entire categories of files with CI validation at every step.
+
+None of that works without the infrastructure. The codemods have to emit types that are compatible with your typed API client. The AI-generated migrations need the typed routing layer to infer what a page component receives.
+
+The foundation is what makes automated tooling trustworthy enough to run at scale.
