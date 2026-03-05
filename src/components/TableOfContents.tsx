@@ -215,10 +215,10 @@ export default function TableOfContents() {
           >
             <a
               href={`#${item.id}`}
-              className={`block border-l-2 py-1 transition-all duration-200 ease-in-out ${
+              className={`block border-l-2 py-1 transition-colors duration-300 ease-in-out ${
                 activeId === item.id
-                  ? "active border-skin-accent font-medium text-skin-accent"
-                  : "border-transparent text-skin-base/70 hover:text-skin-accent"
+                  ? "active border-skin-accent font-bold text-skin-accent"
+                  : "border-transparent font-normal text-skin-base/70 hover:text-skin-accent"
               }`}
               style={{
                 paddingLeft: "0.75rem",
