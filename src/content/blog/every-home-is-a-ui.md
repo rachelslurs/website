@@ -1,9 +1,7 @@
 ---
 title: "Every Home Is a UI"
 description: >-
-  My mom spent her career as an occupational therapist helping people navigate
-  the world safely. When she needed a hip replacement, I was the one retrofitting
-  my home, and learning that accessibility follows the same rules everywhere.
+  Retrofitting my home for my mom's hip replacement taught me that accessibility follows the same rules everywhere. Physical spaces are just another interface.
 featured: true
 draft: false
 author: Rachel Cantor
