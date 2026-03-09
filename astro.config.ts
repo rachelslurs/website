@@ -10,6 +10,9 @@ import mdx from "@astrojs/mdx";
 export default defineConfig({
   site: SITE.website,
   trailingSlash: "never",
+  build: {
+    format: "file", // This ensures /about.html is created instead of /about/index.html
+  },
   integrations: [
     tailwind({
       applyBaseStyles: false,
