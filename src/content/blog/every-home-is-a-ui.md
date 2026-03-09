@@ -27,7 +27,7 @@ But I watched her struggle with the shower threshold. That lip you step over to 
 
 Once they were in, the small bathroom went from "manageable" to genuinely safe. She always had something to hold onto, and now she had something _designed_ to be held onto.
 
-!['A drawing of a shower with grab bars installed'](/uploads/shower.png)
+!['A drawing of a shower with grab bars installed'](/uploads/shower.webp)
 
 It hit me that this is exactly how accessibility works on the web, too. Sometimes the thing that helps the most isn't a redesign. It's recognizing what's already working and reinforcing the parts that aren't.
 
