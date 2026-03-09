@@ -1,6 +1,8 @@
 ---
 title: "ControlGroup.com: Built Using Jekyll"
-description: Using a static-site generator led to huge performance gains
+description: >-
+  How we rebuilt Control Group's site with Jekyll: static generation, no CMS,
+  and the performance gains that came with it.
 author: Rachel Cantor
 pubDatetime: 2012-10-19T04:00:00.000Z
 tags:

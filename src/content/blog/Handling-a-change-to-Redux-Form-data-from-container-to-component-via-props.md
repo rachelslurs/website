@@ -1,5 +1,8 @@
 ---
 title: Handling a change to Redux-Form data from container to component via props
+description: >-
+  An alternative to React context: passing Redux Form data changes from container
+  to component via props, using getFormValues and connect.
 featured: false
 draft: false
 author: Rachel Cantor

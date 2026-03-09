@@ -1,5 +1,8 @@
 ---
 title: The Missing Guide to Sentry Source Maps in Vite Web Workers
+description: >-
+  Fix Sentry's "Could not determine debug ID" warnings for Web Worker bundles.
+  Get readable stack traces instead of minified gibberish in your error reports.
 featured: false
 author: Rachel Cantor
 pubDatetime: 2025-11-27T05:00:00.000Z

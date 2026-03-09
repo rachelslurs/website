@@ -1,5 +1,8 @@
 ---
 title: Tinkering with CartoDB to make data visualizations
+description: >-
+  Cleaning 150,000 records of messy OSHA data with OpenRefine and visualizing
+  chemical exposure in New York State on an interactive CartoDB map.
 author: Rachel Cantor
 pubDatetime: 2015-07-01T04:00:00.000Z
 tags:

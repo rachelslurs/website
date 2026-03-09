@@ -1,5 +1,8 @@
 ---
 title: "Setting Up Sentry with Vite and Source\_Maps"
+description: >-
+  A step-by-step guide to adding Sentry error tracking with source map support
+  to your Vite app, so you get meaningful stack traces instead of minified code.
 author: Rachel Cantor
 pubDatetime: 2025-03-01T05:00:00.000Z
 tags:
@@ -65,24 +68,24 @@ import './instrument
 4\. Configure the Vite plugin for source maps in your Vite config
 
 ```typescript
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 
 export default defineConfig({
   plugins: [
     react(),
     sentryVitePlugin({
-      org: "your sentry org",  // Your Sentry organization slug
-      project: "your sentry project name",  // Your Sentry project name
-      authToken: process.env.SENTRY_AUTH_TOKEN,  // Auth token from environment
-    })
+      org: "your sentry org", // Your Sentry organization slug
+      project: "your sentry project name", // Your Sentry project name
+      authToken: process.env.SENTRY_AUTH_TOKEN, // Auth token from environment
+    }),
   ],
-  base: '/',  // Changed from './' to '/' for Cloudflare Pages
+  base: "/", // Changed from './' to '/' for Cloudflare Pages
   build: {
-    outDir: 'dist',
-    sourcemap: true  // This is crucial for the source maps to be generated
-  }
+    outDir: "dist",
+    sourcemap: true, // This is crucial for the source maps to be generated
+  },
 });
 ```
 
@@ -92,22 +95,22 @@ export default defineConfig({
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_APP_TITLE: string
+  readonly VITE_APP_TITLE: string;
   // more env variables...
 }
 
 interface ImportMeta {
-  readonly env: ImportMetaEnv
+  readonly env: ImportMetaEnv;
 }
 ```
 
 ### Try uploading sourcemaps locally
 
 1. Add .env to your .gitignore (if it isn’t there already)
-2. Create/edit a local .env file with your SENTRY\_AUTH\_TOKEN
+2. Create/edit a local .env file with your SENTRY_AUTH_TOKEN
 3. Run npm run build
 
-If running on a CI of some kind (whether it be Cloudflare pages, Github actions, etc), you will need to add your environment variable SENTRY\_AUTH\_TOKEN as a secret to the CI running your build.
+If running on a CI of some kind (whether it be Cloudflare pages, Github actions, etc), you will need to add your environment variable SENTRY_AUTH_TOKEN as a secret to the CI running your build.
 
 ### One final thing if you’re silly like me:
 

@@ -1,5 +1,8 @@
 ---
 title: Building a Nutrition Facts Web Component with Polymer
+description: >-
+  A walkthrough of building a reusable nutrition facts web component with Polymer
+  at GDG DevFest, using custom elements and a service element to import JSON data.
 author: Rachel Cantor
 pubDatetime: 2014-11-03T05:00:00.000Z
 tags:
