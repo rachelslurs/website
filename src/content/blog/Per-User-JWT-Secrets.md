@@ -52,7 +52,9 @@ Every user's external JWT is signed with the same key. This creates two limitati
 
 ## The Solution: Per-User Cryptographic Secrets
 
-The fix is simple: give each user their own secret, then derive a combined signing key. To revoke all of a user's tokens, rotate their secret.![](/uploads/per-user-diagram.png)
+The fix is simple: give each user their own secret, then derive a combined signing key. To revoke all of a user's tokens, rotate their secret.
+
+![Diagram showing per-user secrets combined with global secret to create signing keys for token revocation](/uploads/per-user-diagram.png)
 
 When you rotate a user's secret, all tokens signed with the old combined key immediately become invalid without affecting any other user.
 

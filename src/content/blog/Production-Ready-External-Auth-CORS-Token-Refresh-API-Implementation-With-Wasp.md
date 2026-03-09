@@ -155,7 +155,7 @@ During development, the middleware provides additional logging to help with debu
 
 Now let's implement the actual API logic. Here's how the three endpoints work together:
 
-![](/uploads/production-ready.png)
+![Diagram showing how the generate token, refresh token, and revoke token API endpoints work together](/uploads/production-ready.png)
 
 Update `app/src/auth/external/api.ts`:
 

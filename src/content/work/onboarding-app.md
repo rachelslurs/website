@@ -47,15 +47,15 @@ The approach involved mapping out a range of flows to determine how to isolate e
 
 #### Sign up: initial registration process
 
-![](/uploads/signup.png)
+![Diagram of the sign up and initial registration process](/uploads/signup.png)
 
 #### Linking a Hype Card: Connecting an NFC card or sticker to a user’s account
 
-![](/uploads/linking.png)
+![Diagram showing how to connect an NFC card or sticker to a user's account](/uploads/linking.png)
 
 #### Claiming a page: User claiming ownership of a pre-existing page
 
-![](/uploads/claiming.png)
+![Diagram showing the user claiming ownership of a pre-existing page](/uploads/claiming.png)
 
 ## Solution
 

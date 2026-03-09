@@ -65,7 +65,7 @@ With the service created, we can now build the UI to display the nutrition facts
 
 We need to create the \<nutrition-facts-display> component, which will present the fetched data in a user-friendly format.
 
-![](/uploads/NutritionFacts.png)
+![Screenshot of the nutrition facts web component displaying food data in the standard FDA format](/uploads/NutritionFacts.png)
 
 Full source code on GitHub: [Nutrition Facts](https://github.com/rachelslurs/nutrition-facts)
 
