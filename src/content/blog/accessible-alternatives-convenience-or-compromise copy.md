@@ -20,7 +20,7 @@ You are likely familiar with these overlay tools that claim to effortlessly rend
 Another accessibility alternative is to create a different set of HTML for users needing assistive technologies. I’ve seen these used on many Shopify websites and they tend to be what I like to call “the ugly stepchild” version of a store, because they tend to be automatically generated either by a theme or plugin and ignored by designers. _Next time you’re shopping online, ⌘F, “accessib”, click, and prepare to be horrified._
 
 <figure>
-<img alt='A gif scrolling luxury retailer Alaïa’s “accessible” version of their website, showing broken images, and ugly blue all caps text.' src='/uploads/accessible_alaia.gif'>
+<img alt='A gif scrolling luxury retailer Alaïa’s “accessible” version of their website, showing broken images, and ugly blue all caps text.' src='/uploads/accessible_alaia.webp'>
 <figcaption class='text-center'>Luxury retailer Alaïa’s alternate version, complete with broken images, and that eggplant visited link color á la the web of yesteryear.</figcaption>
 </figure>
 

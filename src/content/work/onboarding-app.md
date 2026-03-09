@@ -17,7 +17,7 @@ tags:
   - Figma
   - TypeScript
 features:
-  - src: /uploads/sign_up_log_in.gif
+  - src: /uploads/sign_up_log_in.webp
     alt: Screen recording showing signup and login toggle
     caption: Sign up and log in toggle
   - src: /uploads/trial.gif
