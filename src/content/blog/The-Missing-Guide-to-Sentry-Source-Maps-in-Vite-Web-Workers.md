@@ -15,7 +15,7 @@ tags:
 
 ### Table of Contents
 
-![](</uploads/Debug web workers.png>)
+![](/uploads/Debug web workers.webp)
 
 Note: this guide assumes you already have source maps set up [like so](https://docs.sentry.io/platforms/javascript/guides/react/) or I [wrote about it here](https://rachel.fyi/posts/setting-up-sentry-with-vite-and-sourcemaps).
 
