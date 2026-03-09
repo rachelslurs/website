@@ -10,21 +10,30 @@ export interface Props {
 }
 
 const { page } = Astro.props;
+
+/** Ensure pagination URLs have no trailing slash for canonical consistency */
+function stripTrailingSlash(url: string | undefined): string | undefined {
+  if (!url) return url;
+  return url.endsWith("/") && url.length > 1 ? url.slice(0, -1) : url;
+}
+
+const prevUrl = stripTrailingSlash(page.url.prev as string | undefined);
+const nextUrl = stripTrailingSlash(page.url.next as string | undefined);
 ---
 
 {
   page.lastPage > 1 && (
     <nav class="pagination-wrapper" aria-label="Pagination">
       <LinkButton
-        disabled={!page.url.prev}
-        href={page.url.prev as string}
-        className={`mr-4 select-none flex items-center gap-1 ${page.url.prev ? "" : "disabled"}`}
+        disabled={!prevUrl}
+        href={prevUrl}
+        className={`mr-4 select-none flex items-center gap-1 ${prevUrl ? "" : "disabled"}`}
         ariaLabel="Previous"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="inline"
-          class:list={[{ "disabled-svg": !page.url.prev }]}
+          class:list={[{ "disabled-svg": !prevUrl }]}
         >
           <path d="M12.707 17.293 8.414 13H18v-2H8.414l4.293-4.293-1.414-1.414L4.586 12l6.707 6.707z" />
         </svg>
@@ -34,16 +43,16 @@ const { page } = Astro.props;
         {page.currentPage} / {page.lastPage}
       </span>
       <LinkButton
-        disabled={!page.url.next}
-        href={page.url.next as string}
-        className={`mx-4 select-none flex items-center gap-1 ${page.url.next ? "" : "disabled"}`}
+        disabled={!nextUrl}
+        href={nextUrl}
+        className={`mx-4 select-none flex items-center gap-1 ${nextUrl ? "" : "disabled"}`}
         ariaLabel="Next"
       >
         <span>Next</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           class="inline"
-          class:list={[{ "disabled-svg": !page.url.next }]}
+          class:list={[{ "disabled-svg": !nextUrl }]}
         >
           <path d="m11.293 17.293 1.414 1.414L19.414 12l-6.707-6.707-1.414 1.414L15.586 11H6v2h9.586z" />
         </svg>

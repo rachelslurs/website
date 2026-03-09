@@ -24,7 +24,7 @@ const { page } = Astro.props;
     <ul class="list-none pl-0">
       {
         page.data.map(({ data, slug }) => (
-          <CollectionCard href={`/work/${slug}/`} frontmatter={data} />
+          <CollectionCard href={`/work/${slug}`} frontmatter={data} />
         ))
       }
     </ul>

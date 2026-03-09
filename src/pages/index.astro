@@ -49,7 +49,7 @@ const featuredDemos = sortedDemos.filter(({ data }) => data.featured);
             <ul class="list-none pl-0">
               {featuredPosts.map(({ data, slug }) => (
                 <CollectionCard
-                  href={`/posts/${slug}/`}
+                  href={`/posts/${slug}`}
                   frontmatter={data}
                   secHeading={false}
                   showDatetime={true}
@@ -69,7 +69,7 @@ const featuredDemos = sortedDemos.filter(({ data }) => data.featured);
             <ul class="list-none pl-0">
               {featuredWorks.map(({ data, slug }) => (
                 <CollectionCard
-                  href={`/work/${slug}/`}
+                  href={`/work/${slug}`}
                   frontmatter={data}
                   secHeading={false}
                 />
@@ -89,7 +89,7 @@ const featuredDemos = sortedDemos.filter(({ data }) => data.featured);
             <ul class="list-none pl-0">
               {featuredDemos.map(({ data, slug }) => (
                 <CollectionCard
-                  href={`/demos/${slug}/`}
+                  href={`/demos/${slug}`}
                   frontmatter={data}
                   secHeading={false}
                 />

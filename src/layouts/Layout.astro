@@ -25,13 +25,24 @@ export interface Props {
   footerNoMarginTop?: boolean;
 }
 
+/** Ensure canonical URL has no trailing slash for directory-like pages (SEO consistency) */
+function getCanonicalURL(): string {
+  const pathname = Astro.url.pathname;
+  const isFile = /\.(xml|txt|json|html?|webmanifest)$/i.test(pathname);
+  const path =
+    pathname && pathname.endsWith("/") && pathname.length > 1 && !isFile
+      ? pathname.slice(0, -1)
+      : pathname;
+  return new URL(path, Astro.site).href;
+}
+
 const {
   title = SITE.title,
   author = SITE.author,
   profile = SITE.profile,
   description = SITE.desc,
   ogImage = SITE.ogImage,
-  canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
+  canonicalURL = getCanonicalURL(),
   pubDatetime,
   modDatetime,
   scrollSmooth = false,

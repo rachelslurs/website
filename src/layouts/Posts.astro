@@ -30,7 +30,7 @@ const { page } = Astro.props;
       {
         page.data.map(({ data, slug }) => (
           <CollectionCard
-            href={`/posts/${slug}/`}
+            href={`/posts/${slug}`}
             frontmatter={data}
             showDatetime={true}
           />
