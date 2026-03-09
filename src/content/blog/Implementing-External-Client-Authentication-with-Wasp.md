@@ -15,7 +15,7 @@ tags:
   - wasp
 ---
 
-_If you’d like a hand in building this or anything like it, I’m open to taking on new clients. See [the end of this article](https://rachel.fyi/posts/implementing-external-client-authentication-with-wasp/#about-the-author) to learn more._
+_If you’d like a hand in building this or anything like it, I’m open to taking on new clients. See [the end of this article](https://rachel.fyi/posts/implementing-external-client-authentication-with-wasp#about-the-author) to learn more._
 
 ---
 

@@ -17,9 +17,9 @@ tags:
 
 ![](</uploads/Debug web workers.png>)
 
-Note: this guide assumes you already have source maps set up [like so](https://docs.sentry.io/platforms/javascript/guides/react/) or I [wrote about it here](https://rachel.fyi/posts/setting-up-sentry-with-vite-and-sourcemaps/).
+Note: this guide assumes you already have source maps set up [like so](https://docs.sentry.io/platforms/javascript/guides/react/) or I [wrote about it here](https://rachel.fyi/posts/setting-up-sentry-with-vite-and-sourcemaps).
 
-I recently set up error tracking for [TidyText.cc](https://tidytext.cc/) and ran into a problem. My Sentry integration was working fine for the main app bundle, but my build logs kept showing warnings about my worker files:
+I recently set up error tracking for [TidyText.cc](https://tidytext.cc) and ran into a problem. My Sentry integration was working fine for the main app bundle, but my build logs kept showing warnings about my worker files:
 
 ```javascript
 [sentry-vite-plugin] Debug: Could not determine debug ID from bundle.

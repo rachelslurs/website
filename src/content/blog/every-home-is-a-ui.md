@@ -76,7 +76,7 @@ A [recent Wirecutter piece on aging in place](https://www.nytimes.com/wirecutter
 
 The experts in that article stressed being proactive: make changes before you need them, not after a fall. One occupational therapist recommended starting adaptations as soon as you're in your "forever home." On the web, this is the exact same argument against retrofitting accessibility after launch. Build it in from the start. The cost of adding it later is always higher, in money, in time, and sometimes in real harm to real people.
 
-Both fields also suffer from the same blind spot: assuming the current setup works because it works _for you_. I never thought about my shower threshold. I never thought about how a rug edge could catch a walker wheel. Just like I once never thought about what happens when a website auto-plays audio over a screen reader, or when [a purchase goes through without a confirmation step](/posts/why-confirming-choices-matters/).
+Both fields also suffer from the same blind spot: assuming the current setup works because it works _for you_. I never thought about my shower threshold. I never thought about how a rug edge could catch a walker wheel. Just like I once never thought about what happens when a website auto-plays audio over a screen reader, or when [a purchase goes through without a confirmation step](/posts/why-confirming-choices-matters).
 
 My mom taught me, long before I ever wrote a line of code, that the world isn't designed for everyone by default. You have to choose to make it that way. That's true for physical space, and it's true for the web.
 
