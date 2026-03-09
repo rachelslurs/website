@@ -29,7 +29,7 @@ The other reason I built this: to streamline the RecipeCast workflow.
 
 Previously, if you wanted to cast a recipe to your TV, you had to copy the URL and paste it into [recipecast.app](https://recipecast.app). Now, you click the extension icon, hit the “RecipeCast…” button, and the URL is already loaded in.
 
-!['RecipeCast demo showing a laptop using RecipeCast to view a recipe on a smart display'](</uploads/RecipeCast Extension Marquee (1400 x 560 px) 2.png>)
+!['RecipeCast demo showing a laptop using RecipeCast to view a recipe on a smart display'](/uploads/RecipeCast Extension Marquee (1400 x 560 px) 2.webp)
 
 I didn’t build casting directly into the extension (though I could have, since [I recently added OAuth-style authentication to the web app](https://medium.com/@rachelcantor/building-external-client-authentication-with-wasp-fa6de95acde1)). I wanted to keep it simple and validate that people actually wanted this workflow first.
 
