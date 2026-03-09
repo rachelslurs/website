@@ -17,8 +17,8 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install gray-matter
-        run: npm install gray-matter
+      - name: Install dependencies
+        run: npm install gray-matter github-slugger
 
       - name: Generate and push Writing.tsx update
         env:

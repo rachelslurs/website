@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync } from 'fs';
 import { join, basename } from 'path';
 import matter from 'gray-matter';
+import { slug as slugify } from 'github-slugger';
 
 // --- 1. Parse all blog posts ---
 const blogDir = 'src/content/blog';
@@ -9,7 +10,8 @@ const files = readdirSync(blogDir).filter(f => f.endsWith('.md') || f.endsWith('
 const posts = files.map(file => {
   const raw = readFileSync(join(blogDir, file), 'utf-8');
   const { data } = matter(raw);
-  const slug = data.slug || basename(file).replace(/\.(md|mdx)$/, '');
+  const rawSlug = data.slug || basename(file).replace(/\.(md|mdx)$/, '');
+  const slug = data.slug || slugify(rawSlug);
   return {
     title: data.title || '',
     summary: data.description || '',
