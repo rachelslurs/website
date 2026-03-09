@@ -13,7 +13,7 @@ tags:
   - sentry
 ---
 
-## Table of Contents
+### Table of Contents
 
 ![](</uploads/Debug web workers.png>)
 
