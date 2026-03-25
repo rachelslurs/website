@@ -277,6 +277,9 @@ function getNode(id: string) {
   return NODES.find(n => n.id === id);
 }
 
+const WARNING_BADGE_W = 24;
+const WARNING_BADGE_H = 22;
+
 function WarningIcon({
   x,
   y,
@@ -289,22 +292,28 @@ function WarningIcon({
   return (
     <g
       transform={`translate(${x}, ${y})`}
-      className={active ? "opacity-[0.85]" : "opacity-30"}
+      className={active ? "opacity-95" : "opacity-35"}
       style={{ transition: "opacity 0.5s ease" }}
     >
-      <path
-        d="M6 0.5L11.5 10.5H0.5L6 0.5Z"
+      <rect
+        x={0}
+        y={0}
+        width={WARNING_BADGE_W}
+        height={WARNING_BADGE_H}
+        rx={5}
         fill="none"
-        className="stroke-skin-accent"
-        strokeWidth={1.2}
+        className="stroke-skin-accent fill-skin-accent/10"
+        strokeWidth={1.6}
+        strokeDasharray="4 3"
         strokeLinejoin="round"
       />
       <text
-        x="6"
-        y="9"
+        x={WARNING_BADGE_W / 2}
+        y={WARNING_BADGE_H / 2}
         textAnchor="middle"
-        className="fill-skin-accent"
-        style={{ fontSize: 7.5, fontWeight: 700, fontFamily: "inherit" }}
+        dominantBaseline="central"
+        className="fill-skin-base"
+        style={{ fontSize: 13, fontWeight: 800, fontFamily: "inherit" }}
       >
         !
       </text>
@@ -343,10 +352,16 @@ function NodeRect({
         rx={6}
         className={`${rectClass} transition-all duration-500 ease-in-out ${highlight ? "[filter:url(#glow)]" : ""}`}
       />
-      {isRace && <WarningIcon x={x + 8} y={y + h / 2 - 5.5} active={active} />}
+      {isRace && (
+        <WarningIcon
+          x={x + 6}
+          y={y + h / 2 - WARNING_BADGE_H / 2}
+          active={active}
+        />
+      )}
       {sub ? (
         <text
-          x={cx + (isRace ? 6 : 0)}
+          x={cx + (isRace ? 14 : 0)}
           y={y + h / 2}
           textAnchor="middle"
           className={active ? "fill-skin-base" : "fill-skin-placeholder"}
@@ -356,11 +371,11 @@ function NodeRect({
             transition: "fill 0.5s ease",
           }}
         >
-          <tspan x={cx + (isRace ? 6 : 0)} dy="-7">
+          <tspan x={cx + (isRace ? 14 : 0)} dy="-7">
             {label}
           </tspan>
           <tspan
-            x={cx + (isRace ? 6 : 0)}
+            x={cx + (isRace ? 14 : 0)}
             dy="15"
             className={active ? P.text : "fill-skin-placeholder"}
             style={{ fontSize: 11, fontWeight: 400 }}
@@ -370,7 +385,7 @@ function NodeRect({
         </text>
       ) : (
         <text
-          x={cx + (isRace ? 6 : 0)}
+          x={cx + (isRace ? 14 : 0)}
           y={y + h / 2}
           textAnchor="middle"
           dominantBaseline="central"
@@ -631,16 +646,16 @@ function UseEffectBranching() {
         </div>
 
         <div className="w-full shrink-0 pt-1 md:order-none md:w-60">
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex w-full min-w-0 items-center justify-between gap-4">
             <button
               type="button"
-              className="flex items-center gap-1.5 whitespace-nowrap rounded-md border border-skin-card-muted/60 bg-skin-card px-3.5 py-1.5 text-sm font-medium text-skin-base hover:bg-skin-card-muted/50"
+              className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-skin-card-muted/60 bg-skin-card px-3.5 py-1.5 text-sm font-medium text-skin-base hover:bg-skin-card-muted/50"
               onClick={() => setPlaying(p => !p)}
             >
               {playing ? <PauseIcon /> : <PlayIcon />}
               {playing ? "Pause" : "Play"}
             </button>
-            <label className="flex cursor-pointer select-none items-center gap-2 whitespace-nowrap text-sm text-skin-placeholder">
+            <label className="flex shrink-0 cursor-pointer select-none items-center gap-2 whitespace-nowrap text-sm text-skin-placeholder">
               <input
                 type="checkbox"
                 className="h-4 w-4 cursor-pointer [accent-color:rgb(var(--color-chart-1))]"

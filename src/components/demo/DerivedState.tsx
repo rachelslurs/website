@@ -341,16 +341,16 @@ export default function DerivedState() {
         </div>
 
         <div className="w-full shrink-0 pt-1 md:w-60">
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex w-full min-w-0 items-center justify-between gap-4">
             <button
               type="button"
-              className="flex items-center gap-1.5 whitespace-nowrap rounded-md border border-skin-card-muted/60 bg-skin-card px-3.5 py-1.5 text-sm font-medium text-skin-base hover:bg-skin-card-muted/50"
+              className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-skin-card-muted/60 bg-skin-card px-3.5 py-1.5 text-sm font-medium text-skin-base hover:bg-skin-card-muted/50"
               onClick={() => setPlaying(p => !p)}
             >
               {playing ? <PauseIcon /> : <PlayIcon />}
               {playing ? "Pause" : "Play"}
             </button>
-            <label className="flex cursor-pointer select-none items-center gap-2 whitespace-nowrap text-sm text-skin-placeholder">
+            <label className="flex shrink-0 cursor-pointer select-none items-center gap-2 whitespace-nowrap text-sm text-skin-placeholder">
               <input
                 type="checkbox"
                 className="h-4 w-4 cursor-pointer [accent-color:rgb(var(--color-chart-3))]"
