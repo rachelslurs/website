@@ -1,0 +1,96 @@
+---
+title: "Why Banning useEffect Is Really About Agents"
+description: Factory's useEffect ban made headlines as a DX play. Their CEO said the thing nobody was talking about — they did it for agent effectiveness.
+featured: true
+draft: false
+author: Rachel Cantor
+pubDatetime: 2026-03-25T05:00:00.000Z
+tags:
+  - react
+  - ai
+  - cursor
+  - how i work
+---
+
+import ConstraintLayers from "@components/demo/ConstraintLayers";
+import UseEffectVsDerived from "@components/demo/UseEffectVsDerived";
+
+[Factory banned `useEffect`](https://x.com/alvinsng/status/2033969062834045089). The React community spent the week debating whether that's too strict, whether it's good DX, whether `useEffect` was always bad or just misused. All fair questions. But Factory's CEO, Eno Reyes, said the thing nobody was talking about: they did it so agents could operate more effectively in the codebase.
+
+That's a different conversation than the one most people were having. This isn't a code style preference. It's an architectural constraint designed for a codebase where AI agents are first-class contributors.
+
+### Table of Contents
+
+## What Factory Actually Did
+
+[Alvin Sng's post](https://x.com/alvinsng/status/2033969062834045089) walks through the full rationale and the replacement patterns, so I won't rehash those here. The short version: direct `useEffect` calls are banned via lint rule. A single `useMountEffect` wrapper exists for genuine mount-time side effects. Everything else (derived state, data fetching, event responses) uses the tool that was always the right tool: inline computation, event handlers, or a data-fetching library.
+
+The interesting part isn't what they replaced `useEffect` with. It's _how_ they enforce it. Not a style guide. Not a PR comment. A `no-restricted-syntax` lint rule that blocks the pattern before it can exist in the codebase.
+
+## The Agent Can't Simulate a Timeline
+
+When an AI agent reads a component with chained `useEffect` calls, it faces a structural problem. The component mounts. Effect A fires. It updates State X. State X is in the dependency array of Effect B, so that fires next. Effect B updates State Y. Now the component re-renders.
+
+To understand what this component does _right now_, the agent has to reconstruct what happened _over time_. It has to simulate a timeline.
+
+Agents don't simulate timelines well. They read code in a context window. They're looking at a snapshot, not running a debugger. When the logic is spread across multiple effects that trigger each other through dependency arrays, the agent is doing the same thing a developer does: jumping between hooks, attempting to trace state mutations, mentally trying to hold the whole chain in working memory.
+
+Compare that to a component where state is derived inline:
+
+```typescript
+function ProductList({ products, filter }) {
+  const filtered = products.filter(p => p.category === filter);
+  const count = filtered.length;
+
+  return (
+    <section aria-label="Product results">
+      <p>{count} products found</p>
+      <ul>
+        {filtered.map(p => <ProductCard key={p.id} product={p} />)}
+      </ul>
+    </section>
+  );
+}
+```
+
+ <UseEffectVsDerived client:load />
+
+No effects. No state synchronization. Props come in, values are derived, JSX goes out. An agent reading this component knows exactly what it does by reading top to bottom. There's no hidden transient dimension to reconstruct.
+
+This is the core insight: `useEffect` turns a tree into a timeline. Banning it turns the timeline back into a tree. Trees are what agents (and humans) can parse.
+
+## Lint Rules as Agent Guardrails
+
+Factory didn't stop at banning `useEffect`. They published their entire ESLint plugin, and the philosophy behind it is worth paying attention to. Named exports over default exports, so agents can grep for specific functions. Absolute imports over relative paths, so agents can resolve dependencies without traversing `../../..`. Colocated test files, so agents can find tests without guessing at directory conventions.
+
+Every rule serves the same purpose: make the codebase deterministic enough that an agent can navigate it without having to waste any context guessing.
+
+This is the same principle behind [Cursor rules](/posts/say-less-with-cursor-rules/). When I set up `.cursor/rules/accessibility.mdc` with a glob pattern on `src/components/**`, I'm doing the same thing Factory is doing with their lint plugin. I'm encoding a constraint once so that every agent session inherits it automatically. The agent doesn't need me to say "make it accessible" in every prompt. The rule already said it.
+
+The difference is scope. Cursor rules are local. They shape what an agent generates in your editor. Lint rules are global. They shape what's _allowed to exist_ in the codebase at all, regardless of whether a human or an agent wrote it.
+
+<ConstraintLayers client:load />
+
+If you're using AI agents in your workflow and you don't have lint rules enforcing your architectural decisions, you're relying on the agent to remember your preferences. That's the equivalent of relying on a new hire to remember every convention from onboarding. It works, but it doesn't scale.
+
+The patterns Factory enforces aren't novel. Named exports, absolute imports, derived state, colocated tests. Good codebases have always done these things. What's new is the forcing function. When an agent is writing code alongside your team, "easy to reason about" stops being a best practice and starts being a requirement. The same way [curb cuts help wheelchair users and parents with strollers and delivery workers with carts](/posts/every-home-is-a-ui), agent-optimized code helps agents _and_ the humans who work alongside them.
+
+## What This Means for Your Codebase
+
+I'm not suggesting you ban `useEffect` tomorrow. Factory's constraint works for Factory because they've built their entire development workflow around agent-native principles. Your mileage will vary depending on your team, your tooling, and how much of your codebase agents are actually touching.
+
+But the contributor pool touching your codebase is about to get a lot wider than your engineering team. Product managers are shipping small features with Cursor and Claude Code. Customer support tools are filing bugs with enough context for agents to attempt auto-resolution. Design engineers are building and committing UI components. The person (or system) reading your component next might not know what a dependency array is.
+
+That's the real argument for treating your codebase as an interface. Not just "agents work here now," but "contributors with less context than ever are going to interact with this code, and the code itself needs to be legible without tribal knowledge."
+
+The question Factory is asking is worth sitting with: **what are the patterns in your codebase that you've stopped noticing, but that a new contributor, human or otherwise, would struggle with?**
+
+Maybe it's a `useEffect` chain that even your senior developers have to squint at. Maybe it's a folder structure that only makes sense if you were there when it was created. Maybe it's a set of conventions that exist in Slack threads but not in lint rules or documentation.
+
+`useEffect` is where React's declarative promise quietly fell apart. Agents just made that obvious. The best codebases have always been the ones that are easy to reason about. Now "easy to reason about" is a measurable requirement, not a subjective preference.
+
+## About the Author
+
+I'm Rachel Cantor, a product engineer with over 14 years of experience building production systems. I plan and implement technical architecture that requires a knack for detail and a focus on high-fidelity user experiences. Currently seeking contract opportunities.
+
+Feel free to reach out to me on [bear.ink](https://bear.ink/) or [LinkedIn](https://linkedin.com/in/rachelcantor) if you're looking to build something sharp. 🙌
