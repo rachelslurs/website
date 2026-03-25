@@ -68,7 +68,7 @@ Factory didn't stop at banning `useEffect`. They published their entire ESLint p
 
 Every rule serves the same purpose: make the codebase deterministic enough that an agent can navigate it without having to waste any context guessing.
 
-This is the same principle behind [Cursor rules](/posts/say-less-with-cursor-rules/). When I set up `.cursor/rules/accessibility.mdc` with a glob pattern on `src/components/**`, I'm doing the same thing Factory is doing with their lint plugin. I'm encoding a constraint once so that every agent session inherits it automatically. The agent doesn't need me to say "make it accessible" in every prompt. The rule already said it.
+This is the same principle behind [Cursor rules](/posts/say-less-with-cursor-rules). When I set up `.cursor/rules/accessibility.mdc` with a glob pattern on `src/components/**`, I'm doing the same thing Factory is doing with their lint plugin. I'm encoding a constraint once so that every agent session inherits it automatically. The agent doesn't need me to say "make it accessible" in every prompt. The rule already said it.
 
 The difference is scope. Cursor rules are local. They shape what an agent generates in your editor. Lint rules are global. They shape what's _allowed to exist_ in the codebase at all, regardless of whether a human or an agent wrote it.
 

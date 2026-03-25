@@ -302,9 +302,8 @@ function WarningIcon({
         width={WARNING_BADGE_W}
         height={WARNING_BADGE_H}
         rx={5}
-        className="fill-skin-accent/[0.06] stroke-skin-accent"
-        strokeWidth={1.6}
-        strokeDasharray="4 3"
+        className="fill-skin-accent/[0.08] stroke-skin-accent/40"
+        strokeWidth={1}
         strokeLinejoin="round"
       />
       <text
@@ -354,18 +353,17 @@ function NodeRect({
             rx={10}
             className={`${active ? P.fillActive : "fill-skin-card-muted/12"} transition-all duration-500 ease-in-out`}
           />
+          {/* Inset so stroke stays inside the fill (half-stroke is not clipped). */}
           <rect
-            x={x}
-            y={y}
-            width={w}
-            height={h}
-            rx={10}
+            x={x + 1.25}
+            y={y + 1.25}
+            width={w - 2.5}
+            height={h - 2.5}
+            rx={8.5}
             fill="none"
-            className={`pointer-events-none transition-all duration-500 ease-in-out ${
-              active
-                ? "stroke-skin-accent stroke-[1.5] [stroke-dasharray:4_3]"
-                : "stroke-skin-accent/45 stroke-[1.5] [stroke-dasharray:4_3]"
-            }`}
+            pointerEvents="none"
+            className="stroke-skin-accent stroke-[1.5] [stroke-dasharray:4px_3px] [stroke-linejoin:round] transition-opacity duration-500 ease-in-out"
+            opacity={active ? 1 : 0.45}
           />
         </g>
       ) : (
@@ -596,8 +594,8 @@ function UseEffectBranching() {
 
   return (
     <div className="rounded-xl border border-skin-line/10 bg-skin-fill p-4 font-sans text-skin-base sm:p-6">
-      <div className="flex w-full max-w-[780px] flex-col items-start gap-4 md:flex-row md:gap-7">
-        <div className="min-w-0 flex-1">
+      <div className="grid w-full max-w-[780px] grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_240px] md:items-start md:gap-x-7 md:gap-y-0">
+        <div className="min-w-0 w-full">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 510 610"
@@ -674,9 +672,16 @@ function UseEffectBranching() {
               ))}
             </g>
           </svg>
+
+          <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2.5 py-2">
+            <LegendItem variant="effect" label="Effect" />
+            <LegendItem variant="state" label="State" />
+            <LegendItem variant="external" label="Side effect" />
+            <LegendItem variant="uncertain" label="Uncertain" dashed warn />
+          </div>
         </div>
 
-        <div className="w-full shrink-0 pt-1 md:order-none md:w-60">
+        <div className="w-full min-w-0 pt-1">
           <div className="flex w-full min-w-0 items-center justify-between gap-4">
             <button
               type="button"
@@ -697,15 +702,8 @@ function UseEffectBranching() {
             </label>
           </div>
 
-          <div className="mt-3.5 flex flex-wrap gap-3 border-b border-skin-card-muted/25 pb-3">
-            <LegendItem variant="effect" label="Effect" />
-            <LegendItem variant="state" label="State" />
-            <LegendItem variant="external" label="Side effect" />
-            <LegendItem variant="uncertain" label="Uncertain" dashed warn />
-          </div>
-
           {showCommentary && (
-            <div className="mt-2.5">
+            <div className="mt-3.5">
               {CAPTIONS.map((caption, i) => {
                 const isActive = i === currentStep;
                 const isPast = i < currentStep;
@@ -727,7 +725,7 @@ function UseEffectBranching() {
                     role="button"
                     tabIndex={0}
                   >
-                    <div className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-skin-base">
+                    <div className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-skin-base opacity-70">
                       Step {i + 1}
                     </div>
                     <div

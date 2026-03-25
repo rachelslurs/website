@@ -106,6 +106,8 @@ module.exports = {
       stroke: {
         skin: {
           line: withOpacity("--color-border"),
+          base: withOpacity("--color-text-base"),
+          accent: withOpacity("--color-accent"),
           "card-muted": withOpacity("--color-card-muted"),
           "chart-1": withOpacity("--color-chart-1"),
           "chart-2": withOpacity("--color-chart-2"),

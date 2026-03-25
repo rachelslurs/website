@@ -15,40 +15,44 @@ type NodeDef = {
   sub: string | null;
 };
 
+/** Same band width as ConstraintLayers (240), centered in 500px canvas. */
+const DS_NODE_W = 240;
+const DS_ORIGIN_X = (500 - DS_NODE_W) / 2;
+
 const NODES: NodeDef[] = [
   {
     id: "props",
     label: "Props",
-    x: 162,
+    x: DS_ORIGIN_X,
     y: 14,
-    w: 176,
+    w: DS_NODE_W,
     h: 50,
     sub: "products, filter",
   },
   {
     id: "filtered",
     label: "const filtered = …",
-    x: 138,
+    x: DS_ORIGIN_X,
     y: 88,
-    w: 224,
+    w: DS_NODE_W,
     h: 60,
     sub: "derived from props",
   },
   {
     id: "count",
     label: "const count = …",
-    x: 138,
+    x: DS_ORIGIN_X,
     y: 180,
-    w: 224,
+    w: DS_NODE_W,
     h: 60,
     sub: "derived from filtered",
   },
   {
     id: "jsx",
     label: "return <JSX />",
-    x: 162,
+    x: DS_ORIGIN_X,
     y: 272,
-    w: 176,
+    w: DS_NODE_W,
     h: 50,
     sub: null,
   },
@@ -74,7 +78,8 @@ const CAPTIONS = [
   "JSX out. Top to bottom. Done.",
 ];
 
-const ACTIVE_RECT = "fill-skin-chart-3/10 stroke-skin-chart-3 stroke-[0.8]";
+/** Match ConstraintLayers: 240× bands, rgba fill + thin stroke on the rect. */
+const ACTIVE_FILL = { fill: "rgba(var(--color-chart-3), 0.1)" } as const;
 const INACTIVE_RECT =
   "fill-skin-card-muted/12 stroke-skin-card-muted/35 stroke-[0.5]";
 
@@ -105,7 +110,13 @@ function NodeRect({
         width={w}
         height={h}
         rx={10}
-        className={`${active ? ACTIVE_RECT : INACTIVE_RECT} transition-all duration-500 ease-in-out ${highlight ? "[filter:url(#glow-ds)]" : ""}`}
+        style={active ? ACTIVE_FILL : undefined}
+        className={`${
+          active
+            ? "stroke-skin-chart-3 transition-all duration-500 ease-in-out"
+            : `${INACTIVE_RECT} transition-all duration-500 ease-in-out`
+        } ${highlight ? "[filter:url(#glow-ds)]" : ""}`}
+        strokeWidth={active ? 0.8 : undefined}
       />
       {sub ? (
         <text
@@ -261,8 +272,8 @@ export default function DerivedState() {
 
   return (
     <div className="rounded-xl border border-skin-line/10 bg-skin-fill p-4 font-sans text-skin-base sm:p-6">
-      <div className="flex w-full max-w-[680px] flex-col items-start gap-4 md:flex-row md:gap-7">
-        <div className="min-w-0 w-full max-w-[380px] flex-1 md:max-w-[380px]">
+      <div className="grid w-full max-w-[780px] grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_240px] md:items-start md:gap-x-7 md:gap-y-0">
+        <div className="min-w-0 w-full max-w-[380px] justify-self-start">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 500 340"
@@ -338,7 +349,7 @@ export default function DerivedState() {
           </svg>
         </div>
 
-        <div className="w-full shrink-0 pt-1 md:w-60">
+        <div className="w-full min-w-0 pt-1">
           <div className="flex w-full min-w-0 items-center justify-between gap-4">
             <button
               type="button"
@@ -382,7 +393,7 @@ export default function DerivedState() {
                     role="button"
                     tabIndex={0}
                   >
-                    <div className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-skin-base">
+                    <div className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-skin-base opacity-70">
                       Step {i + 1}
                     </div>
                     <div
