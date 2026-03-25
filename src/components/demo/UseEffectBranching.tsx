@@ -3,35 +3,36 @@ import { useState, useEffect, useRef } from "react";
 /** Maps data palette keys to Tailwind skin classes (full strings for JIT). */
 const PALETTE = {
   effect: {
-    fillActive: "fill-skin-chart-1/20",
+    fillActive: "fill-skin-chart-1/10",
     strokeActive: "stroke-skin-chart-1 stroke-[0.8]",
     text: "fill-skin-chart-1",
     edge: "stroke-skin-chart-1",
     markerPath: "stroke-skin-chart-1",
   },
   state: {
-    fillActive: "fill-skin-chart-2/15",
+    fillActive: "fill-skin-chart-2/10",
     strokeActive: "stroke-skin-chart-2 stroke-[0.8]",
     text: "fill-skin-chart-2",
     edge: "stroke-skin-chart-2",
     markerPath: "stroke-skin-chart-2",
   },
   external: {
-    fillActive: "fill-skin-chart-3/15",
+    fillActive: "fill-skin-chart-3/10",
     strokeActive: "stroke-skin-chart-3 stroke-[0.8]",
     text: "fill-skin-chart-3",
     edge: "stroke-skin-chart-3",
     markerPath: "stroke-skin-chart-3",
   },
   race: {
-    fillActive: "fill-skin-accent/15",
-    strokeActive: "stroke-skin-accent stroke-[1.2] [stroke-dasharray:5_3]",
+    fillActive: "fill-skin-accent/10",
+    /** Fill only — dashed accent ring is a separate stroke-only rect (matches legend). */
+    strokeActive: "",
     text: "fill-skin-accent",
     edge: "stroke-skin-accent",
     markerPath: "stroke-skin-accent",
   },
   neutral: {
-    fillActive: "fill-skin-base/10",
+    fillActive: "fill-skin-base/[0.06]",
     strokeActive: "stroke-skin-base stroke-[0.8]",
     text: "fill-skin-base",
     edge: "stroke-skin-base",
@@ -59,140 +60,140 @@ const NODES: NodeDef[] = [
   {
     id: "mount",
     label: "Component mounts",
-    x: 195,
+    x: 191,
     y: 10,
-    w: 160,
-    h: 42,
+    w: 168,
+    h: 48,
     sub: null,
     palette: "neutral",
   },
   {
     id: "effectA",
     label: "useEffect A",
-    x: 205,
+    x: 201,
     y: 92,
-    w: 140,
-    h: 52,
+    w: 148,
+    h: 58,
     sub: "deps: [ ]",
     palette: "effect",
   },
   {
     id: "setX",
     label: "setState(X)",
-    x: 100,
+    x: 96,
     y: 188,
-    w: 130,
-    h: 42,
+    w: 138,
+    h: 48,
     sub: null,
     palette: "state",
   },
   {
     id: "race",
     label: "setState(X)",
-    x: 320,
+    x: 316,
     y: 188,
-    w: 140,
-    h: 52,
+    w: 148,
+    h: 58,
     sub: "race condition",
     palette: "race",
   },
   {
     id: "effectB",
     label: "useEffect B",
-    x: 30,
+    x: 26,
     y: 284,
-    w: 130,
-    h: 52,
+    w: 138,
+    h: 58,
     sub: "deps: [X]",
     palette: "effect",
   },
   {
     id: "effectC",
     label: "useEffect C",
-    x: 195,
+    x: 191,
     y: 284,
-    w: 140,
-    h: 52,
+    w: 148,
+    h: 58,
     sub: "deps: [X]",
     palette: "effect",
   },
   {
     id: "noop",
     label: "effects skip",
-    x: 370,
+    x: 366,
     y: 284,
-    w: 130,
-    h: 52,
+    w: 138,
+    h: 58,
     sub: "stale closure?",
     palette: "race",
   },
   {
     id: "fetchOk",
     label: "fetch → data",
-    x: 10,
+    x: 6,
     y: 380,
-    w: 115,
-    h: 42,
+    w: 123,
+    h: 48,
     sub: null,
     palette: "external",
   },
   {
     id: "fetchErr",
     label: "fetch → error",
-    x: 145,
+    x: 141,
     y: 380,
-    w: 120,
-    h: 42,
+    w: 128,
+    h: 48,
     sub: null,
     palette: "race",
   },
   {
     id: "title",
     label: "document.title",
-    x: 305,
+    x: 301,
     y: 380,
-    w: 140,
-    h: 52,
+    w: 148,
+    h: 58,
     sub: "side effect",
     palette: "external",
   },
   {
     id: "effectD",
     label: "useEffect D",
-    x: 5,
+    x: 1,
     y: 466,
-    w: 130,
-    h: 52,
+    w: 138,
+    h: 58,
     sub: "deps: [data]",
     palette: "effect",
   },
   {
     id: "effectE",
     label: "useEffect E",
-    x: 155,
+    x: 151,
     y: 466,
-    w: 135,
-    h: 52,
+    w: 143,
+    h: 58,
     sub: "deps: [error]",
     palette: "effect",
   },
   {
     id: "analytics",
     label: "analytics.track()",
-    x: 5,
+    x: 1,
     y: 558,
-    w: 140,
-    h: 42,
+    w: 148,
+    h: 48,
     sub: null,
     palette: "external",
   },
   {
     id: "toast",
     label: "toast + retry?",
-    x: 165,
+    x: 161,
     y: 558,
-    w: 130,
-    h: 42,
+    w: 138,
+    h: 48,
     sub: null,
     palette: "race",
   },
@@ -301,8 +302,7 @@ function WarningIcon({
         width={WARNING_BADGE_W}
         height={WARNING_BADGE_H}
         rx={5}
-        fill="none"
-        className="stroke-skin-accent fill-skin-accent/10"
+        className="fill-skin-accent/[0.06] stroke-skin-accent"
         strokeWidth={1.6}
         strokeDasharray="4 3"
         strokeLinejoin="round"
@@ -335,7 +335,7 @@ function NodeRect({
   const P = PALETTE[palette];
   const isRace = palette === "race";
 
-  const rectClass = active
+  const nonRaceRectClass = active
     ? `${P.fillActive} ${P.strokeActive}`
     : INACTIVE_RECT;
 
@@ -344,14 +344,40 @@ function NodeRect({
       className={active ? "opacity-100" : "opacity-25"}
       style={{ transition: "opacity 0.5s ease" }}
     >
-      <rect
-        x={x}
-        y={y}
-        width={w}
-        height={h}
-        rx={6}
-        className={`${rectClass} transition-all duration-500 ease-in-out ${highlight ? "[filter:url(#glow)]" : ""}`}
-      />
+      {isRace ? (
+        <g className={highlight ? "[filter:url(#glow)]" : ""}>
+          <rect
+            x={x}
+            y={y}
+            width={w}
+            height={h}
+            rx={10}
+            className={`${active ? P.fillActive : "fill-skin-card-muted/12"} transition-all duration-500 ease-in-out`}
+          />
+          <rect
+            x={x}
+            y={y}
+            width={w}
+            height={h}
+            rx={10}
+            fill="none"
+            className={`pointer-events-none transition-all duration-500 ease-in-out ${
+              active
+                ? "stroke-skin-accent stroke-[1.5] [stroke-dasharray:4_3]"
+                : "stroke-skin-accent/45 stroke-[1.5] [stroke-dasharray:4_3]"
+            }`}
+          />
+        </g>
+      ) : (
+        <rect
+          x={x}
+          y={y}
+          width={w}
+          height={h}
+          rx={10}
+          className={`${nonRaceRectClass} transition-all duration-500 ease-in-out ${highlight ? "[filter:url(#glow)]" : ""}`}
+        />
+      )}
       {isRace && (
         <WarningIcon
           x={x + 6}
@@ -364,21 +390,23 @@ function NodeRect({
           x={cx + (isRace ? 14 : 0)}
           y={y + h / 2}
           textAnchor="middle"
-          className={active ? "fill-skin-base" : "fill-skin-placeholder"}
-          style={{
-            fontSize: 12,
-            fontWeight: 500,
-            transition: "fill 0.5s ease",
-          }}
+          className={active ? P.text : "fill-skin-placeholder"}
+          style={{ transition: "fill 0.5s ease" }}
         >
-          <tspan x={cx + (isRace ? 14 : 0)} dy="-7">
+          <tspan
+            x={cx + (isRace ? 14 : 0)}
+            dy="-8"
+            style={{ fontSize: 14, fontWeight: 600 }}
+          >
             {label}
           </tspan>
           <tspan
             x={cx + (isRace ? 14 : 0)}
-            dy="15"
-            className={active ? P.text : "fill-skin-placeholder"}
-            style={{ fontSize: 11, fontWeight: 400 }}
+            dy="18"
+            className={
+              active ? `${P.text} opacity-70` : "fill-skin-placeholder"
+            }
+            style={{ fontSize: 12, fontWeight: 400 }}
           >
             {sub}
           </tspan>
@@ -391,8 +419,8 @@ function NodeRect({
           dominantBaseline="central"
           className={active ? P.text : "fill-skin-placeholder"}
           style={{
-            fontSize: 12,
-            fontWeight: 500,
+            fontSize: 14,
+            fontWeight: 600,
             transition: "fill 0.5s ease",
           }}
         >
@@ -493,10 +521,13 @@ function LegendItem({
   warn?: boolean;
 }) {
   const s = LEGEND_STYLES[variant];
+  const swatchClass = warn
+    ? "h-[22px] min-w-[24px] rounded-[5px] text-[13px] font-extrabold"
+    : "h-3 w-3 rounded-sm text-[8px] font-bold";
   return (
     <div className="flex items-center gap-2">
       <div
-        className={`flex h-3 w-3 items-center justify-center rounded-sm text-[8px] font-bold leading-none ${s.box} ${dashed ? "border-dashed bg-transparent" : ""}`}
+        className={`flex items-center justify-center leading-none ${swatchClass} ${s.box} ${dashed ? "border-dashed" : ""}`}
       >
         {warn ? "!" : ""}
       </div>
@@ -507,16 +538,16 @@ function LegendItem({
 
 const LEGEND_STYLES = {
   effect: {
-    box: "border border-skin-chart-1 bg-skin-chart-1/15 text-skin-chart-1",
+    box: "border border-skin-chart-1 bg-skin-chart-1/10 text-skin-chart-1",
   },
   state: {
-    box: "border border-skin-chart-2 bg-skin-chart-2/15 text-skin-chart-2",
+    box: "border border-skin-chart-2 bg-skin-chart-2/10 text-skin-chart-2",
   },
   external: {
-    box: "border border-skin-chart-3 bg-skin-chart-3/15 text-skin-chart-3",
+    box: "border border-skin-chart-3 bg-skin-chart-3/10 text-skin-chart-3",
   },
   uncertain: {
-    box: "border border-skin-accent bg-transparent text-skin-accent",
+    box: "border border-skin-accent bg-skin-accent/[0.06] text-skin-base",
   },
 } as const;
 
@@ -696,7 +727,7 @@ function UseEffectBranching() {
                     role="button"
                     tabIndex={0}
                   >
-                    <div className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-skin-chart-1">
+                    <div className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-skin-base">
                       Step {i + 1}
                     </div>
                     <div

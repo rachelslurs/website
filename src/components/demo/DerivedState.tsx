@@ -19,37 +19,37 @@ const NODES: NodeDef[] = [
   {
     id: "props",
     label: "Props",
-    x: 175,
-    y: 20,
-    w: 150,
-    h: 42,
+    x: 162,
+    y: 14,
+    w: 176,
+    h: 50,
     sub: "products, filter",
   },
   {
     id: "filtered",
     label: "const filtered = …",
-    x: 155,
-    y: 110,
-    w: 190,
-    h: 52,
+    x: 138,
+    y: 88,
+    w: 224,
+    h: 60,
     sub: "derived from props",
   },
   {
     id: "count",
     label: "const count = …",
-    x: 155,
-    y: 210,
-    w: 190,
-    h: 52,
+    x: 138,
+    y: 180,
+    w: 224,
+    h: 60,
     sub: "derived from filtered",
   },
   {
     id: "jsx",
     label: "return <JSX />",
-    x: 175,
-    y: 310,
-    w: 150,
-    h: 42,
+    x: 162,
+    y: 272,
+    w: 176,
+    h: 50,
     sub: null,
   },
 ];
@@ -74,7 +74,7 @@ const CAPTIONS = [
   "JSX out. Top to bottom. Done.",
 ];
 
-const ACTIVE_RECT = "fill-skin-chart-3/15 stroke-skin-chart-3 stroke-[0.8]";
+const ACTIVE_RECT = "fill-skin-chart-3/10 stroke-skin-chart-3 stroke-[0.8]";
 const INACTIVE_RECT =
   "fill-skin-card-muted/12 stroke-skin-card-muted/35 stroke-[0.5]";
 
@@ -104,7 +104,7 @@ function NodeRect({
         y={y}
         width={w}
         height={h}
-        rx={6}
+        rx={10}
         className={`${active ? ACTIVE_RECT : INACTIVE_RECT} transition-all duration-500 ease-in-out ${highlight ? "[filter:url(#glow-ds)]" : ""}`}
       />
       {sub ? (
@@ -112,21 +112,19 @@ function NodeRect({
           x={cx}
           y={y + h / 2}
           textAnchor="middle"
-          className={active ? "fill-skin-base" : "fill-skin-placeholder"}
-          style={{
-            fontSize: 12,
-            fontWeight: 500,
-            transition: "fill 0.5s ease",
-          }}
+          className={active ? "fill-skin-chart-3" : "fill-skin-placeholder"}
+          style={{ transition: "fill 0.5s ease" }}
         >
-          <tspan x={cx} dy="-7">
+          <tspan x={cx} dy="-8" style={{ fontSize: 14, fontWeight: 600 }}>
             {label}
           </tspan>
           <tspan
             x={cx}
-            dy="15"
-            className={active ? "fill-skin-chart-3" : "fill-skin-placeholder"}
-            style={{ fontSize: 11, fontWeight: 400 }}
+            dy="18"
+            className={
+              active ? "fill-skin-chart-3 opacity-70" : "fill-skin-placeholder"
+            }
+            style={{ fontSize: 12, fontWeight: 400 }}
           >
             {sub}
           </tspan>
@@ -139,8 +137,8 @@ function NodeRect({
           dominantBaseline="central"
           className={active ? "fill-skin-chart-3" : "fill-skin-placeholder"}
           style={{
-            fontSize: 12,
-            fontWeight: 500,
+            fontSize: 14,
+            fontWeight: 600,
             transition: "fill 0.5s ease",
           }}
         >
@@ -267,7 +265,7 @@ export default function DerivedState() {
         <div className="min-w-0 w-full max-w-[380px] flex-1 md:max-w-[380px]">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 500 380"
+            viewBox="0 0 500 340"
             className="w-full"
             role="img"
             aria-label="Derived state: a straight top-to-bottom data flow with no side effects"
@@ -318,7 +316,7 @@ export default function DerivedState() {
               </filter>
             </defs>
 
-            <rect width="500" height="380" rx="12" className="fill-skin-fill" />
+            <rect width="500" height="340" rx="12" className="fill-skin-fill" />
 
             <g transform="translate(0, 4)">
               {EDGES.map(e => (
@@ -384,7 +382,7 @@ export default function DerivedState() {
                     role="button"
                     tabIndex={0}
                   >
-                    <div className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-skin-chart-3">
+                    <div className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-skin-base">
                       Step {i + 1}
                     </div>
                     <div
