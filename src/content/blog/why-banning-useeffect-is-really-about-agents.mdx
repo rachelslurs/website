@@ -13,7 +13,8 @@ tags:
 ---
 
 import ConstraintLayers from "@components/demo/ConstraintLayers";
-import UseEffectVsDerived from "@components/demo/UseEffectVsDerived";
+import DerivedState from "@components/demo/DerivedState";
+import UseEffectBranching from "@components/demo/UseEffectBranching";
 
 [Factory banned `useEffect`](https://x.com/alvinsng/status/2033969062834045089). The React community spent the week debating whether that's too strict, whether it's good DX, whether `useEffect` was always bad or just misused. All fair questions. But Factory's CEO, Eno Reyes, said the thing nobody was talking about: they did it so agents could operate more effectively in the codebase.
 
@@ -30,6 +31,8 @@ The interesting part isn't what they replaced `useEffect` with. It's _how_ they 
 ## The Agent Can't Simulate a Timeline
 
 When an AI agent reads a component with chained `useEffect` calls, it faces a structural problem. The component mounts. Effect A fires. It updates State X. State X is in the dependency array of Effect B, so that fires next. Effect B updates State Y. Now the component re-renders.
+
+<UseEffectBranching client:load />
 
 To understand what this component does _right now_, the agent has to reconstruct what happened _over time_. It has to simulate a timeline.
 
@@ -53,7 +56,7 @@ function ProductList({ products, filter }) {
 }
 ```
 
- <UseEffectVsDerived client:load />
+<DerivedState client:load />
 
 No effects. No state synchronization. Props come in, values are derived, JSX goes out. An agent reading this component knows exactly what it does by reading top to bottom. There's no hidden transient dimension to reconstruct.
 
