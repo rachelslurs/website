@@ -12,6 +12,7 @@ tags:
   - how i work
 ---
 
+import BlogDemo from "@components/BlogDemo";
 import DerivedState from "@components/demo/DerivedState";
 import UseEffectBranching from "@components/demo/UseEffectBranching";
 import ConstraintLayers from "@components/demo/ConstraintLayers";
@@ -32,7 +33,9 @@ The interesting part isn't what they replaced `useEffect` with. It's _how_ they 
 
 When an AI agent reads a component with chained `useEffect` calls, it faces a structural problem. The component mounts. Effect A fires. It updates State X. State X is in the dependency array of Effect B, so that fires next. Effect B updates State Y. Now the component re-renders.
 
-<UseEffectBranching client:load />
+<BlogDemo>
+  <UseEffectBranching client:load />
+</BlogDemo>
 
 To understand what this component does _right now_, the agent has to reconstruct what happened _over time_. It has to simulate a timeline.
 
@@ -56,7 +59,9 @@ function ProductList({ products, filter }) {
 }
 ```
 
-<DerivedState client:load />
+<BlogDemo>
+  <DerivedState client:load />
+</BlogDemo>
 
 No effects. No state synchronization. Props come in, values are derived, JSX goes out. An agent reading this component knows exactly what it does by reading top to bottom. There's no hidden transient dimension to reconstruct.
 
@@ -72,7 +77,9 @@ This is the same principle behind [Cursor rules](/posts/say-less-with-cursor-rul
 
 The difference is scope. Cursor rules are local. They shape what an agent generates in your editor. Lint rules are global. They shape what's _allowed to exist_ in the codebase at all, regardless of whether a human or an agent wrote it.
 
-<ConstraintLayers client:load />
+<BlogDemo>
+  <ConstraintLayers client:load />
+</BlogDemo>
 
 If you're using AI agents in your workflow and you don't have lint rules enforcing your architectural decisions, you're relying on the agent to remember your preferences. That's the equivalent of relying on a new hire to remember every convention from onboarding. It works, but it doesn't scale.
 
