@@ -1,0 +1,159 @@
+---
+title: "useRef vs useState in Streaming UIs"
+description: >-
+  A recruiter screen I bombed led me to dig into how React's primitives behave differently when chunks arrive every 50 milliseconds.
+featured: true
+draft: false
+author: Rachel Cantor
+pubDatetime: 2026-04-01T05:00:00.000Z
+tags:
+  - react
+  - streaming
+  - frontend architecture
+  - how i work
+---
+
+import BlogDemo from "@components/BlogDemo";
+import Naive from "@components/demo/streaming/Naive";
+import Cancel from "@components/demo/streaming/Cancel";
+import Race from "@components/demo/streaming/Race";
+import Scroll from "@components/demo/streaming/Scroll";
+import Combined from "@components/demo/streaming/Combined";
+
+I recently had a technical recruiter screen with a company whose product you've probably used today. One of the questions: when would you reach for `useRef` versus `useState` in a streaming context?
+
+I gave a textbook answer. `useState` triggers re-renders, `useRef` doesn't. The interviewer waited for more. I didn't have more. The screen didn't go well.
+
+The thing is, I knew the API difference. I just hadn't internalized what that difference _costs_ you when chunks are arriving every 50 milliseconds. So I did what I always do when something doesn't click: I built it until it did.
+
+This post is the answer I should have given.
+
+`useState` triggers a re-render when it updates. `useRef` stores a value that persists across renders without triggering one. In most React code, it barely matters which one you pick for values the user never sees. But in a streaming context, where state updates fire 20 times per second, picking wrong means jumbled output, race conditions, and scroll jank.
+
+## Start With the Naive Version
+
+Here's a basic streaming chat component. Everything lives in `useState`. It works.
+
+```tsx
+const [messages, setMessages] = useState([]);
+const [partialContent, setPartialContent] = useState("");
+const [isStreaming, setIsStreaming] = useState(false);
+
+// Auto-scroll on every update
+useEffect(() => {
+  scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+}, [partialContent, messages]);
+```
+
+<BlogDemo>
+  <Naive client:load />
+</BlogDemo>
+
+Send a few messages. Watch the render counter. Everything looks fine. The problems only surface under pressure.
+
+## What Breaks Under Pressure
+
+### Problem 1: No Cancel
+
+Send a message. While it's still streaming, send another one. In the naive version, both streams write to the same `partialContent` buffer. The output jumbles together.
+
+<BlogDemo>
+  <Cancel client:load />
+</BlogDemo>
+
+The fix is an `AbortController` stored in a `useRef`. When a new message comes in, abort the previous stream before starting the new one.
+
+```tsx
+const abortRef = useRef(null);
+
+const sendMessage = async (text) => {
+  // Cancel previous stream
+  if (abortRef.current) abortRef.current.abort();
+  abortRef.current = new AbortController();
+
+  const stream = fetchStream(text, abortRef.current.signal);
+  // ...
+};
+```
+
+Why a ref? You don't render the AbortController. You don't show it to the user. You just need to reference it when the next message arrives. Putting it in state would trigger a re-render every time you create a new one, and that re-render does nothing visible.
+
+### Problem 2: Race Condition
+
+Send three messages in quick succession. Each response streams back at a different speed. The slowest response finishes last and overwrites the faster ones. Wrong order.
+
+<BlogDemo>
+  <Race client:load />
+</BlogDemo>
+
+The fix is a request ID stored in a `useRef`. Increment it on each new request. Before writing a chunk, check: does this chunk's request ID match `requestIdRef.current`? If not, discard it.
+
+```tsx
+const requestIdRef = useRef(0);
+
+const sendMessage = async (text) => {
+  requestIdRef.current += 1;
+  const myRequestId = requestIdRef.current;
+
+  for await (const chunk of stream) {
+    // Stale? Discard.
+    if (requestIdRef.current !== myRequestId) return;
+    setPartialContent((prev) => prev + chunk);
+  }
+};
+```
+
+This comparison happens inside an async callback, not during render. The value doesn't drive UI. It drives a decision. That's the ref use case.
+
+### Problem 3: Scroll Thrashing
+
+The naive version auto-scrolls to the bottom on every chunk. If the user scrolls up to re-read an earlier message, they get yanked back down within 50 milliseconds.
+
+<BlogDemo>
+  <Scroll client:load />
+</BlogDemo>
+
+The fix is a scroll position flag stored in a `useRef`. Track whether the user has scrolled up. If they have, stop auto-scrolling entirely and show a button to jump back down. Don't try to guess if they're "close enough" to the bottom.
+
+```tsx
+const userScrolledUpRef = useRef(false);
+
+const handleScroll = () => {
+  const el = scrollRef.current;
+  const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 1;
+  userScrolledUpRef.current = !atBottom;
+};
+
+// Only auto-scroll if user hasn't scrolled up
+useEffect(() => {
+  if (!userScrolledUpRef.current) {
+    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }
+}, [partialContent]);
+```
+
+The scroll flag changes on scroll events, which fire constantly as the user drags. If this were state, every pixel of scrolling would trigger a re-render on top of the streaming re-renders you're already paying for. The user doesn't see the flag. Only your auto-scroll logic reads it. That's a ref.
+
+## All Three Together
+
+<BlogDemo>
+  <Combined client:load />
+</BlogDemo>
+
+Three refs. Same component. No jumbled output, no race conditions, no scroll fighting.
+
+The render counter is still there. It'll look similar to the naive version because the chunks you _display_ still need re-renders. That's correct. But watch the "Saved" counter when you send mid-stream or fire rapid messages. Those are the `setPartialContent` calls that never happened because a ref caught them first.
+
+## TL;DR
+
+If you're reading a value during render to show the user something: `useState`.
+
+If you're reading a value inside a callback to make a decision: `useRef`.
+
+This applies everywhere in React. Streaming just makes the cost of getting it wrong impossible to ignore.
+
+## About the Author
+
+I'm Rachel Cantor, a product engineer with over 14 years of experience building production systems. I plan and implement technical architecture that requires a knack for detail and a focus on high-fidelity user experiences. Currently seeking contract opportunities.
+
+Feel free to reach out to me on [bear.ink](https://bear.ink/) or [LinkedIn](https://linkedin.com/in/rachelcantor) if you're looking to build something sharp. 🙌
