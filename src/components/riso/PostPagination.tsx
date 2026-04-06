@@ -24,20 +24,21 @@ export default function PostPagination({
   if (!prevPost && !nextPost) return null;
 
   const rawCSS = `
-    .pagination-zone {
+    /* Scoped to .riso-post-pagination so generic class names don't leak globally */
+    .riso-post-pagination {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1.5rem;
       /* Pulls cards slightly under the main looseleaf paper */
-      margin-top: -2.5rem; 
+      margin-top: -2.5rem;
       position: relative;
       /* Lower than the main paper's shadow (which is z-10) */
-      z-index: 5; 
+      z-index: 5;
       padding: 0 4rem;
     }
 
     @media (max-width: 768px) {
-      .pagination-zone {
+      .riso-post-pagination {
         grid-template-columns: 1fr;
         margin-top: -1.5rem;
         padding: 0 1.5rem;
@@ -45,7 +46,7 @@ export default function PostPagination({
     }
 
     /* ── THE INDEX CARD ── */
-    .index-card {
+    .riso-post-pagination .index-card {
       background: var(--cream);
       padding: 1.5rem;
       min-height: 120px;
@@ -54,31 +55,31 @@ export default function PostPagination({
       flex-direction: column;
       justify-content: center;
       transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), z-index 0s 0.3s;
-      
+
       /* Ruled index card top line using the base ink color */
       border-top: 2px solid rgb(var(--color-text-base));
-      
+
       /* Link styling resets */
       text-decoration: none;
       color: inherit;
     }
 
-    .index-card:focus-visible {
+    .riso-post-pagination .index-card:focus-visible {
       outline: 3px dashed rgb(var(--color-accent));
       outline-offset: 4px;
     }
 
     /* Map to Kraft Riso Palette */
-    .prev-card { 
-      transform: rotate(-1.5deg); 
+    .riso-post-pagination .prev-card {
+      transform: rotate(-1.5deg);
       border-top-color: rgb(var(--color-chart-2)); /* Riso Blue */
     }
-    .next-card { 
-      transform: rotate(1.5deg); 
+    .riso-post-pagination .next-card {
+      transform: rotate(1.5deg);
       border-top-color: rgb(var(--color-accent)); /* Riso Red */
     }
 
-    .index-card:hover {
+    .riso-post-pagination .index-card:hover {
       /* Cards "slide out" from under the paper on hover */
       transform: translateY(16px) rotate(0deg);
       z-index: 15; /* Lift above the paper edge temporarily */
@@ -86,11 +87,11 @@ export default function PostPagination({
     }
 
     /* ── CARD CONTENT ── */
-    .card-label {
+    .riso-post-pagination .card-label {
       margin-bottom: 0.75rem;
     }
 
-    .card-title {
+    .riso-post-pagination .card-title {
       font-family: 'Playfair Display', Georgia, serif;
       font-size: 1.125rem;
       line-height: 1.3;
@@ -100,11 +101,11 @@ export default function PostPagination({
       transition: color 0.2s;
     }
 
-    .prev-card:hover .card-title {
+    .riso-post-pagination .prev-card:hover .card-title {
       color: rgb(var(--color-chart-2));
     }
 
-    .next-card:hover .card-title {
+    .riso-post-pagination .next-card:hover .card-title {
       color: rgb(var(--color-accent));
     }
   `;
@@ -112,7 +113,7 @@ export default function PostPagination({
   return (
     <>
       <style>{rawCSS}</style>
-      <nav className="pagination-zone" aria-label={navLabel}>
+      <nav className="riso-post-pagination" aria-label={navLabel}>
         {prevPost ? (
           <a
             href={`${hrefBase}/${prevPost.slug}`}
