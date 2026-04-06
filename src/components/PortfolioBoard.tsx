@@ -80,6 +80,8 @@ const BoardCard = React.memo(
     index,
     pin = "",
     className = "",
+    /** Applied to the outer wrapper (grid/flex item). Use for `col-span-*` etc. */
+    wrapperClassName = "",
     style = {},
     stagger = 0,
   }: {
@@ -87,6 +89,7 @@ const BoardCard = React.memo(
     index: number;
     pin?: string;
     className?: string;
+    wrapperClassName?: string;
     style?: React.CSSProperties;
     stagger?: number;
   }) => {
@@ -174,7 +177,7 @@ const BoardCard = React.memo(
     return (
       <div
         ref={dragRef}
-        className={`board-card relative select-none ${pin} ${shadowClass} ${className}`}
+        className={`flex h-full min-h-0 w-full min-w-0 flex-col ${wrapperClassName}`}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -194,12 +197,15 @@ const BoardCard = React.memo(
         }}
       >
         <motion.div
+          className={`board-card relative flex h-full min-h-0 flex-col select-none ${pin} ${shadowClass} ${className}`}
           initial={prefersReducedMotion ? "visible" : "hidden"}
           whileInView="visible"
           viewport={{ once: true, margin: "-10% 0px" }}
           variants={entranceVariants}
         >
-          {children}
+          <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
+            {children}
+          </div>
         </motion.div>
       </div>
     );
@@ -377,7 +383,7 @@ export default function PortfolioBoard({
 
         <SectionDivider label="WRITING" id="posts" />
         <section
-          className="relative grid grid-cols-3 gap-5 max-lg:grid-cols-2 max-sm:grid-cols-1"
+          className="relative grid grid-cols-3 gap-8 max-lg:grid-cols-2 max-sm:grid-cols-1"
           aria-label="Blog posts"
         >
           {posts.map((post, i) => {
@@ -394,7 +400,8 @@ export default function PortfolioBoard({
                 key={post.id}
                 index={i + 10}
                 pin={pins[i % pins.length]}
-                className={`post-item ${i === 0 ? "col-span-2 max-sm:col-span-1" : ""}`}
+                className={`post-item ${i === 0 ? "featured-post-tape" : ""}`}
+                wrapperClassName={i === 0 ? "col-span-2 max-sm:col-span-1" : ""}
                 stagger={i}
               >
                 <article className="card flex flex-col">
@@ -439,7 +446,7 @@ export default function PortfolioBoard({
 
         <SectionDivider label="WORK" id="work" />
         <section
-          className="relative grid grid-cols-3 gap-5 max-lg:grid-cols-2 max-sm:grid-cols-1"
+          className="relative grid grid-cols-3 gap-8 max-lg:grid-cols-2 max-sm:grid-cols-1"
           aria-label="Selected work"
         >
           {work.map((w, i) => {
@@ -449,7 +456,12 @@ export default function PortfolioBoard({
                 key={w.id}
                 index={i + 20}
                 pin={pins[i % pins.length]}
-                className={`work-item ${i === work.length - 1 ? "max-lg:col-span-2 max-sm:col-span-1" : ""}`}
+                className="work-item"
+                wrapperClassName={
+                  i === work.length - 1
+                    ? "max-lg:col-span-2 max-sm:col-span-1"
+                    : ""
+                }
                 stagger={i}
               >
                 <article className="card flex flex-col">
@@ -470,7 +482,7 @@ export default function PortfolioBoard({
 
         <SectionDivider label="DEMOS" id="demos" />
         <section
-          className="relative grid grid-cols-4 gap-4 max-lg:grid-cols-2"
+          className="relative grid grid-cols-4 gap-8 max-lg:grid-cols-2"
           aria-label="Interactive demos"
         >
           {demos.map((d, i) => {
