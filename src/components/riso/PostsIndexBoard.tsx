@@ -286,7 +286,7 @@ export default function PostsIndexBoard({
 
   const handleLoadMore = useCallback(() => {
     const batch = Math.min(pageSize, remainingPosts);
-    setVisibleCount(v => v + pageSize);
+    setVisibleCount(v => v + batch);
     const noun = batch === 1 ? "post" : "posts";
     setLoadMoreStatus(`${batch} more ${noun} loaded.`);
   }, [pageSize, remainingPosts]);
