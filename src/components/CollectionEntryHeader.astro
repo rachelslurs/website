@@ -5,9 +5,17 @@ interface Props {
   slug: string;
   /** Blog posts: serif title like index cards, larger for h1 (see `.post-page-title` in riso.css). */
   variant?: "default" | "blog";
+  /** Editorial “looseleaf” post layout: Playfair title on baseline grid (see `.analog-post` in riso.css). */
+  analogPostTitle?: boolean;
 }
 
-const { title, summary, slug, variant = "default" } = Astro.props;
+const {
+  title,
+  summary,
+  slug,
+  variant = "default",
+  analogPostTitle = false,
+} = Astro.props;
 ---
 
 <h1
@@ -15,7 +23,8 @@ const { title, summary, slug, variant = "default" } = Astro.props;
   class:list={[
     "collection-entry-title",
     "inline-block",
-    variant === "blog" && "post-page-title",
+    variant === "blog" && !analogPostTitle && "post-page-title",
+    analogPostTitle && "post-title",
   ]}
 >
   {title}
@@ -23,7 +32,7 @@ const { title, summary, slug, variant = "default" } = Astro.props;
 {summary && <p class="my-6 text-lg leading-6">{summary}</p>}
 
 <style>
-  .collection-entry-title:not(.post-page-title) {
+  .collection-entry-title:not(.post-page-title):not(.post-title) {
     @apply mb-4 text-skin-accent;
   }
   .post-page-title {

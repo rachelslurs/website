@@ -7,7 +7,6 @@ import TableOfContents from "@components/TableOfContents";
 import CollectionEntryBack from "@components/CollectionEntryBack.astro";
 import CollectionEntryHeader from "@components/CollectionEntryHeader.astro";
 import type { CollectionEntry } from "astro:content";
-import { boardCardRestRotationDeg } from "@utils/cardRotation";
 import { slugifyStr } from "@utils/slugify";
 import { SITE } from "@config";
 import BackToTop from "@components/BackToTop.astro";
@@ -31,8 +30,6 @@ const {
 } = post.data;
 
 const { Content } = await post.render();
-
-const headerCardRotateDeg = boardCardRestRotationDeg(post.slug);
 
 const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
 const ogUrl = new URL(
@@ -86,34 +83,39 @@ const nextPost =
           role="article"
           class="post-detail w-full max-w-none"
         >
-          <header class="entry-header-wide post-detail-header">
-            <div
-              class="post-header-card"
-              style={`--post-header-rotate: ${headerCardRotateDeg}deg`}
-            >
-              <CollectionEntryHeader
-                title={title}
-                slug={post.slug}
-                variant="blog"
-              />
-              <Datetime
-                pubDatetime={pubDatetime}
-                modDatetime={modDatetime}
-                size="lg"
-                className="!mb-0 mt-3"
-              />
+          <div class="analog-post">
+            <div class="post-container">
+              <div class="long-looseleaf tape-top-left tape-top-right">
+                <header class="post-header">
+                  <Datetime
+                    pubDatetime={pubDatetime}
+                    modDatetime={modDatetime}
+                    variant="analog"
+                  />
+                  <CollectionEntryHeader
+                    title={title}
+                    slug={post.slug}
+                    variant="blog"
+                    analogPostTitle
+                  />
+                </header>
+
+                <div class="analog-prose">
+                  <Content />
+
+                  <div class="analog-post-back">
+                    <BackToTop />
+                  </div>
+                </div>
+
+                <footer class="post-footer">
+                  <ul class="post-tags list-none pl-0">
+                    <li class="post-tags-lead">Tags:</li>
+                    {tags.map(tag => <Tag tag={slugifyStr(tag)} />)}
+                  </ul>
+                </footer>
+              </div>
             </div>
-          </header>
-          <div
-            class="entry-body post-detail-body prose prose-lg prose-img:rounded prose-img:bg-white"
-          >
-            <Content />
-
-            <ul class="my-8 list-none pl-0 text-sm">
-              Tags: {tags.map(tag => <Tag tag={slugifyStr(tag)} />)}
-            </ul>
-
-            <BackToTop />
           </div>
         </article>
       </div>
