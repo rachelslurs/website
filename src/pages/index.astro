@@ -1,9 +1,10 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
+import RisoBoardShell from "@components/RisoBoardShell.astro";
 import PortfolioBoard from "@components/PortfolioBoard";
 import type { TagColor } from "@components/PortfolioBoard";
-import { SITE, SOCIALS } from "@config";
+import { SITE } from "@config";
 import getSortedPosts from "@utils/getSortedPosts";
 import getSortedWork from "@utils/getSortedWork";
 import getSortedDemos from "@utils/getSortedDemos";
@@ -71,23 +72,18 @@ const portfolioDemos = homeDemosRaw.map(entry => ({
   sub: entry.data.summary ?? entry.data.description ?? "",
   href: `/demos/${entry.slug}`,
 }));
-
-const github = SOCIALS.find(s => s.name === "Github" && s.active);
-const linkedin = SOCIALS.find(s => s.name === "LinkedIn" && s.active);
 ---
 
 <Layout>
-  <PortfolioBoard
-    client:load
-    activePath={Astro.url.pathname}
-    siteTitle={SITE.title}
-    heroHeadline="I make the web feel like something."
-    heroBody={SITE.desc}
-    quote="Strong opinions, loosely held"
-    posts={portfolioPosts}
-    work={portfolioWork}
-    demos={portfolioDemos}
-    githubHref={github?.href ?? "https://github.com/rachelslurs"}
-    linkedinHref={linkedin?.href ?? "https://www.linkedin.com/in/rachelcantor"}
-  />
+  <RisoBoardShell animateNav>
+    <PortfolioBoard
+      client:load
+      heroHeadline="I make the web feel like something."
+      heroBody={SITE.desc}
+      quote="Strong opinions, loosely held"
+      posts={portfolioPosts}
+      work={portfolioWork}
+      demos={portfolioDemos}
+    />
+  </RisoBoardShell>
 </Layout>

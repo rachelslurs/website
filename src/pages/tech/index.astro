@@ -5,7 +5,6 @@ import Main from "@layouts/Main.astro";
 import WorkTag from "@components/WorkTag.astro";
 import { getUniqueWorkTags } from "@utils/getUniqueTags";
 import { SITE } from "@config";
-import Footer from "@components/Footer.astro";
 
 const work = await getCollection("work");
 
@@ -13,14 +12,9 @@ let tech = getUniqueWorkTags(work);
 ---
 
 <Layout title={`Tech | ${SITE.title}`}>
-  <Main
-    pageTitle="Tech"
-    pageDesc="All the work tagged by tech."
-    activeNav="work"
-  >
+  <Main pageTitle="Tech" pageDesc="All the work tagged by tech.">
     <ul>
       {tech.map(({ tag }) => <WorkTag {tag} size="lg" />)}
     </ul>
   </Main>
-  <Footer />
 </Layout>

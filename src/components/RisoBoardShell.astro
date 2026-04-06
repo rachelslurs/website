@@ -1,0 +1,47 @@
+---
+import { SITE } from "@config";
+import RisoNav from "@components/RisoNav";
+import Footer from "@components/Footer.astro";
+
+export interface Props {
+  /** Staggered Dymo nav entrance (homepage only). */
+  animateNav?: boolean;
+}
+
+const { animateNav = false } = Astro.props;
+---
+
+<a id="skip-to-content" href="#main-content" class="skip-to-content-board">
+  Skip to content
+</a>
+<div class="board-page-outer mx-auto w-full max-w-[1200px] p-4 max-sm:p-2">
+  <main
+    class="board relative flex flex-col gap-8 overflow-hidden px-10 pb-10 pt-8 max-lg:p-6 max-sm:gap-5 max-sm:p-4"
+  >
+    <!-- Persist grain + blobs only: full-shell persist breaks in-page link navigation. -->
+    <div
+      class="pointer-events-none absolute inset-0 z-[100] overflow-hidden"
+      aria-hidden="true"
+      transition:persist="riso-board-decoration"
+    >
+      <div class="grain"></div>
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+      <div class="blob blob-4"></div>
+    </div>
+
+    <div class="relative z-[110] flex min-h-0 flex-1 flex-col gap-8">
+      <RisoNav
+        client:load
+        activePath={Astro.url.pathname}
+        siteTitle={SITE.title}
+        animateEntrance={animateNav}
+      />
+      <div transition:name="board-content" class="min-h-0 flex-1">
+        <slot />
+      </div>
+      <Footer />
+    </div>
+  </main>
+</div>

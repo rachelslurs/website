@@ -629,3 +629,77 @@
     filter: drop-shadow(2px 3px 5px rgba(0, 0, 0, 0.18)) !important;
   }
 }
+
+/* Site-wide board shell (see RisoBoardShell.astro) */
+.board-page-outer {
+  position: relative;
+}
+
+.skip-to-content-board {
+  position: absolute;
+  left: 1rem;
+  top: 0;
+  z-index: 200;
+  transform: translateY(-100%);
+  padding: 0.5rem 0.75rem;
+  background: var(--yellow);
+  color: var(--black);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: transform 0.15s ease;
+}
+
+.skip-to-content-board:focus {
+  transform: translateY(0.5rem);
+  outline: 3px solid var(--yellow);
+  outline-offset: 2px;
+}
+
+/* Cream “paper” surface for prose/listing content on the cork board */
+.board-slot {
+  background: var(--cream);
+  box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.18);
+  padding: 1.5rem;
+  border-radius: 2px;
+}
+
+/* View Transitions: animate only the “pinned” slot (see RisoBoardShell.astro) */
+::view-transition-old(board-content) {
+  animation: board-content-out 0.32s cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+
+::view-transition-new(board-content) {
+  animation: board-content-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes board-content-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px) rotate(0.35deg);
+  }
+}
+
+@keyframes board-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) rotate(-0.35deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(board-content),
+  ::view-transition-new(board-content) {
+    animation-duration: 0.01ms !important;
+  }
+}
