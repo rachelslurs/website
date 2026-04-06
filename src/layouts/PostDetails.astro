@@ -1,16 +1,15 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import RisoBoardShell from "@components/RisoBoardShell.astro";
-import Tag from "@components/Tag.astro";
 import Datetime from "@components/Datetime";
+import PostFooterTagLinks from "@components/riso/PostFooterTagLinks";
 import TableOfContents from "@components/TableOfContents";
-import CollectionEntryBack from "@components/CollectionEntryBack.astro";
 import CollectionEntryHeader from "@components/CollectionEntryHeader.astro";
+import GhostEntryBack from "@components/riso/GhostEntryBack";
+import GhostBackToTop from "@components/riso/GhostBackToTop";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import { SITE } from "@config";
-import BackToTop from "@components/BackToTop.astro";
-
 export interface Props {
   post: CollectionEntry<"blog">;
   posts: CollectionEntry<"blog">[];
@@ -60,6 +59,8 @@ const currentPostIndex = allPosts.findIndex(a => a.slug === post.slug);
 const prevPost = currentPostIndex !== 0 ? allPosts[currentPostIndex - 1] : null;
 const nextPost =
   currentPostIndex !== allPosts.length ? allPosts[currentPostIndex + 1] : null;
+
+const tagItems = tags.map(t => ({ slug: slugifyStr(t), label: t }));
 ---
 
 <Layout {...layoutProps}>
@@ -69,8 +70,6 @@ const nextPost =
 
   <RisoBoardShell>
     <main id="main-content" class="app-layout board-slot">
-      <CollectionEntryBack />
-
       <div class="toc-layout-grid">
         <!-- TOC Sidebar -->
         <aside class="toc-sidebar">
@@ -86,34 +85,42 @@ const nextPost =
           <div class="analog-post">
             <div class="post-container">
               <div class="long-looseleaf tape-top-left tape-top-right">
-                <header class="post-header">
-                  <Datetime
-                    pubDatetime={pubDatetime}
-                    modDatetime={modDatetime}
-                    variant="analog"
-                  />
-                  <CollectionEntryHeader
-                    title={title}
-                    slug={post.slug}
-                    variant="blog"
-                    analogPostTitle
-                  />
-                </header>
-
-                <div class="analog-prose">
-                  <Content />
-
-                  <div class="analog-post-back">
-                    <BackToTop />
-                  </div>
+                <div class="header-zone">
+                  <GhostEntryBack fallbackHref="/posts" client:load />
+                  <header class="post-header">
+                    <Datetime
+                      pubDatetime={pubDatetime}
+                      modDatetime={modDatetime}
+                      variant="analog"
+                    />
+                    <CollectionEntryHeader
+                      title={title}
+                      slug={post.slug}
+                      variant="blog"
+                      analogPostTitle
+                    />
+                  </header>
                 </div>
 
-                <footer class="post-footer">
-                  <ul class="post-tags list-none pl-0">
-                    <li class="post-tags-lead">Tags:</li>
-                    {tags.map(tag => <Tag tag={slugifyStr(tag)} />)}
-                  </ul>
-                </footer>
+                <div
+                  class="prose analog-prose max-w-none min-w-0 prose-img:rounded prose-img:bg-white"
+                >
+                  <Content />
+                </div>
+
+                <div class="footer-zone">
+                  <footer class="post-footer">
+                    {
+                      tagItems.length > 0 && (
+                        <div class="post-tags">
+                          <span class="post-tags-heading">Tags:</span>
+                          <PostFooterTagLinks items={tagItems} client:load />
+                        </div>
+                      )
+                    }
+                  </footer>
+                  <GhostBackToTop client:load />
+                </div>
               </div>
             </div>
           </div>

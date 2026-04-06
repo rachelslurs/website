@@ -22,12 +22,10 @@ export default function Datetime({
   if (variant === "analog") {
     return (
       <div className={`post-meta ${className}`}>
-        <span>
-          <FormattedDatetime
-            pubDatetime={pubDatetime}
-            modDatetime={modDatetime}
-          />
-        </span>
+        <FormattedDatetime
+          pubDatetime={pubDatetime}
+          modDatetime={modDatetime}
+        />
       </div>
     );
   }

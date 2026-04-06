@@ -1,13 +1,11 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import RisoBoardShell from "@components/RisoBoardShell.astro";
-import CollectionEntryBack from "@components/CollectionEntryBack.astro";
 import CollectionEntryHeader from "@components/CollectionEntryHeader.astro";
+import GhostEntryBack from "@components/riso/GhostEntryBack";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import { SITE } from "@config";
-import BackToTop from "@components/BackToTop.astro";
-
 export interface Props {
   demo: CollectionEntry<"demos">;
   demos: CollectionEntry<"demos">[];
@@ -49,18 +47,19 @@ const layoutProps = {
 <Layout {...layoutProps}>
   <RisoBoardShell>
     <main id="main-content" class="app-layout board-slot">
-      <CollectionEntryBack />
       <article id="article" role="article" class="w-full max-w-none">
-        <header class="entry-header-wide">
-          <CollectionEntryHeader
-            title={title}
-            summary={summary}
-            slug={slugifyStr(title)}
-          />
-        </header>
-        <div class="entry-body prose-img:bg-white">
+        <div class="header-zone">
+          <GhostEntryBack fallbackHref="/demos" client:load />
+          <header class="entry-header-wide">
+            <CollectionEntryHeader
+              title={title}
+              summary={summary}
+              slug={slugifyStr(title)}
+            />
+          </header>
+        </div>
+        <div class="entry-body">
           <Content />
-          <BackToTop />
         </div>
       </article>
     </main>
