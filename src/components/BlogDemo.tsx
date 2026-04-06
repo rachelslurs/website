@@ -22,6 +22,7 @@ export default function BlogDemo({ children, wide = false }: BlogDemoProps) {
     // Physical paper metaphor: sharp borders, slight shadow, graph grid
     <figure
       className={`
+        tape-c tc-pink
         group not-prose relative z-10 my-10 w-full max-w-none
         border border-skin-line/40 bg-skin-fill
         p-4 sm:p-6 lg:p-8
@@ -31,16 +32,6 @@ export default function BlogDemo({ children, wide = false }: BlogDemoProps) {
         ${wide ? BREAKOUT_WIDE : BREAKOUT_DEFAULT}
       `}
     >
-      {/* Analog Tape Details: Top Left and Bottom Right mathematically centered on corners */}
-      <div
-        className="absolute left-0 top-0 h-5 w-14 -translate-x-1/2 -translate-y-1/2 -rotate-45 bg-skin-card-muted/70 backdrop-blur-sm shadow-sm"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute bottom-0 right-0 h-5 w-14 translate-x-1/2 translate-y-1/2 -rotate-45 bg-skin-card-muted/70 backdrop-blur-sm shadow-sm"
-        aria-hidden="true"
-      />
-
       {/* For demos that CANNOT scale down smoothly (like complex tables), 
         we wrap the children in an overflow container. 
         SVGs with viewBox (like your state chart) will scale naturally.
