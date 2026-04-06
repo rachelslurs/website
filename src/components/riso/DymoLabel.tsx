@@ -68,7 +68,7 @@ const DymoLabel = React.memo(
           href={href || "#"}
           className={cls}
           onClick={onClick}
-          aria-current={isActive ? "true" : undefined}
+          aria-current={isActive ? "page" : undefined}
         >
           {inner}
         </a>
