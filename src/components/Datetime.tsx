@@ -8,6 +8,8 @@ interface DatetimesProps {
 interface Props extends DatetimesProps {
   size?: "sm" | "lg";
   className?: string;
+  /** Blog looseleaf: mono date line, no icon (matches editorial post-meta). */
+  variant?: "default" | "analog";
 }
 
 export default function Datetime({
@@ -15,7 +17,21 @@ export default function Datetime({
   modDatetime,
   size = "sm",
   className = "",
+  variant = "default",
 }: Props) {
+  if (variant === "analog") {
+    return (
+      <div className={`post-meta ${className}`}>
+        <span>
+          <FormattedDatetime
+            pubDatetime={pubDatetime}
+            modDatetime={modDatetime}
+          />
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`flex items-center space-x-2 opacity-80 font-mono ${size === "sm" ? "mt-0 mb-2" : "mt-0 mb-10"} ${className}`}

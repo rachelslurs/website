@@ -8,12 +8,6 @@ import React, {
 import { motion, useReducedMotion } from "framer-motion";
 import DymoLabel from "@components/riso/DymoLabel";
 import type { PortfolioPost } from "@components/PortfolioBoard";
-import {
-  boardCardEntranceExtraRotateDeg,
-  boardCardRestRotationDeg,
-} from "@utils/cardRotation";
-import { seededOffset } from "@utils/seededOffset";
-
 /** Base delay before the first card (homepage waits for nav; /posts uses 0). */
 const CONTENT_ENTRANCE_DELAY_S = 0;
 /** Seconds between each card’s entrance — clearer than PortfolioBoard’s 0.08s step. */
@@ -98,7 +92,6 @@ function DraggableCard({
   dragDisabled,
   stagger,
   tapeClass,
-  rotationSlug,
   children,
 }: {
   targetX: number;
@@ -108,30 +101,22 @@ function DraggableCard({
   isVisible: boolean;
   dragDisabled: boolean;
   stagger: number;
-  /** Same slug as post URL — matches `.post-header-card` tilt on detail. */
-  rotationSlug: string;
   tapeClass: string;
   children: React.ReactNode;
 }) {
   const prefersReducedMotion = useReducedMotion();
-  const restRot = useMemo(
-    () => boardCardRestRotationDeg(rotationSlug),
-    [rotationSlug]
-  );
   const [pos, setPos] = useState({ x: targetX, y: targetY });
   const [dragRot, setDragRot] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const dragRef = useRef<HTMLDivElement>(null);
 
-  const entranceVariants = useMemo(() => {
-    const hiddenRotate =
-      restRot + boardCardEntranceExtraRotateDeg(rotationSlug);
-    return {
+  const entranceVariants = useMemo(
+    () => ({
       hidden: {
         opacity: 0,
         y: 30,
-        rotate: hiddenRotate,
+        rotate: 0,
         scale: 0.95,
         transition: { duration: 0.2 },
       },
@@ -147,10 +132,11 @@ function DraggableCard({
           delay: CONTENT_ENTRANCE_DELAY_S + staggerIndex * STAGGER_STEP_S,
         },
       }),
-    };
-  }, [restRot, rotationSlug]);
+    }),
+    []
+  );
 
-  const currentRot = dragRot !== null ? dragRot : restRot;
+  const currentRot = dragRot !== null ? dragRot : 0;
   const scale = isDragging ? 1.04 : isHovered && !dragDisabled ? 1.015 : 1;
   const shadowClass = isDragging
     ? "is-dragging"
@@ -186,7 +172,7 @@ function DraggableCard({
   const onPointerUp = (e: React.PointerEvent) => {
     if (!isDragging) return;
     setIsDragging(false);
-    setDragRot(seededOffset(Date.now(), 3));
+    setDragRot(0);
     dragRef.current?.releasePointerCapture(e.pointerId);
   };
 
@@ -452,7 +438,6 @@ export default function PostsIndexBoard({
             isVisible={isVisible}
             dragDisabled={dragDisabled}
             stagger={stagger}
-            rotationSlug={post.slug}
             tapeClass={tapeClass}
           >
             <article className="card flex flex-col">

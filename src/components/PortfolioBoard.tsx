@@ -92,6 +92,8 @@ const BoardCard = React.memo(
     stagger = 0,
     /** When set (blog cards), tilt matches `/posts` board and post header. */
     rotationSlug,
+    /** No rest or entrance rotation (blog cards on index). */
+    flat = false,
   }: {
     children: React.ReactNode;
     index: number;
@@ -101,13 +103,16 @@ const BoardCard = React.memo(
     style?: React.CSSProperties;
     stagger?: number;
     rotationSlug?: string;
+    flat?: boolean;
   }) => {
     const rot = useMemo(
       () =>
-        rotationSlug
-          ? boardCardRestRotationDeg(rotationSlug)
-          : seededOffset(index * 17, 2.5),
-      [rotationSlug, index]
+        flat
+          ? 0
+          : rotationSlug
+            ? boardCardRestRotationDeg(rotationSlug)
+            : seededOffset(index * 17, 2.5),
+      [flat, rotationSlug, index]
     );
     const [dragRot, setDragRot] = useState<number | null>(null);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -150,10 +155,10 @@ const BoardCard = React.memo(
       (e: React.PointerEvent) => {
         if (!isDragging) return;
         setIsDragging(false);
-        setDragRot(seededOffset(Date.now(), 3));
+        setDragRot(flat ? 0 : seededOffset(Date.now(), 3));
         dragRef.current?.releasePointerCapture(e.pointerId);
       },
-      [isDragging]
+      [isDragging, flat]
     );
 
     const currentRot = dragRot !== null ? dragRot : rot;
@@ -164,11 +169,12 @@ const BoardCard = React.memo(
         hidden: {
           opacity: 0,
           y: 30,
-          rotate:
-            rot +
-            (rotationSlug
-              ? boardCardEntranceExtraRotateDeg(rotationSlug)
-              : seededOffset(index * 31, 6)),
+          rotate: flat
+            ? 0
+            : rot +
+              (rotationSlug
+                ? boardCardEntranceExtraRotateDeg(rotationSlug)
+                : seededOffset(index * 31, 6)),
           scale: 0.95,
         },
         visible: {
@@ -184,7 +190,7 @@ const BoardCard = React.memo(
           },
         },
       }),
-      [rot, index, stagger, boardEntranceDelayS, rotationSlug]
+      [flat, rot, index, stagger, boardEntranceDelayS, rotationSlug]
     );
 
     const shadowClass = isDragging
@@ -393,7 +399,7 @@ export default function PortfolioBoard({
               <BoardCard
                 key={post.id}
                 index={i + 10}
-                rotationSlug={post.slug}
+                flat
                 pin={pins[i % pins.length]}
                 className={`post-item ${i === 0 ? "featured-post-tape" : ""}`}
                 wrapperClassName={i === 0 ? "col-span-2 max-sm:col-span-1" : ""}
