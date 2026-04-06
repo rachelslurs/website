@@ -40,15 +40,12 @@ export function getBreadcrumbItems(pathname: string): BreadcrumbItem[] {
     breadcrumbList.length >= 3 &&
     !isNaN(Number(breadcrumbList[2]))
   ) {
-    breadcrumbList.splice(
-      1,
-      3,
-      `${breadcrumbList[1]} ${
-        Number(breadcrumbList[2]) === 1 || breadcrumbList[2] === ""
-          ? ""
-          : "(page " + breadcrumbList[2] + ")"
-      }`
-    );
+    const tagName = breadcrumbList[1] ?? "";
+    const pagePart =
+      breadcrumbList[2] === "" || Number(breadcrumbList[2]) === 1
+        ? ""
+        : `(page ${breadcrumbList[2]})`;
+    breadcrumbList.splice(1, 3, pagePart ? `${tagName} ${pagePart}` : tagName);
   }
 
   const items: BreadcrumbItem[] = [{ label: "HOME", href: "/" }];
