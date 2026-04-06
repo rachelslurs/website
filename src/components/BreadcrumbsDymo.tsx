@@ -15,10 +15,7 @@ export default function BreadcrumbsDymo({
       {items.map((item, i) => (
         <Fragment key={`${item.label}-${i}-${item.href ?? "here"}`}>
           {i > 0 && (
-            <span
-              className="select-none text-[rgba(0,0,0,0.35)]"
-              aria-hidden="true"
-            >
+            <span className="select-none text-skin-base/35" aria-hidden="true">
               ›
             </span>
           )}

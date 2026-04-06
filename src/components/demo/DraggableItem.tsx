@@ -40,7 +40,7 @@ export default function DraggableItem({
       }}
       className={`
         ${color} 
-        text-white 
+        text-skin-inverted 
         ${compact ? "px-3 py-2" : "px-4 py-3"}
         rounded-lg 
         cursor-grab 

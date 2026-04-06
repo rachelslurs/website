@@ -269,7 +269,7 @@ const KanbanCard = memo(
           className="p-3 bg-skin-card border border-skin-line rounded-lg cursor-grab active:cursor-grabbing hover:border-skin-accent transition-colors shadow-sm"
           whileDrag={{
             scale: 1.05,
-            boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+            boxShadow: "0 10px 30px rgba(var(--color-shadow), 0.2)",
             zIndex: 50,
           }}
         >

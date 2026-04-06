@@ -77,7 +77,7 @@ export default memo(function AddDeleteItems() {
         />
         <button
           onClick={addItem}
-          className="px-4 py-2 bg-skin-accent text-white rounded-lg hover:opacity-90 transition-colors flex items-center justify-center"
+          className="px-4 py-2 bg-skin-accent text-skin-inverted rounded-lg hover:opacity-90 transition-colors flex items-center justify-center"
         >
           <PlusIcon className="w-5 h-5" />
         </button>

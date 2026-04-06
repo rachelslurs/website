@@ -21,7 +21,7 @@ export default function DemoPrimaryButton({
         "focus-outline inline-flex items-center justify-center rounded-lg border-2 px-4 py-3 font-semibold transition-all shadow-md active:scale-95",
         computedDisabled
           ? "cursor-not-allowed border-skin-line bg-skin-card-muted/20 text-skin-base opacity-60"
-          : "border-skin-accent bg-skin-accent text-white hover:opacity-90",
+          : "border-skin-accent bg-skin-accent text-skin-inverted hover:opacity-90",
         className ?? "",
       ].join(" ")}
       {...props}
