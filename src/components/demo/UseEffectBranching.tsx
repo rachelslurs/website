@@ -278,8 +278,8 @@ function getNode(id: string) {
   return NODES.find(n => n.id === id);
 }
 
-const WARNING_BADGE_W = 24;
-const WARNING_BADGE_H = 22;
+const WARNING_BADGE_W = 26;
+const WARNING_BADGE_H = 26;
 
 function WarningIcon({
   x,
@@ -311,7 +311,7 @@ function WarningIcon({
         y={WARNING_BADGE_H / 2}
         textAnchor="middle"
         dominantBaseline="central"
-        className="fill-skin-base text-sm font-extrabold [font-family:inherit]"
+        className="fill-skin-base text-base font-extrabold [font-family:inherit]"
       >
         !
       </text>
@@ -393,15 +393,15 @@ function NodeRect({
         >
           <tspan
             x={cx + (isRace ? 14 : 0)}
-            dy="-8"
-            className="text-sm font-semibold"
+            dy="-10"
+            className="text-base font-semibold"
           >
             {label}
           </tspan>
           <tspan
             x={cx + (isRace ? 14 : 0)}
-            dy="18"
-            className={`text-xs font-normal ${
+            dy="22"
+            className={`text-sm font-normal ${
               active ? `${P.text} opacity-70` : "fill-skin-placeholder"
             }`}
           >
@@ -414,7 +414,7 @@ function NodeRect({
           y={y + h / 2}
           textAnchor="middle"
           dominantBaseline="central"
-          className={`text-sm font-semibold transition-[fill] duration-500 ease-in-out ${
+          className={`text-base font-semibold transition-[fill] duration-500 ease-in-out ${
             active ? P.text : "fill-skin-placeholder"
           }`}
         >
@@ -525,7 +525,7 @@ function LegendItem({
       >
         {warn ? "!" : ""}
       </div>
-      <span className="text-xs text-skin-placeholder">{label}</span>
+      <span className="text-sm text-skin-placeholder">{label}</span>
     </div>
   );
 }
