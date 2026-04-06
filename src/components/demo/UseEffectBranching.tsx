@@ -311,8 +311,7 @@ function WarningIcon({
         y={WARNING_BADGE_H / 2}
         textAnchor="middle"
         dominantBaseline="central"
-        className="fill-skin-base"
-        style={{ fontSize: 13, fontWeight: 800, fontFamily: "inherit" }}
+        className="fill-skin-base text-sm font-extrabold [font-family:inherit]"
       >
         !
       </text>
@@ -388,23 +387,23 @@ function NodeRect({
           x={cx + (isRace ? 14 : 0)}
           y={y + h / 2}
           textAnchor="middle"
-          className={active ? P.text : "fill-skin-placeholder"}
-          style={{ transition: "fill 0.5s ease" }}
+          className={`transition-[fill] duration-500 ease-in-out ${
+            active ? P.text : "fill-skin-placeholder"
+          }`}
         >
           <tspan
             x={cx + (isRace ? 14 : 0)}
             dy="-8"
-            style={{ fontSize: 14, fontWeight: 600 }}
+            className="text-sm font-semibold"
           >
             {label}
           </tspan>
           <tspan
             x={cx + (isRace ? 14 : 0)}
             dy="18"
-            className={
+            className={`text-xs font-normal ${
               active ? `${P.text} opacity-70` : "fill-skin-placeholder"
-            }
-            style={{ fontSize: 12, fontWeight: 400 }}
+            }`}
           >
             {sub}
           </tspan>
@@ -415,12 +414,9 @@ function NodeRect({
           y={y + h / 2}
           textAnchor="middle"
           dominantBaseline="central"
-          className={active ? P.text : "fill-skin-placeholder"}
-          style={{
-            fontSize: 14,
-            fontWeight: 600,
-            transition: "fill 0.5s ease",
-          }}
+          className={`text-sm font-semibold transition-[fill] duration-500 ease-in-out ${
+            active ? P.text : "fill-skin-placeholder"
+          }`}
         >
           {label}
         </text>
@@ -520,8 +516,8 @@ function LegendItem({
 }) {
   const s = LEGEND_STYLES[variant];
   const swatchClass = warn
-    ? "h-[22px] min-w-[24px] rounded-[5px] text-[13px] font-extrabold"
-    : "h-3 w-3 rounded-sm text-[8px] font-bold";
+    ? "h-[22px] min-w-[24px] rounded-[5px] text-sm font-extrabold"
+    : "h-3 w-3 rounded-sm text-xs font-bold";
   return (
     <div className="flex items-center gap-2">
       <div
@@ -729,7 +725,7 @@ function UseEffectBranching() {
                       Step {i + 1}
                     </div>
                     <div
-                      className={`text-[13px] leading-snug ${isActive ? "text-skin-base" : "text-skin-placeholder"}`}
+                      className={`text-sm leading-snug ${isActive ? "text-skin-base" : "text-skin-placeholder"}`}
                     >
                       {caption}
                     </div>

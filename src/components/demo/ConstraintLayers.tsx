@@ -24,8 +24,7 @@ const ConstraintLayers = () => (
       y="72"
       textAnchor="middle"
       dominantBaseline="central"
-      className="fill-skin-chart-2"
-      style={{ fontSize: 14, fontWeight: 600 }}
+      className="fill-skin-chart-2 text-sm font-semibold"
     >
       CI / pre-commit hooks
     </text>
@@ -34,8 +33,7 @@ const ConstraintLayers = () => (
       y="94"
       textAnchor="middle"
       dominantBaseline="central"
-      className="fill-skin-chart-2"
-      style={{ fontSize: 12, opacity: 0.7 }}
+      className="fill-skin-chart-2 text-xs opacity-70"
     >
       Blocks what can be merged
     </text>
@@ -56,8 +54,7 @@ const ConstraintLayers = () => (
       y="172"
       textAnchor="middle"
       dominantBaseline="central"
-      className="fill-skin-chart-3"
-      style={{ fontSize: 14, fontWeight: 600 }}
+      className="fill-skin-chart-3 text-sm font-semibold"
     >
       Lint rules / ESLint config
     </text>
@@ -66,8 +63,7 @@ const ConstraintLayers = () => (
       y="194"
       textAnchor="middle"
       dominantBaseline="central"
-      className="fill-skin-chart-3"
-      style={{ fontSize: 12, opacity: 0.7 }}
+      className="fill-skin-chart-3 text-xs opacity-70"
     >
       Blocks what can be committed
     </text>
@@ -88,8 +84,7 @@ const ConstraintLayers = () => (
       y="272"
       textAnchor="middle"
       dominantBaseline="central"
-      className="fill-skin-chart-1"
-      style={{ fontSize: 14, fontWeight: 600 }}
+      className="fill-skin-chart-1 text-sm font-semibold"
     >
       Editor rules / .cursor/rules/
     </text>
@@ -98,8 +93,7 @@ const ConstraintLayers = () => (
       y="294"
       textAnchor="middle"
       dominantBaseline="central"
-      className="fill-skin-chart-1"
-      style={{ fontSize: 12, opacity: 0.7 }}
+      className="fill-skin-chart-1 text-xs opacity-70"
     >
       Shapes what the agent generates
     </text>
@@ -122,8 +116,7 @@ const ConstraintLayers = () => (
       x="575"
       y="172"
       dominantBaseline="central"
-      className="fill-skin-placeholder"
-      style={{ fontSize: 12, fontWeight: 500 }}
+      className="fill-skin-placeholder text-xs font-medium"
     >
       Constraint
     </text>
@@ -131,8 +124,7 @@ const ConstraintLayers = () => (
       x="575"
       y="190"
       dominantBaseline="central"
-      className="fill-skin-placeholder"
-      style={{ fontSize: 12, fontWeight: 500 }}
+      className="fill-skin-placeholder text-xs font-medium"
     >
       tightens
     </text>
@@ -141,8 +133,7 @@ const ConstraintLayers = () => (
       x="248"
       y="82"
       textAnchor="end"
-      className="fill-skin-chart-2"
-      style={{ fontSize: 12, opacity: 0.7 }}
+      className="fill-skin-chart-2 text-xs opacity-70"
     >
       All tests pass
     </text>
@@ -150,8 +141,7 @@ const ConstraintLayers = () => (
       x="248"
       y="182"
       textAnchor="end"
-      className="fill-skin-chart-3"
-      style={{ fontSize: 12, opacity: 0.7 }}
+      className="fill-skin-chart-3 text-xs opacity-70"
     >
       No direct useEffect
     </text>
@@ -159,8 +149,7 @@ const ConstraintLayers = () => (
       x="248"
       y="282"
       textAnchor="end"
-      className="fill-skin-chart-1"
-      style={{ fontSize: 12, opacity: 0.7 }}
+      className="fill-skin-chart-1 text-xs opacity-70"
     >
       Use semantic HTML
     </text>

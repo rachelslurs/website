@@ -96,7 +96,7 @@ export default function StreamingChatNaive() {
                 : "bg-skin-card-muted shadow-chart-3",
             ].join(" ")}
           />
-          <span className="text-[13px] tracking-[0.02em] text-skin-placeholder">
+          <span className="text-sm tracking-[0.02em] text-skin-placeholder">
             Naive version: everything in useState
           </span>
         </div>
@@ -154,12 +154,12 @@ export default function StreamingChatNaive() {
               isStreaming ? "Waiting for response..." : "Type a message..."
             }
             disabled={isStreaming}
-            className="flex-1 rounded-lg border border-skin-line/25 bg-skin-fill px-4 py-3 font-mono text-[13px] text-skin-base outline-none transition-colors duration-150 placeholder:text-skin-placeholder disabled:opacity-50"
+            className="flex-1 rounded-lg border border-skin-line/25 bg-skin-fill px-4 py-3 font-mono text-sm text-skin-base outline-none transition-colors duration-150 placeholder:text-skin-placeholder disabled:opacity-50"
           />
           <DemoPrimaryButton
             onClick={sendMessage}
             isDisabled={isStreaming || !input.trim()}
-            className="gap-2 text-[13px]"
+            className="gap-2 text-sm"
           >
             Send
           </DemoPrimaryButton>

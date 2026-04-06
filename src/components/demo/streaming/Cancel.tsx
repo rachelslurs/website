@@ -152,7 +152,7 @@ export default function CancelProblemDemo() {
           <div className="text-sm font-bold text-skin-base">
             Problem 1: No Cancel
           </div>
-          <div className="mt-0.5 text-[11px] text-skin-placeholder">
+          <div className="mt-0.5 text-xs text-skin-placeholder">
             What happens when you send a new message mid-stream?
           </div>
         </div>

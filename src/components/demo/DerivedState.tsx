@@ -123,19 +123,19 @@ function NodeRect({
           x={cx}
           y={y + h / 2}
           textAnchor="middle"
-          className={active ? "fill-skin-chart-3" : "fill-skin-placeholder"}
-          style={{ transition: "fill 0.5s ease" }}
+          className={`transition-[fill] duration-500 ease-in-out ${
+            active ? "fill-skin-chart-3" : "fill-skin-placeholder"
+          }`}
         >
-          <tspan x={cx} dy="-8" style={{ fontSize: 14, fontWeight: 600 }}>
+          <tspan x={cx} dy="-8" className="text-sm font-semibold">
             {label}
           </tspan>
           <tspan
             x={cx}
             dy="18"
-            className={
+            className={`text-xs font-normal ${
               active ? "fill-skin-chart-3 opacity-70" : "fill-skin-placeholder"
-            }
-            style={{ fontSize: 12, fontWeight: 400 }}
+            }`}
           >
             {sub}
           </tspan>
@@ -146,12 +146,9 @@ function NodeRect({
           y={y + h / 2}
           textAnchor="middle"
           dominantBaseline="central"
-          className={active ? "fill-skin-chart-3" : "fill-skin-placeholder"}
-          style={{
-            fontSize: 14,
-            fontWeight: 600,
-            transition: "fill 0.5s ease",
-          }}
+          className={`text-sm font-semibold transition-[fill] duration-500 ease-in-out ${
+            active ? "fill-skin-chart-3" : "fill-skin-placeholder"
+          }`}
         >
           {label}
         </text>
@@ -397,7 +394,7 @@ export default function DerivedState() {
                       Step {i + 1}
                     </div>
                     <div
-                      className={`text-[13px] leading-snug ${isActive ? "text-skin-base" : "text-skin-placeholder"}`}
+                      className={`text-sm leading-snug ${isActive ? "text-skin-base" : "text-skin-placeholder"}`}
                     >
                       {caption}
                     </div>

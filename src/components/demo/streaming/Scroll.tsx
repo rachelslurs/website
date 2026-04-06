@@ -195,7 +195,7 @@ export default function ScrollThrashingDemo() {
           <div className="text-sm font-bold text-skin-base">
             Problem 3: Scroll Thrashing
           </div>
-          <div className="mt-0.5 text-[11px] text-skin-placeholder">
+          <div className="mt-0.5 text-xs text-skin-placeholder">
             Auto-scroll fights the user
           </div>
         </div>

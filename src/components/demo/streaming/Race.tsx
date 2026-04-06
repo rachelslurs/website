@@ -256,7 +256,7 @@ export default function RaceConditionDemo() {
           <div className="text-sm font-bold text-skin-base">
             Problem 2: Race Condition
           </div>
-          <div className="mt-0.5 text-[11px] text-skin-placeholder">
+          <div className="mt-0.5 text-xs text-skin-placeholder">
             Rapid messages, responses arrive out of order
           </div>
         </div>

@@ -421,9 +421,7 @@ const GravityCard = memo(
         x={GRAV_X + GRAV_CARD_W / 2}
         y={y - 10}
         textAnchor="middle"
-        fontSize="10"
-        fontWeight="700"
-        className={`transition-[fill] duration-200 ease-out pointer-events-none ${
+        className={`text-xs font-bold transition-[fill] duration-200 ease-out pointer-events-none ${
           dimmed
             ? "fill-skin-card-muted"
             : active
@@ -437,8 +435,7 @@ const GravityCard = memo(
         x={GRAV_X + GRAV_CARD_W / 2}
         y={y + 8}
         textAnchor="middle"
-        fontSize="8.5"
-        className={`transition-[fill] duration-200 ease-out pointer-events-none ${dimmed ? "fill-skin-card-muted" : "fill-skin-placeholder"}`}
+        className={`text-xs transition-[fill] duration-200 ease-out pointer-events-none ${dimmed ? "fill-skin-card-muted" : "fill-skin-placeholder"}`}
       >
         {g.sub}
       </text>
@@ -463,11 +460,11 @@ const MobileGravityCard = memo(
       } ${dimmed ? "opacity-30" : ""}`}
     >
       <div
-        className={`text-[10px] font-bold whitespace-nowrap overflow-hidden text-ellipsis transition-colors duration-200 ease-out ${active ? chartTextClass(g.id) : "text-skin-base"}`}
+        className={`text-xs font-bold whitespace-nowrap overflow-hidden text-ellipsis transition-colors duration-200 ease-out ${active ? chartTextClass(g.id) : "text-skin-base"}`}
       >
         {g.label}
       </div>
-      <div className="text-[8px] text-skin-placeholder mt-0.5 whitespace-nowrap overflow-hidden text-ellipsis">
+      <div className="text-xs text-skin-placeholder mt-0.5 whitespace-nowrap overflow-hidden text-ellipsis leading-tight">
         {g.sub}
       </div>
     </div>
@@ -670,8 +667,7 @@ export default function GravityTree() {
                 <text
                   x={TREE_X + node.depth * 16 + 8}
                   y={y + 16}
-                  fontSize={11}
-                  className={`transition-[fill] duration-200 ease-out select-none ${fillClass}`}
+                  className={`text-xs transition-[fill] duration-200 ease-out select-none ${fillClass}`}
                 >
                   {`└─ ${node.label}`}
                 </text>

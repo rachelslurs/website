@@ -31,7 +31,7 @@ async function* simulateStream(
 
 function RefBadge({ label }: { label: string }) {
   return (
-    <span className="ml-1.5 rounded border border-skin-chart-3/15 bg-skin-card-muted/10 px-1.5 py-0.5 font-mono text-[10px] font-medium text-skin-chart-3">
+    <span className="ml-1.5 rounded border border-skin-chart-3/15 bg-skin-card-muted/10 px-1.5 py-0.5 font-mono text-xs font-medium text-skin-chart-3">
       {label}
     </span>
   );
@@ -154,7 +154,7 @@ export default function StreamingChatFixed() {
           <span className="text-sm font-bold text-skin-base">
             Fixed version
           </span>
-          <span className="text-[11px] text-skin-placeholder">
+          <span className="text-xs text-skin-placeholder">
             all three useRef fixes applied
           </span>
         </div>
@@ -172,7 +172,7 @@ export default function StreamingChatFixed() {
 
       {/* Ref badges */}
       <div className="flex flex-wrap items-center gap-1.5 border-b border-skin-line/10 px-4 py-3">
-        <span className="font-mono text-[11px] text-skin-placeholder">
+        <span className="font-mono text-xs text-skin-placeholder">
           Active refs:
         </span>
         <RefBadge label="AbortController" />
@@ -241,13 +241,13 @@ export default function StreamingChatFixed() {
                 ? "Send another to test cancel..."
                 : "Type a message..."
             }
-            className="flex-1 rounded-lg border border-skin-line/25 bg-skin-fill px-4 py-3 font-mono text-[13px] text-skin-base outline-none transition-colors duration-150 placeholder:text-skin-placeholder"
+            className="flex-1 rounded-lg border border-skin-line/25 bg-skin-fill px-4 py-3 font-mono text-sm text-skin-base outline-none transition-colors duration-150 placeholder:text-skin-placeholder"
           />
           <DemoPrimaryButton
             type="button"
             onClick={sendMessage}
             isDisabled={!input.trim()}
-            className="text-[13px]"
+            className="text-sm"
           >
             Send
           </DemoPrimaryButton>
