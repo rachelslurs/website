@@ -62,8 +62,7 @@ function cardXsForBoardWidth(width: number) {
   if (rightX + CARD_WIDTH > w - EDGE_PAD) {
     rightX = w - EDGE_PAD - CARD_WIDTH;
   }
-  const hideX = Math.max(EDGE_PAD, center - CARD_WIDTH / 2);
-  return { leftX, rightX, hideX };
+  return { leftX, rightX };
 }
 
 function boardLayout(boardWidth: number) {
@@ -76,10 +75,8 @@ function boardLayout(boardWidth: number) {
     stacked,
     cardW,
     stackedLeftX,
-    hideOffCanvasX: w + 120,
     leftX: twoCol.leftX,
     rightX: twoCol.rightX,
-    hideXCentered: twoCol.hideX,
   };
 }
 
@@ -88,7 +85,6 @@ function DraggableCard({
   targetY,
   w,
   zIndex,
-  isVisible,
   dragDisabled,
   stagger,
   tapeClass,
@@ -98,7 +94,6 @@ function DraggableCard({
   targetY: number;
   w: number;
   zIndex: number;
-  isVisible: boolean;
   dragDisabled: boolean;
   stagger: number;
   tapeClass: string;
@@ -154,8 +149,7 @@ function DraggableCard({
     if (dragDisabled) return;
     if (
       (e.target as HTMLElement).closest("a") ||
-      (e.target as HTMLElement).closest("button") ||
-      !isVisible
+      (e.target as HTMLElement).closest("button")
     )
       return;
     e.preventDefault();
@@ -193,7 +187,7 @@ function DraggableCard({
         width: w,
         zIndex: isDragging ? 9999 : zIndex,
         transform: `translate(0, 0) rotate(${currentRot}deg) scale(${scale})`,
-        pointerEvents: !isVisible ? "none" : "auto",
+        pointerEvents: "auto",
         cursor: dragDisabled ? "default" : isDragging ? "grabbing" : "grab",
         transition: isDragging
           ? "none"
@@ -207,7 +201,7 @@ function DraggableCard({
         variants={entranceVariants}
         custom={stagger}
         initial={prefersReducedMotion ? "visible" : "hidden"}
-        animate={isVisible ? "visible" : "hidden"}
+        animate="visible"
       >
         {children}
       </motion.div>
@@ -277,10 +271,6 @@ export default function PostsIndexBoard({
     () => posts.slice(0, visibleCount),
     [posts, visibleCount]
   );
-  const displayOrder = useMemo(
-    () => displayedPosts.map(p => p.id),
-    [displayedPosts]
-  );
   const hasMore = visibleCount < posts.length;
   const remainingPosts = posts.length - visibleCount;
 
@@ -291,7 +281,7 @@ export default function PostsIndexBoard({
     setLoadMoreStatus(`${batch} more ${noun} loaded.`);
   }, [pageSize, remainingPosts]);
 
-  const nPosts = displayOrder.length;
+  const nPosts = displayedPosts.length;
   const estCardH = stacked ? EST_CARD_H_STACKED : EST_CARD_H_TWO_COL;
   /** Same as (top of first card − twine start): gap under top knot area to first card top. */
   const topGap = cardBaseY - twineTop;
@@ -403,30 +393,22 @@ export default function PostsIndexBoard({
         {loadMoreStatus}
       </p>
 
-      {posts.map((post, postIndex) => {
-        const filteredIdx = displayOrder.indexOf(post.id);
-        const isVisible = filteredIdx !== -1;
-        const colIndex = filteredIdx >= 0 ? filteredIdx : postIndex;
-        const isLeft = colIndex % 2 === 0;
+      {displayedPosts.map((post, displayIdx) => {
+        const isLeft = displayIdx % 2 === 0;
 
-        const targetX = isVisible
-          ? stacked
-            ? layout.stackedLeftX
-            : isLeft
-              ? layout.leftX
-              : layout.rightX
-          : stacked
-            ? layout.hideOffCanvasX
-            : layout.hideXCentered;
-        const targetY = isVisible ? cardBaseY + filteredIdx * rowStep : 1800;
-        const tapeIdx = filteredIdx >= 0 ? filteredIdx : postIndex;
+        const targetX = stacked
+          ? layout.stackedLeftX
+          : isLeft
+            ? layout.leftX
+            : layout.rightX;
+        const targetY = cardBaseY + displayIdx * rowStep;
         /* Corner washi (tape-c): same centered diagonal strips as homepage Writing cards. */
-        const tapeClass = `${postIndex === 0 ? "featured-post-tape " : ""}tape-c ${
-          tapeIdx % 2 === 0 ? "tc-pink" : "tc-yellow"
+        const tapeClass = `${displayIdx === 0 ? "featured-post-tape " : ""}tape-c ${
+          displayIdx % 2 === 0 ? "tc-pink" : "tc-yellow"
         }`;
 
-        const stackZ = filteredIdx === -1 ? 0 : 14 - filteredIdx;
-        const stagger = filteredIdx >= 0 ? filteredIdx : 0;
+        const stackZ = 14 - displayIdx;
+        const stagger = displayIdx;
 
         return (
           <DraggableCard
@@ -435,7 +417,6 @@ export default function PostsIndexBoard({
             targetY={targetY}
             w={layout.cardW}
             zIndex={stackZ}
-            isVisible={isVisible}
             dragDisabled={dragDisabled}
             stagger={stagger}
             tapeClass={tapeClass}
@@ -445,7 +426,7 @@ export default function PostsIndexBoard({
                 {post.dateLabel}
               </time>
               <h2
-                className={`post-title m-0 ${postIndex === 0 ? "post-title-lg" : ""}`}
+                className={`post-title m-0 ${displayIdx === 0 ? "post-title-lg" : ""}`}
                 style={{ viewTransitionName: post.slug }}
               >
                 {post.title}
