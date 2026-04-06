@@ -59,8 +59,7 @@ export interface PortfolioBoardProps {
 const DEFAULT_SKILLS = [
   "React",
   "TypeScript",
-  "Next.js",
-  "Node",
+  "Node.js",
   "Framer Motion",
   "Design Systems",
   "a11y",
@@ -335,7 +334,7 @@ export default function PortfolioBoard({
                 aria-label="Technical skills"
               >
                 {skills.map((tag, i) => {
-                  const highlight = ["Next.js", "a11y"].includes(tag)
+                  const highlight = ["React", "a11y"].includes(tag)
                     ? "tag-yellow"
                     : tag === "Framer Motion"
                       ? "tag-pink"

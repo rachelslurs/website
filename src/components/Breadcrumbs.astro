@@ -5,6 +5,6 @@ import { getBreadcrumbItems } from "@utils/breadcrumbItems";
 const items = getBreadcrumbItems(Astro.url.pathname);
 ---
 
-<div class="app-layout">
+<div>
   <BreadcrumbsDymo client:load items={items} />
 </div>
