@@ -75,13 +75,6 @@ nav .group:hover .dust-note {
   border-radius: 50%;
   pointer-events: none;
 }
-.blob-1 {
-  width: 350px;
-  height: 350px;
-  background: var(--yellow);
-  top: 0;
-  left: -40px;
-}
 .blob-2 {
   width: 280px;
   height: 280px;
