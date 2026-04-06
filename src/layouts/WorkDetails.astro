@@ -1,10 +1,10 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import RisoBoardShell from "@components/RisoBoardShell.astro";
-import WorkTag from "@components/WorkTag.astro";
 import Features from "@components/Features";
 import TableOfContents from "@components/TableOfContents";
 import CollectionEntryHeader from "@components/CollectionEntryHeader.astro";
+import PostFooterTagLinks from "@components/riso/PostFooterTagLinks";
 import GhostEntryBack from "@components/riso/GhostEntryBack";
 import GhostBackToTop from "@components/riso/GhostBackToTop";
 import type { CollectionEntry } from "astro:content";
@@ -15,7 +15,7 @@ export interface Props {
   works: CollectionEntry<"work">[];
 }
 
-const { work } = Astro.props;
+const { work, works } = Astro.props;
 
 const {
   title,
@@ -48,6 +48,21 @@ const layoutProps = {
   ogImage: ogUrl,
   scrollSmooth: true,
 };
+
+const allWorks = works.map(({ data: { title: t }, slug }) => ({
+  slug,
+  title: t,
+}));
+
+const currentWorkIndex = allWorks.findIndex(a => a.slug === work.slug);
+
+const prevWork = currentWorkIndex !== 0 ? allWorks[currentWorkIndex - 1] : null;
+const nextWork =
+  currentWorkIndex < allWorks.length - 1
+    ? allWorks[currentWorkIndex + 1]
+    : null;
+
+const tagItems = tags.map(t => ({ slug: slugifyStr(t), label: t }));
 ---
 
 <Layout {...layoutProps}>
@@ -60,38 +75,136 @@ const layoutProps = {
         </aside>
 
         <!-- Main Content -->
-        <article id="article" role="article" class="w-full max-w-none">
-          <div class="header-zone">
-            <GhostEntryBack fallbackHref="/work" client:load />
-            <header class="entry-header-wide">
-              <CollectionEntryHeader
-                title={title}
-                summary={summary}
-                slug={slugifyStr(title)}
-              />
-              <!-- {year && <WorkYear year={year} size="lg" className="my-2" />} -->
-            </header>
-          </div>
-          <div class="entry-body">
-            {
-              features && features.length > 0 && (
-                <Features features={features} client:load />
-              )
-            }
-            <Content />
+        <article
+          id="article"
+          role="article"
+          class="post-detail w-full max-w-none"
+        >
+          <div class="analog-post">
+            <div class="post-container">
+              <div class="long-looseleaf tape-top-left tape-top-right">
+                <div class="header-zone">
+                  <GhostEntryBack fallbackHref="/work" client:load />
+                  <header class="post-header">
+                    <CollectionEntryHeader
+                      title={title}
+                      summary={summary}
+                      slug={work.slug}
+                      variant="blog"
+                      analogPostTitle
+                    />
+                  </header>
+                </div>
 
-            <ul class="my-8">
-              {tags.map(tag => <WorkTag tag={slugifyStr(tag)} />)}
-            </ul>
-          </div>
-          <div class="footer-zone">
-            <GhostBackToTop client:load />
+                <div
+                  class="prose analog-prose max-w-none min-w-0 prose-img:rounded prose-img:bg-skin-fill"
+                >
+                  {
+                    features && features.length > 0 && (
+                      <Features features={features} client:load />
+                    )
+                  }
+                  <Content />
+                </div>
+
+                <div class="footer-zone">
+                  <footer class="post-footer">
+                    {
+                      tagItems.length > 0 && (
+                        <div class="post-tags">
+                          <span class="post-tags-heading">Tech:</span>
+                          <PostFooterTagLinks
+                            items={tagItems}
+                            basePath="/tech"
+                            client:load
+                          />
+                        </div>
+                      )
+                    }
+                  </footer>
+                  <GhostBackToTop client:load />
+                </div>
+
+                <div
+                  class="analog-post__tape-bottom tape-bottom-left tape-bottom-right"
+                  aria-hidden="true"
+                >
+                </div>
+              </div>
+            </div>
           </div>
         </article>
+      </div>
+
+      <hr class="my-6 border-dashed" />
+
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        {
+          prevWork && (
+            <a
+              href={`/work/${prevWork.slug}`}
+              class="flex w-full gap-1 hover:opacity-75"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left flex-none"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M15 6l-6 6l6 6" />
+              </svg>
+              <div>
+                <span>Previous</span>
+                <div class="text-sm text-skin-accent/85">{prevWork.title}</div>
+              </div>
+            </a>
+          )
+        }
+        {
+          nextWork && (
+            <a
+              href={`/work/${nextWork.slug}`}
+              class="flex w-full justify-end gap-1 text-right hover:opacity-75 sm:col-start-2"
+            >
+              <div>
+                <span>Next</span>
+                <div class="text-sm text-skin-accent/85">{nextWork.title}</div>
+              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right flex-none"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M9 6l6 6l-6 6" />
+              </svg>
+            </a>
+          )
+        }
       </div>
     </main>
   </RisoBoardShell>
 </Layout>
+
+<style>
+  main {
+    @apply pb-12;
+  }
+</style>
 
 <script is:inline>
   /** Create a progress indicator
@@ -134,24 +247,28 @@ const layoutProps = {
   document.addEventListener("scroll", updateScrollProgress);
 
   /** Attaches links to headings in the document,
-   *  allowing sharing of sections easily */
+   *  allowing sharing of sections easily.
+   *  Excludes headings with data-exclude-heading-link or inside astro-island
+   *  so we don't mutate DOM that React will hydrate. */
   function addHeadingLinks() {
     let headings = Array.from(
-      document.querySelectorAll("h2:not(#table-of-contents), h3, h4, h5, h6")
-    );
+      document.querySelectorAll(
+        "h2, h3:not([data-exclude-heading-link]), h4:not([data-exclude-heading-link]), h5:not([data-exclude-heading-link]), h6:not([data-exclude-heading-link])"
+      )
+    ).filter(h => !h.closest("astro-island"));
 
     for (let heading of headings) {
-      const text = heading.textContent;
-      heading.textContent = "";
-      heading.className = "group heading-group";
+      heading.classList.add("group");
       let link = document.createElement("a");
-      link.className = "heading-link";
+      link.className = "ml-2 heading-link";
+      let linkSpan = document.createElement("span");
+      linkSpan.innerText = "#";
+      let ariaText = document.createElement("span");
+      ariaText.className = "sr-only focus:not-sr-only";
+      ariaText.innerText = `Link to section titled: ${heading.textContent}`;
       link.href = "#" + heading.id;
-      link.textContent = text;
-      let visualDetail = document.createElement("span");
-      visualDetail.ariaHidden = true;
-      visualDetail.innerText = "🔗";
-      link.appendChild(visualDetail);
+      link.appendChild(ariaText);
+      link.appendChild(linkSpan);
       heading.appendChild(link);
     }
   }
@@ -169,7 +286,7 @@ const layoutProps = {
 
       let copyButton = document.createElement("button");
       copyButton.className =
-        "copy-code absolute right-3 -top-3 rounded bg-skin-card px-2 py-1 text-xs leading-4 text-skin-base font-medium";
+        "copy-code absolute right-3 top-0 rounded bg-skin-card px-2 py-1 text-xs leading-4 text-skin-base font-medium";
       copyButton.innerHTML = copyButtonLabel;
       codeBlock.setAttribute("tabindex", "0");
       codeBlock.appendChild(copyButton);
