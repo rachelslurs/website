@@ -13,7 +13,7 @@
   --cork: #c4a97d;
   --ink-muted: #6b5c4c; /* warm medium brown — replaces #555 */
   --ink-secondary: #292524; /* warm dark brown — replaces #222 */
-  --mono: "Space Mono", monospace;
+  --mono: "IBM Plex Mono", monospace;
   --serif: "Playfair Display", Georgia, serif;
   --sans: "Lato", sans-serif;
 }
