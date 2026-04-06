@@ -658,12 +658,12 @@
   outline-offset: 2px;
 }
 
-/* Cream “paper” surface for prose/listing content on the cork board */
+/* Main content: no panel — reads as continuous cork (same as the board surface). */
 .board-slot {
-  background: var(--cream);
-  box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.18);
-  padding: 1.5rem;
-  border-radius: 2px;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
 }
 
 /* View Transitions: animate only the “pinned” slot (see RisoBoardShell.astro) */

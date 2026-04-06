@@ -32,20 +32,14 @@
   body {
     @apply flex min-h-[100svh] flex-col bg-skin-fill text-skin-base selection:bg-skin-accent selection:bg-opacity-70 selection:text-skin-inverted;
   }
+  /* Full width within the cork board (matches homepage); use max-w-3xl on inner prose where needed */
   .app-layout {
-    @apply mx-auto w-full max-w-3xl;
+    @apply mx-auto w-full max-w-none;
     padding-inline: calc(var(--spacing) * 4);
     margin-inline: auto;
     section {
       @apply flex w-full flex-col;
     }
-  }
-
-  /* Layout for pages with TOC sidebar */
-  .app-layout-with-toc {
-    @apply mx-auto w-full;
-    padding-inline: calc(var(--spacing) * 4);
-    max-width: 48rem; /* Same as standard .app-layout - content stays in same position */
   }
 
   /* Grid container for TOC + content */
@@ -82,11 +76,20 @@
     }
   }
 
-  /* Article stays in normal flow */
+  /* Article stays in normal flow (full width of main; body copy uses .entry-body) */
   .toc-layout-grid > article {
     grid-area: content;
-    max-width: 48rem; /* max-w-3xl */
+    max-width: none;
     width: 100%;
+  }
+
+  /* Post/work/demo detail: title block matches nav width; MDX/prose uses comfortable measure */
+  .entry-header-wide {
+    @apply w-full max-w-none;
+  }
+
+  .entry-body {
+    @apply prose min-w-0 max-w-prose;
   }
 
   /* Hide inline remark-toc on xl+ screens when sidebar TOC is showing */

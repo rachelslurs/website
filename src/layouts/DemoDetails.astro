@@ -50,21 +50,19 @@ const layoutProps = {
   <RisoBoardShell>
     <main id="main-content" class="app-layout board-slot">
       <CollectionEntryBack />
-      <article
-        id="article"
-        role="article"
-        class="prose max-w-3xl prose-img:bg-white"
-      >
-        <header>
+      <article id="article" role="article" class="w-full max-w-none">
+        <header class="entry-header-wide">
           <CollectionEntryHeader
             title={title}
             summary={summary}
             slug={slugifyStr(title)}
           />
         </header>
-        <Content />
+        <div class="entry-body prose-img:bg-white">
+          <Content />
+          <BackToTop />
+        </div>
       </article>
-      <BackToTop />
     </main>
   </RisoBoardShell>
 </Layout>
