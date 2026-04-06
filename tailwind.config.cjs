@@ -128,7 +128,7 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ["DM Sans", "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ["Lato", "ui-sans-serif", "system-ui", "sans-serif"],
         serif: ["Playfair Display", "Georgia", "serif"],
         mono: ["Space Mono", "ui-monospace", "SFMono-Regular", "monospace"],
       },
@@ -150,8 +150,8 @@ module.exports = {
             'blockquote p:first-of-type::after': false,
             maxWidth: 'var(--max-3xl)',
             lineHeight: '1.75',
-            fontSize: '1.1rem',
-            fontFamily: "'DM Sans', ui-sans-serif, system-ui, sans-serif",
+            fontSize: '1rem',
+            fontFamily: "'Lato', ui-sans-serif, system-ui, sans-serif",
             color: 'rgb(var(--color-text-base))',
             'a:hover': {
               color: 'rgb(var(--color-accent))',

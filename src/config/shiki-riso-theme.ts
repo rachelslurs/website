@@ -2,7 +2,8 @@ import type { ShikiTransformer } from "shiki";
 import { createCssVariablesTheme } from "shiki/core";
 
 /**
- * Riso palette aligned with :root in src/styles/riso.css — drives Shiki via CSS variables + fallbacks.
+ * “Faded ink” Shiki palette — CSS variables + fallbacks; background is transparent so
+ * `.analog-prose pre` greenbar stripes show through.
  * @see https://shiki.style/guide/theme-colors#css-variables-theme
  */
 const risoAnalogTheme = createCssVariablesTheme({
@@ -11,15 +12,16 @@ const risoAnalogTheme = createCssVariablesTheme({
   fontStyle: true,
   variableDefaults: {
     foreground: "#1a1a1a",
-    background: "#ffffff",
+    /** Lets riso.css greenbar stripes show; Shiki sets inline background-color on `<pre>` */
+    background: "transparent",
     "token-keyword": "#0078bf",
-    "token-parameter": "#444444",
+    "token-parameter": "#4a4a4a",
     "token-function": "#e8453c",
     "token-string": "#00a95c",
     "token-string-expression": "#00a95c",
-    "token-punctuation": "#5a5150",
+    "token-punctuation": "#6a6a6a",
     "token-link": "#0078bf",
-    "token-comment": "#888888",
+    "token-comment": "#7a7a7a",
     "token-constant": "#7b68ae",
     "token-inserted": "#00a95c",
     "token-deleted": "#e8453c",
