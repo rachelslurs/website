@@ -95,7 +95,7 @@ export default function PostPagination({
       font-size: 1.125rem;
       line-height: 1.3;
       color: rgb(var(--color-text-base));
-      font-weight: 500;
+      font-weight: 600;
       display: block;
       transition: color 0.2s;
     }
