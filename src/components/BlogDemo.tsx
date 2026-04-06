@@ -31,13 +31,13 @@ export default function BlogDemo({ children, wide = false }: BlogDemoProps) {
         ${wide ? BREAKOUT_WIDE : BREAKOUT_DEFAULT}
       `}
     >
-      {/* Analog Tape Details: Top Left and Bottom Right */}
+      {/* Analog Tape Details: Top Left and Bottom Right mathematically centered on corners */}
       <div
-        className="absolute -left-3 -top-3 h-6 w-14 -rotate-12 bg-skin-card-muted/50 backdrop-blur-sm shadow-sm"
+        className="absolute left-0 top-0 h-5 w-14 -translate-x-1/2 -translate-y-1/2 -rotate-45 bg-skin-card-muted/70 backdrop-blur-sm shadow-sm"
         aria-hidden="true"
       />
       <div
-        className="absolute -bottom-3 -right-3 h-6 w-14 -rotate-12 bg-skin-card-muted/50 backdrop-blur-sm shadow-sm"
+        className="absolute bottom-0 right-0 h-5 w-14 translate-x-1/2 translate-y-1/2 -rotate-45 bg-skin-card-muted/70 backdrop-blur-sm shadow-sm"
         aria-hidden="true"
       />
 
