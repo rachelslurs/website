@@ -514,9 +514,9 @@ export default function PortfolioBoard({
                 className="demo-item"
                 stagger={i}
               >
-                <article className="card h-full card-demo flex min-h-[150px] flex-col items-center text-center">
-                  <div className="flex flex-1 flex-col items-center justify-center pt-2 pb-4">
-                    <h3 className="demo-title m-0">
+                <article className="card h-full card-demo flex min-h-[130px] flex-col items-center text-center">
+                  <div className="flex flex-1 w-full flex-col items-center pt-0 pb-3">
+                    <h3 className="demo-title m-0 h-8">
                       <a
                         href={d.href}
                         className="hover:text-[var(--yellow)] transition-colors focus-visible:outline-none"
@@ -524,9 +524,7 @@ export default function PortfolioBoard({
                         {d.title}
                       </a>
                     </h3>
-                    <p className="demo-sub mt-1.5 mb-0 leading-tight">
-                      {d.sub}
-                    </p>
+                    <p className="demo-sub mt-0 mb-0 leading-tight">{d.sub}</p>
                   </div>
                   <a
                     href={d.href}
