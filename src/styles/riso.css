@@ -98,6 +98,15 @@
 .is-dragging .card {
   box-shadow: 8px 16px 24px rgba(0, 0, 0, 0.28);
 }
+.board-card.card-looseleaf {
+  transition: box-shadow 0.25s ease;
+}
+.board-card.card-looseleaf.is-hovered {
+  box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.22);
+}
+.board-card.card-looseleaf.is-dragging {
+  box-shadow: 8px 16px 24px rgba(0, 0, 0, 0.28);
+}
 .hero-card-inner {
   padding: 2rem 2.5rem;
 }
@@ -267,35 +276,6 @@
   font-size: 10px;
   letter-spacing: 2px;
   color: rgba(0, 0, 0, 0.4);
-}
-
-/* ── RISO MISREGISTRATION ── */
-.riso-text {
-  position: relative;
-  display: inline;
-}
-.riso-r,
-.riso-b {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  pointer-events: none;
-}
-.riso-r {
-  color: var(--red);
-  opacity: 0.3;
-  transform: translate(2px, 1.5px);
-  z-index: -1;
-}
-.riso-b {
-  color: var(--blue);
-  opacity: 0.2;
-  transform: translate(-1.5px, -1px);
-  z-index: -2;
-}
-.riso-main {
-  position: relative;
 }
 
 /* ── TAG HIGHLIGHTS ── */
@@ -713,4 +693,277 @@
   ::view-transition-new(board-content) {
     animation-duration: 0.01ms !important;
   }
+}
+
+/* ── POSTS INDEX (looseleaf + twine) ── */
+.posts-index-board {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  overflow: hidden;
+  color: var(--black);
+}
+
+.posts-twine {
+  position: absolute;
+  left: 50%;
+  width: 4px;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(
+    45deg,
+    #f5f0e8,
+    #f5f0e8 4px,
+    #e8453c 4px,
+    #e8453c 8px
+  );
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  border-radius: 2px;
+  transition: height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card-looseleaf {
+  background-color: var(--cream);
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 38px,
+      rgba(232, 69, 60, 0.3) 38px,
+      rgba(232, 69, 60, 0.3) 40px,
+      transparent 40px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      transparent,
+      transparent 27px,
+      rgba(0, 120, 191, 0.15) 27px,
+      rgba(0, 120, 191, 0.15) 28px
+    );
+  padding: 1.5rem 1.5rem 1.5rem 3.5rem;
+  position: relative;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+  box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.18);
+}
+
+.hole-punch {
+  position: absolute;
+  left: 12px;
+  width: 14px;
+  height: 14px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  box-shadow: inset 1px 2px 3px rgba(0, 0, 0, 0.5);
+}
+.hole-1 {
+  top: 15%;
+}
+.hole-2 {
+  top: 50%;
+  transform: translateY(-50%);
+}
+.hole-3 {
+  bottom: 15%;
+}
+
+.posts-index-board .pd {
+  font-family: var(--mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #555;
+  margin-bottom: 0.4rem;
+  font-weight: 700;
+}
+.posts-index-board .pt {
+  font-family: var(--serif);
+  font-size: 24px;
+  line-height: 1.15;
+  color: var(--black);
+}
+.posts-index-board .pe {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #222;
+  margin-top: 0.5rem;
+  flex: 1;
+}
+
+.posts-card-footer {
+  margin-top: auto;
+  padding-top: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.tape-right-edge::before {
+  content: "";
+  position: absolute;
+  right: -15px;
+  top: -10px;
+  width: 55px;
+  height: 18px;
+  transform: rotate(45deg);
+  z-index: 10;
+  opacity: 0.8;
+}
+.tape-left-edge::before {
+  content: "";
+  position: absolute;
+  left: -15px;
+  top: -10px;
+  width: 55px;
+  height: 18px;
+  transform: rotate(-45deg);
+  z-index: 10;
+  opacity: 0.8;
+}
+.tp-yellow::before {
+  background-color: var(--yellow);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.15) 25%, transparent 25%);
+  background-size: 8px 8px;
+}
+.tp-pink::before {
+  background-color: var(--pink);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 3px,
+    rgba(255, 255, 255, 0.5) 3px,
+    rgba(255, 255, 255, 0.5) 6px
+  );
+}
+
+.twine-knot {
+  position: absolute;
+  width: 8px;
+  height: 10px;
+  left: -2px;
+  background: repeating-linear-gradient(
+    135deg,
+    #f5f0e8,
+    #f5f0e8 4px,
+    #e8453c 4px,
+    #e8453c 8px
+  );
+  box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.4);
+  z-index: 2;
+}
+.knot-top {
+  top: -3px;
+  border-radius: 60% 40% 50% 50%;
+  transform: rotate(15deg);
+}
+.knot-bottom {
+  bottom: -4px;
+  border-radius: 40% 60% 40% 60%;
+  transform: rotate(-10deg);
+}
+.knot-bottom::before {
+  content: "";
+  position: absolute;
+  top: 7px;
+  left: 2px;
+  width: 4px;
+  height: 45px;
+  background: repeating-linear-gradient(
+    45deg,
+    #f5f0e8,
+    #f5f0e8 4px,
+    #e8453c 4px,
+    #e8453c 8px
+  );
+  border-radius: 2px;
+  transform: rotate(8deg);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+.knot-top::before {
+  content: "";
+  position: absolute;
+  bottom: 7px;
+  left: 2px;
+  width: 4px;
+  height: 45px;
+  background: repeating-linear-gradient(
+    45deg,
+    #f5f0e8,
+    #f5f0e8 4px,
+    #e8453c 4px,
+    #e8453c 8px
+  );
+  border-radius: 2px;
+  transform-origin: bottom center;
+  transform: rotate(-25deg);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes pullBounce {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(6px);
+  }
+}
+.pull-container {
+  position: absolute;
+  left: 50%;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-50%);
+  animation: pullBounce 2s infinite ease-in-out;
+  transition: top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.pull-container--no-motion {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pull-container {
+    animation: none;
+  }
+}
+/* Bottom knot + dangling string live in the pull stack so they bounce with the button. */
+.pull-container .twine-knot.knot-bottom {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  flex-shrink: 0;
+}
+/* Button sits below the main stripe: knot + ::before tail, then CTA. */
+.pull-container .pull-action {
+  margin-top: 42px;
+}
+.pull-action {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 20px;
+  transition: transform 0.15s;
+}
+.pull-action:active {
+  transform: translateY(15px);
+}
+.pull-tag-text {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: var(--red);
+  background: var(--cream);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px dashed var(--red);
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
 }

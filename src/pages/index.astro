@@ -3,9 +3,9 @@ import { getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import RisoBoardShell from "@components/RisoBoardShell.astro";
 import PortfolioBoard from "@components/PortfolioBoard";
-import type { TagColor } from "@components/PortfolioBoard";
 import { SITE } from "@config";
 import getSortedPosts from "@utils/getSortedPosts";
+import { mapBlogEntryToPortfolioPost } from "@utils/mapBlogToPortfolioPost";
 import getSortedWork from "@utils/getSortedWork";
 import getSortedDemos from "@utils/getSortedDemos";
 
@@ -32,33 +32,9 @@ const homeDemosRaw = (
   featuredDemos.length > 0 ? featuredDemos : sortedDemos
 ).slice(0, 4);
 
-function formatPostDate(d: Date) {
-  return d.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-const TAG_COLORS: TagColor[] = ["red", "blue", "green"];
-
-function tagColorFor(i: number): TagColor {
-  return TAG_COLORS[i % TAG_COLORS.length]!;
-}
-
-const portfolioPosts = homePostsRaw.map((entry, i) => {
-  const tag = entry.data.tags[0] ?? "Writing";
-  return {
-    id: entry.id,
-    dateLabel: formatPostDate(entry.data.pubDatetime),
-    dateTime: entry.data.pubDatetime.toISOString(),
-    title: entry.data.title,
-    desc: entry.data.description ?? "",
-    tag,
-    tagColor: tagColorFor(i),
-    href: `/posts/${entry.slug}`,
-  };
-});
+const portfolioPosts = homePostsRaw.map((entry, i) =>
+  mapBlogEntryToPortfolioPost(entry, i)
+);
 
 const portfolioWork = homeWorksRaw.map(entry => ({
   id: entry.id,
