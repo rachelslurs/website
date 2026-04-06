@@ -127,13 +127,13 @@ function NodeRect({
             active ? "fill-skin-chart-3" : "fill-skin-placeholder"
           }`}
         >
-          <tspan x={cx} dy="-8" className="text-sm font-semibold">
+          <tspan x={cx} dy="-10" className="text-base font-semibold">
             {label}
           </tspan>
           <tspan
             x={cx}
-            dy="18"
-            className={`text-xs font-normal ${
+            dy="22"
+            className={`text-sm font-normal ${
               active ? "fill-skin-chart-3 opacity-70" : "fill-skin-placeholder"
             }`}
           >
@@ -146,7 +146,7 @@ function NodeRect({
           y={y + h / 2}
           textAnchor="middle"
           dominantBaseline="central"
-          className={`text-sm font-semibold transition-[fill] duration-500 ease-in-out ${
+          className={`text-base font-semibold transition-[fill] duration-500 ease-in-out ${
             active ? "fill-skin-chart-3" : "fill-skin-placeholder"
           }`}
         >
