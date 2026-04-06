@@ -4,13 +4,12 @@ import RisoBoardShell from "@components/RisoBoardShell.astro";
 import WorkTag from "@components/WorkTag.astro";
 import Features from "@components/Features";
 import TableOfContents from "@components/TableOfContents";
-import CollectionEntryBack from "@components/CollectionEntryBack.astro";
 import CollectionEntryHeader from "@components/CollectionEntryHeader.astro";
+import GhostEntryBack from "@components/riso/GhostEntryBack";
+import GhostBackToTop from "@components/riso/GhostBackToTop";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import { SITE } from "@config";
-import BackToTop from "@components/BackToTop.astro";
-
 export interface Props {
   work: CollectionEntry<"work">;
   works: CollectionEntry<"work">[];
@@ -54,8 +53,6 @@ const layoutProps = {
 <Layout {...layoutProps}>
   <RisoBoardShell>
     <main id="main-content" class="app-layout board-slot">
-      <CollectionEntryBack />
-
       <div class="toc-layout-grid">
         <!-- TOC Sidebar -->
         <aside class="toc-sidebar">
@@ -64,15 +61,18 @@ const layoutProps = {
 
         <!-- Main Content -->
         <article id="article" role="article" class="w-full max-w-none">
-          <header class="entry-header-wide">
-            <CollectionEntryHeader
-              title={title}
-              summary={summary}
-              slug={slugifyStr(title)}
-            />
-            <!-- {year && <WorkYear year={year} size="lg" className="my-2" />} -->
-          </header>
-          <div class="entry-body prose-img:rounded prose-img:bg-white">
+          <div class="header-zone">
+            <GhostEntryBack fallbackHref="/work" client:load />
+            <header class="entry-header-wide">
+              <CollectionEntryHeader
+                title={title}
+                summary={summary}
+                slug={slugifyStr(title)}
+              />
+              <!-- {year && <WorkYear year={year} size="lg" className="my-2" />} -->
+            </header>
+          </div>
+          <div class="entry-body">
             {
               features && features.length > 0 && (
                 <Features features={features} client:load />
@@ -83,8 +83,9 @@ const layoutProps = {
             <ul class="my-8">
               {tags.map(tag => <WorkTag tag={slugifyStr(tag)} />)}
             </ul>
-
-            <BackToTop />
+          </div>
+          <div class="footer-zone">
+            <GhostBackToTop client:load />
           </div>
         </article>
       </div>

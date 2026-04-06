@@ -92,8 +92,9 @@
     @apply w-full max-w-none;
   }
 
+  /* Work / demo MDX: Tailwind Typography defaults + comfortable measure */
   .entry-body {
-    @apply prose min-w-0 max-w-prose;
+    @apply prose min-w-0 max-w-prose prose-img:rounded prose-img:bg-white;
   }
 
   /* Hide inline remark-toc on xl+ screens when sidebar TOC is showing */
@@ -378,5 +379,38 @@
   /* Footer shadow (themeable) */
   .shadow-footer {
     box-shadow: 0 -4px 16px rgba(var(--color-shadow), 0.08);
+  }
+
+  /* Ghost nav (PostDetails / WorkDetails / DemoDetails): hover-to-reveal Dymo controls */
+  .header-zone,
+  .footer-zone {
+    position: relative;
+    --baseline: 28px;
+  }
+
+  .ghost-btn-wrapper {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    width: 100%;
+    height: var(--baseline);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .header-zone:hover .ghost-btn-wrapper,
+  .footer-zone:hover .ghost-btn-wrapper,
+  .ghost-btn-wrapper:focus-within {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .ghost-entry-back-link {
+    display: inline-block;
+  }
+
+  .ghost-back-to-top-btn {
+    cursor: pointer;
   }
 }
