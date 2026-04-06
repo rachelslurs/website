@@ -120,7 +120,7 @@ function ExpressDeliveryForm({
               ? "bg-skin-card-muted/20 text-skin-base border-skin-line hover:bg-skin-card"
               : isPlaying && step >= 2
                 ? "bg-skin-card-muted/20 text-skin-base border-skin-line cursor-not-allowed opacity-60"
-                : "bg-skin-accent text-white dark:text-[rgb(var(--color-fill))] border-skin-accent hover:opacity-90"
+                : "bg-skin-accent text-white border-skin-accent hover:opacity-90"
           }`}
         >
           {step === 6 ? (

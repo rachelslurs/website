@@ -214,7 +214,7 @@ function SharedBrain() {
             {/* Desktop: horizontal stream bar */}
             <div className="hidden md:block w-full h-1 bg-skin-line rounded-full relative overflow-hidden">
               <div
-                className={`absolute inset-0 bg-skin-accent/20 dark:bg-skin-accent/35 transition-opacity duration-500 ${step === 3 || step === 5 ? "opacity-100" : "opacity-0"}`}
+                className={`absolute inset-0 bg-skin-accent/25 transition-opacity duration-500 ${step === 3 || step === 5 ? "opacity-100" : "opacity-0"}`}
               ></div>
               {step === 3 && (
                 <div className="absolute bg-skin-accent stream-glow rounded-full animate-stream-horizontal-forward"></div>
@@ -231,7 +231,7 @@ function SharedBrain() {
           <div className="flex-none md:flex-[1] min-w-0 flex flex-col items-center justify-center p-2 md:p-6 relative z-10">
             <div className="relative flex flex-col items-center">
               <div
-                className={`p-3 md:p-6 rounded-full border-2 transition-all duration-500 relative flex items-center justify-center ${step === 4 ? "bg-skin-card border-skin-accent shadow-xl scale-105" : "bg-skin-card/50 dark:bg-skin-card/60 border-skin-line opacity-70 dark:opacity-80"}`}
+                className={`p-3 md:p-6 rounded-full border-2 transition-all duration-500 relative flex items-center justify-center ${step === 4 ? "bg-skin-card border-skin-accent shadow-xl scale-105" : "bg-skin-card/50 border-skin-line opacity-70"}`}
               >
                 <CircleStackIcon
                   className={`w-5 h-5 md:w-7 md:h-7 ${step === 4 ? "text-skin-accent" : "text-skin-base opacity-50"}`}

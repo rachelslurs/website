@@ -15,11 +15,7 @@ export interface Props {
 const { page } = Astro.props;
 ---
 
-<Layout
-  title={`Work | ${SITE.title}`}
-  activeNav="work"
-  footerNoMarginTop={page.lastPage > 1}
->
+<Layout title={`Work | ${SITE.title}`}>
   <Main pageTitle="Work" pageDesc="My work" activeNav="work">
     <ul class="list-none pl-0">
       {

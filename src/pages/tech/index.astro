@@ -12,8 +12,12 @@ const work = await getCollection("work");
 let tech = getUniqueWorkTags(work);
 ---
 
-<Layout title={`Tech | ${SITE.title}`} activeNav="work">
-  <Main pageTitle="Tech" pageDesc="All the work tagged by tech.">
+<Layout title={`Tech | ${SITE.title}`}>
+  <Main
+    pageTitle="Tech"
+    pageDesc="All the work tagged by tech."
+    activeNav="work"
+  >
     <ul>
       {tech.map(({ tag }) => <WorkTag {tag} size="lg" />)}
     </ul>

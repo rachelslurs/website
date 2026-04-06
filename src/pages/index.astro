@@ -1,137 +1,93 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
-import Header from "@components/Header.astro";
-import Footer from "@components/Footer.astro";
-import LinkButton from "@components/LinkButton.astro";
-import CollectionCard from "@components/CollectionCard";
+import PortfolioBoard from "@components/PortfolioBoard";
+import type { TagColor } from "@components/PortfolioBoard";
+import { SITE, SOCIALS } from "@config";
 import getSortedPosts from "@utils/getSortedPosts";
 import getSortedWork from "@utils/getSortedWork";
 import getSortedDemos from "@utils/getSortedDemos";
-import Arrow from "@components/Arrow";
 
 const posts = await getCollection("blog");
-
 const sortedPosts = getSortedPosts(posts);
 const featuredPosts = sortedPosts.filter(({ data }) => data.featured);
+const homePostsRaw = (
+  featuredPosts.length > 0 ? featuredPosts : sortedPosts
+).slice(0, 6);
 
 const works = await getCollection("work");
-
 const sortedWorks = getSortedWork(works);
 const featuredWorks = sortedWorks.filter(({ data }) => data.featured);
+const homeWorksRaw = (
+  featuredWorks.length > 0 ? featuredWorks : sortedWorks
+).slice(0, 3);
 
 const demos = await getCollection("demos");
-
 const sortedDemos = getSortedDemos(demos);
 const featuredDemos = sortedDemos.filter(({ data }) => data.featured);
+const homeDemosRaw = (
+  featuredDemos.length > 0 ? featuredDemos : sortedDemos
+).slice(0, 4);
+
+function formatPostDate(d: Date) {
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+const TAG_COLORS: TagColor[] = ["red", "blue", "green"];
+
+function tagColorFor(i: number): TagColor {
+  return TAG_COLORS[i % TAG_COLORS.length]!;
+}
+
+const portfolioPosts = homePostsRaw.map((entry, i) => {
+  const tag = entry.data.tags[0] ?? "Writing";
+  return {
+    id: entry.id,
+    dateLabel: formatPostDate(entry.data.pubDatetime),
+    dateTime: entry.data.pubDatetime.toISOString(),
+    title: entry.data.title,
+    desc: entry.data.description ?? "",
+    tag,
+    tagColor: tagColorFor(i),
+    href: `/posts/${entry.slug}`,
+  };
+});
+
+const portfolioWork = homeWorksRaw.map(entry => ({
+  id: entry.id,
+  label: entry.data.year ?? entry.data.tags[0] ?? "Work",
+  name: entry.data.title,
+  desc: entry.data.summary ?? entry.data.description ?? "",
+  href: `/work/${entry.slug}`,
+}));
+
+const portfolioDemos = homeDemosRaw.map(entry => ({
+  id: entry.id,
+  title: entry.data.title,
+  sub: entry.data.summary ?? entry.data.description ?? "",
+  href: `/demos/${entry.slug}`,
+}));
+
+const github = SOCIALS.find(s => s.name === "Github" && s.active);
+const linkedin = SOCIALS.find(s => s.name === "LinkedIn" && s.active);
 ---
 
 <Layout>
-  <Header />
-  <main id="main-content" class="app-layout">
-    <section id="hero" class="prose my-6 max-w-3xl dark:prose-invert">
-      <p class="!my-0">
-        I'm a Software Engineer with 14+ years of experience building web,
-        mobile, and cross-platform TV applications across startups, political
-        campaigns, and civic technology.
-      </p>
-      <p>
-        <LinkButton href="/about">More about me <Arrow /></LinkButton>
-      </p>
-    </section>
-    {
-      featuredPosts.length > 0 && (
-        <>
-          <section
-            id="featured-posts"
-            class="prose max-w-3xl dark:prose-invert"
-          >
-            <ul class="list-none pl-0">
-              {featuredPosts.map(({ data, slug }) => (
-                <CollectionCard
-                  href={`/posts/${slug}`}
-                  frontmatter={data}
-                  secHeading={false}
-                  showDatetime={true}
-                />
-              ))}
-            </ul>
-          </section>
-        </>
-      )
-    }
-
-    <div class="grid max-w-3xl grid-cols-1 gap-10 md:grid-cols-2">
-      {
-        featuredWorks.length > 0 && (
-          <section id="featured-work" class="prose my-4 py-2 dark:prose-invert">
-            <h2 class="my-2 border-b pb-2">Featured Work</h2>
-            <ul class="list-none pl-0">
-              {featuredWorks.map(({ data, slug }) => (
-                <CollectionCard
-                  href={`/work/${slug}`}
-                  frontmatter={data}
-                  secHeading={false}
-                />
-              ))}
-            </ul>
-          </section>
-        )
-      }
-
-      {
-        featuredDemos.length > 0 && (
-          <section
-            id="featured-demos"
-            class="prose my-4 py-2 dark:prose-invert"
-          >
-            <h2 class="my-2 border-b pb-2">Interactive Demos</h2>
-            <ul class="list-none pl-0">
-              {featuredDemos.map(({ data, slug }) => (
-                <CollectionCard
-                  href={`/demos/${slug}`}
-                  frontmatter={data}
-                  secHeading={false}
-                />
-              ))}
-            </ul>
-          </section>
-        )
-      }
-    </div>
-  </main>
-  <Footer />
+  <PortfolioBoard
+    client:load
+    activePath={Astro.url.pathname}
+    siteTitle={SITE.title}
+    heroHeadline="I make the web feel like something."
+    heroBody={SITE.desc}
+    quote="Strong opinions, loosely held"
+    posts={portfolioPosts}
+    work={portfolioWork}
+    demos={portfolioDemos}
+    githubHref={github?.href ?? "https://github.com/rachelslurs"}
+    linkedinHref={linkedin?.href ?? "https://www.linkedin.com/in/rachelcantor"}
+  />
 </Layout>
-
-<style>
-  /* ===== Hero Section ===== */
-
-  #main-content h3 {
-    @apply mb-6 text-xl font-semibold;
-  }
-  #hero .rss-link {
-    @apply mb-6;
-  }
-  #hero .rss-icon {
-    @apply mb-2 h-6 w-6 scale-110 fill-skin-accent sm:mb-3 sm:scale-125;
-  }
-
-  .social-wrapper {
-    @apply mt-4 flex flex-col sm:flex-row sm:items-center;
-  }
-  .social-links {
-    @apply mb-1 mr-2 whitespace-nowrap sm:mb-0;
-  }
-
-  /* ===== Featured & Recent Posts Sections ===== */
-  #featured-posts,
-  #featured-work,
-  #featured-demos,
-  #recent-posts {
-    @apply py-0;
-  }
-
-  .all-posts-btn-wrapper {
-    @apply my-8 text-center;
-  }
-</style>
