@@ -22,7 +22,6 @@
     "@fontsource/ibm-plex-mono": "^5.2.7",
     "@fontsource/lato": "^5.2.7",
     "@fontsource/playfair-display": "^5.2.8",
-    "@fontsource/space-mono": "^5.2.9",
     "@headlessui/react": "^2.1.1",
     "@headlessui/tailwindcss": "0.2.1",
     "@heroicons/react": "^2.2.0",

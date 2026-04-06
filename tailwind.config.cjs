@@ -135,7 +135,7 @@ module.exports = {
       fontFamily: {
         sans: ["Lato", "ui-sans-serif", "system-ui", "sans-serif"],
         serif: ["Playfair Display", "Georgia", "serif"],
-        mono: ["Space Mono", "ui-monospace", "SFMono-Regular", "monospace"],
+        mono: ["IBM Plex Mono", "ui-monospace", "SFMono-Regular", "monospace"],
       },
 
       boxShadow: {
@@ -177,7 +177,7 @@ module.exports = {
               fontFamily: 'Playfair Display, Georgia, serif',
             },
             code: {
-              fontFamily: 'Space Mono, monospace',
+              fontFamily: 'IBM Plex Mono, monospace',
               backgroundColor: 'rgba(var(--color-text-base), 0.05)',
               padding: '0.2em 0.4em',
               borderRadius: '4px',
@@ -198,7 +198,7 @@ module.exports = {
               fontSize: '0.95rem',
             },
             'blockquote > p, blockquote > ul > li, blockquote > ol > li': {
-              fontFamily: 'Space Mono, monospace',
+              fontFamily: 'IBM Plex Mono, monospace',
             },
 
             'hr': {

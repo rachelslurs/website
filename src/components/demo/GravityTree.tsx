@@ -36,6 +36,8 @@ interface FolderLabelProps {
   y: number;
   label: string;
   textClass: string;
+  /** foreignObject width — wider on mobile when the viewBox is expanded */
+  labelWidth?: number;
 }
 
 interface EdgeProps {
@@ -270,18 +272,28 @@ const TREE: TreeNode[] = [
 ];
 
 const FILES = TREE.filter(n => n.type === "file");
-const ROW_H = 24;
+/** Taller rows so `text-base` tree labels fit inside foreignObject */
+const ROW_H = 28;
 const TREE_X = 32;
 const TOP_PAD = 32;
 const GRAV_X = 460;
 const EDGE_X = 280;
 /** Room for variable-width gravity cards (fit content + wrap) */
 const SVG_W = 720;
+/** Mobile-only: wider viewBox + tree column so the diagram isn’t squeezed to 320px units */
+const MOBILE_VB_W = 520;
+const MOBILE_TREE_W = 480;
 
+/** Right edge (x) of the tree row rects — for sizing foreignObject labels */
+function treeRowRightEdge(mobile: boolean) {
+  return TREE_X - 4 + (mobile ? MOBILE_TREE_W : 250);
+}
+
+/** Scaled with ROW_H (was tuned for 24px rows) */
 const GRAVITY_Y: Record<GravityId, number> = {
-  api: TOP_PAD + 90,
-  router: TOP_PAD + 230,
-  analytics: TOP_PAD + 375,
+  api: TOP_PAD + Math.round((90 * ROW_H) / 24),
+  router: TOP_PAD + Math.round((230 * ROW_H) / 24),
+  analytics: TOP_PAD + Math.round((375 * ROW_H) / 24),
 };
 
 const FOLDER_GRAVITY = Object.fromEntries(
@@ -354,19 +366,49 @@ const Chevron = memo(() => (
   </svg>
 ));
 
-const FolderLabel = memo(({ x, y, label, textClass }: FolderLabelProps) => (
-  <foreignObject x={x} y={y + 2} width="220" height={ROW_H - 4}>
-    <div
-      {...({
-        xmlns: "http://www.w3.org/1999/xhtml",
-      } as React.HTMLAttributes<HTMLDivElement>)}
-      className={`flex items-center gap-1 h-full pointer-events-none select-none text-xs font-bold font-mono transition-colors duration-200 ease-out ${textClass}`}
-    >
-      <Chevron />
-      <span>{label}/</span>
-    </div>
-  </foreignObject>
-));
+const FolderLabel = memo(
+  ({ x, y, label, textClass, labelWidth = 220 }: FolderLabelProps) => (
+    <foreignObject x={x} y={y + 2} width={labelWidth} height={ROW_H - 4}>
+      <div
+        {...({
+          xmlns: "http://www.w3.org/1999/xhtml",
+        } as React.HTMLAttributes<HTMLDivElement>)}
+        className={`flex h-full w-full min-w-0 items-center gap-1 font-mono text-base font-bold leading-none transition-colors duration-200 ease-out pointer-events-none select-none ${textClass}`}
+      >
+        <Chevron />
+        <span className="min-w-0 flex-1 truncate">{label}/</span>
+      </div>
+    </foreignObject>
+  )
+);
+
+interface FileRowLabelProps {
+  depth: number;
+  y: number;
+  label: string;
+  mobile: boolean;
+  textClass: string;
+}
+
+/** File rows use foreignObject (not SVG text nodes) so type scales with the viewBox like folders. */
+const FileRowLabel = memo(
+  ({ depth, y, label, mobile, textClass }: FileRowLabelProps) => {
+    const foX = TREE_X + depth * 16 + 4;
+    const foW = Math.max(48, treeRowRightEdge(mobile) - foX - 10);
+    return (
+      <foreignObject x={foX} y={y + 2} width={foW} height={ROW_H - 4}>
+        <div
+          {...({
+            xmlns: "http://www.w3.org/1999/xhtml",
+          } as React.HTMLAttributes<HTMLDivElement>)}
+          className={`flex h-full w-full min-w-0 items-center font-mono text-base font-normal leading-tight transition-colors duration-200 ease-out pointer-events-none select-none ${textClass}`}
+        >
+          <span className="min-w-0 w-full text-left">{`└─ ${label}`}</span>
+        </div>
+      </foreignObject>
+    );
+  }
+);
 
 const Edge = memo(({ d, strokeClass, opacity, width }: EdgeProps) => (
   <path
@@ -389,18 +431,28 @@ const GravityCard = memo(function GravityCardInner({
   focusClassName,
 }: GravityCardProps) {
   const measureRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ w: 148, h: 58 });
+  /** Generous first pass so foreignObject doesn’t clip before measure; RO used to tighten */
+  const [size, setSize] = useState({ w: 260, h: 120 });
 
   useLayoutEffect(() => {
     const el = measureRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(([entry]) => {
-      const cr = entry.contentRect;
-      setSize({
-        w: Math.max(1, Math.ceil(cr.width)),
-        h: Math.max(1, Math.ceil(cr.height)),
-      });
-    });
+
+    const measure = () => {
+      // contentRect tracks the *clipped* box; scroll sizes reflect full laid-out content
+      const sw = el.scrollWidth;
+      const sh = el.scrollHeight;
+      const w = Math.ceil(Math.max(sw, el.offsetWidth)) + 6;
+      const h = Math.ceil(Math.max(sh, el.offsetHeight)) + 6;
+      setSize(prev =>
+        prev.w === w && prev.h === h
+          ? prev
+          : { w: Math.max(152, w), h: Math.max(52, h) }
+      );
+    };
+
+    measure();
+    const ro = new ResizeObserver(() => measure());
     ro.observe(el);
     return () => ro.disconnect();
   }, [g.label, g.sub, active, dimmed]);
@@ -450,6 +502,7 @@ const GravityCard = memo(function GravityCardInner({
         y={top}
         width={w}
         height={h}
+        overflow="visible"
         pointerEvents="none"
       >
         <div
@@ -457,10 +510,10 @@ const GravityCard = memo(function GravityCardInner({
           {...({
             xmlns: "http://www.w3.org/1999/xhtml",
           } as React.HTMLAttributes<HTMLDivElement>)}
-          className="inline-flex w-fit max-w-[11rem] flex-col items-center justify-center gap-0.5 px-2.5 py-2 text-center font-mono text-xs leading-tight"
+          className="box-border flex w-max max-w-[13rem] min-w-0 flex-col items-center justify-center gap-1 px-3 py-2.5 text-center font-mono leading-snug"
         >
           <div
-            className={`font-bold transition-colors duration-200 ease-out ${
+            className={`text-base font-bold transition-colors duration-200 ease-out ${
               dimmed
                 ? "text-skin-card-muted"
                 : active
@@ -471,7 +524,7 @@ const GravityCard = memo(function GravityCardInner({
             {g.label}
           </div>
           <div
-            className={`transition-colors duration-200 ease-out ${
+            className={`text-sm transition-colors duration-200 ease-out ${
               dimmed ? "text-skin-card-muted" : "text-skin-placeholder"
             }`}
           >
@@ -500,11 +553,11 @@ const MobileGravityCard = memo(
       } ${dimmed ? "opacity-30" : ""}`}
     >
       <div
-        className={`text-xs font-bold leading-tight transition-colors duration-200 ease-out break-words ${active ? chartTextClass(g.id) : "text-skin-base"}`}
+        className={`text-base font-bold leading-snug transition-colors duration-200 ease-out break-words ${active ? chartTextClass(g.id) : "text-skin-base"}`}
       >
         {g.label}
       </div>
-      <div className="mt-1 text-xs leading-snug text-skin-placeholder break-words">
+      <div className="mt-1 text-sm leading-snug text-skin-placeholder break-words">
         {g.sub}
       </div>
     </div>
@@ -582,11 +635,12 @@ export default function GravityTree() {
   return (
     <div
       ref={containerRef}
-      className="w-full rounded-xl border border-skin-line/10 bg-skin-fill p-4 font-mono text-skin-base sm:p-6"
+      className="w-full rounded-xl border border-skin-line/10 bg-skin-fill p-4 font-mono text-base text-skin-base sm:p-6"
     >
       <svg
-        viewBox={`0 0 ${mobile ? 320 : SVG_W} ${SVG_H}`}
-        className="w-full max-w-3xl"
+        viewBox={`0 0 ${mobile ? MOBILE_VB_W : SVG_W} ${SVG_H}`}
+        className="h-auto w-full max-w-none"
+        preserveAspectRatio="xMinYMin meet"
         role="img"
         aria-label="File tree diagram showing gravity centers: API Client, Routing Layer, and Analytics Layer"
       >
@@ -598,7 +652,7 @@ export default function GravityTree() {
               key={`bg-${node.id}`}
               x={TREE_X - 4}
               y={y + 2}
-              width={mobile ? 290 : 250}
+              width={mobile ? MOBILE_TREE_W : 250}
               height={ROW_H - 4}
               rx={4}
               className="fill-skin-fill"
@@ -628,11 +682,6 @@ export default function GravityTree() {
             : active
               ? "text-skin-base"
               : "text-skin-placeholder";
-          const fillClass = dimmed
-            ? "fill-skin-card-muted"
-            : active
-              ? "fill-skin-base"
-              : "fill-skin-placeholder";
 
           const activateNode = () =>
             mobile
@@ -671,7 +720,7 @@ export default function GravityTree() {
               <rect
                 x={TREE_X - 4}
                 y={y + 2}
-                width={mobile ? 290 : 250}
+                width={mobile ? MOBILE_TREE_W : 250}
                 height={ROW_H - 4}
                 rx={4}
                 fill={active ? undefined : "transparent"}
@@ -688,22 +737,23 @@ export default function GravityTree() {
                   y={y}
                   label={node.label}
                   textClass={textClass}
+                  labelWidth={mobile ? MOBILE_TREE_W - 56 : 220}
                 />
               ) : (
-                <text
-                  x={TREE_X + node.depth * 16 + 8}
-                  y={y + 16}
-                  className={`text-xs transition-[fill] duration-200 ease-out select-none ${fillClass}`}
-                >
-                  {`└─ ${node.label}`}
-                </text>
+                <FileRowLabel
+                  depth={node.depth}
+                  y={y}
+                  label={node.label}
+                  mobile={mobile}
+                  textClass={textClass}
+                />
               )}
 
               {active &&
                 nodeGravities.map((gid, i) => (
                   <circle
                     key={gid}
-                    cx={(mobile ? 278 : 238) - i * 13}
+                    cx={(mobile ? MOBILE_VB_W - 24 : 238) - i * 13}
                     cy={y + ROW_H / 2 + 1}
                     r={4.5}
                     className={`transition-opacity duration-200 ease-out ${chartFillClass(gid)}`}
