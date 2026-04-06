@@ -633,11 +633,12 @@
   position: relative;
 }
 
-.skip-to-content-board {
+/* Extra `a` specificity beats @layer base `a { outline-… }` */
+a.skip-to-content-board {
   position: absolute;
   left: 1rem;
   top: 0;
-  z-index: 200;
+  z-index: 100;
   transform: translateY(-100%);
   padding: 0.5rem 0.75rem;
   background: var(--yellow);
@@ -647,10 +648,20 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  transition: transform 0.15s ease;
+  text-decoration: none;
+  border: 0;
+  box-shadow: none;
+  outline: none;
+  outline-offset: 0;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
+  /* Hidden until focused: no hairline through transparent progress layer */
+  opacity: 0;
 }
 
-.skip-to-content-board:focus {
+a.skip-to-content-board:focus {
+  opacity: 1;
   transform: translateY(0.5rem);
   outline: 3px solid var(--yellow);
   outline-offset: 2px;
@@ -736,15 +747,18 @@
   }
 }
 
-/* Washi tape corners (scoped so `.tape-top` on the board is unchanged) */
+/*
+ * Post looseleaf top corners: wider/taller than `.tape-c` (40×18) so the post page reads bolder.
+ * Left −45°; right +90° from that → 45°.
+ */
 .analog-post .tape-top-left::before {
   content: "";
   position: absolute;
-  left: -20px;
-  top: -15px;
-  width: 80px;
-  height: 24px;
-  transform: rotate(-35deg);
+  left: 0;
+  top: 0;
+  width: 56px;
+  height: 22px;
+  transform: translate(-50%, -50%) rotate(-45deg);
   z-index: 10;
   opacity: 0.8;
   background-color: var(--yellow);
@@ -755,21 +769,58 @@
 .analog-post .tape-top-right::after {
   content: "";
   position: absolute;
-  right: -25px;
-  top: -10px;
-  width: 70px;
+  left: 100%;
+  top: 0;
+  width: 56px;
   height: 22px;
-  transform: rotate(45deg);
+  transform: translate(-50%, -50%) rotate(45deg);
   z-index: 10;
   opacity: 0.8;
-  background-color: var(--pink);
-  background-image: repeating-linear-gradient(
-    45deg,
-    transparent,
-    transparent 3px,
-    rgba(255, 255, 255, 0.5) 3px,
-    rgba(255, 255, 255, 0.5) 6px
-  );
+  background-color: var(--yellow);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.15) 25%, transparent 25%);
+  background-size: 8px 8px;
+}
+
+/* Bottom corners: same strip as top; left 45°; right +90° from that → 135°. Anchor is a
+   zero-height row so `left`/`bottom` match the looseleaf corners. */
+.analog-post .analog-post__tape-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.analog-post .tape-bottom-left::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 56px;
+  height: 22px;
+  transform: translate(-50%, 50%) rotate(45deg);
+  z-index: 10;
+  opacity: 0.8;
+  background-color: var(--yellow);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.15) 25%, transparent 25%);
+  background-size: 8px 8px;
+}
+
+.analog-post .tape-bottom-right::after {
+  content: "";
+  position: absolute;
+  left: 100%;
+  bottom: 0;
+  width: 56px;
+  height: 22px;
+  transform: translate(-50%, 50%) rotate(135deg);
+  z-index: 10;
+  opacity: 0.8;
+  background-color: var(--yellow);
+  background-image: radial-gradient(rgba(0, 0, 0, 0.15) 25%, transparent 25%);
+  background-size: 8px 8px;
 }
 
 .analog-post .post-header,
@@ -876,30 +927,12 @@
   color: var(--analog-body);
 }
 
+/* Vertical rhythm only — do not set horizontal margin; Tailwind `-mx-*` on
+   components like BlogDemo must win for breakout from the 600px column. */
 .analog-prose .not-prose {
-  margin: calc(var(--baseline) * 2) 0;
+  margin-top: calc(var(--baseline) * 2);
+  margin-bottom: calc(var(--baseline) * 2);
   max-width: none;
-}
-
-/*
- * Wider interactive demos: `.analog-prose` stays at 600px for reading measure,
- * but BlogDemo can opt into the full inner width of the looseleaf
- * (post-container max 900px minus 4rem horizontal padding each side).
- */
-.analog-prose .blog-demo-wide {
-  max-width: none;
-  width: min(740px, 100vw - 4rem);
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-@media (max-width: 768px) {
-  .analog-prose .blog-demo-wide {
-    width: 100%;
-    left: 0;
-    transform: none;
-  }
 }
 
 .analog-prose p {

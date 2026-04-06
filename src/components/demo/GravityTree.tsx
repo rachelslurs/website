@@ -1,4 +1,12 @@
-import { useState, useMemo, useCallback, useRef, useEffect, memo } from "react";
+import {
+  useState,
+  useMemo,
+  useCallback,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+  memo,
+} from "react";
 
 // --- Types ---
 type GravityId = "api" | "router" | "analytics";
@@ -266,9 +274,9 @@ const ROW_H = 24;
 const TREE_X = 32;
 const TOP_PAD = 32;
 const GRAV_X = 460;
-const GRAV_CARD_W = 148;
 const EDGE_X = 280;
-const SVG_W = 640;
+/** Room for variable-width gravity cards (fit content + wrap) */
+const SVG_W = 720;
 
 const GRAVITY_Y: Record<GravityId, number> = {
   api: TOP_PAD + 90,
@@ -370,17 +378,37 @@ const Edge = memo(({ d, strokeClass, opacity, width }: EdgeProps) => (
   />
 ));
 
-const GravityCard = memo(
-  ({
-    g,
-    active,
-    dimmed,
-    y,
-    onEnter,
-    onLeave,
-    onKeyDown,
-    focusClassName,
-  }: GravityCardProps) => (
+const GravityCard = memo(function GravityCardInner({
+  g,
+  active,
+  dimmed,
+  y,
+  onEnter,
+  onLeave,
+  onKeyDown,
+  focusClassName,
+}: GravityCardProps) {
+  const measureRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState({ w: 148, h: 58 });
+
+  useLayoutEffect(() => {
+    const el = measureRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      const cr = entry.contentRect;
+      setSize({
+        w: Math.max(1, Math.ceil(cr.width)),
+        h: Math.max(1, Math.ceil(cr.height)),
+      });
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [g.label, g.sub, active, dimmed]);
+
+  const { w, h } = size;
+  const top = y - h / 2;
+
+  return (
     <g
       tabIndex={0}
       role="button"
@@ -396,18 +424,18 @@ const GravityCard = memo(
       {active && (
         <rect
           x={GRAV_X - 6}
-          y={y - 36}
-          width={GRAV_CARD_W + 12}
-          height={70}
+          y={top - 6}
+          width={w + 12}
+          height={h + 12}
           rx={10}
           className={`transition-opacity duration-200 ease-out ${chartFillAlphaClass(g.id)}`}
         />
       )}
       <rect
         x={GRAV_X}
-        y={y - 30}
-        width={GRAV_CARD_W}
-        height={58}
+        y={top}
+        width={w}
+        height={h}
         rx={7}
         strokeWidth={active ? 1.75 : 0.75}
         strokeOpacity={dimmed ? 0.2 : 1}
@@ -417,31 +445,43 @@ const GravityCard = memo(
             : "fill-skin-card stroke-skin-line"
         }`}
       />
-      <text
-        x={GRAV_X + GRAV_CARD_W / 2}
-        y={y - 10}
-        textAnchor="middle"
-        className={`text-xs font-bold transition-[fill] duration-200 ease-out pointer-events-none ${
-          dimmed
-            ? "fill-skin-card-muted"
-            : active
-              ? chartFillClass(g.id)
-              : "fill-skin-base"
-        }`}
+      <foreignObject
+        x={GRAV_X}
+        y={top}
+        width={w}
+        height={h}
+        pointerEvents="none"
       >
-        {g.label}
-      </text>
-      <text
-        x={GRAV_X + GRAV_CARD_W / 2}
-        y={y + 8}
-        textAnchor="middle"
-        className={`text-xs transition-[fill] duration-200 ease-out pointer-events-none ${dimmed ? "fill-skin-card-muted" : "fill-skin-placeholder"}`}
-      >
-        {g.sub}
-      </text>
+        <div
+          ref={measureRef}
+          {...({
+            xmlns: "http://www.w3.org/1999/xhtml",
+          } as React.HTMLAttributes<HTMLDivElement>)}
+          className="inline-flex w-fit max-w-[11rem] flex-col items-center justify-center gap-0.5 px-2.5 py-2 text-center font-mono text-xs leading-tight"
+        >
+          <div
+            className={`font-bold transition-colors duration-200 ease-out ${
+              dimmed
+                ? "text-skin-card-muted"
+                : active
+                  ? chartTextClass(g.id)
+                  : "text-skin-base"
+            }`}
+          >
+            {g.label}
+          </div>
+          <div
+            className={`transition-colors duration-200 ease-out ${
+              dimmed ? "text-skin-card-muted" : "text-skin-placeholder"
+            }`}
+          >
+            {g.sub}
+          </div>
+        </div>
+      </foreignObject>
     </g>
-  )
-);
+  );
+});
 
 // Mobile footer gravity card (HTML) — tap only, no hover (avoids touch ghost events)
 const MobileGravityCard = memo(
@@ -453,18 +493,18 @@ const MobileGravityCard = memo(
       aria-pressed={active}
       onClick={onTap}
       onKeyDown={onKeyDown}
-      className={`flex-1 min-w-0 cursor-pointer rounded-md border px-2.5 py-2 transition-all duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-skin-accent focus-visible:ring-offset-2 focus-visible:ring-offset-skin ${
+      className={`min-w-0 flex-[1_1_7.5rem] cursor-pointer rounded-md border px-2 py-2 text-center transition-all duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-skin-accent focus-visible:ring-offset-2 focus-visible:ring-offset-skin ${
         active
           ? `border-[1.75px] ${chartBgAlphaClass(g.id)} ${chartBorderClass(g.id)} ${chartShadowClass(g.id)}`
           : "border-[0.75px] border-skin-line bg-skin-card"
       } ${dimmed ? "opacity-30" : ""}`}
     >
       <div
-        className={`text-xs font-bold whitespace-nowrap overflow-hidden text-ellipsis transition-colors duration-200 ease-out ${active ? chartTextClass(g.id) : "text-skin-base"}`}
+        className={`text-xs font-bold leading-tight transition-colors duration-200 ease-out break-words ${active ? chartTextClass(g.id) : "text-skin-base"}`}
       >
         {g.label}
       </div>
-      <div className="text-xs text-skin-placeholder mt-0.5 whitespace-nowrap overflow-hidden text-ellipsis leading-tight">
+      <div className="mt-1 text-xs leading-snug text-skin-placeholder break-words">
         {g.sub}
       </div>
     </div>
@@ -475,9 +515,7 @@ const MobileGravityCard = memo(
 export default function GravityTree() {
   const [hovered, setHovered] = useState<Hovered | null>(null);
   const containerRef = useRef(null);
-  const diagramRef = useRef(null);
   const [mobile, setMobile] = useState(false);
-  const [diagramVisible, setDiagramVisible] = useState(false);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -487,17 +525,6 @@ export default function GravityTree() {
     );
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const el = diagramRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => setDiagramVisible(entry.isIntersecting),
-      { threshold: 0.1 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
   }, []);
 
   const enter = useCallback(
@@ -555,10 +582,9 @@ export default function GravityTree() {
   return (
     <div
       ref={containerRef}
-      className={`min-h-screen flex flex-col items-center justify-center font-mono bg-skin-fill ${mobile ? "p-4 pb-[5rem]" : "p-6"}`}
+      className="w-full rounded-xl border border-skin-line/10 bg-skin-fill p-4 font-mono text-skin-base sm:p-6"
     >
       <svg
-        ref={diagramRef}
         viewBox={`0 0 ${mobile ? 320 : SVG_W} ${SVG_H}`}
         className="w-full max-w-3xl"
         role="img"
@@ -709,14 +735,11 @@ export default function GravityTree() {
           })}
       </svg>
 
-      {/* Mobile footer gravity cards — animates in/out with diagram visibility */}
       {mobile && (
         <div
           role="toolbar"
           aria-label="Gravity center selector"
-          className={`fixed bottom-0 left-0 right-0 flex gap-2 bg-skin-fill border-t border-skin-card-muted px-3 py-2.5 pb-3.5 shadow-footer transition-transform duration-300 ease-out ${
-            diagramVisible ? "translate-y-0" : "translate-y-full"
-          } ${!diagramVisible ? "pointer-events-none" : ""}`}
+          className="mt-3 flex flex-wrap gap-2 border-t border-skin-card-muted pt-3"
         >
           {GRAVITY.map(g => {
             const state = getGravityState(hovered, g.id);
