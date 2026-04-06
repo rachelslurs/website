@@ -2,8 +2,7 @@
 import { SITE } from "@config";
 import Breadcrumbs from "@components/Breadcrumbs.astro";
 import Layout from "./Layout.astro";
-import Header from "@components/Header.astro";
-import Footer from "@components/Footer.astro";
+import RisoBoardShell from "@components/RisoBoardShell.astro";
 
 export interface Props {
   frontmatter: {
@@ -17,13 +16,13 @@ const { frontmatter } = Astro.props;
 ---
 
 <Layout title={`${frontmatter.title} | ${SITE.title}`}>
-  <Header activeNav={frontmatter.activeNav} />
-  <Breadcrumbs />
-  <main id="main-content" class="app-layout prose max-w-3xl">
-    <h1 class="mb-4">{frontmatter.title}</h1>
-    <section class="mb-28 mt-4 prose-img:border-0">
-      <slot />
-    </section>
-  </main>
-  <Footer />
+  <RisoBoardShell>
+    <Breadcrumbs />
+    <main id="main-content" class="board-slot app-layout prose max-w-3xl">
+      <h1 class="mb-4">{frontmatter.title}</h1>
+      <section class="mb-28 mt-4 prose-img:border-0">
+        <slot />
+      </section>
+    </main>
+  </RisoBoardShell>
 </Layout>

@@ -1,7 +1,6 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import Header from "@components/Header.astro";
-import Footer from "@components/Footer.astro";
+import RisoBoardShell from "@components/RisoBoardShell.astro";
 import CollectionEntryBack from "@components/CollectionEntryBack.astro";
 import CollectionEntryHeader from "@components/CollectionEntryHeader.astro";
 import type { CollectionEntry } from "astro:content";
@@ -44,32 +43,31 @@ const layoutProps = {
   canonicalURL,
   ogImage: ogUrl,
   scrollSmooth: true,
-  activeNav: "demos" as const,
 };
 ---
 
 <Layout {...layoutProps}>
-  <Header activeNav="demos" />
-  <main id="main-content" class="app-layout">
-    <CollectionEntryBack />
-    <article
-      id="article"
-      role="article"
-      class="prose max-w-3xl prose-img:bg-white"
-    >
-      <header>
-        <CollectionEntryHeader
-          title={title}
-          summary={summary}
-          slug={slugifyStr(title)}
-        />
-      </header>
-      <Content />
-    </article>
-    <BackToTop />
-  </main>
+  <RisoBoardShell>
+    <main id="main-content" class="app-layout board-slot">
+      <CollectionEntryBack />
+      <article
+        id="article"
+        role="article"
+        class="prose max-w-3xl prose-img:bg-white"
+      >
+        <header>
+          <CollectionEntryHeader
+            title={title}
+            summary={summary}
+            slug={slugifyStr(title)}
+          />
+        </header>
+        <Content />
+      </article>
+      <BackToTop />
+    </main>
+  </RisoBoardShell>
 </Layout>
-<Footer />
 
 <style>
   main {

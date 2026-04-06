@@ -6,7 +6,7 @@
   :root {
     --spacing: 0.25rem;
     /* Riso light palette (aligned with src/styles/riso.css) */
-    --color-fill: 245, 240, 232;
+    --color-fill: 255, 255, 255;
     --color-text-base: 26, 26, 46;
     --color-accent: 232, 69, 60;
     --color-card: 245, 240, 232;
@@ -22,7 +22,7 @@
     --color-toast-info-border: 191, 219, 254;
     --color-toast-info-icon: 0, 120, 191;
     --color-shadow: 26, 26, 46;
-    --color-ring-offset: 245, 240, 232;
+    --color-ring-offset: 255, 255, 255;
     --color-placeholder: 90, 85, 80;
     --color-chart-1: 232, 69, 60;
     --color-chart-2: 0, 120, 191;
