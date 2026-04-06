@@ -245,11 +245,11 @@ function SharedBrain() {
               </div>
 
               <div className="absolute top-full mt-2 md:mt-4 flex flex-col items-center gap-0.5 w-24 md:w-32 justify-start pointer-events-none">
-                <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-skin-base opacity-70 text-center">
+                <span className="text-xs md:text-sm font-black uppercase tracking-widest text-skin-base opacity-70 text-center">
                   Backend
                 </span>
                 <span
-                  className={`text-[10px] md:text-xs font-bold uppercase tracking-widest h-3 md:h-4 flex items-center justify-center ${step === 4 ? "text-skin-accent animate-pulse" : "invisible"}`}
+                  className={`text-xs md:text-sm font-bold uppercase tracking-widest h-3 md:h-4 flex items-center justify-center ${step === 4 ? "text-skin-accent animate-pulse" : "invisible"}`}
                 >
                   Verifying
                 </span>

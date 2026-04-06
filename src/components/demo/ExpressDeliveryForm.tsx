@@ -70,7 +70,7 @@ function ExpressDeliveryForm({
         </div>
 
         <div className="flex flex-col justify-center mt-3 md:mt-6">
-          <label className="text-[10px] md:text-xs pb-1.5 md:pb-2 font-semibold uppercase tracking-wider text-skin-base">
+          <label className="text-xs md:text-sm pb-1.5 md:pb-2 font-semibold uppercase tracking-wider text-skin-base">
             {isConfirmed ? "Confirmed Date" : "Estimated Date"}
           </label>
           <div className="h-10 md:h-12 flex items-center justify-center rounded-lg md:rounded-xl bg-skin-card-muted/20 border border-skin-line px-3 md:px-4 py-2 md:py-3 relative">
