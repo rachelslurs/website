@@ -1,0 +1,15 @@
+---
+import Posts from "@layouts/Posts.astro";
+import { SITE } from "@config";
+import { getCollection } from "astro:content";
+import getSortedPosts from "@utils/getSortedPosts";
+import { mapBlogEntryToPortfolioPost } from "@utils/mapBlogToPortfolioPost";
+
+const posts = await getCollection("blog", ({ data }) => !data.draft);
+const sorted = getSortedPosts(posts);
+const portfolioPosts = sorted.map((entry, i) =>
+  mapBlogEntryToPortfolioPost(entry, i)
+);
+---
+
+<Posts portfolioPosts={portfolioPosts} pageSize={SITE.postPerPage} />

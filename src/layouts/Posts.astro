@@ -1,32 +1,20 @@
 ---
-import type { CollectionEntry } from "astro:content";
+import type { PortfolioPost } from "@components/PortfolioBoard";
 import Layout from "@layouts/Layout.astro";
 import Main from "@layouts/Main.astro";
-import Pagination from "@components/Pagination.astro";
-import CollectionCard from "@components/CollectionCard";
+import PostsIndexBoard from "@components/riso/PostsIndexBoard";
 import { SITE } from "@config";
-import type { Page } from "astro";
 
 export interface Props {
-  page: Page<CollectionEntry<"blog">>;
+  portfolioPosts: PortfolioPost[];
+  pageSize: number;
 }
 
-const { page } = Astro.props;
+const { portfolioPosts, pageSize } = Astro.props;
 ---
 
 <Layout title={`Posts | ${SITE.title}`}>
-  <Main pageTitle="Posts" pageDesc="All of the posts." includeRss={true}>
-    <ul class="list-none pl-0">
-      {
-        page.data.map(({ data, slug }) => (
-          <CollectionCard
-            href={`/posts/${slug}`}
-            frontmatter={data}
-            showDatetime={true}
-          />
-        ))
-      }
-    </ul>
-    <Pagination {page} />
+  <Main pageTitle="Posts" showPageHeader={false} showBreadcrumbs={false}>
+    <PostsIndexBoard client:load posts={portfolioPosts} pageSize={pageSize} />
   </Main>
 </Layout>

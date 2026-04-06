@@ -212,24 +212,6 @@ const BoardCard = React.memo(
   }
 );
 
-const RisoText = ({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => (
-  <span className={`riso-text ${className}`}>
-    <span className="riso-r" aria-hidden="true">
-      {children}
-    </span>
-    <span className="riso-b" aria-hidden="true">
-      {children}
-    </span>
-    <span className="riso-main">{children}</span>
-  </span>
-);
-
 const SectionDivider = ({ label, id }: { label: string; id: string }) => {
   const prefersReducedMotion = useReducedMotion();
   const boardEntranceDelayS = useContext(BoardEntranceDelayContext);
@@ -315,9 +297,7 @@ export default function PortfolioBoard({
                 size="section"
                 isInteractive={false}
               />
-              <h1 className="hero-headline my-3">
-                <RisoText>{heroHeadline}</RisoText>
-              </h1>
+              <h1 className="hero-headline my-3">{heroHeadline}</h1>
               <p className="hero-body max-w-[480px]">{heroBody}</p>
             </div>
           </BoardCard>
@@ -411,11 +391,7 @@ export default function PortfolioBoard({
                   <h3
                     className={`post-title ${i === 0 ? "post-title-lg" : ""}`}
                   >
-                    {i % 2 === 1 ? (
-                      <RisoText>{post.title}</RisoText>
-                    ) : (
-                      post.title
-                    )}
+                    {post.title}
                   </h3>
                   {post.desc ? (
                     <p className="post-excerpt">{post.desc}</p>
@@ -466,9 +442,7 @@ export default function PortfolioBoard({
               >
                 <article className="card flex flex-col">
                   <div className="work-label">{w.label}</div>
-                  <h3 className="work-name">
-                    {i % 2 === 0 ? <RisoText>{w.name}</RisoText> : w.name}
-                  </h3>
+                  <h3 className="work-name">{w.name}</h3>
                   <p className="work-desc">{w.desc}</p>
                   <a href={w.href} className="card-link self-start">
                     <span aria-hidden="true">&rarr;</span> Case study
