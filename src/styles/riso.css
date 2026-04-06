@@ -12,7 +12,7 @@
   --cream: #f5f0e8;
   --cork: #c4a97d;
   --ink-muted: #6b5c4c; /* warm medium brown — replaces #555 */
-  --ink-secondary: #3d3428; /* warm dark brown — replaces #222 */
+  --ink-secondary: #292524; /* warm dark brown — replaces #222 */
   --mono: "Space Mono", monospace;
   --serif: "Playfair Display", Georgia, serif;
   --sans: "Lato", sans-serif;
@@ -881,6 +881,27 @@
   max-width: none;
 }
 
+/*
+ * Wider interactive demos: `.analog-prose` stays at 600px for reading measure,
+ * but BlogDemo can opt into the full inner width of the looseleaf
+ * (post-container max 900px minus 4rem horizontal padding each side).
+ */
+.analog-prose .blog-demo-wide {
+  max-width: none;
+  width: min(740px, 100vw - 4rem);
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@media (max-width: 768px) {
+  .analog-prose .blog-demo-wide {
+    width: 100%;
+    left: 0;
+    transform: none;
+  }
+}
+
 .analog-prose p {
   margin: 0 0 var(--baseline) 0;
   color: var(--analog-body);
@@ -916,7 +937,6 @@
 /* Beat Tailwind Typography’s `.prose a { text-decoration: underline }` — only one underline */
 .prose.analog-prose a {
   color: var(--blue);
-  font-weight: 700;
   text-decoration: none !important;
   text-decoration-line: none !important;
   /* Lower stops = underline sits farther below the text (more clear space above the band) */

@@ -33,7 +33,7 @@ The interesting part isn't what they replaced `useEffect` with. It's _how_ they 
 
 When an AI agent reads a component with chained `useEffect` calls, it faces a structural problem. The component mounts. Effect A fires. It updates State X. State X is in the dependency array of Effect B, so that fires next. Effect B updates State Y. Now the component re-renders.
 
-<BlogDemo>
+<BlogDemo wide>
   <UseEffectBranching client:load />
 </BlogDemo>
 
@@ -59,7 +59,7 @@ function ProductList({ products, filter }) {
 }
 ```
 
-<BlogDemo>
+<BlogDemo wide>
   <DerivedState client:load />
 </BlogDemo>
 
@@ -77,7 +77,7 @@ This is the same principle behind [Cursor rules](/posts/say-less-with-cursor-rul
 
 The difference is scope. Cursor rules are local. They shape what an agent generates in your editor. Lint rules are global. They shape what's _allowed to exist_ in the codebase at all, regardless of whether a human or an agent wrote it.
 
-<BlogDemo>
+<BlogDemo wide>
   <ConstraintLayers client:load />
 </BlogDemo>
 

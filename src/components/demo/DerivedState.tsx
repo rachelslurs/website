@@ -15,8 +15,8 @@ type NodeDef = {
   sub: string | null;
 };
 
-/** Same band width as ConstraintLayers (240), centered in 500px canvas. */
-const DS_NODE_W = 240;
+/** Wider bands than ConstraintLayers for label padding; centered in 500px canvas. */
+const DS_NODE_W = 252;
 const DS_ORIGIN_X = (500 - DS_NODE_W) / 2;
 
 const NODES: NodeDef[] = [
@@ -24,36 +24,36 @@ const NODES: NodeDef[] = [
     id: "props",
     label: "Props",
     x: DS_ORIGIN_X,
-    y: 14,
+    y: 12,
     w: DS_NODE_W,
-    h: 50,
+    h: 58,
     sub: "products, filter",
   },
   {
     id: "filtered",
     label: "const filtered = …",
     x: DS_ORIGIN_X,
-    y: 88,
+    y: 102,
     w: DS_NODE_W,
-    h: 60,
+    h: 76,
     sub: "derived from props",
   },
   {
     id: "count",
     label: "const count = …",
     x: DS_ORIGIN_X,
-    y: 180,
+    y: 210,
     w: DS_NODE_W,
-    h: 60,
+    h: 76,
     sub: "derived from filtered",
   },
   {
     id: "jsx",
     label: "return <JSX />",
     x: DS_ORIGIN_X,
-    y: 272,
+    y: 318,
     w: DS_NODE_W,
-    h: 50,
+    h: 58,
     sub: null,
   },
 ];
@@ -273,7 +273,7 @@ export default function DerivedState() {
         <div className="min-w-0 w-full max-w-xs justify-self-start">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 500 340"
+            viewBox="0 0 500 400"
             className="w-full"
             role="img"
             aria-label="Derived state: a straight top-to-bottom data flow with no side effects"
@@ -324,7 +324,7 @@ export default function DerivedState() {
               </filter>
             </defs>
 
-            <rect width="500" height="340" rx="12" className="fill-skin-fill" />
+            <rect width="500" height="400" rx="12" className="fill-skin-fill" />
 
             <g transform="translate(0, 4)">
               {EDGES.map(e => (
