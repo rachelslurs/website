@@ -543,7 +543,7 @@ function SuccessView() {
     <CheckCircle2 className= "h-12 w-12 text-green-500 mb-4" />
     <SerifH3 className="mb-2" > Tokens Granted Successfully < /SerifH3>
       < p className = "text-muted-foreground mb-4" >
-        <strong className="text-green-600 dark:text-green-400" > You're signed in!</strong>
+        <strong className="text-green-600" > You're signed in!</strong>
           < br />
           <span className="text-sm" > This window will close automatically...</span>
             < /p>

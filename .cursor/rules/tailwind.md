@@ -147,34 +147,9 @@ const sizes = {
 
 ---
 
-## Dark Mode
+## Dark mode
 
-### Class Strategy
-
-```tsx
-// Add dark mode variants
-<div className="
-  bg-white text-gray-900
-  dark:bg-gray-900 dark:text-white
-">
-  <h1 className="text-gray-900 dark:text-white">
-    Title
-  </h1>
-  <p className="text-gray-600 dark:text-gray-400">
-    Description
-  </p>
-</div>
-```
-
-### Configuration
-
-```typescript
-// tailwind.config.ts
-export default {
-  darkMode: 'class', // or 'media' for system preference
-  // ...
-}
-```
+This project does not use Tailwind `dark:` variants. Prefer `skin.*` colors and CSS variables defined in the theme.
 
 ---
 
@@ -319,6 +294,6 @@ const colorClasses = {
 | Dynamic class names | Use object maps with complete classes |
 | Too many `@apply` | Keep utilities in markup |
 | Not using design system | Define colors/spacing in config |
-| Ignoring dark mode | Add `dark:` variants |
+| Ignoring theme tokens | Use `skin.*` and CSS variables |
 | Inconsistent spacing | Use Tailwind's spacing scale |
 | Random class order | Follow consistent ordering |
