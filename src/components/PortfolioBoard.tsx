@@ -292,11 +292,6 @@ export default function PortfolioBoard({
             stagger={0}
           >
             <div className="card hero-card-inner border-[3px] border-[var(--black)]">
-              <DymoLabel
-                text="FRONTEND ENGINEER"
-                size="section"
-                isInteractive={false}
-              />
               <h1 className="hero-headline my-3">{heroHeadline}</h1>
               <p className="hero-body max-w-[480px]">{heroBody}</p>
             </div>

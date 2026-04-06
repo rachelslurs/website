@@ -20,12 +20,39 @@ const CARD_WIDTH = 360;
 /** Gap (px) from twine edge to nearest card edge — keeps columns centered on the string at any board width. */
 const TWINE_GAP = 45;
 const HALF_TWINE = 2;
-const ROW_STEP = 190;
-const TWINE_TOP = 72;
+/** Match `.knot-top::before { height }` in riso.css — dangling string above the knot. */
+const KNOT_TOP_TAIL_PX = 45;
+const ROW_STEP_DEFAULT = 210;
+const TWINE_TOP_DEFAULT = 52;
 /** Pull stack nudges up so the bottom knot meets the twine (no visible gap). */
 const TWINE_PULL_STACK_OVERLAP = 10;
-const CARD_BASE_Y = 120;
+const CARD_BASE_Y_DEFAULT = 104;
 const EDGE_PAD = 8;
+/** Below this width, add more vertical rhythm (RSS ↔ cards ↔ pull). */
+const NARROW_BOARD_MAX_PX = 640;
+const ROW_STEP_NARROW = 245;
+const TWINE_TOP_NARROW = 74;
+const CARD_BASE_Y_NARROW = 157;
+/** Extra twine below the last “row” before the pull / bottom knot. */
+const STRING_TRAILING_DEFAULT = 88;
+const STRING_TRAILING_NARROW = 120;
+/** Stacked layout: tail after last row (shorter than two-col but not stubby). */
+const STRING_TRAILING_STACKED = 80;
+const BOARD_BOTTOM_PAD_DEFAULT = 260;
+const BOARD_BOTTOM_PAD_NARROW = 300;
+/**
+ * Below this width, two 360px columns + twine gap do not fit — use one centered column
+ * so cards are not clipped or overlapping horizontally.
+ */
+const TWO_COL_MIN_PX =
+  CARD_WIDTH * 2 + TWINE_GAP * 2 + HALF_TWINE * 2 + EDGE_PAD * 2 + 24;
+/** Vertical stride when stacked (must exceed typical card height incl. excerpt). */
+const STACK_ROW_STEP = 330;
+const TWINE_TOP_STACKED = 66;
+const CARD_BASE_Y_STACKED = 140;
+/** Conservative card block height for board sizing (content varies). */
+const EST_CARD_H_TWO_COL = 300;
+const EST_CARD_H_STACKED = 330;
 
 function cardXsForBoardWidth(width: number) {
   const w = Math.max(width, 320);
@@ -39,6 +66,23 @@ function cardXsForBoardWidth(width: number) {
   }
   const hideX = Math.max(EDGE_PAD, center - CARD_WIDTH / 2);
   return { leftX, rightX, hideX };
+}
+
+function boardLayout(boardWidth: number) {
+  const w = Math.max(boardWidth, 320);
+  const stacked = w < TWO_COL_MIN_PX;
+  const cardW = stacked ? Math.min(CARD_WIDTH, w - EDGE_PAD * 2) : CARD_WIDTH;
+  const stackedLeftX = Math.round((w - cardW) / 2);
+  const twoCol = cardXsForBoardWidth(w);
+  return {
+    stacked,
+    cardW,
+    stackedLeftX,
+    hideOffCanvasX: w + 120,
+    leftX: twoCol.leftX,
+    rightX: twoCol.rightX,
+    hideXCentered: twoCol.hideX,
+  };
 }
 
 function DraggableCard({
@@ -212,10 +256,33 @@ export default function PostsIndexBoard({
     return () => ro.disconnect();
   }, []);
 
-  const { leftX, rightX, hideX } = useMemo(
-    () => cardXsForBoardWidth(boardWidth),
-    [boardWidth]
-  );
+  const layout = useMemo(() => boardLayout(boardWidth), [boardWidth]);
+
+  const narrowBoard = boardWidth < NARROW_BOARD_MAX_PX;
+  const stacked = layout.stacked;
+  const twineTop = stacked
+    ? TWINE_TOP_STACKED
+    : narrowBoard
+      ? TWINE_TOP_NARROW
+      : TWINE_TOP_DEFAULT;
+  const cardBaseY = stacked
+    ? CARD_BASE_Y_STACKED
+    : narrowBoard
+      ? CARD_BASE_Y_NARROW
+      : CARD_BASE_Y_DEFAULT;
+  const rowStep = stacked
+    ? STACK_ROW_STEP
+    : narrowBoard
+      ? ROW_STEP_NARROW
+      : ROW_STEP_DEFAULT;
+  const stringTrailing = stacked
+    ? STRING_TRAILING_STACKED
+    : narrowBoard
+      ? STRING_TRAILING_NARROW
+      : STRING_TRAILING_DEFAULT;
+  const boardBottomPad = narrowBoard
+    ? BOARD_BOTTOM_PAD_NARROW
+    : BOARD_BOTTOM_PAD_DEFAULT;
 
   const dragDisabled = isTouchDevice;
 
@@ -237,22 +304,59 @@ export default function PostsIndexBoard({
     setLoadMoreStatus(`${batch} more ${noun} loaded.`);
   }, [pageSize, remainingPosts]);
 
-  const stringHeight = Math.max(300, displayOrder.length * ROW_STEP + 100);
-  const boardHeight = Math.max(800, TWINE_TOP + stringHeight + 260);
+  const stringHeight = Math.max(
+    260,
+    displayOrder.length * rowStep + stringTrailing
+  );
+  const nPosts = displayOrder.length;
+  const estCardH = stacked ? EST_CARD_H_STACKED : EST_CARD_H_TWO_COL;
+  const stackBottomY =
+    nPosts === 0 ? twineTop : cardBaseY + (nPosts - 1) * rowStep + estCardH;
+  const boardHeight = Math.max(
+    800,
+    twineTop + stringHeight + boardBottomPad,
+    stackBottomY + boardBottomPad
+  );
+
+  /** Tag top lines up with the top of the knot tail (`knot-top::before`), before the knot blob. */
+  const rssAnchorTop = twineTop - KNOT_TOP_TAIL_PX;
 
   return (
     <div
       ref={boardRef}
-      className="posts-index-board not-prose"
+      className={`posts-index-board not-prose${stacked ? " posts-index-board--stacked" : ""}`}
       style={{
         height: `${boardHeight}px`,
         transition: "height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
       }}
     >
       <div
+        className="posts-rss-anchor"
+        style={{
+          top: rssAnchorTop,
+          /* Right edge of RSS tag aligns with right edge of the card column. */
+          left: stacked
+            ? layout.stackedLeftX + layout.cardW
+            : layout.rightX + CARD_WIDTH,
+          transform: "translateX(-100%)",
+        }}
+      >
+        <a
+          href="/rss.xml"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rss-tag"
+          aria-label="RSS feed"
+          title="RSS Feed"
+        >
+          RSS
+        </a>
+      </div>
+
+      <div
         className="posts-twine"
         style={{
-          top: TWINE_TOP,
+          top: twineTop,
           height: `${stringHeight}px`,
         }}
       >
@@ -264,7 +368,7 @@ export default function PostsIndexBoard({
         <div
           className={`pull-container ${prefersReducedMotion ? "pull-container--no-motion" : ""}`}
           style={{
-            top: `${TWINE_TOP + stringHeight - TWINE_PULL_STACK_OVERLAP}px`,
+            top: `${twineTop + stringHeight - TWINE_PULL_STACK_OVERLAP}px`,
           }}
         >
           <div className="twine-knot knot-bottom" aria-hidden="true" />
@@ -295,11 +399,21 @@ export default function PostsIndexBoard({
         const colIndex = filteredIdx >= 0 ? filteredIdx : postIndex;
         const isLeft = colIndex % 2 === 0;
 
-        const targetX = isVisible ? (isLeft ? leftX : rightX) : hideX;
-        const targetY = isVisible ? CARD_BASE_Y + filteredIdx * ROW_STEP : 1800;
-        const tapeClass = isLeft
-          ? "tape-right-edge tp-pink"
-          : "tape-left-edge tp-yellow";
+        const targetX = isVisible
+          ? stacked
+            ? layout.stackedLeftX
+            : isLeft
+              ? layout.leftX
+              : layout.rightX
+          : stacked
+            ? layout.hideOffCanvasX
+            : layout.hideXCentered;
+        const targetY = isVisible ? cardBaseY + filteredIdx * rowStep : 1800;
+        const tapeIdx = filteredIdx >= 0 ? filteredIdx : postIndex;
+        /* Corner washi (tape-c): same centered diagonal strips as homepage Writing cards. */
+        const tapeClass = `${postIndex === 0 ? "featured-post-tape " : ""}tape-c ${
+          tapeIdx % 2 === 0 ? "tc-pink" : "tc-yellow"
+        }`;
 
         const titleVt = slugifyStr(post.title);
         const stackZ = filteredIdx === -1 ? 0 : 14 - filteredIdx;
@@ -310,7 +424,7 @@ export default function PostsIndexBoard({
             key={post.id}
             targetX={targetX}
             targetY={targetY}
-            w={CARD_WIDTH}
+            w={layout.cardW}
             zIndex={stackZ}
             isVisible={isVisible}
             dragDisabled={dragDisabled}
