@@ -156,11 +156,6 @@ nav .group:hover .dust-note {
     flex-wrap: wrap;
     gap: 1rem;
   }
-  .hero-sidebar .skills-card,
-  .hero-sidebar .quote-card {
-    flex: 1;
-    min-width: 140px;
-  }
 }
 
 /* ── HERO TYPOGRAPHY ── */

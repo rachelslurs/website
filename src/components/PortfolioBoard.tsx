@@ -324,6 +324,7 @@ export default function PortfolioBoard({
               index={1}
               pin="pushpin pp-green"
               className="skills-card"
+              wrapperClassName="max-sm:flex-1 max-sm:min-w-[140px]"
               stagger={1}
             >
               <div
@@ -357,6 +358,7 @@ export default function PortfolioBoard({
               index={2}
               pin="pushpin pp-red"
               className="quote-card"
+              wrapperClassName="max-sm:flex-1 max-sm:min-w-[140px]"
               stagger={2}
             >
               <blockquote className="card m-0 flex min-h-[100px] items-center justify-center border-2 border-dashed border-[var(--black)] p-5">
