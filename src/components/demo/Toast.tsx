@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, forwardRef } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   CheckIcon,
@@ -22,67 +23,97 @@ interface ToastProps {
 
 const ToastNotification = forwardRef<
   HTMLDivElement,
-  ToastProps & { reducedMotion?: boolean }
->(({ message, type = "info", onClose, reducedMotion = false }, ref) => {
-  const bgColor =
-    type === "success"
-      ? "bg-skin-toast-success border-skin-toast-success"
-      : type === "error"
-        ? "bg-skin-toast-error border-skin-toast-error"
-        : "bg-skin-toast-info border-skin-toast-info";
+  ToastProps & {
+    reducedMotion?: boolean;
+    /** Fires once when the enter animation has finished — start auto-dismiss from here. */
+    onEntered?: () => void;
+  }
+>(
+  (
+    { message, type = "info", onClose, reducedMotion = false, onEntered },
+    ref
+  ) => {
+    const enteredRef = useRef(false);
 
-  const iconColor =
-    type === "success"
-      ? "text-skin-toast-success"
-      : type === "error"
-        ? "text-skin-toast-error"
-        : "text-skin-toast-info";
-
-  const icon =
-    type === "success" ? (
-      <CheckIcon className={`w-5 h-5 ${iconColor} flex-shrink-0`} />
-    ) : (
-      <ExclamationCircleIcon className={`w-5 h-5 ${iconColor} flex-shrink-0`} />
-    );
-
-  return (
-    <motion.div
-      ref={ref}
-      layout={!reducedMotion}
-      initial={
-        reducedMotion ? { opacity: 0 } : { opacity: 0, y: 20, scale: 0.95 }
-      }
-      animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-      exit={
-        reducedMotion ? { opacity: 0 } : { opacity: 0, y: -20, scale: 0.95 }
-      }
-      transition={
-        reducedMotion
-          ? { duration: 0 }
-          : {
-              duration: 0.2,
-              layout: { duration: 0.3, ease: "easeOut" },
-            }
-      }
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${bgColor} shadow-lg w-80`}
-      onAnimationComplete={definition => {
-        // Only call onClose when exit animation completes
-        if (definition === "exit") {
-          onClose();
+    /* Fallback if `onAnimationComplete` doesn’t report `animate` (layout-only updates, etc.). */
+    useEffect(() => {
+      const fallbackMs = reducedMotion ? 0 : 250;
+      const t = window.setTimeout(() => {
+        if (!enteredRef.current) {
+          enteredRef.current = true;
+          onEntered?.();
         }
-      }}
-    >
-      {icon}
-      <p className="text-sm text-skin-base flex-1">{message}</p>
-      <button
-        onClick={onClose}
-        className="text-skin-base opacity-70 hover:opacity-100 flex-shrink-0 transition-opacity"
+      }, fallbackMs);
+      return () => clearTimeout(t);
+    }, [onEntered, reducedMotion]);
+    const bgColor =
+      type === "success"
+        ? "bg-skin-toast-success border-skin-toast-success"
+        : type === "error"
+          ? "bg-skin-toast-error border-skin-toast-error"
+          : "bg-skin-toast-info border-skin-toast-info";
+
+    const iconColor =
+      type === "success"
+        ? "text-skin-toast-success"
+        : type === "error"
+          ? "text-skin-toast-error"
+          : "text-skin-toast-info";
+
+    const icon =
+      type === "success" ? (
+        <CheckIcon className={`w-5 h-5 ${iconColor} flex-shrink-0`} />
+      ) : (
+        <ExclamationCircleIcon
+          className={`w-5 h-5 ${iconColor} flex-shrink-0`}
+        />
+      );
+
+    return (
+      <motion.div
+        ref={ref}
+        layout={!reducedMotion}
+        initial={
+          reducedMotion ? { opacity: 0 } : { opacity: 0, y: 20, scale: 0.95 }
+        }
+        animate={
+          reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }
+        }
+        exit={
+          reducedMotion ? { opacity: 0 } : { opacity: 0, y: -20, scale: 0.95 }
+        }
+        transition={
+          reducedMotion
+            ? { duration: 0 }
+            : {
+                duration: 0.2,
+                layout: { duration: 0.3, ease: "easeOut" },
+              }
+        }
+        className={`flex items-center gap-3 px-4 py-3 rounded-lg border ${bgColor} shadow-lg w-80`}
+        onAnimationComplete={definition => {
+          if (definition === "animate" && !enteredRef.current) {
+            enteredRef.current = true;
+            onEntered?.();
+          }
+          if (definition === "exit") {
+            onClose();
+          }
+        }}
       >
-        <XMarkIcon className="w-4 h-4" />
-      </button>
-    </motion.div>
-  );
-});
+        {icon}
+        <p className="text-sm text-skin-base flex-1">{message}</p>
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-skin-base opacity-70 hover:opacity-100 flex-shrink-0 transition-opacity"
+        >
+          <XMarkIcon className="w-4 h-4" />
+        </button>
+      </motion.div>
+    );
+  }
+);
 
 ToastNotification.displayName = "ToastNotification";
 
@@ -94,23 +125,27 @@ interface ToastContainerProps {
     timestamp: number;
   }>;
   removeToast: (id: string) => void;
+  onToastEntered: (id: string) => void;
   reducedMotion?: boolean;
 }
 
 function ToastContainer({
   toasts,
   removeToast,
+  onToastEntered,
   reducedMotion = false,
 }: ToastContainerProps) {
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
-      <AnimatePresence mode="popLayout" initial={false}>
+    <div className="fixed top-4 right-4 z-[10050] flex flex-col gap-2">
+      {/* sync: avoid popLayout reshuffling other toasts while one exits (felt odd with the queue). */}
+      <AnimatePresence mode="sync" initial={false}>
         {toasts.map(toast => (
           <ToastNotification
             key={toast.id}
             message={toast.message}
             type={toast.type}
             onClose={() => removeToast(toast.id)}
+            onEntered={() => onToastEntered(toast.id)}
             reducedMotion={reducedMotion}
           />
         ))}
@@ -120,10 +155,11 @@ function ToastContainer({
 }
 
 const DEDUPLICATION_WINDOW_MS = 3000; // Ignore duplicate messages within 3 seconds
+/** Visible time after enter animation completes; exit runs after this via `removeToast`. */
 const AUTO_DISMISS_DURATION_MS = 3000;
-const EXIT_ANIMATION_DURATION_MS = 200; // Match the exit animation duration
 
 export default function Toast() {
+  const [toastHostReady, setToastHostReady] = useState(false);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const [queuedToasts, setQueuedToasts] = useState<ToastItem[]>([]);
   const [deduplicationEnabled, setDeduplicationEnabled] = useState(true);
@@ -154,27 +190,25 @@ export default function Toast() {
     });
   }, []);
 
-  // Centralized auto-dismiss timer management
-  const scheduleDismiss = useCallback(
+  /** Auto-dismiss: full `AUTO_DISMISS_DURATION_MS` after the toast has finished entering (incl. queued). */
+  const scheduleAutoDismiss = useCallback(
     (toastId: string) => {
-      // Clear any existing timer for this toast
       const existingTimer = timersRef.current.get(toastId);
       if (existingTimer) {
         clearTimeout(existingTimer);
       }
 
-      // Set new timer
       const timer = setTimeout(() => {
         removeToast(toastId);
         timersRef.current.delete(toastId);
-      }, AUTO_DISMISS_DURATION_MS + EXIT_ANIMATION_DURATION_MS); // Wait for dismiss + animation
+      }, AUTO_DISMISS_DURATION_MS);
 
       timersRef.current.set(toastId, timer);
     },
     [removeToast]
   );
 
-  // Process queue when there's space available
+  // Process queue when there's space available (timers start in `onToastEntered`, not here)
   useEffect(() => {
     if (isProcessingRef.current) return;
     if (toasts.length >= maxVisibleToasts) return;
@@ -185,16 +219,10 @@ export default function Toast() {
     const toastsToAdd = queuedToasts.slice(0, slotsAvailable);
     const remainingQueue = queuedToasts.slice(slotsAvailable);
 
-    // Schedule dismiss timers for new toasts
-    toastsToAdd.forEach(toast => {
-      scheduleDismiss(toast.id);
-    });
-
-    // Update states
     setToasts(prev => [...prev, ...toastsToAdd]);
     setQueuedToasts(remainingQueue);
     isProcessingRef.current = false;
-  }, [toasts.length, queuedToasts.length, maxVisibleToasts, scheduleDismiss]);
+  }, [toasts.length, queuedToasts.length, maxVisibleToasts]);
 
   const addToast = useCallback(
     (message: string, type: "success" | "error" | "info" = "info") => {
@@ -210,8 +238,7 @@ export default function Toast() {
         );
 
         if (recentToast) {
-          // Reset timer for existing toast
-          scheduleDismiss(recentToast.id);
+          scheduleAutoDismiss(recentToast.id);
           return;
         }
       }
@@ -226,21 +253,16 @@ export default function Toast() {
 
       setToasts(prev => {
         if (prev.length < maxVisibleToasts) {
-          // Add directly if under limit
-          const updated = [...prev, newToast];
-          scheduleDismiss(id);
-          return updated;
-        } else {
-          // Add to queue
-          setQueuedToasts(queue => [...queue, newToast]);
-          return prev;
+          return [...prev, newToast];
         }
+        setQueuedToasts(queue => [...queue, newToast]);
+        return prev;
       });
     },
     [
       toasts,
       queuedToasts,
-      scheduleDismiss,
+      scheduleAutoDismiss,
       deduplicationEnabled,
       maxVisibleToasts,
     ]
@@ -252,6 +274,11 @@ export default function Toast() {
       timersRef.current.forEach(timer => clearTimeout(timer));
       timersRef.current.clear();
     };
+  }, []);
+
+  /** Mount toasts on `document.body` so they escape `overflow-hidden` / stacking on the board shell. */
+  useEffect(() => {
+    setToastHostReady(true);
   }, []);
 
   return (
@@ -305,6 +332,7 @@ export default function Toast() {
         </div>
         <div className="flex flex-wrap gap-3">
           <button
+            type="button"
             onClick={() =>
               addToast("Operation completed successfully!", "success")
             }
@@ -313,12 +341,14 @@ export default function Toast() {
             Success
           </button>
           <button
+            type="button"
             onClick={() => addToast("Something went wrong!", "error")}
             className="px-4 py-2 bg-skin-accent text-skin-inverted rounded-lg hover:opacity-90 transition-opacity"
           >
             Error
           </button>
           <button
+            type="button"
             onClick={() => addToast("Here's some information for you", "info")}
             className="px-4 py-2 bg-skin-accent text-skin-inverted rounded-lg hover:opacity-90 transition-opacity"
           >
@@ -327,6 +357,7 @@ export default function Toast() {
         </div>
         <div className="flex flex-wrap gap-3">
           <button
+            type="button"
             onClick={() => {
               // Test max visible toasts
               for (let i = 0; i < 5; i++) {
@@ -344,11 +375,16 @@ export default function Toast() {
           at once.
         </p>
       </div>
-      <ToastContainer
-        toasts={toasts}
-        removeToast={removeToast}
-        reducedMotion={reducedMotion}
-      />
+      {toastHostReady &&
+        createPortal(
+          <ToastContainer
+            toasts={toasts}
+            removeToast={removeToast}
+            onToastEntered={scheduleAutoDismiss}
+            reducedMotion={reducedMotion}
+          />,
+          document.body
+        )}
     </DemoLayout>
   );
 }
