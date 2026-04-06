@@ -308,19 +308,19 @@ export default function Toast() {
             onClick={() =>
               addToast("Operation completed successfully!", "success")
             }
-            className="px-4 py-2 bg-skin-accent text-white rounded-lg hover:opacity-90 transition-opacity"
+            className="px-4 py-2 bg-skin-accent text-skin-inverted rounded-lg hover:opacity-90 transition-opacity"
           >
             Success
           </button>
           <button
             onClick={() => addToast("Something went wrong!", "error")}
-            className="px-4 py-2 bg-skin-accent text-white rounded-lg hover:opacity-90 transition-opacity"
+            className="px-4 py-2 bg-skin-accent text-skin-inverted rounded-lg hover:opacity-90 transition-opacity"
           >
             Error
           </button>
           <button
             onClick={() => addToast("Here's some information for you", "info")}
-            className="px-4 py-2 bg-skin-accent text-white rounded-lg hover:opacity-90 transition-opacity"
+            className="px-4 py-2 bg-skin-accent text-skin-inverted rounded-lg hover:opacity-90 transition-opacity"
           >
             Info
           </button>
@@ -333,7 +333,7 @@ export default function Toast() {
                 addToast(`Toast ${i + 1}`, "info");
               }
             }}
-            className="px-4 py-2 bg-skin-accent text-white rounded-lg hover:opacity-90 transition-opacity"
+            className="px-4 py-2 bg-skin-accent text-skin-inverted rounded-lg hover:opacity-90 transition-opacity"
           >
             Show 5 Toasts (Tests Queue)
           </button>

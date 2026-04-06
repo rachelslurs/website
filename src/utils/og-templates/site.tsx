@@ -4,7 +4,7 @@ export default () => {
   return (
     <div
       style={{
-        background: "#fefbfb",
+        background: "#F5F0E8",
         width: "100%",
         height: "100%",
         display: "flex",
@@ -17,8 +17,8 @@ export default () => {
           position: "absolute",
           top: "-1px",
           right: "-1px",
-          border: "4px solid #000",
-          background: "#ecebeb",
+          border: "4px solid #1A1A2E",
+          background: "#EDE8D8",
           opacity: "0.9",
           borderRadius: "4px",
           display: "flex",
@@ -31,8 +31,8 @@ export default () => {
 
       <div
         style={{
-          border: "4px solid #000",
-          background: "#fefbfb",
+          border: "4px solid #1A1A2E",
+          background: "#F5F0E8",
           borderRadius: "4px",
           display: "flex",
           justifyContent: "center",

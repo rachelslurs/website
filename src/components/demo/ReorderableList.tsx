@@ -36,7 +36,7 @@ export default function ReorderableList() {
             className="flex items-center gap-3 p-4 bg-skin-card rounded-lg cursor-grab active:cursor-grabbing border-2 border-skin-line hover:border-skin-accent transition-colors duration-300"
             whileDrag={{
               scale: 1.02,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+              boxShadow: "0 10px 30px rgba(var(--color-shadow), 0.1)",
               zIndex: 50,
             }}
           >

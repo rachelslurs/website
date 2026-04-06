@@ -4,33 +4,33 @@
 
 @layer base {
   html {
-    font-size: 16px;
+    font-size: 18px;
   }
 
   :root {
     --spacing: 0.25rem;
-    /* Riso light palette (aligned with src/styles/riso.css) */
-    --color-fill: 255, 255, 255;
-    --color-text-base: 26, 26, 46;
-    --color-accent: 232, 69, 60;
-    --color-card: 245, 240, 232;
-    --color-card-muted: 196, 169, 125;
-    --color-border: 64, 61, 57;
-    --color-toast-success-bg: 240, 253, 244;
-    --color-toast-success-border: 187, 247, 208;
+    --color-fill: 255, 255, 255; /* white — page bg, form fields */
+    --color-cork: 196, 169, 125; /* kraft/cork — board surface */
+    --color-text-base: 26, 26, 46; /* riso black */
+    --color-accent: 232, 69, 60; /* riso red */
+    --color-card: 245, 240, 232; /* cream — card/looseleaf bg */
+    --color-card-muted: 174, 145, 96; /* darker cork — muted surfaces */
+    --color-border: 139, 110, 78; /* warm wood brown */
+    --color-toast-success-bg: 235, 245, 230;
+    --color-toast-success-border: 150, 210, 160;
     --color-toast-success-icon: 0, 169, 92;
-    --color-toast-error-bg: 254, 242, 242;
-    --color-toast-error-border: 254, 202, 202;
+    --color-toast-error-bg: 248, 232, 228;
+    --color-toast-error-border: 232, 160, 150;
     --color-toast-error-icon: 232, 69, 60;
-    --color-toast-info-bg: 239, 246, 255;
-    --color-toast-info-border: 191, 219, 254;
+    --color-toast-info-bg: 228, 238, 248;
+    --color-toast-info-border: 160, 195, 230;
     --color-toast-info-icon: 0, 120, 191;
-    --color-shadow: 26, 26, 46;
-    --color-ring-offset: 255, 255, 255;
-    --color-placeholder: 90, 85, 80;
-    --color-chart-1: 232, 69, 60;
-    --color-chart-2: 0, 120, 191;
-    --color-chart-3: 0, 169, 92;
+    --color-shadow: 90, 70, 45; /* warm brown shadow */
+    --color-ring-offset: 255, 255, 255; /* matches fill */
+    --color-placeholder: 120, 100, 75; /* warm muted brown */
+    --color-chart-1: 232, 69, 60; /* riso red */
+    --color-chart-2: 0, 120, 191; /* riso blue */
+    --color-chart-3: 0, 169, 92; /* riso green */
     --max-3xl: 48rem;
   }
   body {
@@ -94,7 +94,7 @@
 
   /* Work / demo MDX: Tailwind Typography defaults + comfortable measure */
   .entry-body {
-    @apply prose min-w-0 max-w-prose prose-img:rounded prose-img:bg-white;
+    @apply prose min-w-0 max-w-prose prose-img:rounded prose-img:bg-skin-fill;
   }
 
   /* Hide inline remark-toc on xl+ screens when sidebar TOC is showing */

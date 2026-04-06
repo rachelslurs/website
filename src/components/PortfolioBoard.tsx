@@ -254,7 +254,7 @@ const SectionDivider = ({ label, id }: { label: string; id: string }) => {
         {label.charAt(0) + label.slice(1).toLowerCase()}
       </h2>
       <DymoLabel text={label} size="section" isInteractive={false} />
-      <span className="h-px flex-1 bg-black/15" aria-hidden="true" />
+      <span className="h-px flex-1 bg-skin-base/15" aria-hidden="true" />
     </motion.div>
   );
 };
