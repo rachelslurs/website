@@ -22,7 +22,7 @@ export default function StreamingChatBubble({
     >
       <div
         className={[
-          "mb-1 flex items-center gap-2 font-mono text-xs uppercase tracking-[0.05em] text-skin-placeholder",
+          "mb-1 flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-skin-placeholder",
           isUser ? "justify-end" : "justify-start",
         ].join(" ")}
       >

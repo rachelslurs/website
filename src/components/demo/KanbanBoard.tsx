@@ -206,7 +206,7 @@ const KanbanColumn = memo(
            to 1/3 of the parent width on smaller desktop screens.
         */
         className={`
-          h-full transition-colors rounded-lg border border-dashed p-4 min-w-[150px]
+          h-full min-w-[7.5rem] rounded-lg border border-dashed p-4 transition-colors
           ${
             isDragOver
               ? "border-skin-accent bg-skin-accent/10"
@@ -226,7 +226,7 @@ const KanbanColumn = memo(
           </span>
         </div>
 
-        <div className="space-y-2 min-h-[100px]">
+        <div className="min-h-20 space-y-2">
           <AnimatePresence mode="popLayout">
             {column.items.map(item => (
               <KanbanCard

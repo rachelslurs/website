@@ -96,7 +96,7 @@ export default function StreamingChatNaive() {
                 : "bg-skin-card-muted shadow-chart-3",
             ].join(" ")}
           />
-          <span className="text-sm tracking-[0.02em] text-skin-placeholder">
+          <span className="text-sm tracking-wide text-skin-placeholder">
             Naive version: everything in useState
           </span>
         </div>
@@ -108,7 +108,7 @@ export default function StreamingChatNaive() {
       {/* Messages */}
       <div
         ref={scrollRef}
-        className="flex h-[340px] flex-col gap-3 overflow-y-auto p-4"
+        className="flex h-[17rem] flex-col gap-3 overflow-y-auto p-4"
       >
         {messages.map((msg, i) => (
           <StreamingChatBubble key={i} role={msg.role} content={msg.content} />

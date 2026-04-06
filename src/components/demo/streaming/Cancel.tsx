@@ -177,7 +177,7 @@ export default function CancelProblemDemo() {
       {/* Messages */}
       <div
         ref={scrollRef}
-        className="flex h-[260px] flex-col gap-3 overflow-y-auto p-4"
+        className="flex h-[13rem] flex-col gap-3 overflow-y-auto p-4"
       >
         {messages.map((msg, i) => (
           <StreamingChatBubble key={i} role={msg.role} content={msg.content} />

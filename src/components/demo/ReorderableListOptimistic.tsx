@@ -66,7 +66,7 @@ export default memo(function ReorderableListOptimistic() {
             ))}
           </Reorder.Group>
           <div className="h-px bg-skin-line mb-3"></div>
-          <div className="flex justify-center items-center min-h-[20px]">
+          <div className="flex min-h-5 items-center justify-center">
             {isReordering && (
               <span className="flex items-center gap-2 text-xs text-skin-base opacity-70">
                 <ArrowPathIcon className="w-3 h-3 animate-spin" />

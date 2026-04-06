@@ -128,7 +128,7 @@ function SharedBrain() {
       filename="SharedBrain.tsx"
       showHeader={false}
     >
-      <div className="max-w-7xl w-full bg-skin-card rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden border-2 border-skin-line flex flex-col h-[540px] md:h-[620px]">
+      <div className="max-w-7xl w-full bg-skin-card rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden border-2 border-skin-line flex flex-col h-[27rem] md:h-[31rem]">
         {/* [ HEADER ] - compact on mobile with reserved space so it never covers content */}
         <div className="sharedbrain-header relative z-20 w-full bg-skin-inverted border-b border-skin-line flex shrink-0 min-h-[3.25rem] py-2 md:py-0 md:min-h-[5rem]">
           <div className="sharedbrain-header-controls flex-1 flex items-center justify-center md:justify-end md:pr-6 py-2 md:py-4 px-2 md:px-4 min-w-0">
