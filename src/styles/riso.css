@@ -18,6 +18,27 @@
   --sans: "Lato", sans-serif;
 }
 
+/* “Pardon the dust” tape wiggle — keyframes + group-hover (see RisoNav) */
+@keyframes dustWiggleHorizontal {
+  0%,
+  100% {
+    transform: translateY(-50%) translateX(5px) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-52%) translateX(8px) rotate(1deg);
+  }
+}
+
+nav .group:hover .dust-note {
+  animation: dustWiggleHorizontal 4s infinite ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  nav .group:hover .dust-note {
+    animation: none;
+  }
+}
+
 /* ── BOARD ── */
 .board {
   background: var(--cork);
