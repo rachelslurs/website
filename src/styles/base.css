@@ -52,42 +52,59 @@
 
   /* Grid container for TOC + content */
   .toc-layout-grid {
-    @apply grid gap-8;
+    display: grid;
     grid-template-columns: 1fr;
-    grid-template-areas:
-      "toc"
-      "content";
+    grid-template-areas: "content";
+    gap: 2rem;
 
-    /* Desktop: content only, TOC positioned separately */
+    /* Desktop: flex layout so TOC sits cleanly next to article */
     @media (min-width: 1280px) {
-      display: block;
-      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 0;
+      transition: gap 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+  }
+
+  /* Only add gap if the sidebar actually contains a generated nav */
+  @media (min-width: 1280px) {
+    .toc-layout-grid:has(.toc-sidebar nav) {
+      gap: 3rem;
     }
   }
 
   /* TOC sidebar */
   .toc-sidebar {
     grid-area: toc;
-
-    /* Hide on mobile, show on xl+ screens */
+    /* Hide unconditionally by default on mobile so an empty sidebar takes no space */
     display: none;
+  }
 
-    /* Desktop: sticky positioning in left margin */
-    @media (min-width: 1280px) {
+  /* Desktop: sticky positioning alongside article only when it has content */
+  @media (min-width: 1280px) {
+    .toc-sidebar {
       display: block;
+      width: 0;
+      opacity: 0;
+      flex-shrink: 0;
+      align-self: flex-start;
       position: sticky;
-      top: 5rem; /* Account for header */
-      float: left;
-      width: 180px;
-      margin-left: calc(-180px - 3rem); /* Extend into left margin */
-      margin-right: 3rem;
+      top: 5rem;
+      margin-top: 2rem;
+      transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .toc-sidebar:has(nav) {
+      width: 220px;
+      opacity: 1;
     }
   }
 
-  /* Article stays in normal flow (full width of main; body copy uses .entry-body) */
+  /* Article stays in normal flow */
   .toc-layout-grid > article {
     grid-area: content;
-    max-width: none;
+    max-width: 900px;
     width: 100%;
   }
 
@@ -416,5 +433,93 @@
 
   .ghost-back-to-top-btn {
     cursor: pointer;
+  }
+
+  /* ── THE LIBRARY CARD ── */
+  .library-card-toc {
+    background-color: rgb(var(--color-card)); /* Riso Cream */
+    width: 220px;
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    box-shadow: 2px 4px 12px rgba(var(--color-shadow), 0.15);
+    position: relative;
+    /* Removed tilt per user request */
+    
+    /* Library Card Ruling Lines */
+    background-image: 
+      linear-gradient(rgb(var(--color-accent)) 2px, transparent 2px); /* Red top line */
+    background-position: 0 3rem;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    
+    border-radius: 2px;
+    animation: slideInToc 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+
+  @keyframes slideInToc {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ── TOC TYPOGRAPHY ── */
+  .toc-header {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgb(var(--color-placeholder));
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .toc-link {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: rgba(var(--color-text-base), 0.7);
+    text-decoration: none;
+    display: block;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  /* ── ACTIVE & HOVER STATES ── */
+  .toc-link:hover {
+    color: rgb(var(--color-text-base));
+  }
+
+  /* The active section gets the "red pen" treatment */
+  .toc-item.active .toc-link {
+    color: rgb(var(--color-accent));
+    /* Faux-bold without layout shift */
+    text-shadow: 0.3px 0 0 currentColor;
+  }
+
+  /* Optional: Faux red dot next to active item */
+  .toc-item.active .toc-link::before {
+    content: '';
+    position: absolute;
+    left: -14px;
+    top: calc(50% - 3px);
+    width: 6px;
+    height: 6px;
+    background-color: rgb(var(--color-accent));
+    border-radius: 50%;
+    opacity: 0.8;
   }
 }

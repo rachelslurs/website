@@ -708,22 +708,22 @@ a.skip-to-content-board:focus {
 @keyframes board-content-out {
   from {
     opacity: 1;
-    transform: translateY(0) rotate(0deg);
+    transform: translateY(0);
   }
   to {
     opacity: 0;
-    transform: translateY(10px) rotate(0.35deg);
+    transform: translateY(10px);
   }
 }
 
 @keyframes board-content-in {
   from {
     opacity: 0;
-    transform: translateY(14px) rotate(-0.35deg);
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) rotate(0deg);
+    transform: translateY(0);
   }
 }
 
@@ -1037,7 +1037,6 @@ a.skip-to-content-board:focus {
 
 .analog-prose code:not(pre code) {
   font-family: var(--mono);
-  font-size: 13px;
   background-color: rgba(255, 181, 17, 0.35);
   padding: 2px 4px;
   border-radius: 2px;

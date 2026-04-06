@@ -7,11 +7,15 @@ interface TocItem {
 }
 
 export default function TableOfContents() {
-  const [activeId, setActiveId] = useState<string>(
-    typeof window !== "undefined" ? window.location.hash.slice(1) : ""
-  );
+  const [activeId, setActiveId] = useState<string>("");
   const [tocItems, setTocItems] = useState<TocItem[]>([]);
   const isScrollingRef = useRef(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash) {
+      setActiveId(window.location.hash.slice(1));
+    }
+  }, []);
 
   // Extract headings on mount
   useEffect(() => {
@@ -201,29 +205,23 @@ export default function TableOfContents() {
   };
 
   return (
-    <nav className="toc-nav" aria-label="Table of contents">
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-skin-base">
-        Table of Contents
-      </h2>
-      <ul className="space-y-2 text-sm">
+    <nav
+      className="library-card-toc pushpin pp-blk"
+      aria-label="Table of contents"
+    >
+      <div className="toc-header">CONTENTS</div>
+      <ul className="toc-list">
         {tocItems.map(item => (
           <li
             key={item.id}
+            className={`toc-item ${activeId === item.id ? "active" : ""}`}
             style={{
               paddingLeft: `${(item.level - 2) * 0.75}rem`,
             }}
           >
             <a
               href={`#${item.id}`}
-              className={`block border-l-2 py-1 transition-colors duration-300 ease-in-out ${
-                activeId === item.id
-                  ? "active border-skin-accent font-bold text-skin-accent"
-                  : "border-transparent font-normal text-skin-base/70 hover:text-skin-accent"
-              }`}
-              style={{
-                paddingLeft: "0.75rem",
-                marginLeft: "-0.75rem",
-              }}
+              className="toc-link"
               onClick={e => handleClick(e, item.id)}
               aria-current={activeId === item.id ? "location" : undefined}
             >

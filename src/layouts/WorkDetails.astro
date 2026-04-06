@@ -7,6 +7,7 @@ import CollectionEntryHeader from "@components/CollectionEntryHeader.astro";
 import PostFooterTagLinks from "@components/riso/PostFooterTagLinks";
 import GhostEntryBack from "@components/riso/GhostEntryBack";
 import GhostBackToTop from "@components/riso/GhostBackToTop";
+import PostPagination from "@components/riso/PostPagination";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import { SITE } from "@config";
@@ -131,70 +132,17 @@ const tagItems = tags.map(t => ({ slug: slugifyStr(t), label: t }));
                 >
                 </div>
               </div>
+
+              <PostPagination
+                prevPost={prevWork}
+                nextPost={nextWork}
+                hrefBase="/work"
+                navLabel="Work navigation"
+                client:load
+              />
             </div>
           </div>
         </article>
-      </div>
-
-      <hr class="my-6 border-dashed" />
-
-      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        {
-          prevWork && (
-            <a
-              href={`/work/${prevWork.slug}`}
-              class="flex w-full gap-1 hover:opacity-75"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-left flex-none"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M15 6l-6 6l6 6" />
-              </svg>
-              <div>
-                <span>Previous</span>
-                <div class="text-sm text-skin-accent/85">{prevWork.title}</div>
-              </div>
-            </a>
-          )
-        }
-        {
-          nextWork && (
-            <a
-              href={`/work/${nextWork.slug}`}
-              class="flex w-full justify-end gap-1 text-right hover:opacity-75 sm:col-start-2"
-            >
-              <div>
-                <span>Next</span>
-                <div class="text-sm text-skin-accent/85">{nextWork.title}</div>
-              </div>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                class="icon icon-tabler icons-tabler-outline icon-tabler-chevron-right flex-none"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M9 6l6 6l-6 6" />
-              </svg>
-            </a>
-          )
-        }
       </div>
     </main>
   </RisoBoardShell>
