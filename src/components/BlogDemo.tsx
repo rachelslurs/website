@@ -19,10 +19,10 @@ export default function BlogDemo({ children, wide = false }: BlogDemoProps) {
   return (
     // We use a <figure> to semantically represent an inserted diagram/demo.
     // The "group" class allows us to style child elements based on the wrapper's hover state if needed.
+    // Physical paper metaphor: sharp borders, slight shadow, graph grid
     <figure
       className={`
         group not-prose relative z-10 my-10 w-full max-w-none
-        /* Physical Paper Metaphor: Sharp borders, slight shadow, graph grid */
         border border-skin-line/40 bg-skin-fill
         p-4 sm:p-6 lg:p-8
         shadow-[2px_4px_12px_rgba(var(--color-shadow),0.08)]
