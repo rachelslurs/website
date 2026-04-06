@@ -255,19 +255,30 @@ const tagItems = tags.map(t => ({ slug: slugifyStr(t), label: t }));
       document.querySelectorAll(
         "h2, h3:not([data-exclude-heading-link]), h4:not([data-exclude-heading-link]), h5:not([data-exclude-heading-link]), h6:not([data-exclude-heading-link])"
       )
-    ).filter(h => !h.closest("astro-island"));
+    ).filter(
+      h =>
+        !h.closest("astro-island") &&
+        typeof h.id === "string" &&
+        h.id.length > 0
+    );
 
     for (let heading of headings) {
       heading.classList.add("group");
       let link = document.createElement("a");
       link.className = "ml-2 heading-link";
-      let linkSpan = document.createElement("span");
-      linkSpan.innerText = "#";
-      let ariaText = document.createElement("span");
-      ariaText.className = "sr-only focus:not-sr-only";
-      ariaText.innerText = `Link to section titled: ${heading.textContent}`;
+      const clone = heading.cloneNode(true);
+      clone.querySelectorAll(".heading-link").forEach(el => el.remove());
+      const sectionTitle = (clone.textContent ?? "").replace(/#/g, "").trim();
+      link.setAttribute(
+        "aria-label",
+        sectionTitle
+          ? `Link to section: ${sectionTitle}`
+          : "Link to this section"
+      );
       link.href = "#" + heading.id;
-      link.appendChild(ariaText);
+      let linkSpan = document.createElement("span");
+      linkSpan.textContent = "#";
+      linkSpan.setAttribute("aria-hidden", "true");
       link.appendChild(linkSpan);
       heading.appendChild(link);
     }
