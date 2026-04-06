@@ -3,11 +3,14 @@
 @tailwind utilities;
 
 @layer base {
+  /* Root for all `rem` values (Tailwind spacing, text-base = 1rem, typography plugin, etc.) */
   html {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   :root {
+    /* Looseleaf / ghost nav line rhythm (~1.75× body); scales if `html` font-size changes */
+    --analog-baseline: 1.75rem;
     --spacing: 0.25rem;
     --color-fill: 255, 255, 255; /* white — page bg, form fields */
     --color-cork: 196, 169, 125; /* kraft/cork — board surface */
@@ -385,7 +388,7 @@
   .header-zone,
   .footer-zone {
     position: relative;
-    --baseline: 28px;
+    --baseline: var(--analog-baseline);
   }
 
   .ghost-btn-wrapper {

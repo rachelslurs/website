@@ -150,7 +150,7 @@
   line-height: 1.05;
 }
 .hero-body {
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.6;
   color: var(--ink-secondary);
 }
@@ -259,7 +259,7 @@
 /* ── QUOTE ── */
 .quote-text {
   font-family: var(--serif);
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.4;
   text-align: center;
   color: var(--ink-muted);
@@ -704,7 +704,7 @@
 
 /* ── BLOG POST (PostDetails): cream “looseleaf” paper + baseline-grid prose */
 .analog-post {
-  --baseline: 28px;
+  --baseline: var(--analog-baseline);
   --analog-ink: #1a1a2e;
   --analog-body: var(--ink-secondary);
 }
@@ -871,7 +871,7 @@
   max-width: 600px;
   margin: 0 auto;
   font-family: var(--sans);
-  font-size: 16px;
+  font-size: 1rem;
   line-height: var(--baseline);
   color: var(--analog-body);
 }
