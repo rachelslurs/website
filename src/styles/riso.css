@@ -759,6 +759,8 @@ a.skip-to-content-board:focus {
   color: var(--analog-ink);
   padding: var(--baseline) 4rem calc(var(--baseline) * 4) 4rem;
   box-shadow: 4px 10px 24px rgba(0, 0, 0, 0.25);
+  /* Stack above index-card pagination (z-index 5) so cards tuck under this edge */
+  z-index: 10;
 }
 
 @media (max-width: 768px) {
