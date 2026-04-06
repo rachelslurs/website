@@ -15,6 +15,7 @@ type NodeDef = {
   sub: string | null;
 };
 
+/** Wider bands than ConstraintLayers for label padding; centered in 500px canvas. */
 const DS_NODE_W = 252;
 const DS_ORIGIN_X = (500 - DS_NODE_W) / 2;
 
@@ -77,6 +78,7 @@ const CAPTIONS = [
   "JSX out. Top to bottom. Done.",
 ];
 
+/** Match ConstraintLayers: 240× bands, rgba fill + thin stroke on the rect. */
 const ACTIVE_FILL = { fill: "rgba(var(--color-chart-3), 0.1)" } as const;
 const INACTIVE_RECT =
   "fill-skin-card-muted/12 stroke-skin-card-muted/35 stroke-[0.5]";
@@ -99,42 +101,41 @@ function NodeRect({
 
   return (
     <g
-      className={active ? "opacity-100" : "opacity-30"}
-      style={{ transition: "opacity 0.4s ease" }}
+      className={active ? "opacity-100" : "opacity-25"}
+      style={{ transition: "opacity 0.5s ease" }}
     >
-      {/* Removed rounded corners (rx=10) for a sharper, printed schematic look */}
       <rect
         x={x}
         y={y}
         width={w}
         height={h}
-        rx={2}
+        rx={10}
         style={active ? ACTIVE_FILL : undefined}
         className={`${
           active
-            ? "stroke-skin-chart-3 stroke-2 transition-all duration-500 ease-in-out"
+            ? "stroke-skin-chart-3 transition-all duration-500 ease-in-out"
             : `${INACTIVE_RECT} transition-all duration-500 ease-in-out`
         } ${highlight ? "[filter:url(#glow-ds)]" : ""}`}
+        strokeWidth={active ? 0.8 : undefined}
       />
       {sub ? (
         <text
           x={cx}
           y={y + h / 2}
           textAnchor="middle"
-          className={`transition-[fill] duration-500 ease-in-out ${active ? "fill-skin-chart-3" : "fill-skin-placeholder"}`}
+          className={`transition-[fill] duration-500 ease-in-out ${
+            active ? "fill-skin-chart-3" : "fill-skin-placeholder"
+          }`}
         >
-          {/* Use font-mono for schematic text */}
-          <tspan
-            x={cx}
-            dy="-10"
-            className="font-mono text-sm font-bold tracking-tight"
-          >
+          <tspan x={cx} dy="-10" className="text-base font-semibold">
             {label}
           </tspan>
           <tspan
             x={cx}
-            dy="20"
-            className={`font-mono text-xs ${active ? "fill-skin-chart-3 opacity-80" : "fill-skin-placeholder"}`}
+            dy="22"
+            className={`text-sm font-normal ${
+              active ? "fill-skin-chart-3 opacity-70" : "fill-skin-placeholder"
+            }`}
           >
             {sub}
           </tspan>
@@ -145,7 +146,9 @@ function NodeRect({
           y={y + h / 2}
           textAnchor="middle"
           dominantBaseline="central"
-          className={`font-mono text-sm font-bold tracking-tight transition-[fill] duration-500 ease-in-out ${active ? "fill-skin-chart-3" : "fill-skin-placeholder"}`}
+          className={`text-base font-semibold transition-[fill] duration-500 ease-in-out ${
+            active ? "fill-skin-chart-3" : "fill-skin-placeholder"
+          }`}
         >
           {label}
         </text>
@@ -178,8 +181,8 @@ function EdgePath({
       fill="none"
       className={
         active
-          ? "stroke-skin-chart-3 stroke-[2] opacity-80 transition-all duration-500 ease-in-out"
-          : "stroke-skin-card-muted/40 stroke-[1] opacity-30 transition-all duration-500 ease-in-out"
+          ? "stroke-skin-chart-3 stroke-[1.5] opacity-60 transition-all duration-500 ease-in-out"
+          : "stroke-skin-card-muted/30 stroke-[0.8] opacity-15 transition-all duration-500 ease-in-out"
       }
       markerEnd={active ? "url(#arr-green-ds)" : "url(#arr-muted-ds)"}
     />
@@ -195,7 +198,7 @@ function PlayIcon() {
       fill="none"
       className="inline-block"
     >
-      <path d="M2.5 1L10 6L2.5 11V1Z" className="fill-skin-fill" />
+      <path d="M2.5 1L10 6L2.5 11V1Z" className="fill-skin-base" />
     </svg>
   );
 }
@@ -209,8 +212,22 @@ function PauseIcon() {
       fill="none"
       className="inline-block"
     >
-      <rect x="2" y="1" width="3" height="10" className="fill-skin-fill" />
-      <rect x="7" y="1" width="3" height="10" className="fill-skin-fill" />
+      <rect
+        x="2"
+        y="1"
+        width="2.5"
+        height="10"
+        rx="0.5"
+        className="fill-skin-base"
+      />
+      <rect
+        x="7.5"
+        y="1"
+        width="2.5"
+        height="10"
+        rx="0.5"
+        className="fill-skin-base"
+      />
     </svg>
   );
 }
@@ -251,17 +268,15 @@ export default function DerivedState() {
   });
 
   return (
-    // Removed the outer rounded border/bg classes since BlogDemo handles the physical wrapper now
-    <div className="font-sans text-skin-base">
-      <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-[minmax(0,1fr)_260px] md:items-start md:gap-x-10">
-        {/* Left Column: SVG Chart */}
-        <div className="w-full max-w-sm justify-self-center md:justify-self-start">
+    <div className="rounded-xl border border-skin-line/10 bg-skin-fill p-4 font-sans text-skin-base sm:p-6">
+      <div className="grid w-full max-w-3xl grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_240px] md:items-start md:gap-x-7 md:gap-y-0">
+        <div className="min-w-0 w-full max-w-xs justify-self-start">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 500 400"
             className="w-full"
             role="img"
-            aria-label="Derived state flow chart"
+            aria-label="Derived state: a straight top-to-bottom data flow with no side effects"
           >
             <defs>
               <marker
@@ -278,8 +293,8 @@ export default function DerivedState() {
                   fill="none"
                   className="stroke-skin-chart-3"
                   strokeWidth="2"
-                  strokeLinecap="square"
-                  strokeLinejoin="miter"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </marker>
               <marker
@@ -294,20 +309,22 @@ export default function DerivedState() {
                 <path
                   d="M2 1L8 5L2 9"
                   fill="none"
-                  className="stroke-skin-card-muted/40"
+                  className="stroke-skin-card-muted/35"
                   strokeWidth="2"
-                  strokeLinecap="square"
-                  strokeLinejoin="miter"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </marker>
               <filter id="glow-ds">
-                <feGaussianBlur stdDeviation="4" result="blur" />
+                <feGaussianBlur stdDeviation="3" result="blur" />
                 <feMerge>
                   <feMergeNode in="blur" />
                   <feMergeNode in="SourceGraphic" />
                 </feMerge>
               </filter>
             </defs>
+
+            <rect width="500" height="400" rx="12" className="fill-skin-fill" />
 
             <g transform="translate(0, 4)">
               {EDGES.map(e => (
@@ -329,47 +346,37 @@ export default function DerivedState() {
           </svg>
         </div>
 
-        {/* Right Column: Controls & Commentary */}
-        <div className="w-full pt-2">
-          <div className="mb-6 flex w-full flex-wrap items-center justify-between gap-4 border-b border-skin-line/20 pb-4">
-            {/* Hardened, industrial button styling */}
+        <div className="w-full min-w-0 pt-1">
+          <div className="flex w-full min-w-0 items-center justify-between gap-4">
             <button
               type="button"
-              className={`
-                flex shrink-0 items-center gap-2 border-[2px] border-skin-base px-4 py-1.5 font-mono text-xs font-bold uppercase tracking-wider transition-all
-                ${playing ? "bg-skin-base text-skin-fill" : "bg-skin-card text-skin-base hover:bg-skin-card-muted/30"}
-                active:translate-y-[2px]
-              `}
+              className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-skin-card-muted/60 bg-skin-card px-3.5 py-1.5 text-sm font-medium text-skin-base hover:bg-skin-card-muted/50"
               onClick={() => setPlaying(p => !p)}
             >
               {playing ? <PauseIcon /> : <PlayIcon />}
               {playing ? "Pause" : "Play"}
             </button>
-
-            <label className="flex cursor-pointer select-none items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-skin-base opacity-80">
+            <label className="flex shrink-0 cursor-pointer select-none items-center gap-2 whitespace-nowrap text-sm text-skin-placeholder">
               <input
                 type="checkbox"
-                className="h-4 w-4 cursor-pointer rounded-sm border-2 border-skin-base bg-skin-fill text-skin-base focus:ring-skin-accent"
+                className="h-4 w-4 cursor-pointer [accent-color:rgb(var(--color-chart-3))]"
                 checked={showCommentary}
                 onChange={e => setShowCommentary(e.target.checked)}
               />
-              Notes
+              Commentary
             </label>
           </div>
 
           {showCommentary && (
-            <div className="flex flex-col gap-2">
+            <div className="mt-3.5">
               {CAPTIONS.map((caption, i) => {
                 const isActive = i === currentStep;
                 const isPast = i < currentStep;
                 return (
                   <div
                     key={i}
-                    className={`
-                      cursor-pointer border-l-[3px] py-2 pl-4 transition-all duration-300
-                      ${isActive ? "border-skin-chart-3 bg-skin-chart-3/5" : "border-skin-card-muted/20 hover:border-skin-card-muted/50"}
-                    `}
-                    style={{ opacity: isActive ? 1 : isPast ? 0.6 : 0.3 }}
+                    className="cursor-pointer border-b border-skin-card-muted/20 py-2 transition-opacity duration-300 last:border-b-0"
+                    style={{ opacity: isActive ? 1 : isPast ? 0.45 : 0.2 }}
                     onClick={() => {
                       setStep(i);
                       setPlaying(false);
@@ -383,10 +390,12 @@ export default function DerivedState() {
                     role="button"
                     tabIndex={0}
                   >
-                    <div className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-skin-placeholder">
-                      {i === currentStep ? "▶ Executing" : `Step ${i + 1}`}
+                    <div className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-skin-base opacity-70">
+                      Step {i + 1}
                     </div>
-                    <div className="text-sm font-medium leading-snug text-skin-base">
+                    <div
+                      className={`text-sm leading-snug ${isActive ? "text-skin-base" : "text-skin-placeholder"}`}
+                    >
                       {caption}
                     </div>
                   </div>

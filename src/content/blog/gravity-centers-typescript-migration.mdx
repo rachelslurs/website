@@ -12,7 +12,7 @@ tags:
   - architecture
   - engineering
 ---
-
+import BlogDemo from "@components/BlogDemo";
 import GravityTree from "@components/demo/GravityTree";
 
 **TL;DR:** The files that matter most in a TypeScript migration are *gravity centers* — the small number of core infrastructure files everything else depends on. Type those first, and type information flows down into the rest of the codebase automatically. Most migrations fail to gain traction because they start at the leaves instead of the roots.
@@ -34,7 +34,9 @@ A gravity center is a piece of code that many other files depend on. When you ty
 This is what file-by-file migration gets backwards. Starting with leaf components means pushing types upward against the direction dependencies actually flow. Starting with core infrastructure means types flow down into everything that touches it.
 
 The tree below shows what that looks like in practice: type a node near the root and watch how far the information reaches.
+<BlogDemo wide>
 <GravityTree client:load />
+</BlogDemo>
 
 ## The Three Gravity Centers That Actually Matter
 

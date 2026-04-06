@@ -9,29 +9,26 @@ type BlogDemoProps = {
   wide?: boolean;
 };
 
+/** Escape `.analog-prose`’s 600px column: wider box + equal negative L/R margins keeps the card centered. */
+const BREAKOUT_DEFAULT =
+  "sm:w-[calc(100%+2rem)] sm:-mx-4 md:w-[calc(100%+4rem)] md:-mx-8";
+const BREAKOUT_WIDE =
+  "sm:w-[calc(100%+4rem)] sm:-mx-8 md:w-[calc(100%+8rem)] md:-mx-16 lg:w-[calc(100%+10rem)] lg:-mx-20";
+
 export default function BlogDemo({ children, wide = false }: BlogDemoProps) {
   return (
     // We use a <figure> to semantically represent an inserted diagram/demo.
     // The "group" class allows us to style child elements based on the wrapper's hover state if needed.
     <figure
       className={`
-        group not-prose relative z-10 my-10 w-full
+        group not-prose relative z-10 my-10 w-full max-w-none
         /* Physical Paper Metaphor: Sharp borders, slight shadow, graph grid */
         border border-skin-line/40 bg-skin-fill
         p-4 sm:p-6 lg:p-8
         shadow-[2px_4px_12px_rgba(var(--color-shadow),0.08)]
         bg-[linear-gradient(rgba(var(--color-text-base),0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(var(--color-text-base),0.04)_1px,transparent_1px)]
         bg-[size:20px_20px]
-        
-        /* RESPONSIVE BREAKOUT MATH */
-        /* On mobile: standard w-full */
-        /* On tablet (md): Break out 2rem on each side */
-        /* On desktop (lg) + wide prop: Break out 3rem on each side */
-        ${
-          wide
-            ? "md:w-[calc(100%+4rem)] md:-ml-8 lg:w-[calc(100%+6rem)] lg:-ml-12"
-            : "md:w-[calc(100%+2rem)] md:-ml-4"
-        }
+        ${wide ? BREAKOUT_WIDE : BREAKOUT_DEFAULT}
       `}
     >
       {/* Analog Tape Details: Top Left and Bottom Right */}
