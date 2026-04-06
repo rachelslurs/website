@@ -9,7 +9,6 @@ function withOpacity(variableName) {
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode:  ['selector', '[data-theme="dark"]'],
   content: ["./src/**/*.{astro,html,js,jsx,md,mdx,ts,tsx}"],
   theme: {
     // Remove the following screen breakpoint or add other breakpoints
@@ -17,6 +16,20 @@ module.exports = {
     
 
     extend: {
+      colors: {
+        riso: {
+          red: "#E8453C",
+          blue: "#0078BF",
+          yellow: "#FFB511",
+          green: "#00A95C",
+          pink: "#F5A0B1",
+          orange: "#F47A2D",
+          violet: "#7B68AE",
+          black: "#1A1A2E",
+          cream: "#F5F0E8",
+          cork: "#C4A97D",
+        },
+      },
       spacing: {
         "spacing": "var(--spacing)",
       },
@@ -115,8 +128,9 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ["Lato", "ui-sans-serif", "system-ui", "sans-serif"],
-        mono: ["IBM Plex Mono", "ui-monospace", "SFMono-Regular", "monospace"],
+        sans: ["DM Sans", "ui-sans-serif", "system-ui", "sans-serif"],
+        serif: ["Playfair Display", "Georgia", "serif"],
+        mono: ["Space Mono", "ui-monospace", "SFMono-Regular", "monospace"],
       },
 
       boxShadow: {
@@ -137,6 +151,7 @@ module.exports = {
             maxWidth: 'var(--max-3xl)',
             lineHeight: '1.75',
             fontSize: '1.1rem',
+            fontFamily: "'DM Sans', ui-sans-serif, system-ui, sans-serif",
             color: 'rgb(var(--color-text-base))',
             'a:hover': {
               color: 'rgb(var(--color-accent))',
@@ -154,9 +169,10 @@ module.exports = {
             'h1, h2, h3, h4, h5, h6': {
               fontWeight: '600',
               letterSpacing: '-0.003em',
+              fontFamily: 'Playfair Display, Georgia, serif',
             },
             code: {
-              fontFamily: 'IBM Plex Mono, monospace',
+              fontFamily: 'Space Mono, monospace',
               backgroundColor: 'rgba(var(--color-text-base), 0.05)',
               padding: '0.2em 0.4em',
               borderRadius: '4px',
@@ -177,7 +193,7 @@ module.exports = {
               fontSize: '0.95rem',
             },
             'blockquote > p, blockquote > ul > li, blockquote > ol > li': {
-              fontFamily: 'IBM Plex Mono, monospace',
+              fontFamily: 'Space Mono, monospace',
             },
 
             'hr': {

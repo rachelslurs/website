@@ -6,7 +6,7 @@ export const SITE: Site = {
   profile: "https://rachel.fyi",
   desc: "Product engineer with 14+ years of experience. I build across the full stack and write about accessibility, architecture, and developer tooling.",
   title: "Rachel Cantor",
-  lightAndDarkMode: true,
+  lightAndDarkMode: false,
   postPerPage: 3,
   scheduledPostMargin: 15 * 60 * 1000, // 15 minutes
   showArchives: true,

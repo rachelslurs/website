@@ -25,7 +25,7 @@ const Checkbox = ({
         checked={checked}
         onChange={e => onChange(e.target.checked)}
         disabled={disabled}
-        className="w-4 h-4 rounded cursor-pointer text-skin-base dark:text-skin-accent"
+        className="w-4 h-4 rounded cursor-pointer text-skin-accent"
       />
       <div className="flex flex-col items-start shrink-0">
         <span className="text-xs font-black uppercase tracking-widest text-skin-foreground">

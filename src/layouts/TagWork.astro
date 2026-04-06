@@ -17,11 +17,7 @@ export interface Props {
 const { page, tag, tagName } = Astro.props;
 ---
 
-<Layout
-  title={`Tech: ${tagName} | ${SITE.title}`}
-  activeNav="work"
-  footerNoMarginTop={page.lastPage > 1}
->
+<Layout title={`Tech: ${tagName} | ${SITE.title}`}>
   <Main
     pageTitle={[`Tech:`, `${tagName}`]}
     titleTransition={tag}
