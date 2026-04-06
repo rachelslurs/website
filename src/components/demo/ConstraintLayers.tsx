@@ -2,7 +2,7 @@ const ConstraintLayers = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 840 330"
-    className="w-full"
+    className="w-full font-sans"
     role="img"
     aria-label="Three layers of constraint enforcement: editor rules shape generation, lint rules block commits, CI blocks merges"
   >

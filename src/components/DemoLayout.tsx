@@ -20,7 +20,7 @@ export default function DemoLayout({
 }: DemoLayoutProps) {
   return (
     <div
-      className={`w-full max-w-6xl mx-auto my-4 overflow-visible ${className}`}
+      className={`w-full max-w-6xl mx-auto my-4 overflow-visible font-sans text-skin-base ${className}`}
     >
       <div className="mb-4">
         <div className="flex justify-between items-baseline">

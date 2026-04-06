@@ -35,7 +35,7 @@ function ExpressDeliveryForm({
 
   return (
     <div
-      className={`w-full max-w-[520px] min-h-[180px] md:min-h-[250px] rounded-xl md:rounded-2xl shadow-lg md:shadow-xl relative overflow-hidden border-2 transition-all flex flex-col bg-skin-card shrink-0 ${isOptimistic ? "border-skin-line/70 ring-4 md:ring-8 ring-skin-accent/10" : "border-skin-line/70"}`}
+      className={`w-full max-w-[26rem] min-h-[9rem] md:min-h-[12.5rem] rounded-xl md:rounded-2xl shadow-lg md:shadow-xl relative overflow-hidden border-2 transition-all flex flex-col bg-skin-card shrink-0 ${isOptimistic ? "border-skin-line/70 ring-4 md:ring-8 ring-skin-accent/10" : "border-skin-line/70"}`}
     >
       <AnimatePresence>
         {showDriftNotification && (
@@ -87,7 +87,7 @@ function ExpressDeliveryForm({
               </div>
             )}
             {step > 0 && (isOptimistic || step === 6) && (
-              <div className="relative min-h-[1.25rem] md:min-h-[1.5rem] flex items-center justify-center w-full">
+              <div className="relative flex min-h-5 w-full items-center justify-center md:min-h-6">
                 <p
                   className={`font-mono font-bold text-base md:text-xl transition-all duration-500 ${
                     step < 6

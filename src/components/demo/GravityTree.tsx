@@ -453,7 +453,7 @@ const MobileGravityCard = memo(
       aria-pressed={active}
       onClick={onTap}
       onKeyDown={onKeyDown}
-      className={`flex-1 min-w-0 rounded-[7px] cursor-pointer px-2.5 py-2 transition-all duration-200 ease-out border focus:outline-none focus-visible:ring-2 focus-visible:ring-skin-accent focus-visible:ring-offset-2 focus-visible:ring-offset-skin ${
+      className={`flex-1 min-w-0 cursor-pointer rounded-md border px-2.5 py-2 transition-all duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-skin-accent focus-visible:ring-offset-2 focus-visible:ring-offset-skin ${
         active
           ? `border-[1.75px] ${chartBgAlphaClass(g.id)} ${chartBorderClass(g.id)} ${chartShadowClass(g.id)}`
           : "border-[0.75px] border-skin-line bg-skin-card"
@@ -555,12 +555,12 @@ export default function GravityTree() {
   return (
     <div
       ref={containerRef}
-      className={`min-h-screen flex flex-col items-center justify-center font-mono bg-skin-fill ${mobile ? "p-4 pb-[100px]" : "p-6"}`}
+      className={`min-h-screen flex flex-col items-center justify-center font-mono bg-skin-fill ${mobile ? "p-4 pb-[5rem]" : "p-6"}`}
     >
       <svg
         ref={diagramRef}
         viewBox={`0 0 ${mobile ? 320 : SVG_W} ${SVG_H}`}
-        className="w-full max-w-[780px]"
+        className="w-full max-w-3xl"
         role="img"
         aria-label="File tree diagram showing gravity centers: API Client, Routing Layer, and Analytics Layer"
       >

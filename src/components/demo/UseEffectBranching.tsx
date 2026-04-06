@@ -516,7 +516,7 @@ function LegendItem({
 }) {
   const s = LEGEND_STYLES[variant];
   const swatchClass = warn
-    ? "h-[22px] min-w-[24px] rounded-[5px] text-sm font-extrabold"
+    ? "h-6 min-w-6 rounded-sm text-sm font-extrabold"
     : "h-3 w-3 rounded-sm text-xs font-bold";
   return (
     <div className="flex items-center gap-2">
@@ -590,7 +590,7 @@ function UseEffectBranching() {
 
   return (
     <div className="rounded-xl border border-skin-line/10 bg-skin-fill p-4 font-sans text-skin-base sm:p-6">
-      <div className="grid w-full max-w-[780px] grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_240px] md:items-start md:gap-x-7 md:gap-y-0">
+      <div className="grid w-full max-w-3xl grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_240px] md:items-start md:gap-x-7 md:gap-y-0">
         <div className="min-w-0 w-full">
           <svg
             xmlns="http://www.w3.org/2000/svg"

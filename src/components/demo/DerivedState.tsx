@@ -269,8 +269,8 @@ export default function DerivedState() {
 
   return (
     <div className="rounded-xl border border-skin-line/10 bg-skin-fill p-4 font-sans text-skin-base sm:p-6">
-      <div className="grid w-full max-w-[780px] grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_240px] md:items-start md:gap-x-7 md:gap-y-0">
-        <div className="min-w-0 w-full max-w-[380px] justify-self-start">
+      <div className="grid w-full max-w-3xl grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_240px] md:items-start md:gap-x-7 md:gap-y-0">
+        <div className="min-w-0 w-full max-w-xs justify-self-start">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 500 340"

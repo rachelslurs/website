@@ -185,7 +185,7 @@ export default function StreamingChatFixed() {
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="flex h-[320px] flex-col gap-3 overflow-y-auto p-4"
+          className="flex h-[16rem] flex-col gap-3 overflow-y-auto p-4"
         >
           {messages.map((msg, i) => (
             <StreamingChatBubble

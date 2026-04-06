@@ -221,7 +221,7 @@ export default function ScrollThrashingDemo() {
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="flex h-[280px] flex-col gap-3 overflow-y-auto p-4"
+          className="flex h-[14rem] flex-col gap-3 overflow-y-auto p-4"
         >
           {messages.map((msg, i) => (
             <StreamingChatBubble

@@ -49,13 +49,10 @@ export default function DraggableItem({
         select-none
         font-medium
         text-sm
+        touch-none
         ${compact ? "w-full" : "inline-block"}
-        relative
+        ${isDragging ? "fixed" : "relative"}
       `}
-      style={{
-        touchAction: "none",
-        position: isDragging ? "fixed" : "relative",
-      }}
     >
       {label}
     </motion.div>
