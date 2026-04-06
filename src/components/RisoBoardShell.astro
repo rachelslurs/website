@@ -15,7 +15,7 @@ const { animateNav = false } = Astro.props;
   Skip to content
 </a>
 <div class="board-page-outer mx-auto w-full max-w-[1200px] p-4 max-sm:p-2">
-  <main
+  <div
     class="board relative flex flex-col gap-8 overflow-hidden px-10 pb-10 pt-8 max-lg:p-6 max-sm:gap-5 max-sm:p-4"
   >
     <!-- Persist grain + blobs only: full-shell persist breaks in-page link navigation. -->
@@ -43,5 +43,5 @@ const { animateNav = false } = Astro.props;
       </div>
       <Footer />
     </div>
-  </main>
+  </div>
 </div>

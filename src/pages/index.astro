@@ -54,14 +54,16 @@ const portfolioDemos = homeDemosRaw.map(entry => ({
 
 <Layout>
   <RisoBoardShell animateNav>
-    <PortfolioBoard
-      client:load
-      heroHeadline="I make the web feel like something."
-      heroBody={SITE.desc}
-      quote="Design-minded frontend engineer"
-      posts={portfolioPosts}
-      work={portfolioWork}
-      demos={portfolioDemos}
-    />
+    <main id="main-content" class="app-layout board-slot">
+      <PortfolioBoard
+        client:load
+        heroHeadline="I make the web feel like something."
+        heroBody={SITE.desc}
+        quote="Design-minded frontend engineer"
+        posts={portfolioPosts}
+        work={portfolioWork}
+        demos={portfolioDemos}
+      />
+    </main>
   </RisoBoardShell>
 </Layout>
