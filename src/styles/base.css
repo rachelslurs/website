@@ -3,9 +3,10 @@
 @tailwind utilities;
 
 @layer base {
-  /* Root for all `rem` values (Tailwind spacing, text-base = 1rem, typography plugin, etc.) */
+  /* Root for all `rem` values (Tailwind spacing, text-base = 1rem, typography plugin, etc.).
+     Percentage preserves user agent / accessibility font-size preferences (unlike a fixed px root). */
   html {
-    font-size: 20px;
+    font-size: 125%;
   }
 
   :root {
