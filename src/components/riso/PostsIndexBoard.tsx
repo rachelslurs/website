@@ -8,7 +8,10 @@ import React, {
 import { motion, useReducedMotion } from "framer-motion";
 import DymoLabel from "@components/riso/DymoLabel";
 import type { PortfolioPost } from "@components/PortfolioBoard";
-import { slugifyStr } from "@utils/slugify";
+import {
+  boardCardEntranceExtraRotateDeg,
+  boardCardRestRotationDeg,
+} from "@utils/cardRotation";
 import { seededOffset } from "@utils/seededOffset";
 
 /** Base delay before the first card (homepage waits for nav; /posts uses 0). */
@@ -26,18 +29,19 @@ const ROW_STEP_DEFAULT = 210;
 const TWINE_TOP_DEFAULT = 52;
 /** Pull stack nudges up so the bottom knot meets the twine (no visible gap). */
 const TWINE_PULL_STACK_OVERLAP = 10;
-const CARD_BASE_Y_DEFAULT = 104;
+/** Pull column height (knot + tail + margin + button) — tune if layout/CSS changes. */
+const PULL_STACK_HEIGHT_PX = 168;
+/** When all posts are shown: knot tail extends below the twine column end. */
+const BOTTOM_KNOT_TAIL_BELOW_TWINE_PX = 52;
+/** Extra vertical stripe length so the bottom knot + pull sit lower (tune visually). */
+const TWINE_EXTRA_LENGTH_PX = 130;
 const EDGE_PAD = 8;
 /** Below this width, add more vertical rhythm (RSS ↔ cards ↔ pull). */
 const NARROW_BOARD_MAX_PX = 640;
 const ROW_STEP_NARROW = 245;
 const TWINE_TOP_NARROW = 74;
+const CARD_BASE_Y_DEFAULT = 104;
 const CARD_BASE_Y_NARROW = 157;
-/** Extra twine below the last “row” before the pull / bottom knot. */
-const STRING_TRAILING_DEFAULT = 88;
-const STRING_TRAILING_NARROW = 120;
-/** Stacked layout: tail after last row (shorter than two-col but not stubby). */
-const STRING_TRAILING_STACKED = 80;
 const BOARD_BOTTOM_PAD_DEFAULT = 260;
 const BOARD_BOTTOM_PAD_NARROW = 300;
 /**
@@ -93,8 +97,8 @@ function DraggableCard({
   isVisible,
   dragDisabled,
   stagger,
-  animationIndex,
   tapeClass,
+  rotationSlug,
   children,
 }: {
   targetX: number;
@@ -104,14 +108,15 @@ function DraggableCard({
   isVisible: boolean;
   dragDisabled: boolean;
   stagger: number;
-  animationIndex: number;
+  /** Same slug as post URL — matches `.post-header-card` tilt on detail. */
+  rotationSlug: string;
   tapeClass: string;
   children: React.ReactNode;
 }) {
   const prefersReducedMotion = useReducedMotion();
   const restRot = useMemo(
-    () => seededOffset(animationIndex * 17, 2.5),
-    [animationIndex]
+    () => boardCardRestRotationDeg(rotationSlug),
+    [rotationSlug]
   );
   const [pos, setPos] = useState({ x: targetX, y: targetY });
   const [dragRot, setDragRot] = useState<number | null>(null);
@@ -120,7 +125,8 @@ function DraggableCard({
   const dragRef = useRef<HTMLDivElement>(null);
 
   const entranceVariants = useMemo(() => {
-    const hiddenRotate = restRot + seededOffset(animationIndex * 31, 6);
+    const hiddenRotate =
+      restRot + boardCardEntranceExtraRotateDeg(rotationSlug);
     return {
       hidden: {
         opacity: 0,
@@ -142,7 +148,7 @@ function DraggableCard({
         },
       }),
     };
-  }, [restRot, animationIndex]);
+  }, [restRot, rotationSlug]);
 
   const currentRot = dragRot !== null ? dragRot : restRot;
   const scale = isDragging ? 1.04 : isHovered && !dragDisabled ? 1.015 : 1;
@@ -211,7 +217,7 @@ function DraggableCard({
       }}
     >
       <motion.div
-        className={`board-card relative flex h-full min-h-0 min-w-0 flex-col select-none card-looseleaf ${tapeClass} ${shadowClass}`}
+        className={`board-card relative flex h-full min-h-0 min-w-0 flex-col select-none ${tapeClass} ${shadowClass}`}
         variants={entranceVariants}
         custom={stagger}
         initial={prefersReducedMotion ? "visible" : "hidden"}
@@ -265,21 +271,16 @@ export default function PostsIndexBoard({
     : narrowBoard
       ? TWINE_TOP_NARROW
       : TWINE_TOP_DEFAULT;
-  const cardBaseY = stacked
-    ? CARD_BASE_Y_STACKED
-    : narrowBoard
-      ? CARD_BASE_Y_NARROW
-      : CARD_BASE_Y_DEFAULT;
   const rowStep = stacked
     ? STACK_ROW_STEP
     : narrowBoard
       ? ROW_STEP_NARROW
       : ROW_STEP_DEFAULT;
-  const stringTrailing = stacked
-    ? STRING_TRAILING_STACKED
+  const cardBaseY = stacked
+    ? CARD_BASE_Y_STACKED
     : narrowBoard
-      ? STRING_TRAILING_NARROW
-      : STRING_TRAILING_DEFAULT;
+      ? CARD_BASE_Y_NARROW
+      : CARD_BASE_Y_DEFAULT;
   const boardBottomPad = narrowBoard
     ? BOARD_BOTTOM_PAD_NARROW
     : BOARD_BOTTOM_PAD_DEFAULT;
@@ -304,12 +305,35 @@ export default function PostsIndexBoard({
     setLoadMoreStatus(`${batch} more ${noun} loaded.`);
   }, [pageSize, remainingPosts]);
 
-  const stringHeight = Math.max(
-    260,
-    displayOrder.length * rowStep + stringTrailing
-  );
   const nPosts = displayOrder.length;
   const estCardH = stacked ? EST_CARD_H_STACKED : EST_CARD_H_TWO_COL;
+  /** Same as (top of first card − twine start): gap under top knot area to first card top. */
+  const topGap = cardBaseY - twineTop;
+  /**
+   * Twine length from topGap / last-card math, plus TWINE_EXTRA_LENGTH_PX so the pull + knot
+   * sit lower. Uses estCardH as stand-in for last card height.
+   */
+  const stringHeight =
+    nPosts === 0
+      ? 260
+      : hasMore
+        ? Math.max(
+            120,
+            2 * topGap +
+              (nPosts - 1) * rowStep +
+              estCardH +
+              TWINE_PULL_STACK_OVERLAP -
+              PULL_STACK_HEIGHT_PX +
+              TWINE_EXTRA_LENGTH_PX
+          )
+        : Math.max(
+            120,
+            2 * topGap +
+              (nPosts - 1) * rowStep +
+              estCardH -
+              BOTTOM_KNOT_TAIL_BELOW_TWINE_PX +
+              TWINE_EXTRA_LENGTH_PX
+          );
   const stackBottomY =
     nPosts === 0 ? twineTop : cardBaseY + (nPosts - 1) * rowStep + estCardH;
   const boardHeight = Math.max(
@@ -415,7 +439,6 @@ export default function PostsIndexBoard({
           tapeIdx % 2 === 0 ? "tc-pink" : "tc-yellow"
         }`;
 
-        const titleVt = slugifyStr(post.title);
         const stackZ = filteredIdx === -1 ? 0 : 14 - filteredIdx;
         const stagger = filteredIdx >= 0 ? filteredIdx : 0;
 
@@ -429,35 +452,36 @@ export default function PostsIndexBoard({
             isVisible={isVisible}
             dragDisabled={dragDisabled}
             stagger={stagger}
-            animationIndex={postIndex}
+            rotationSlug={post.slug}
             tapeClass={tapeClass}
           >
-            <div className="hole-punch hole-1" />
-            <div className="hole-punch hole-2" />
-            <div className="hole-punch hole-3" />
-
-            <time className="pd" dateTime={post.dateTime}>
-              {post.dateLabel}
-            </time>
-            <h2 className="pt m-0">{post.title}</h2>
-            {post.desc ? <p className="pe m-0">{post.desc}</p> : null}
-
-            <div className="posts-card-footer">
-              <DymoLabel
-                text={post.tag}
-                size="section"
-                color={post.tagColor}
-                isInteractive={false}
-              />
-              <a
-                href={post.href}
-                className="card-link"
-                style={{ viewTransitionName: titleVt }}
+            <article className="card flex flex-col">
+              <time className="post-date" dateTime={post.dateTime}>
+                {post.dateLabel}
+              </time>
+              <h2
+                className={`post-title m-0 ${postIndex === 0 ? "post-title-lg" : ""}`}
+                style={{ viewTransitionName: post.slug }}
               >
-                <span aria-hidden="true">&rarr;</span> Read
-                <span className="sr-only">: {post.title}</span>
-              </a>
-            </div>
+                {post.title}
+              </h2>
+              {post.desc ? (
+                <p className="post-excerpt m-0">{post.desc}</p>
+              ) : null}
+
+              <div className="mt-auto flex items-end justify-between pt-4">
+                <DymoLabel
+                  text={post.tag}
+                  size="section"
+                  color={post.tagColor}
+                  isInteractive={false}
+                />
+                <a href={post.href} className="card-link">
+                  <span aria-hidden="true">&rarr;</span> Read
+                  <span className="sr-only">: {post.title}</span>
+                </a>
+              </div>
+            </article>
           </DraggableCard>
         );
       })}
