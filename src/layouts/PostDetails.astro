@@ -68,7 +68,7 @@ const nextPost =
   </div> -->
 
   <RisoBoardShell>
-    <main id="main-content" class="app-layout-with-toc board-slot">
+    <main id="main-content" class="app-layout board-slot">
       <CollectionEntryBack />
 
       <div class="toc-layout-grid">
@@ -78,12 +78,8 @@ const nextPost =
         </aside>
 
         <!-- Main Content -->
-        <article
-          id="article"
-          role="article"
-          class="prose max-w-3xl prose-img:rounded prose-img:bg-white"
-        >
-          <header>
+        <article id="article" role="article" class="w-full max-w-none">
+          <header class="entry-header-wide">
             <CollectionEntryHeader title={title} slug={slugifyStr(title)} />
             <Datetime
               pubDatetime={pubDatetime}
@@ -91,13 +87,15 @@ const nextPost =
               size="lg"
             />
           </header>
-          <Content />
+          <div class="entry-body prose-img:rounded prose-img:bg-white">
+            <Content />
 
-          <ul class="my-8 list-none pl-0 text-sm">
-            Tags: {tags.map(tag => <Tag tag={slugifyStr(tag)} />)}
-          </ul>
+            <ul class="my-8 list-none pl-0 text-sm">
+              Tags: {tags.map(tag => <Tag tag={slugifyStr(tag)} />)}
+            </ul>
 
-          <BackToTop />
+            <BackToTop />
+          </div>
         </article>
       </div>
 

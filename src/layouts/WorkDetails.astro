@@ -53,7 +53,7 @@ const layoutProps = {
 
 <Layout {...layoutProps}>
   <RisoBoardShell>
-    <main id="main-content" class="app-layout-with-toc board-slot">
+    <main id="main-content" class="app-layout board-slot">
       <CollectionEntryBack />
 
       <div class="toc-layout-grid">
@@ -63,12 +63,8 @@ const layoutProps = {
         </aside>
 
         <!-- Main Content -->
-        <article
-          id="article"
-          role="article"
-          class="prose max-w-3xl prose-img:rounded prose-img:bg-white"
-        >
-          <header>
+        <article id="article" role="article" class="w-full max-w-none">
+          <header class="entry-header-wide">
             <CollectionEntryHeader
               title={title}
               summary={summary}
@@ -76,18 +72,20 @@ const layoutProps = {
             />
             <!-- {year && <WorkYear year={year} size="lg" className="my-2" />} -->
           </header>
-          {
-            features && features.length > 0 && (
-              <Features features={features} client:load />
-            )
-          }
-          <Content />
+          <div class="entry-body prose-img:rounded prose-img:bg-white">
+            {
+              features && features.length > 0 && (
+                <Features features={features} client:load />
+              )
+            }
+            <Content />
 
-          <ul class="prose my-8">
-            {tags.map(tag => <WorkTag tag={slugifyStr(tag)} />)}
-          </ul>
+            <ul class="my-8">
+              {tags.map(tag => <WorkTag tag={slugifyStr(tag)} />)}
+            </ul>
 
-          <BackToTop />
+            <BackToTop />
+          </div>
         </article>
       </div>
     </main>
