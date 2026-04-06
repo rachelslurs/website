@@ -429,7 +429,12 @@ export default function PostsIndexBoard({
                 className={`post-title m-0 ${displayIdx === 0 ? "post-title-lg" : ""}`}
                 style={{ viewTransitionName: post.slug }}
               >
-                {post.title}
+                <a
+                  href={post.href}
+                  className="hover:text-[var(--red)] transition-colors focus-visible:outline-none"
+                >
+                  {post.title}
+                </a>
               </h2>
               {post.desc ? (
                 <p className="post-excerpt m-0">{post.desc}</p>

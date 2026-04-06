@@ -201,7 +201,7 @@ const BoardCard = React.memo(
     return (
       <div
         ref={dragRef}
-        className={`flex h-full min-h-0 w-full min-w-0 flex-col ${wrapperClassName}`}
+        className={`h-full ${wrapperClassName}`}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -221,15 +221,13 @@ const BoardCard = React.memo(
         }}
       >
         <motion.div
-          className={`board-card relative flex h-full min-h-0 flex-col select-none ${pin} ${shadowClass} ${className}`}
+          className={`board-card relative flex h-full flex-col select-none ${pin} ${shadowClass} ${className}`}
           initial={prefersReducedMotion ? "visible" : "hidden"}
           whileInView="visible"
           viewport={{ once: true, margin: "-10% 0px" }}
           variants={entranceVariants}
         >
-          <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
-            {children}
-          </div>
+          {children}
         </motion.div>
       </div>
     );
@@ -315,8 +313,8 @@ export default function PortfolioBoard({
             className="hero-card"
             stagger={0}
           >
-            <div className="card hero-card-inner border-[3px] border-[var(--black)]">
-              <h1 className="hero-headline my-3">{heroHeadline}</h1>
+            <div className="card h-full hero-card-inner border-[3px] border-[var(--black)] justify-center">
+              <h1 className="hero-headline mb-4 mt-0">{heroHeadline}</h1>
               <p className="hero-body max-w-[480px]">{heroBody}</p>
             </div>
           </BoardCard>
@@ -404,7 +402,7 @@ export default function PortfolioBoard({
                 wrapperClassName={i === 0 ? "col-span-2 max-sm:col-span-1" : ""}
                 stagger={i}
               >
-                <article className="card flex flex-col">
+                <article className="card h-full flex flex-col">
                   <time className="post-date" dateTime={post.dateTime}>
                     {post.dateLabel}
                   </time>
@@ -412,7 +410,12 @@ export default function PortfolioBoard({
                     className={`post-title ${i === 0 ? "post-title-lg" : ""}`}
                     style={{ viewTransitionName: post.slug }}
                   >
-                    {post.title}
+                    <a
+                      href={post.href}
+                      className="hover:text-[var(--red)] transition-colors focus-visible:outline-none"
+                    >
+                      {post.title}
+                    </a>
                   </h3>
                   {post.desc ? (
                     <p className="post-excerpt">{post.desc}</p>
@@ -461,11 +464,25 @@ export default function PortfolioBoard({
                 }
                 stagger={i}
               >
-                <article className="card flex flex-col">
-                  <div className="work-label">{w.label}</div>
-                  <h3 className="work-name">{w.name}</h3>
-                  <p className="work-desc">{w.desc}</p>
-                  <a href={w.href} className="card-link self-start">
+                <article className="card h-full flex flex-col">
+                  <div className="flex flex-1 flex-col mb-4">
+                    <div className="work-label">{w.label}</div>
+                    <h3 className="work-name m-0">
+                      <a
+                        href={w.href}
+                        className="hover:text-[var(--red)] transition-colors focus-visible:outline-none"
+                      >
+                        {w.name}
+                      </a>
+                    </h3>
+                    <p className="work-desc !flex-none mt-1.5 mb-0 leading-relaxed">
+                      {w.desc}
+                    </p>
+                  </div>
+                  <a
+                    href={w.href}
+                    className="card-link self-start mt-auto !mb-1"
+                  >
                     <span aria-hidden="true">&rarr;</span> Case study
                     <span className="sr-only">: {w.name}</span>
                   </a>
@@ -495,10 +512,24 @@ export default function PortfolioBoard({
                 className="demo-item"
                 stagger={i}
               >
-                <article className="card card-demo flex min-h-[120px] flex-col items-center justify-center text-center">
-                  <h3 className="demo-title">{d.title}</h3>
-                  <p className="demo-sub">{d.sub}</p>
-                  <a href={d.href} className="card-link demo-link">
+                <article className="card h-full card-demo flex min-h-[150px] flex-col items-center text-center">
+                  <div className="flex flex-1 flex-col items-center justify-center pt-2 pb-4">
+                    <h3 className="demo-title m-0">
+                      <a
+                        href={d.href}
+                        className="hover:text-[var(--yellow)] transition-colors focus-visible:outline-none"
+                      >
+                        {d.title}
+                      </a>
+                    </h3>
+                    <p className="demo-sub mt-1.5 mb-0 leading-tight">
+                      {d.sub}
+                    </p>
+                  </div>
+                  <a
+                    href={d.href}
+                    className="card-link demo-link mt-auto !mb-1"
+                  >
                     <span aria-hidden="true">&rarr;</span> Launch
                     <span className="sr-only">: {d.title} demo</span>
                   </a>
