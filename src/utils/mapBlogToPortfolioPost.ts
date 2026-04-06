@@ -22,6 +22,8 @@ export function mapBlogEntryToPortfolioPost(
   const tag = entry.data.tags[0] ?? "Writing";
   return {
     id: entry.id,
+    /** Content-collection slug; use for view-transition-name with post detail (must match `post.slug`). */
+    slug: entry.slug,
     dateLabel: formatPostDate(entry.data.pubDatetime),
     dateTime: entry.data.pubDatetime.toISOString(),
     title: entry.data.title,

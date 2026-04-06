@@ -7,6 +7,7 @@ import TableOfContents from "@components/TableOfContents";
 import CollectionEntryBack from "@components/CollectionEntryBack.astro";
 import CollectionEntryHeader from "@components/CollectionEntryHeader.astro";
 import type { CollectionEntry } from "astro:content";
+import { boardCardRestRotationDeg } from "@utils/cardRotation";
 import { slugifyStr } from "@utils/slugify";
 import { SITE } from "@config";
 import BackToTop from "@components/BackToTop.astro";
@@ -30,6 +31,8 @@ const {
 } = post.data;
 
 const { Content } = await post.render();
+
+const headerCardRotateDeg = boardCardRestRotationDeg(post.slug);
 
 const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
 const ogUrl = new URL(
@@ -78,16 +81,32 @@ const nextPost =
         </aside>
 
         <!-- Main Content -->
-        <article id="article" role="article" class="w-full max-w-none">
-          <header class="entry-header-wide">
-            <CollectionEntryHeader title={title} slug={slugifyStr(title)} />
-            <Datetime
-              pubDatetime={pubDatetime}
-              modDatetime={modDatetime}
-              size="lg"
-            />
+        <article
+          id="article"
+          role="article"
+          class="post-detail w-full max-w-none"
+        >
+          <header class="entry-header-wide post-detail-header">
+            <div
+              class="post-header-card"
+              style={`--post-header-rotate: ${headerCardRotateDeg}deg`}
+            >
+              <CollectionEntryHeader
+                title={title}
+                slug={post.slug}
+                variant="blog"
+              />
+              <Datetime
+                pubDatetime={pubDatetime}
+                modDatetime={modDatetime}
+                size="lg"
+                className="!mb-0 mt-3"
+              />
+            </div>
           </header>
-          <div class="entry-body prose-img:rounded prose-img:bg-white">
+          <div
+            class="entry-body post-detail-body prose prose-lg prose-img:rounded prose-img:bg-white"
+          >
             <Content />
 
             <ul class="my-8 list-none pl-0 text-sm">
