@@ -112,7 +112,7 @@ export default function PostPagination({
 
   return (
     <>
-      <style>{rawCSS}</style>
+      <style dangerouslySetInnerHTML={{ __html: rawCSS }} />
       <nav className="riso-post-pagination" aria-label={navLabel}>
         {prevPost ? (
           <a
