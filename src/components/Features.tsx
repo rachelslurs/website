@@ -147,7 +147,7 @@ function FeaturesMobile(props: FeaturesProps) {
     <>
       <div
         ref={slideContainerRef}
-        className="-mb-4 flex snap-x snap-mandatory -space-x-0 overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-width:none] sm:-space-x-6 [&::-webkit-scrollbar]:hidden"
+        className="-mb-4 flex w-full snap-x snap-mandatory -space-x-0 overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-width:none] sm:-space-x-6 [&::-webkit-scrollbar]:hidden"
       >
         {features.map((feature, featureIndex) => (
           <div
