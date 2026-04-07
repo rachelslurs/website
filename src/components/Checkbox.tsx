@@ -28,11 +28,11 @@ const Checkbox = ({
         className="w-4 h-4 rounded cursor-pointer text-skin-accent"
       />
       <div className="flex flex-col items-start shrink-0">
-        <span className="text-xs font-black uppercase tracking-widest text-skin-foreground">
+        <span className="text-[11px] font-black uppercase tracking-widest text-skin-foreground">
           {label}
         </span>
         {description && (
-          <span className="checkbox-desc text-xs font-bold transition-colors text-skin-foreground">
+          <span className="checkbox-desc text-[11px] font-bold transition-colors text-skin-foreground">
             {description}
           </span>
         )}

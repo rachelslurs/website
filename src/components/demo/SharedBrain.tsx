@@ -128,10 +128,10 @@ function SharedBrain() {
       filename="SharedBrain.tsx"
       showHeader={false}
     >
-      <div className="max-w-7xl w-full bg-skin-card rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden border-2 border-skin-line flex flex-col h-[27rem] md:h-[31rem]">
+      <div className="max-w-7xl w-full bg-skin-card rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden border-2 border-skin-line flex flex-col h-[22.5rem] md:h-[24.5rem] font-[ui-sans-serif] text-xs md:text-sm">
         {/* [ HEADER ] - compact on mobile with reserved space so it never covers content */}
-        <div className="sharedbrain-header relative z-20 w-full bg-skin-inverted border-b border-skin-line flex shrink-0 min-h-[3.25rem] py-2 md:py-0 md:min-h-[5rem]">
-          <div className="sharedbrain-header-controls flex-1 flex items-center justify-center md:justify-end md:pr-6 py-2 md:py-4 px-2 md:px-4 min-w-0">
+        <div className="sharedbrain-header relative z-20 w-full bg-skin-inverted border-b border-skin-line flex shrink-0 min-h-[2.5rem] py-1 md:py-0 md:min-h-[3rem]">
+          <div className="sharedbrain-header-controls flex-1 flex items-center justify-center md:justify-end md:pr-3 py-1 md:py-2 px-2 md:px-3 min-w-0">
             <Toggle
               label="Optimistic UI"
               description={isOptimistic ? "Active" : "Inactive"}
@@ -143,7 +143,7 @@ function SharedBrain() {
             className="sharedbrain-header-divider w-px bg-skin-line shrink-0 self-stretch my-2 hidden md:block"
             aria-hidden
           />
-          <div className="sharedbrain-header-controls flex-1 flex items-center justify-center md:justify-start md:pl-6 py-2 md:py-4 px-2 md:px-4 min-w-0">
+          <div className="sharedbrain-header-controls flex-1 flex items-center justify-center md:justify-start md:pl-3 py-1 md:py-2 px-2 md:px-3 min-w-0">
             <Checkbox
               label="Simulate Drift"
               description="Trigger Conflict"
@@ -158,12 +158,12 @@ function SharedBrain() {
         </div>
 
         {/* [ MAIN STAGE ] - stacked on mobile, row on desktop; z-0 so header stays on top */}
-        <div className="flex-1 flex flex-col md:flex-row bg-skin-card relative z-0 overflow-hidden px-4 md:px-6 min-h-0">
+        <div className="flex-1 flex flex-col md:flex-row bg-skin-card relative z-0 overflow-hidden px-2.5 md:px-3 min-h-0">
           <div className="absolute inset-0 opacity-[0.06] pointer-events-none bg-[radial-gradient(currentColor_1px,transparent_1px)] [background-size:32px_32px] text-skin-base"></div>
 
           {/* CLIENT - fixed proportion on desktop; overflow only on mobile if needed */}
-          <div className="flex-1 md:flex-[3] min-w-0 min-h-0 flex flex-col items-center justify-center md:justify-center p-4 md:px-6 relative z-10 overflow-y-auto md:overflow-visible">
-            <div className="w-full flex flex-col items-center md:my-5 shrink-0">
+          <div className="flex-1 md:flex-[3] min-w-0 min-h-0 flex flex-col items-center justify-center md:justify-center p-1.5 md:px-3 relative z-10 overflow-y-auto md:overflow-visible">
+            <div className="w-full flex flex-col items-center md:my-2 shrink-0">
               <ExpressDeliveryForm
                 step={step}
                 isOptimistic={isOptimistic}
@@ -176,7 +176,7 @@ function SharedBrain() {
           </div>
 
           {/* NETWORK: arrow on mobile (only when sending/receiving), horizontal bar on desktop */}
-          <div className="flex-none md:flex-[2] min-w-0 flex items-center justify-center py-2 md:py-4 md:px-4 relative z-10">
+          <div className="flex-none md:flex-[2] min-w-0 flex items-center justify-center py-0.5 md:py-1.5 md:px-2.5 relative z-10">
             {/* Mobile: arrow down = sending (step 3), arrow up = receiving (step 5); hidden when idle */}
             <div
               className="flex flex-col items-center justify-center md:hidden min-h-[2rem] transition-opacity duration-300"
@@ -228,28 +228,28 @@ function SharedBrain() {
           </div>
 
           {/* BACKEND - smaller on mobile */}
-          <div className="flex-none md:flex-[1] min-w-0 flex flex-col items-center justify-center p-2 md:p-6 relative z-10">
+          <div className="flex-none md:flex-[1] min-w-0 flex flex-col items-center justify-center p-2 md:p-3 relative z-10">
             <div className="relative flex flex-col items-center">
               <div
-                className={`p-3 md:p-6 rounded-full border-2 transition-all duration-500 relative flex items-center justify-center ${step === 4 ? "bg-skin-card border-skin-accent shadow-xl scale-105" : "bg-skin-card/50 border-skin-line opacity-70"}`}
+                className={`p-2.5 md:p-4 rounded-full border-2 transition-all duration-500 relative flex items-center justify-center ${step === 4 ? "bg-skin-card border-skin-accent shadow-xl scale-105" : "bg-skin-card/50 border-skin-line opacity-70"}`}
               >
                 <CircleStackIcon
-                  className={`w-5 h-5 md:w-7 md:h-7 ${step === 4 ? "text-skin-accent" : "text-skin-base opacity-50"}`}
+                  className={`w-4 h-4 md:w-5 md:h-5 ${step === 4 ? "text-skin-accent" : "text-skin-base opacity-50"}`}
                 />
                 {step === 4 && (
-                  <div className="absolute top-0 right-0 flex h-2.5 w-2.5 md:h-3.5 md:w-3.5">
+                  <div className="absolute top-0 right-0 flex h-2 w-2 md:h-2.5 md:w-2.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-skin-accent opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 md:h-3.5 md:w-3.5 bg-skin-accent"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 md:h-2.5 md:w-2.5 bg-skin-accent"></span>
                   </div>
                 )}
               </div>
 
-              <div className="absolute top-full mt-2 md:mt-4 flex flex-col items-center gap-0.5 w-24 md:w-32 justify-start pointer-events-none">
-                <span className="text-xs md:text-sm font-black uppercase tracking-widest text-skin-base opacity-70 text-center">
+              <div className="absolute top-full mt-1.5 md:mt-2.5 flex flex-col items-center gap-0 w-20 md:w-28 justify-start pointer-events-none">
+                <span className="text-[10px] md:text-xs font-black uppercase tracking-widest text-skin-base opacity-70 text-center">
                   Backend
                 </span>
                 <span
-                  className={`text-xs md:text-sm font-bold uppercase tracking-widest h-3 md:h-4 flex items-center justify-center ${step === 4 ? "text-skin-accent animate-pulse" : "invisible"}`}
+                  className={`text-[10px] md:text-xs font-bold uppercase tracking-widest h-3 md:h-3.5 flex items-center justify-center ${step === 4 ? "text-skin-accent animate-pulse" : "invisible"}`}
                 >
                   Verifying
                 </span>
@@ -259,7 +259,7 @@ function SharedBrain() {
         </div>
 
         {/* [ FOOTER: Console ] - shorter on mobile to fit stacked stage */}
-        <div className="h-[6rem] md:h-[10rem] shrink-0 flex flex-col min-h-0">
+        <div className="h-[4.5rem] md:h-[6rem] shrink-0 flex flex-col min-h-0">
           <Console
             log={log}
             visibleId={visibleId}

@@ -190,6 +190,14 @@ nav .group:hover .dust-note {
   color: var(--black);
   font-weight: 400;
 }
+
+/* Editorial “looseleaf” post layout: stamped title (outside `.analog-prose`). */
+.analog-post-title {
+  font-family: var(--display);
+  @apply text-2xl sm:text-3xl md:text-4xl break-words leading-tight md:leading-[1.15];
+  color: var(--black);
+  font-weight: 400;
+}
 .post-excerpt {
   font-size: 13px;
   line-height: 1.5;
@@ -451,6 +459,7 @@ nav .group:hover .dust-note {
   transform: translate(-50%, -50%) rotate(-45deg);
   z-index: 10;
   opacity: 0.8;
+  pointer-events: none;
 }
 .tape-c::after {
   content: "";
@@ -462,6 +471,7 @@ nav .group:hover .dust-note {
   transform: translate(-50%, -50%) rotate(-45deg);
   z-index: 10;
   opacity: 0.8;
+  pointer-events: none;
 }
 .tc-pink::before,
 .tc-pink::after {
@@ -938,6 +948,14 @@ a.skip-to-content-board:focus {
 .analog-prose p {
   margin: 0 0 var(--baseline) 0;
   color: var(--analog-body);
+}
+
+/* Blog demos: prevent `.analog-prose p` vertical rhythm from affecting UI copy */
+.analog-prose .blog-demo p {
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
 }
 
 .analog-prose h2 {
