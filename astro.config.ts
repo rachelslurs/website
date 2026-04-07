@@ -39,4 +39,7 @@ export default defineConfig({
   experimental: {
     contentLayer: true,
   },
+  build: {
+    inlineStylesheets: "always",
+  },
 });
