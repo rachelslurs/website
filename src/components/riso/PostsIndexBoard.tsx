@@ -423,7 +423,7 @@ export default function PostsIndexBoard({
           >
             <article className="card flex flex-col">
               <h2
-                className="post-title m-0 mb-1 font-heading font-semibold"
+                className="post-title m-0 mb-1 font-semibold"
                 style={{ viewTransitionName: post.slug }}
               >
                 <a
