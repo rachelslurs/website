@@ -935,7 +935,7 @@ a.skip-to-content-board:focus {
 .analog-post .post-title {
   font-family: var(--display);
   font-weight: 400;
-  font-size: 46px;
+  font-size: clamp(2.125rem, 4.5vw, 3rem);
   line-height: calc(var(--baseline) * 2);
   margin: 0;
   padding: 0 1rem;
@@ -944,12 +944,12 @@ a.skip-to-content-board:focus {
 
 @media (max-width: 768px) {
   .analog-post .post-title {
-    font-size: 34px;
+    font-size: clamp(1.875rem, 5vw, 2.25rem);
   }
 }
 
 .analog-prose {
-  max-width: 600px;
+  max-width: min(65ch, 100%);
   margin: 0 auto;
   font-family: var(--sans);
   font-size: 1rem;
@@ -958,7 +958,7 @@ a.skip-to-content-board:focus {
 }
 
 /* Vertical rhythm only — do not set horizontal margin; Tailwind `-mx-*` on
-   components like BlogDemo must win for breakout from the 600px column. */
+   components like BlogDemo must win for breakout from the 65ch column. */
 .analog-prose .not-prose {
   margin-top: calc(var(--baseline) * 2);
   margin-bottom: calc(var(--baseline) * 2);
@@ -972,19 +972,19 @@ a.skip-to-content-board:focus {
 
 .analog-prose h2 {
   font-family: var(--serif);
-  font-weight: 400;
+  font-weight: 600;
   font-size: 24px;
   line-height: var(--baseline);
-  margin: var(--baseline) 0 var(--baseline) 0;
+  margin: 2.5rem 0 0.375rem 0;
   color: var(--analog-ink);
 }
 
 .analog-prose h3 {
   font-family: var(--serif);
-  font-weight: 400;
+  font-weight: 600;
   font-size: 20px;
   line-height: var(--baseline);
-  margin: var(--baseline) 0 var(--baseline) 0;
+  margin: 2rem 0 0.375rem 0;
   color: var(--analog-ink);
 }
 
@@ -1054,8 +1054,8 @@ a.skip-to-content-board:focus {
 
 /* Ruled “code paper”: white + pale green lines — reads separately from cream looseleaf body */
 .analog-prose pre {
-  margin: var(--baseline) -2rem var(--baseline) -2rem;
-  padding: var(--baseline) 2rem;
+  margin: 2rem -2rem;
+  padding: 1.5rem 2rem;
   width: calc(100% + 4rem);
   box-sizing: border-box;
   background-color: rgb(var(--color-fill));
