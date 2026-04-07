@@ -14,10 +14,6 @@
   --cork: #c4a97d;
   --ink-muted: #6b5c4c; /* warm medium brown — replaces #555 */
   --ink-secondary: #292524; /* warm dark brown — replaces #222 */
-  --mono: "IBM Plex Mono", monospace;
-  --display: "Archivo Black", sans-serif;
-  --serif: "Zilla Slab", Georgia, serif;
-  --body: "Lora", Georgia, serif;
 }
 
 /* “Pardon the dust” tape wiggle — keyframes + group-hover (see RisoNav) */
@@ -46,7 +42,7 @@ nav .group:hover .dust-note {
   background: var(--cork);
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
   color: var(--black);
-  font-family: var(--body);
+  @apply font-body;
   border: 6px solid rgb(var(--color-border));
   box-shadow:
     inset 0 0 30px rgba(0, 0, 0, 0.15),
@@ -153,7 +149,7 @@ nav .group:hover .dust-note {
 
 /* ── HERO TYPOGRAPHY ── */
 .hero-headline {
-  font-family: var(--display);
+  @apply font-display;
   @apply text-4xl sm:text-5xl md:text-6xl break-words leading-tight md:leading-[1.15];
   font-weight: 400;
 }
@@ -165,7 +161,7 @@ nav .group:hover .dust-note {
 
 /* ── POST TYPOGRAPHY ── */
 .post-date {
-  font-family: var(--mono);
+  @apply font-mono;
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 1.5px;
@@ -174,7 +170,7 @@ nav .group:hover .dust-note {
   font-weight: 700;
 }
 .post-title {
-  font-family: var(--display);
+  @apply font-display;
   @apply text-xl sm:text-2xl md:text-3xl break-words leading-tight md:leading-[1.15];
   color: var(--black);
   font-weight: 400;
@@ -185,7 +181,7 @@ nav .group:hover .dust-note {
 
 /* Blog post page h1: same family/weight/color as .post-title, scaled up */
 .post-page-title {
-  font-family: var(--display);
+  @apply font-display;
   @apply text-2xl sm:text-3xl md:text-4xl break-words leading-tight md:leading-[1.15];
   color: var(--black);
   font-weight: 400;
@@ -193,7 +189,7 @@ nav .group:hover .dust-note {
 
 /* Editorial “looseleaf” post layout: stamped title (outside `.analog-prose`). */
 .analog-post-title {
-  font-family: var(--display);
+  @apply font-display;
   @apply text-2xl sm:text-3xl md:text-4xl break-words leading-tight md:leading-[1.15];
   color: var(--black);
   font-weight: 400;
@@ -217,7 +213,7 @@ nav .group:hover .dust-note {
   font-weight: 700;
 }
 .posts-index-board .post-excerpt {
-  font-family: var(--body);
+  @apply font-body;
   margin-top: 0;
   font-size: 0.8125rem;
   line-height: 1.55;
@@ -226,7 +222,7 @@ nav .group:hover .dust-note {
 
 /* ── WORK TYPOGRAPHY ── */
 .work-label {
-  font-family: var(--mono);
+  @apply font-mono;
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 1.5px;
@@ -235,7 +231,7 @@ nav .group:hover .dust-note {
   font-weight: 700;
 }
 .work-name {
-  font-family: var(--body);
+  @apply font-body;
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 0.35rem;
@@ -255,13 +251,13 @@ nav .group:hover .dust-note {
   padding: 1.25rem;
 }
 .demo-title {
-  font-family: var(--mono);
+  @apply font-mono;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 2px;
 }
 .demo-sub {
-  font-family: var(--serif);
+  @apply font-heading;
   font-size: 13px;
   margin-top: 3px;
   opacity: 0.6;
@@ -269,7 +265,7 @@ nav .group:hover .dust-note {
 
 /* ── QUOTE ── */
 .quote-text {
-  font-family: var(--serif);
+  @apply font-heading;
   font-size: 1rem;
   line-height: 1.4;
   text-align: center;
@@ -280,7 +276,7 @@ nav .group:hover .dust-note {
 
 /* ── SKILL TAGS ── */
 .skill-tag {
-  font-family: var(--mono);
+  @apply font-mono;
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -290,7 +286,7 @@ nav .group:hover .dust-note {
 
 /* ── FOOTER ── */
 .footer-hint {
-  font-family: var(--mono);
+  @apply font-mono;
   font-size: 10px;
   letter-spacing: 2px;
   color: rgba(0, 0, 0, 0.4);
@@ -308,7 +304,7 @@ nav .group:hover .dust-note {
 
 /* ── CARD LINKS ── */
 .card-link {
-  font-family: var(--mono);
+  @apply font-mono;
   font-size: 12px;
   margin-top: 0.75rem;
   color: var(--blue);
@@ -559,7 +555,7 @@ nav .group:hover .dust-note {
   pointer-events: none;
 }
 .dymo-text {
-  font-family: var(--mono);
+  @apply font-mono;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -662,7 +658,7 @@ a.skip-to-content-board {
   padding: 0.5rem 0.75rem;
   background: var(--yellow);
   color: var(--black);
-  font-family: var(--mono);
+  @apply font-mono;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -894,7 +890,7 @@ a.skip-to-content-board:focus {
 /* Archival stamp: date line + “Tags:” label (locked to baseline grid) */
 .analog-post .post-meta,
 .analog-post .post-tags-heading {
-  font-family: var(--mono);
+  @apply font-mono;
   font-size: 11px;
   font-weight: 400;
   text-transform: uppercase;
@@ -918,7 +914,7 @@ a.skip-to-content-board:focus {
 }
 
 .analog-post .post-title {
-  font-family: var(--display);
+  @apply font-display;
   font-weight: 400;
   font-size: clamp(1.875rem, 5vw, 2.25rem);
   line-height: calc(var(--baseline) * 2);
@@ -936,7 +932,7 @@ a.skip-to-content-board:focus {
 .analog-prose {
   max-width: min(65ch, 100%);
   margin: 0 auto;
-  font-family: var(--body);
+  @apply font-body;
   font-size: 1rem;
   line-height: var(--baseline);
   color: var(--analog-body);
@@ -964,7 +960,7 @@ a.skip-to-content-board:focus {
 }
 
 .analog-prose h2 {
-  font-family: var(--serif);
+  @apply font-heading;
   font-weight: 600;
   font-size: 24px;
   line-height: var(--baseline);
@@ -973,7 +969,7 @@ a.skip-to-content-board:focus {
 }
 
 .analog-prose h3 {
-  font-family: var(--serif);
+  @apply font-heading;
   font-weight: 600;
   font-size: 20px;
   line-height: var(--baseline);
@@ -989,7 +985,7 @@ a.skip-to-content-board:focus {
 }
 
 .analog-prose h4 {
-  font-family: var(--serif);
+  @apply font-heading;
   font-weight: 400;
   font-size: 17px;
   line-height: var(--baseline);
@@ -1043,7 +1039,7 @@ a.skip-to-content-board:focus {
 }
 
 .analog-prose code:not(pre code) {
-  font-family: var(--mono);
+  @apply font-mono;
   background-color: rgba(255, 181, 17, 0.35);
   padding: 2px 4px;
   border-radius: 2px;
@@ -1104,7 +1100,7 @@ a.skip-to-content-board:focus {
 }
 
 .analog-prose pre code {
-  font-family: var(--mono);
+  @apply font-mono;
   font-size: 13px;
   line-height: var(--baseline);
   display: block;
@@ -1145,7 +1141,7 @@ a.skip-to-content-board:focus {
 /* Work case study: technical annotations + opt-in pullquotes (see WorkDetails work-case-study) */
 .post-detail.work-case-study .analog-prose figure figcaption,
 .post-detail.work-case-study .analog-prose .work-tech-label {
-  font-family: var(--mono);
+  @apply font-mono;
   font-size: 0.875rem;
   line-height: 1.55;
   letter-spacing: 0.02em;
@@ -1159,7 +1155,7 @@ a.skip-to-content-board:focus {
   max-width: none;
   box-sizing: border-box;
   border-left: none;
-  font-family: var(--serif);
+  @apply font-heading;
   font-style: italic;
   font-weight: 600;
   font-size: clamp(1.563rem, 4vw, 2.441rem);
@@ -1168,7 +1164,7 @@ a.skip-to-content-board:focus {
 }
 
 .post-detail.work-case-study .analog-prose blockquote.work-pullquote p {
-  font-family: var(--serif);
+  @apply font-heading;
   font-style: italic;
   font-weight: 600;
   font-size: inherit;
@@ -1241,7 +1237,7 @@ a.skip-to-content-board:focus {
   left: 0;
   width: 100%;
   text-align: center;
-  font-family: var(--mono);
+  @apply font-mono;
   font-size: 12px;
   line-height: var(--baseline);
   color: var(--blue);
@@ -1306,7 +1302,7 @@ a.skip-to-content-board:focus {
 }
 
 .analog-post-back button {
-  font-family: var(--body);
+  @apply font-body;
   font-size: 16px;
   line-height: var(--baseline);
   color: var(--analog-ink);
@@ -1375,7 +1371,7 @@ a.skip-to-content-board:focus {
   border: none;
   cursor: pointer;
   text-decoration: none;
-  font-family: var(--mono);
+  @apply font-mono;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -1568,7 +1564,7 @@ a.skip-to-content-board:focus {
   transform: translateY(15px);
 }
 .pull-tag-text {
-  font-family: var(--mono);
+  @apply font-mono;
   font-size: 10px;
   font-weight: bold;
   letter-spacing: 1px;
