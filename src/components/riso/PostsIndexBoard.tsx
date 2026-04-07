@@ -19,7 +19,7 @@ const TWINE_GAP = 45;
 const HALF_TWINE = 2;
 /** Match `.knot-top::before { height }` in riso.css — dangling string above the knot. */
 const KNOT_TOP_TAIL_PX = 45;
-const ROW_STEP_DEFAULT = 210;
+const ROW_STEP_DEFAULT = 270;
 const TWINE_TOP_DEFAULT = 52;
 /** Pull stack nudges up so the bottom knot meets the twine (no visible gap). */
 const TWINE_PULL_STACK_OVERLAP = 10;
@@ -32,7 +32,7 @@ const TWINE_EXTRA_LENGTH_PX = 130;
 const EDGE_PAD = 8;
 /** Below this width, add more vertical rhythm (RSS ↔ cards ↔ pull). */
 const NARROW_BOARD_MAX_PX = 640;
-const ROW_STEP_NARROW = 245;
+const ROW_STEP_NARROW = 300;
 const TWINE_TOP_NARROW = 74;
 const CARD_BASE_Y_DEFAULT = 104;
 const CARD_BASE_Y_NARROW = 157;
@@ -45,12 +45,12 @@ const BOARD_BOTTOM_PAD_NARROW = 300;
 const TWO_COL_MIN_PX =
   CARD_WIDTH * 2 + TWINE_GAP * 2 + HALF_TWINE * 2 + EDGE_PAD * 2 + 24;
 /** Vertical stride when stacked (must exceed typical card height incl. excerpt). */
-const STACK_ROW_STEP = 330;
+const STACK_ROW_STEP = 360;
 const TWINE_TOP_STACKED = 66;
 const CARD_BASE_Y_STACKED = 140;
 /** Conservative card block height for board sizing (content varies). */
-const EST_CARD_H_TWO_COL = 300;
-const EST_CARD_H_STACKED = 330;
+const EST_CARD_H_TWO_COL = 320;
+const EST_CARD_H_STACKED = 350;
 
 function cardXsForBoardWidth(width: number) {
   const w = Math.max(width, 320);
@@ -422,11 +422,8 @@ export default function PostsIndexBoard({
             tapeClass={tapeClass}
           >
             <article className="card flex flex-col">
-              <time className="post-date" dateTime={post.dateTime}>
-                {post.dateLabel}
-              </time>
               <h2
-                className={`post-title m-0 ${displayIdx === 0 ? "post-title-lg" : ""}`}
+                className={`post-title m-0 mb-1 font-heading font-semibold ${displayIdx === 0 ? "post-title-lg" : ""}`}
                 style={{ viewTransitionName: post.slug }}
               >
                 <a
@@ -436,8 +433,16 @@ export default function PostsIndexBoard({
                   {post.title}
                 </a>
               </h2>
+              <time
+                className="post-date mb-3 font-mono text-xs uppercase tracking-widest text-[var(--ink-muted)]"
+                dateTime={post.dateTime}
+              >
+                {post.dateLabel}
+              </time>
               {post.desc ? (
-                <p className="post-excerpt m-0">{post.desc}</p>
+                <p className="post-excerpt m-0 font-body leading-relaxed">
+                  {post.desc}
+                </p>
               ) : null}
 
               <div className="mt-auto flex items-end justify-between pt-4">

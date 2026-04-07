@@ -216,6 +216,24 @@ nav .group:hover .dust-note {
   margin-top: 0.5rem;
   flex: 1;
 }
+
+/* Posts index (/posts): title → date → snippet rhythm; homepage cards keep base .post-* */
+.posts-index-board .post-title {
+  font-weight: 600;
+}
+.posts-index-board .post-date {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+}
+.posts-index-board .post-excerpt {
+  font-family: var(--sans);
+  margin-top: 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  flex: 1;
+}
 @media (max-width: 640px) {
   .post-title,
   .post-title-lg {
