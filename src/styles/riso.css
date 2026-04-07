@@ -539,6 +539,11 @@ nav .group:hover .dust-note {
     background-image 0.3s ease,
     background-color 0.3s ease;
 }
+
+/* Breadcrumbs: keep linked + current crumb heights consistent on mobile. */
+.breadcrumb-dymo .dymo {
+  @apply min-h-[44px] sm:min-h-0;
+}
 .dymo::before {
   content: "";
   position: absolute;
