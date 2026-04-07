@@ -134,7 +134,22 @@ module.exports = {
       },
       /* The Bold Manual: sans aliases body (Lora) for existing font-sans utilities; serif aliases heading (Zilla Slab). */
       fontFamily: {
-        sans: ["Lora", "Georgia", "ui-serif", "serif"],
+        sans: [
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          '"Segoe UI"',
+          "Roboto",
+          '"Helvetica Neue"',
+          "Arial",
+          '"Noto Sans"',
+          "sans-serif",
+          '"Apple Color Emoji"',
+          '"Segoe UI Emoji"',
+          '"Segoe UI Symbol"',
+          '"Noto Color Emoji"',
+        ],
         serif: ["Zilla Slab", "Georgia", "serif"],
         display: ["Archivo Black", "ui-sans-serif", "system-ui", "sans-serif"],
         heading: ["Zilla Slab", "Georgia", "serif"],
