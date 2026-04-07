@@ -28,7 +28,7 @@ const PULL_STACK_HEIGHT_PX = 168;
 /** When all posts are shown: knot tail extends below the twine column end. */
 const BOTTOM_KNOT_TAIL_BELOW_TWINE_PX = 52;
 /** Extra vertical stripe length so the bottom knot + pull sit lower (tune visually). */
-const TWINE_EXTRA_LENGTH_PX = 130;
+const TWINE_EXTRA_LENGTH_PX = 200;
 const EDGE_PAD = 8;
 /** Below this width, add more vertical rhythm (RSS ↔ cards ↔ pull). */
 const NARROW_BOARD_MAX_PX = 640;
