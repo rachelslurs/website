@@ -173,7 +173,9 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        // Prefer semantic stacks (UI vs reading) rather than repurposing `sans`.
+        // This repo uses `font-sans` for UI sans and `font-body` for Lora (reading).
+        sans: ['ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       spacing: {
         '18': '4.5rem',
@@ -205,7 +207,8 @@ export default {
   --color-brand-500: #0ea5e9;
   --color-brand-600: #0284c7;
   
-  --font-sans: "Inter", system-ui, sans-serif;
+  /* Use `font-sans` for UI sans; prefer `font-body` for reading faces. */
+  --font-sans: ui-sans-serif, system-ui, sans-serif;
   
   --radius-lg: 0.75rem;
 }
