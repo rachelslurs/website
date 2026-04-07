@@ -3,7 +3,7 @@ import Layout from "@layouts/Layout.astro";
 import RisoBoardShell from "@components/RisoBoardShell.astro";
 import Datetime from "@components/Datetime";
 import PostFooterTagLinks from "@components/riso/PostFooterTagLinks";
-import TableOfContents from "@components/TableOfContents";
+import TableOfContents from "@components/TableOfContents.astro";
 import CollectionEntryHeader from "@components/CollectionEntryHeader.astro";
 import GhostEntryBack from "@components/riso/GhostEntryBack";
 import GhostBackToTop from "@components/riso/GhostBackToTop";
@@ -29,7 +29,7 @@ const {
   tags,
 } = post.data;
 
-const { Content } = await post.render();
+const { Content, headings } = await post.render();
 
 const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
 const ogUrl = new URL(
@@ -76,7 +76,7 @@ const tagItems = tags.map(t => ({ slug: slugifyStr(t), label: t }));
       <div class="toc-layout-grid">
         <!-- TOC Sidebar -->
         <aside class="toc-sidebar">
-          <TableOfContents client:load />
+          <TableOfContents headings={headings} />
         </aside>
 
         <!-- Main Content -->
