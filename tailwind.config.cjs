@@ -132,7 +132,12 @@ module.exports = {
           "chart-3": withOpacity("--color-chart-3"),
         },
       },
-      /* The Bold Manual: sans aliases body (Lora) for existing font-sans utilities; serif aliases heading (Zilla Slab). */
+      /* The Bold Manual: be explicit about intent.
+       * - sans: UI sans stack (for components/demos that want “app UI”)
+       * - body: Lora serif stack (long-form reading)
+       * - heading/serif: Zilla Slab serif stack
+       * - display: Archivo Black (stamped headlines)
+       */
       fontFamily: {
         sans: [
           "ui-sans-serif",
