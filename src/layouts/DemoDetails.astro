@@ -76,7 +76,7 @@ const nextDemo =
             <div class="post-container">
               <div class="long-looseleaf tape-top-left tape-top-right">
                 <div class="header-zone">
-                  <GhostEntryBack fallbackHref="/demos" client:load />
+                  <GhostEntryBack fallbackHref="/demos" client:visible />
                   <header class="post-header">
                     <CollectionEntryHeader
                       title={title}
@@ -89,7 +89,7 @@ const nextDemo =
                 </div>
 
                 <div
-                  class="prose analog-prose max-w-none min-w-0 prose-img:rounded prose-img:bg-skin-fill"
+                  class="analog-prose prose min-w-0 max-w-none prose-img:rounded prose-img:bg-skin-fill"
                 >
                   <Content />
                 </div>
@@ -110,7 +110,7 @@ const nextDemo =
                 nextPost={nextDemo}
                 hrefBase="/demos"
                 navLabel="Demo navigation"
-                client:load
+                client:visible
               />
             </div>
           </div>
