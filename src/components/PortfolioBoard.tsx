@@ -313,11 +313,7 @@ export default function PortfolioBoard({
           >
             <div className="card h-full hero-card-inner border-[3px] border-[var(--black)] justify-center">
               <h1 className="hero-headline mb-4 mt-0">{heroHeadline}</h1>
-              <div className="intro-calling-card max-w-[480px] rounded-sm border-2 border-[var(--black)] bg-[var(--cream)] px-4 py-3 shadow-[3px_5px_0_rgba(0,0,0,0.12)]">
-                <p className="font-body text-xl leading-tight text-[var(--ink-secondary)] md:text-2xl md:leading-snug">
-                  {heroBody}
-                </p>
-              </div>
+              <p className="hero-body max-w-[480px]">{heroBody}</p>
             </div>
           </BoardCard>
 
