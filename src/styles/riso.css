@@ -1139,6 +1139,61 @@ a.skip-to-content-board:focus {
   color: var(--ink-muted);
 }
 
+/* Work case study: technical annotations + opt-in pullquotes (see WorkDetails work-case-study) */
+.post-detail.work-case-study .analog-prose figure figcaption,
+.post-detail.work-case-study .analog-prose .work-tech-label {
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+  color: rgb(var(--color-placeholder));
+}
+
+.post-detail.work-case-study .analog-prose blockquote.work-pullquote {
+  margin: 2.5rem 0;
+  padding: 0 1rem;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  border-left: none;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(1.563rem, 4vw, 2.441rem);
+  line-height: 1.35;
+  color: var(--analog-ink);
+}
+
+.post-detail.work-case-study .analog-prose blockquote.work-pullquote p {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+  color: inherit;
+}
+
+@media (min-width: 640px) {
+  .post-detail.work-case-study .analog-prose blockquote.work-pullquote {
+    width: calc(100% + 2rem);
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .post-detail.work-case-study .analog-prose blockquote.work-pullquote {
+    width: calc(100% + 4rem);
+    margin-left: -2rem;
+    margin-right: -2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
 .analog-prose hr {
   margin: var(--baseline) 0;
   border: none;

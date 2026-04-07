@@ -70,7 +70,7 @@ function FeaturesDesktop(props: FeaturesProps) {
               <Tab className="text-left ui-not-focus-visible:outline-none p-8 w-full">
                 {({ selected }) => (
                   <div className="group rounded-2xl transition-colors hover:bg-skin-base">
-                    <p className="text-left ui-not-focus-visible:outline-none">
+                    <p className="text-left font-mono text-sm tracking-wide text-skin-placeholder ui-not-focus-visible:outline-none">
                       {feature.caption}
                     </p>
                   </div>
@@ -164,7 +164,7 @@ function FeaturesMobile(props: FeaturesProps) {
                 />
               </Device>
               <div className="text-skin-base p-4">
-                <p className="text-center ui-not-focus-visible:outline-none">
+                <p className="text-center font-mono text-sm tracking-wide text-skin-placeholder ui-not-focus-visible:outline-none">
                   {feature.caption}
                 </p>
               </div>
