@@ -1,4 +1,5 @@
 /* Riso board: palette, texture, pins, dymo, cards — fonts loaded via Fontsource in Layout.astro */
+/* Width breakpoints: @screen uses Tailwind default theme screens (sm/md/lg/xl). */
 
 :root {
   --red: #e8453c;
@@ -46,14 +47,14 @@ nav .group:hover .dust-note {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
   color: var(--black);
   font-family: var(--sans);
-  border: 10px solid rgb(var(--color-border));
+  border: 6px solid rgb(var(--color-border));
   box-shadow:
     inset 0 0 30px rgba(0, 0, 0, 0.15),
     0 20px 50px rgba(0, 0, 0, 0.5);
 }
-@media (max-width: 640px) {
+@screen sm {
   .board {
-    border-width: 6px;
+    border-width: 10px;
   }
 }
 
@@ -116,46 +117,44 @@ nav .group:hover .dust-note {
   box-shadow: 8px 16px 24px rgba(0, 0, 0, 0.28);
 }
 .hero-card-inner {
-  padding: 2rem 2.5rem;
+  padding: 1.25rem;
 }
-@media (max-width: 640px) {
+@screen sm {
   .hero-card-inner {
-    padding: 1.25rem;
+    padding: 2rem 2.5rem;
   }
 }
 
 /* ── HERO LAYOUT ── */
 .zone-hero {
-  display: grid;
-  grid-template-columns: 1fr 240px;
-  gap: 2.25rem;
-  align-items: start;
+  @apply grid items-start gap-9;
+  grid-template-columns: 1fr;
 }
 .hero-sidebar {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
-@media (max-width: 1024px) {
+@screen sm {
   .zone-hero {
     grid-template-columns: 1fr 200px;
   }
-}
-@media (max-width: 640px) {
-  .zone-hero {
-    grid-template-columns: 1fr;
-  }
   .hero-sidebar {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+@screen lg {
+  .zone-hero {
+    grid-template-columns: 1fr 240px;
   }
 }
 
 /* ── HERO TYPOGRAPHY ── */
 .hero-headline {
   font-family: var(--serif);
-  font-size: clamp(32px, 5vw, 48px);
+  font-size: 28px;
   font-weight: 400;
   line-height: 1.05;
 }
@@ -164,14 +163,14 @@ nav .group:hover .dust-note {
   line-height: 1.6;
   color: var(--ink-secondary);
 }
-@media (max-width: 1024px) {
+@screen sm {
   .hero-headline {
     font-size: clamp(28px, 4.5vw, 40px);
   }
 }
-@media (max-width: 640px) {
+@screen lg {
   .hero-headline {
-    font-size: 28px;
+    font-size: clamp(32px, 5vw, 48px);
   }
 }
 
@@ -187,26 +186,32 @@ nav .group:hover .dust-note {
 }
 .post-title {
   font-family: var(--serif);
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1.15;
   color: var(--black);
   font-weight: 400;
 }
 .post-title-lg {
-  font-size: 26px;
+  font-size: 20px;
 }
 
 /* Blog post page h1: same family/weight/color as .post-title, scaled up */
 .post-page-title {
   font-family: var(--serif);
-  font-size: clamp(1.75rem, 4vw, 2.125rem);
+  font-size: clamp(1.375rem, 4vw, 1.875rem);
   line-height: 1.15;
   color: var(--black);
   font-weight: 400;
 }
-@media (max-width: 640px) {
+@screen sm {
+  .post-title {
+    font-size: 22px;
+  }
+  .post-title-lg {
+    font-size: 26px;
+  }
   .post-page-title {
-    font-size: clamp(1.375rem, 4vw, 1.875rem);
+    font-size: clamp(1.75rem, 4vw, 2.125rem);
   }
 }
 .post-excerpt {
@@ -233,12 +238,6 @@ nav .group:hover .dust-note {
   font-size: 0.8125rem;
   line-height: 1.55;
   flex: 1;
-}
-@media (max-width: 640px) {
-  .post-title,
-  .post-title-lg {
-    font-size: 20px;
-  }
 }
 
 /* ── WORK TYPOGRAPHY ── */
@@ -355,8 +354,8 @@ nav .group:hover .dust-note {
 
 /* ── SWATCHES ── */
 .swatch {
-  width: 80px;
-  height: 65px;
+  width: 60px;
+  height: 50px;
   background: var(--sw-color);
   mix-blend-mode: multiply;
   position: relative;
@@ -385,10 +384,10 @@ nav .group:hover .dust-note {
   );
   background-size: 5px 5px;
 }
-@media (max-width: 640px) {
+@screen sm {
   .swatch {
-    width: 60px;
-    height: 50px;
+    width: 80px;
+    height: 65px;
   }
 }
 
@@ -597,7 +596,7 @@ nav .group:hover .dust-note {
   padding: 7px 14px 6px;
 }
 .dymo-lg .dymo-text {
-  font-size: 14px;
+  font-size: 12px;
 }
 .dymo-section {
   padding: 4px 10px 3px;
@@ -625,9 +624,9 @@ nav .group:hover .dust-note {
 .dymo-green.is-interactive:hover {
   background-color: #007a42;
 }
-@media (max-width: 640px) {
+@screen sm {
   .dymo-lg .dymo-text {
-    font-size: 12px;
+    font-size: 14px;
   }
 }
 
@@ -759,21 +758,16 @@ a.skip-to-content-board:focus {
 }
 
 .analog-post .long-looseleaf {
-  position: relative;
-  overflow: visible;
-  box-sizing: border-box;
+  @apply relative z-10 box-border overflow-visible;
   background-color: var(--cream);
   color: var(--analog-ink);
-  padding: var(--baseline) 4rem calc(var(--baseline) * 4) 4rem;
+  padding: var(--baseline) 2rem calc(var(--baseline) * 4) 2rem;
   box-shadow: 4px 10px 24px rgba(0, 0, 0, 0.25);
-  /* Stack above index-card pagination (z-index 5) so cards tuck under this edge */
-  z-index: 10;
 }
-
-@media (max-width: 768px) {
+@screen md {
   .analog-post .long-looseleaf {
-    padding-left: 2rem;
-    padding-right: 2rem;
+    padding-left: 4rem;
+    padding-right: 4rem;
   }
 }
 
@@ -935,16 +929,16 @@ a.skip-to-content-board:focus {
 .analog-post .post-title {
   font-family: var(--display);
   font-weight: 400;
-  font-size: clamp(2.125rem, 4.5vw, 3rem);
+  font-size: clamp(1.875rem, 5vw, 2.25rem);
   line-height: calc(var(--baseline) * 2);
   margin: 0;
   padding: 0 1rem;
   max-width: 100%;
 }
 
-@media (max-width: 768px) {
+@screen md {
   .analog-post .post-title {
-    font-size: clamp(1.875rem, 5vw, 2.25rem);
+    font-size: clamp(2.125rem, 4.5vw, 3rem);
   }
 }
 
@@ -1174,7 +1168,7 @@ a.skip-to-content-board:focus {
   color: inherit;
 }
 
-@media (min-width: 640px) {
+@screen sm {
   .post-detail.work-case-study .analog-prose blockquote.work-pullquote {
     width: calc(100% + 2rem);
     margin-left: -1rem;
@@ -1184,7 +1178,7 @@ a.skip-to-content-board:focus {
   }
 }
 
-@media (min-width: 768px) {
+@screen md {
   .post-detail.work-case-study .analog-prose blockquote.work-pullquote {
     width: calc(100% + 4rem);
     margin-left: -2rem;

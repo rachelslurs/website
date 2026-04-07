@@ -37,10 +37,15 @@
     --color-chart-3: 0, 169, 92; /* riso green */
     --max-3xl: 48rem;
   }
-  @media (max-width: 1279px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  @screen xl {
     html,
     body {
-      overflow-x: hidden;
+      overflow-x: visible;
     }
   }
   body {
@@ -93,8 +98,7 @@
     grid-template-areas: "content";
     gap: 0;
 
-    /* Desktop: flex layout so TOC sits cleanly next to article */
-    @media (min-width: 1280px) {
+    @screen xl {
       display: flex;
       justify-content: center;
       align-items: flex-start;
@@ -103,7 +107,7 @@
   }
 
   /* Horizontal spacing between sidebar and article only here (single source of truth) */
-  @media (min-width: 1280px) {
+  @screen xl {
     .toc-layout-grid:has(.toc-sidebar) {
       gap: 3rem;
     }
@@ -116,7 +120,7 @@
   }
 
   /* Desktop: sticky sidebar; aside is only in the DOM when TOC has entries */
-  @media (min-width: 1280px) {
+  @screen xl {
     .toc-sidebar {
       display: block;
       width: 100%;
