@@ -25,7 +25,7 @@ const {
   summary,
 } = demo.data;
 
-const { Content, headings } = await demo.render();
+const { Content } = await demo.render();
 
 const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
 const ogUrl = new URL(
