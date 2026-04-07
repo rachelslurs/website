@@ -4,7 +4,6 @@ import { useDebouncedCallback } from "use-debounce";
 import { AnimatePresence, motion } from "framer-motion";
 
 import Device from "./Device.tsx";
-import Container from "@components/Container.tsx";
 
 type FeatureProps = {
   src: string;
@@ -48,12 +47,12 @@ function FeaturesDesktop(props: FeaturesProps) {
 
   return (
     <TabGroup
-      className="grid grid-cols-12 items-center gap-8 lg:gap-16 xl:gap-24"
+      className="grid grid-cols-1 md:grid-cols-2 items-center gap-8 lg:gap-12"
       selectedIndex={selectedIndex}
       onChange={onChange}
       vertical
     >
-      <TabList className="relative z-10 order-last col-span-6 space-y-6">
+      <TabList className="relative z-10 order-last space-y-6">
         {features.map((feature, featureIndex) => (
           <div
             className="relative rounded-2xl bg-skin-card-muted text-skin-base transition-colors hover:border-dashed hover:border-skin-accent"
@@ -81,7 +80,7 @@ function FeaturesDesktop(props: FeaturesProps) {
           </div>
         ))}
       </TabList>
-      <div className="relative col-span-6">
+      <div className="relative">
         <Device>
           <TabPanels as={Fragment}>
             <AnimatePresence
@@ -200,12 +199,12 @@ export default function PrimaryFeatures(props: FeaturesProps) {
   const { features } = props;
   return (
     <section id="features" aria-label="Features">
-      <Container className="my-8 sm:hidden">
+      <div className="my-8 md:hidden">
         <FeaturesMobile features={features} />
-      </Container>
-      <Container className="hidden sm:my-12 sm:block">
+      </div>
+      <div className="hidden md:my-12 md:block">
         <FeaturesDesktop features={features} />
-      </Container>
+      </div>
     </section>
   );
 }
