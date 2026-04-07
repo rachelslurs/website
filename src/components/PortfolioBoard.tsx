@@ -239,18 +239,17 @@ const SectionDivider = ({ label, id }: { label: string; id: string }) => {
   const delay = prefersReducedMotion ? 0 : boardEntranceDelayS;
   return (
     <motion.div
-      className="flex items-center gap-3 py-2"
+      className="mb-6 mt-16 flex items-center gap-3 py-2"
       id={id}
       initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, x: -20 }}
       whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: "-5% 0px" }}
       transition={{ duration: 0.4, ease: "easeOut", delay }}
     >
-      <h2 className="sr-only">
-        {label.charAt(0) + label.slice(1).toLowerCase()}
+      <h2 className="font-heading shrink-0 text-lg font-semibold uppercase tracking-wide text-[var(--black)]">
+        {label}
       </h2>
-      <DymoLabel text={label} size="section" isInteractive={false} />
-      <span className="h-px flex-1 bg-skin-base/15" aria-hidden="true" />
+      <span className="h-px flex-1 bg-[var(--black)]/15" aria-hidden="true" />
     </motion.div>
   );
 };
@@ -304,7 +303,7 @@ export default function PortfolioBoard({
 
   return (
     <BoardEntranceDelayContext.Provider value={boardEntranceDelayS}>
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col">
         <section className="zone-hero relative" aria-label="Introduction">
           <BoardCard
             index={0}
@@ -314,7 +313,11 @@ export default function PortfolioBoard({
           >
             <div className="card h-full hero-card-inner border-[3px] border-[var(--black)] justify-center">
               <h1 className="hero-headline mb-4 mt-0">{heroHeadline}</h1>
-              <p className="hero-body max-w-[480px]">{heroBody}</p>
+              <div className="intro-calling-card max-w-[480px] rounded-sm border-2 border-[var(--black)] bg-[var(--cream)] px-4 py-3 shadow-[3px_5px_0_rgba(0,0,0,0.12)]">
+                <p className="font-body text-xl leading-tight text-[var(--ink-secondary)] md:text-2xl md:leading-snug">
+                  {heroBody}
+                </p>
+              </div>
             </div>
           </BoardCard>
 
@@ -379,7 +382,7 @@ export default function PortfolioBoard({
           />
         </section>
 
-        <SectionDivider label="WRITING" id="posts" />
+        <SectionDivider label="Recent Posts" id="posts" />
         <section
           className="relative grid grid-cols-3 gap-8 max-lg:grid-cols-2 max-sm:grid-cols-1"
           aria-label="Blog posts"
@@ -445,7 +448,7 @@ export default function PortfolioBoard({
           <Swatch color="var(--green)" pattern="stripe" index={5} />
         </div>
 
-        <SectionDivider label="WORK" id="work" />
+        <SectionDivider label="Featured Work" id="work" />
         <section
           className="relative grid grid-cols-3 gap-8 max-lg:grid-cols-2 max-sm:grid-cols-1"
           aria-label="Selected work"
