@@ -85,7 +85,7 @@ const tagItems = tags.map(t => ({ slug: slugifyStr(t), label: t }));
             <div class="post-container">
               <div class="long-looseleaf tape-top-left tape-top-right">
                 <div class="header-zone">
-                  <GhostEntryBack fallbackHref="/work" client:load />
+                  <GhostEntryBack fallbackHref="/work" client:visible />
                   <header class="post-header">
                     <CollectionEntryHeader
                       title={title}
@@ -98,7 +98,7 @@ const tagItems = tags.map(t => ({ slug: slugifyStr(t), label: t }));
                 </div>
 
                 <div
-                  class="prose analog-prose max-w-none min-w-0 prose-img:rounded prose-img:bg-skin-fill"
+                  class="analog-prose prose min-w-0 max-w-none prose-img:rounded prose-img:bg-skin-fill"
                 >
                   {
                     features && features.length > 0 && (
@@ -117,13 +117,13 @@ const tagItems = tags.map(t => ({ slug: slugifyStr(t), label: t }));
                           <PostFooterTagLinks
                             items={tagItems}
                             basePath="/tech"
-                            client:load
+                            client:visible
                           />
                         </div>
                       )
                     }
                   </footer>
-                  <GhostBackToTop client:load />
+                  <GhostBackToTop client:visible />
                 </div>
 
                 <div
@@ -138,7 +138,7 @@ const tagItems = tags.map(t => ({ slug: slugifyStr(t), label: t }));
                 nextPost={nextWork}
                 hrefBase="/work"
                 navLabel="Work navigation"
-                client:load
+                client:visible
               />
             </div>
           </div>

@@ -89,7 +89,7 @@ const tagItems = tags.map(t => ({ slug: slugifyStr(t), label: t }));
             <div class="post-container">
               <div class="long-looseleaf tape-top-left tape-top-right">
                 <div class="header-zone">
-                  <GhostEntryBack fallbackHref="/posts" client:load />
+                  <GhostEntryBack fallbackHref="/posts" client:visible />
                   <header class="post-header">
                     <Datetime
                       pubDatetime={pubDatetime}
@@ -106,7 +106,7 @@ const tagItems = tags.map(t => ({ slug: slugifyStr(t), label: t }));
                 </div>
 
                 <div
-                  class="prose analog-prose max-w-none min-w-0 prose-img:rounded prose-img:bg-skin-fill"
+                  class="analog-prose prose min-w-0 max-w-none prose-img:rounded prose-img:bg-skin-fill"
                 >
                   <Content />
                 </div>
@@ -117,12 +117,12 @@ const tagItems = tags.map(t => ({ slug: slugifyStr(t), label: t }));
                       tagItems.length > 0 && (
                         <div class="post-tags">
                           <span class="post-tags-heading">Tags:</span>
-                          <PostFooterTagLinks items={tagItems} client:load />
+                          <PostFooterTagLinks items={tagItems} client:visible />
                         </div>
                       )
                     }
                   </footer>
-                  <GhostBackToTop client:load />
+                  <GhostBackToTop client:visible />
                 </div>
 
                 <div
@@ -135,7 +135,7 @@ const tagItems = tags.map(t => ({ slug: slugifyStr(t), label: t }));
               <PostPagination
                 prevPost={prevPost}
                 nextPost={nextPost}
-                client:load
+                client:visible
               />
             </div>
           </div>
