@@ -60,7 +60,7 @@
 
   /* The Bold Manual — heading roles + proximity (margin-top ≈ 2.5× margin-bottom) */
   h1 {
-    @apply font-display text-3xl sm:text-4xl md:text-5xl break-words;
+    @apply font-display text-3xl sm:text-4xl md:text-5xl break-words leading-tight md:leading-[1.15];
     margin-top: 1.25em;
     margin-bottom: 0.5em;
   }
