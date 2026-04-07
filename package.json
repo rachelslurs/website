@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "tinacms dev -c \"astro dev\"",
     "start": "tinacms build && astro dev",
-    "build": "tinacms build && astro build",
+    "build": "node scripts/tina-build.mjs && astro build",
     "preview": "astro preview",
     "sync": "astro sync",
     "astro": "astro",
