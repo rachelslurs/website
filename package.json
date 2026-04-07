@@ -13,7 +13,9 @@
     "format": "prettier --write . --plugin=prettier-plugin-astro",
     "cz": "cz",
     "prepare": "husky install",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "perf:report": "node scripts/perf-baseline.mjs",
+    "perf:baseline": "npm run build && npm run perf:report"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
