@@ -59,8 +59,7 @@ export interface PortfolioBoardProps {
 const DEFAULT_SKILLS = [
   "React",
   "TypeScript",
-  "Node.js",
-  "Framer Motion",
+  "UI Animation",
   "Design Systems",
   "a11y",
   "Storybook",
@@ -335,7 +334,7 @@ export default function PortfolioBoard({
                 {skills.map((tag, i) => {
                   const highlight = ["React", "a11y"].includes(tag)
                     ? "tag-yellow"
-                    : tag === "Framer Motion"
+                    : tag === "UI Animation"
                       ? "tag-pink"
                       : "";
                   return (
