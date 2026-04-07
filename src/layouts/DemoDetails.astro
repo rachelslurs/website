@@ -41,7 +41,6 @@ const layoutProps = {
   modDatetime,
   canonicalURL,
   ogImage: ogUrl,
-  scrollSmooth: true,
 };
 
 const allDemos = demos.map(({ data: { title: t }, slug }) => ({
@@ -152,7 +151,7 @@ const nextDemo =
       }
     }
   }
-  document.addEventListener("scroll", updateScrollProgress);
+  document.addEventListener("scroll", updateScrollProgress, { passive: true });
 
   /** Attaches links to headings in the document,
    *  allowing sharing of sections easily.

@@ -48,7 +48,6 @@ const layoutProps = {
   modDatetime,
   canonicalURL,
   ogImage: ogUrl,
-  scrollSmooth: true,
 };
 
 const allWorks = works.map(({ data: { title: t }, slug }) => ({
@@ -198,7 +197,7 @@ const hasSidebarToc = filterTocHeadings(headings).length > 0;
       }
     }
   }
-  document.addEventListener("scroll", updateScrollProgress);
+  document.addEventListener("scroll", updateScrollProgress, { passive: true });
 
   /** Attaches links to headings in the document,
    *  allowing sharing of sections easily.

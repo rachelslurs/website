@@ -44,3 +44,37 @@ const { animateNav = false } = Astro.props;
     </div>
   </div>
 </div>
+
+<script is:inline>
+  /** Skip link: instant scroll (avoid animating past chrome; matches user expectation). */
+  (function initSkipToContent() {
+    function bind() {
+      const skip = document.getElementById("skip-to-content");
+      if (!skip || skip.dataset.skipInstantBound) return;
+      skip.dataset.skipInstantBound = "true";
+      skip.addEventListener("click", e => {
+        e.preventDefault();
+        const main = document.getElementById("main-content");
+        if (!main) return;
+        const hadTabindex = main.hasAttribute("tabindex");
+        if (!hadTabindex) main.setAttribute("tabindex", "-1");
+        main.scrollIntoView({ behavior: "auto", block: "start" });
+        main.focus({ preventScroll: true });
+        if (!hadTabindex) {
+          main.addEventListener(
+            "blur",
+            () => main.removeAttribute("tabindex"),
+            { once: true }
+          );
+        }
+        history.replaceState(null, "", "#main-content");
+      });
+    }
+    bind();
+    const afterSwapKey = "__skipToContentAfterSwap";
+    if (!globalThis[afterSwapKey]) {
+      globalThis[afterSwapKey] = true;
+      document.addEventListener("astro:after-swap", bind);
+    }
+  })();
+</script>

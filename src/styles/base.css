@@ -15,6 +15,18 @@
     }
   }
 
+  /* Native anchor / fragment navigation; respect reduced motion (Tailwind `scroll-smooth` alone does not). */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /* In-page targets clear sticky UI and read comfortably below the top edge */
+  #main-content :is(h2, h3, h4, h5, h6)[id] {
+    scroll-margin-top: 5rem;
+  }
+
   :root {
     /* Looseleaf / ghost nav line rhythm (~1.75× body); scales if `html` font-size changes */
     --analog-baseline: 1.75rem;

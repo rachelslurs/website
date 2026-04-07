@@ -30,7 +30,6 @@ export interface Props {
   canonicalURL?: string;
   pubDatetime?: Date;
   modDatetime?: Date | null;
-  scrollSmooth?: boolean;
 }
 
 /** Ensure canonical URL has no trailing slash for directory-like pages (SEO consistency) */
@@ -53,7 +52,6 @@ const {
   canonicalURL = getCanonicalURL(),
   pubDatetime,
   modDatetime,
-  scrollSmooth = false,
 } = Astro.props;
 
 const pathname = Astro.url.pathname;
@@ -86,10 +84,7 @@ const structuredData =
 ---
 
 <!doctype html>
-<html
-  lang=`${LOCALE.lang ?? "en"}`
-  class={`${scrollSmooth && "scroll-smooth"}`}
->
+<html lang=`${LOCALE.lang ?? "en"}`>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
