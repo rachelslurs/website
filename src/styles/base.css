@@ -119,11 +119,12 @@
   @media (min-width: 1280px) {
     .toc-sidebar {
       display: block;
-      width: 220px;
+      width: 100%;
+      max-width: 250px;
       flex-shrink: 0;
       align-self: flex-start;
       position: sticky;
-      top: 5rem;
+      top: 6rem;
       margin-top: 2rem;
     }
   }
@@ -477,7 +478,8 @@
   /* ── THE LIBRARY CARD ── */
   .library-card-toc {
     background-color: rgb(var(--color-card)); /* Riso Cream */
-    width: 220px;
+    width: 100%;
+    max-width: 250px;
     padding: 2rem 1.5rem 1.5rem 1.5rem;
     box-shadow: 2px 4px 12px rgba(var(--color-shadow), 0.15);
     position: relative;
@@ -507,16 +509,9 @@
     }
   }
 
-  /* ── TOC TYPOGRAPHY ── */
+  /* ── TOC TYPOGRAPHY (Bold Manual: mono label + body links, tight short-line rhythm) ── */
   .toc-header {
-    font-family: "Space Mono", monospace;
-    font-size: 0.65rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: rgb(var(--color-placeholder));
-    margin-bottom: 1.5rem;
-    text-align: center;
+    @apply mb-6 text-center font-mono text-xs font-semibold uppercase tracking-widest text-skin-placeholder;
   }
 
   .toc-list {
@@ -525,42 +520,25 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
+    gap: 0.75rem;
   }
 
   .toc-link {
-    font-family: "DM Sans", sans-serif;
-    font-size: 0.85rem;
-    line-height: 1.4;
-    color: rgba(var(--color-text-base), 0.7);
-    text-decoration: none;
-    display: block;
-    transition: all 0.2s ease;
-    position: relative;
+    @apply relative block border-l-2 border-transparent pl-3 font-body text-[15px] font-medium leading-snug text-skin-base/70 no-underline transition-colors duration-200;
+  }
+
+  .toc-item[data-toc-depth="3"] .toc-link,
+  .toc-item[data-toc-depth="4"] .toc-link {
+    @apply font-normal text-skin-base/60;
   }
 
   /* ── ACTIVE & HOVER STATES ── */
   .toc-link:hover {
-    color: rgb(var(--color-text-base));
+    @apply text-skin-base;
   }
 
-  /* The active section gets the "red pen" treatment */
+  /* Active section: accent tab + weight (scroll-spy sets .active on li) */
   .toc-item.active .toc-link {
-    color: rgb(var(--color-accent));
-    /* Faux-bold without layout shift */
-    text-shadow: 0.3px 0 0 currentColor;
-  }
-
-  /* Optional: Faux red dot next to active item */
-  .toc-item.active .toc-link::before {
-    content: "";
-    position: absolute;
-    left: -14px;
-    top: calc(50% - 3px);
-    width: 6px;
-    height: 6px;
-    background-color: rgb(var(--color-accent));
-    border-radius: 50%;
-    opacity: 0.8;
+    @apply border-skin-accent font-semibold text-skin-accent;
   }
 }

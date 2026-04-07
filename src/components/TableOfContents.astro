@@ -29,7 +29,8 @@ const tocItems = filterTocHeadings(headings).map(h => ({
           {tocItems.map(item => (
             <li
               class="toc-item"
-              style={{ paddingLeft: `${(item.level - 2) * 0.75}rem` }}
+              data-toc-depth={item.level}
+              style={{ paddingLeft: `${Math.max(0, item.level - 2) * 1}rem` }}
               data-toc-id={item.id}
             >
               <a href={`#${item.id}`} class="toc-link">
