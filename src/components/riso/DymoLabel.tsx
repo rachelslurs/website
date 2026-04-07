@@ -45,21 +45,23 @@ const DymoLabel = React.memo(
       .join(" ");
 
     const inner = (
-      <span className="dymo-text" aria-label={text}>
-        {chars.map((c, i) => (
-          <span
-            key={i}
-            aria-hidden="true"
-            style={{
-              marginRight: c.mr,
-              transform: `translateY(${c.y}) rotate(${c.rot})`,
-              display: "inline-block",
-            }}
-          >
-            {c.char}
-          </span>
-        ))}
-      </span>
+      <>
+        <span className="sr-only">{text}</span>
+        <span className="dymo-text" aria-hidden="true">
+          {chars.map((c, i) => (
+            <span
+              key={i}
+              style={{
+                marginRight: c.mr,
+                transform: `translateY(${c.y}) rotate(${c.rot})`,
+                display: "inline-block",
+              }}
+            >
+              {c.char}
+            </span>
+          ))}
+        </span>
+      </>
     );
 
     if (Tag === "a") {
