@@ -8,6 +8,7 @@ import risoAnalogTheme, {
   risoAnalogSyntaxTransformer,
 } from "./src/config/shiki-riso-theme";
 import mdx from "@astrojs/mdx";
+import rehypeTableWrap from "./src/plugins/rehype-table-wrap";
 
 // https://astro.build/config
 export default defineConfig({
@@ -23,6 +24,7 @@ export default defineConfig({
   ],
   markdown: {
     remarkPlugins: [remarkToc],
+    rehypePlugins: [rehypeTableWrap as any],
     shikiConfig: {
       theme: risoAnalogTheme,
       wrap: true,

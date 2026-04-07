@@ -371,11 +371,16 @@
     }
   }
 
-  /* Allow wide tables to scroll horizontally on narrow viewports */
-  .analog-prose table {
-    display: block;
+  /* Responsive tables: a rehype plugin wraps <table> in a scrollable div.
+     The wrapper handles overflow; the table keeps its native layout. */
+  .table-scroll-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    margin: var(--analog-baseline, 1.75rem) 0;
+  }
+
+  .table-scroll-wrapper table {
+    margin: 0;
   }
 
   /* Remove backticks that Tailwind Typography adds to inline code */
