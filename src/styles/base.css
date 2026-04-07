@@ -118,7 +118,11 @@
     @apply prose min-w-0 max-w-prose prose-img:rounded prose-img:bg-skin-fill;
   }
 
-  /* Unconditionally hide inline remark-toc since we use the sidebar TOC component on all screen sizes */
+  /*
+   * Hide remark-toc output inside the article so it never duplicates the sidebar TOC.
+   * Sidebar TOC (.toc-sidebar) is only shown at xl+; below 1280px there is no TOC column—
+   * readers use in-flow headings only.
+   */
   .toc-layout-grid article #table-of-contents,
   .toc-layout-grid article #table-of-contents + ul {
     display: none !important;
