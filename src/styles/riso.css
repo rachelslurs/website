@@ -14,8 +14,9 @@
   --ink-muted: #6b5c4c; /* warm medium brown — replaces #555 */
   --ink-secondary: #292524; /* warm dark brown — replaces #222 */
   --mono: "IBM Plex Mono", monospace;
-  --serif: "Playfair Display", Georgia, serif;
-  --sans: "Lato", sans-serif;
+  --display: "Archivo Black", sans-serif;
+  --serif: "Zilla Slab", Georgia, serif;
+  --sans: "Lora", Georgia, serif;
 }
 
 /* “Pardon the dust” tape wiggle — keyframes + group-hover (see RisoNav) */
@@ -914,7 +915,7 @@ a.skip-to-content-board:focus {
 }
 
 .analog-post .post-title {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-weight: 400;
   font-size: 46px;
   line-height: calc(var(--baseline) * 2);
