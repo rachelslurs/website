@@ -3,13 +3,13 @@ import type { ReactNode } from "react";
 type BlogDemoProps = {
   children: ReactNode;
   /**
-   * Break out of the `.analog-prose` 600px measure so charts / wide UIs use the
+   * Break out of the `.analog-prose` ~65ch measure so charts / wide UIs use the
    * full looseleaf content band.
    */
   wide?: boolean;
 };
 
-/** Escape `.analog-prose`’s 600px column: wider box + equal negative L/R margins keeps the card centered. */
+/** Escape `.analog-prose`’s column: wider box + equal negative L/R margins keeps the card centered. */
 const BREAKOUT_DEFAULT =
   "sm:w-[calc(100%+2rem)] sm:-mx-4 md:w-[calc(100%+4rem)] md:-mx-8";
 const BREAKOUT_WIDE =
