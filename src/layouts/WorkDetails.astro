@@ -10,6 +10,7 @@ import GhostBackToTop from "@components/riso/GhostBackToTop";
 import PostPagination from "@components/riso/PostPagination";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
+import { filterTocHeadings } from "@utils/filterTocHeadings";
 import { SITE } from "@config";
 export interface Props {
   work: CollectionEntry<"work">;
@@ -64,16 +65,21 @@ const nextWork =
     : null;
 
 const tagItems = tags.map(t => ({ slug: slugifyStr(t), label: t }));
+
+const hasSidebarToc = filterTocHeadings(headings).length > 0;
 ---
 
 <Layout {...layoutProps}>
   <RisoBoardShell>
     <main id="main-content" class="app-layout board-slot">
       <div class="toc-layout-grid">
-        <!-- TOC Sidebar -->
-        <aside class="toc-sidebar">
-          <TableOfContents headings={headings} />
-        </aside>
+        {
+          hasSidebarToc && (
+            <aside class="toc-sidebar">
+              <TableOfContents headings={headings} />
+            </aside>
+          )
+        }
 
         <!-- Main Content -->
         <article
