@@ -25,12 +25,22 @@ const DymoLabel = React.memo(
       return text
         .toUpperCase()
         .split("")
-        .map((char, i) => ({
-          char,
-          mr: `${seededOffset(i * 3, 0.8) + 0.8}px`,
-          y: `${seededOffset(i * 7, 0.5)}px`,
-          rot: `${seededOffset(i * 13, 1.5)}deg`,
-        }));
+        .map((char, i) => {
+          if (char === " ") {
+            return {
+              char: "\u00A0",
+              mr: "4px",
+              y: "0px",
+              rot: "0deg",
+            };
+          }
+          return {
+            char,
+            mr: `${seededOffset(i * 3, 0.8) + 0.8}px`,
+            y: `${seededOffset(i * 7, 0.5)}px`,
+            rot: `${seededOffset(i * 13, 1.5)}deg`,
+          };
+        });
     }, [text]);
 
     const cls = [
