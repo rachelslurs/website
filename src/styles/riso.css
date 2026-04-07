@@ -17,7 +17,7 @@
   --mono: "IBM Plex Mono", monospace;
   --display: "Archivo Black", sans-serif;
   --serif: "Zilla Slab", Georgia, serif;
-  --sans: "Lora", Georgia, serif;
+  --body: "Lora", Georgia, serif;
 }
 
 /* “Pardon the dust” tape wiggle — keyframes + group-hover (see RisoNav) */
@@ -46,7 +46,7 @@ nav .group:hover .dust-note {
   background: var(--cork);
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
   color: var(--black);
-  font-family: var(--sans);
+  font-family: var(--body);
   border: 6px solid rgb(var(--color-border));
   box-shadow:
     inset 0 0 30px rgba(0, 0, 0, 0.15),
@@ -217,7 +217,7 @@ nav .group:hover .dust-note {
   font-weight: 700;
 }
 .posts-index-board .post-excerpt {
-  font-family: var(--sans);
+  font-family: var(--body);
   margin-top: 0;
   font-size: 0.8125rem;
   line-height: 1.55;
@@ -235,7 +235,7 @@ nav .group:hover .dust-note {
   font-weight: 700;
 }
 .work-name {
-  font-family: var(--sans);
+  font-family: var(--body);
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 0.35rem;
@@ -936,7 +936,7 @@ a.skip-to-content-board:focus {
 .analog-prose {
   max-width: min(65ch, 100%);
   margin: 0 auto;
-  font-family: var(--sans);
+  font-family: var(--body);
   font-size: 1rem;
   line-height: var(--baseline);
   color: var(--analog-body);
@@ -1306,7 +1306,7 @@ a.skip-to-content-board:focus {
 }
 
 .analog-post-back button {
-  font-family: var(--sans);
+  font-family: var(--body);
   font-size: 16px;
   line-height: var(--baseline);
   color: var(--analog-ink);
