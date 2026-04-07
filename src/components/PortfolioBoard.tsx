@@ -246,8 +246,8 @@ const SectionDivider = ({ label, id }: { label: string; id: string }) => {
       viewport={{ once: true, margin: "-5% 0px" }}
       transition={{ duration: 0.4, ease: "easeOut", delay }}
     >
-      <h2 className="font-heading shrink-0 text-lg font-semibold uppercase tracking-wide text-[var(--black)]">
-        {label}
+      <h2 className="shrink-0">
+        <DymoLabel text={label} size="section" isInteractive={false} />
       </h2>
       <span className="h-px flex-1 bg-[var(--black)]/15" aria-hidden="true" />
     </motion.div>
