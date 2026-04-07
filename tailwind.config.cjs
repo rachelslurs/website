@@ -132,10 +132,27 @@ module.exports = {
           "chart-3": withOpacity("--color-chart-3"),
         },
       },
+      /* The Bold Manual: sans aliases body (Lora) for existing font-sans utilities; serif aliases heading (Zilla Slab). */
       fontFamily: {
-        sans: ["Lato", "ui-sans-serif", "system-ui", "sans-serif"],
-        serif: ["Playfair Display", "Georgia", "serif"],
+        sans: ["Lora", "Georgia", "ui-serif", "serif"],
+        serif: ["Zilla Slab", "Georgia", "serif"],
+        display: ["Archivo Black", "ui-sans-serif", "system-ui", "sans-serif"],
+        heading: ["Zilla Slab", "Georgia", "serif"],
+        body: ["Lora", "Georgia", "ui-serif", "serif"],
         mono: ["IBM Plex Mono", "ui-monospace", "SFMono-Regular", "monospace"],
+      },
+
+      /* Modular scale — major third (1.25); rem values harmonize display vs body */
+      fontSize: {
+        "type-2xs": ["0.64rem", { lineHeight: "1.5" }],
+        "type-xs": ["0.8rem", { lineHeight: "1.55" }],
+        "type-sm": ["1rem", { lineHeight: "1.65" }],
+        "type-md": ["1.25rem", { lineHeight: "1.5" }],
+        "type-lg": ["1.563rem", { lineHeight: "1.45" }],
+        "type-xl": ["1.953rem", { lineHeight: "1.35" }],
+        "type-2xl": ["2.441rem", { lineHeight: "1.25" }],
+        "type-3xl": ["3.052rem", { lineHeight: "1.15" }],
+        "type-4xl": ["3.815rem", { lineHeight: "1.1" }],
       },
 
       boxShadow: {
@@ -154,9 +171,9 @@ module.exports = {
             'blockquote p:first-of-type::before': false,
             'blockquote p:first-of-type::after': false,
             maxWidth: 'var(--max-3xl)',
-            lineHeight: '1.75',
+            lineHeight: '1.65',
             fontSize: '1rem',
-            fontFamily: "'Lato', ui-sans-serif, system-ui, sans-serif",
+            fontFamily: "'Lora', Georgia, ui-serif, serif",
             color: 'rgb(var(--color-text-base))',
             'a:hover': {
               color: 'rgb(var(--color-accent))',
@@ -171,17 +188,77 @@ module.exports = {
             li: {
               marginBottom: '0.5em',
             },
-            'h1, h2, h3, h4, h5, h6': {
+            h1: {
+              fontWeight: '400',
+              letterSpacing: '-0.02em',
+              fontFamily: 'Archivo Black, ui-sans-serif, system-ui, sans-serif',
+              marginTop: '1.25em',
+              marginBottom: '0.5em',
+            },
+            'h1:first-child': {
+              marginTop: '0',
+            },
+            h2: {
               fontWeight: '600',
-              letterSpacing: '-0.003em',
-              fontFamily: 'Playfair Display, Georgia, serif',
+              letterSpacing: '-0.01em',
+              fontFamily: 'Zilla Slab, Georgia, serif',
+              marginTop: '1.25em',
+              marginBottom: '0.5em',
+            },
+            'h2:first-child': {
+              marginTop: '0',
+            },
+            h3: {
+              fontWeight: '600',
+              letterSpacing: '-0.01em',
+              fontFamily: 'Zilla Slab, Georgia, serif',
+              marginTop: '1.25em',
+              marginBottom: '0.5em',
+            },
+            'h3:first-child': {
+              marginTop: '0',
+            },
+            h4: {
+              fontWeight: '600',
+              letterSpacing: '-0.01em',
+              fontFamily: 'Zilla Slab, Georgia, serif',
+              marginTop: '1.25em',
+              marginBottom: '0.5em',
+            },
+            'h4:first-child': {
+              marginTop: '0',
+            },
+            h5: {
+              fontWeight: '600',
+              letterSpacing: '-0.01em',
+              fontFamily: 'Zilla Slab, Georgia, serif',
+              marginTop: '1.25em',
+              marginBottom: '0.5em',
+            },
+            'h5:first-child': {
+              marginTop: '0',
+            },
+            h6: {
+              fontWeight: '600',
+              letterSpacing: '-0.01em',
+              fontFamily: 'Zilla Slab, Georgia, serif',
+              marginTop: '1.25em',
+              marginBottom: '0.5em',
+            },
+            'h6:first-child': {
+              marginTop: '0',
             },
             code: {
               fontFamily: 'IBM Plex Mono, monospace',
+              fontSize: '0.9em',
               backgroundColor: 'rgba(var(--color-text-base), 0.05)',
               padding: '0.2em 0.4em',
               borderRadius: '4px',
               fontWeight: '400',
+            },
+            pre: {
+              fontFamily: 'IBM Plex Mono, monospace',
+              fontSize: '0.9em',
             },
             strong: {
               color: 'inherit',
@@ -190,6 +267,7 @@ module.exports = {
             'pre code': {
               backgroundColor: 'transparent',
               padding: '0',
+              fontSize: '1em',
             },
             'blockquote, blockquote > ul, blockquote > ol': {
               fontStyle: 'normal',

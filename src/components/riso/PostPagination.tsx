@@ -92,7 +92,7 @@ export default function PostPagination({
     }
 
     .riso-post-pagination .card-title {
-      font-family: 'Playfair Display', Georgia, serif;
+      font-family: var(--serif);
       font-size: 1.125rem;
       line-height: 1.3;
       color: rgb(var(--color-text-base));

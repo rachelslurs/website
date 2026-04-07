@@ -44,7 +44,36 @@
     }
   }
   body {
-    @apply flex min-h-[100svh] flex-col bg-skin-fill text-skin-base selection:bg-skin-accent selection:bg-opacity-70 selection:text-skin-inverted;
+    @apply flex min-h-[100svh] flex-col bg-skin-fill font-body leading-[1.65] text-skin-base selection:bg-skin-accent selection:bg-opacity-70 selection:text-skin-inverted;
+  }
+
+  /* The Bold Manual — heading roles + proximity (margin-top ≈ 2.5× margin-bottom) */
+  h1 {
+    @apply font-display;
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+  }
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+    margin-top: 1.25em;
+    margin-bottom: 0.5em;
+  }
+  :is(h1, h2, h3, h4, h5, h6):first-child {
+    margin-top: 0;
+  }
+
+  code {
+    @apply font-mono text-[0.9em];
+  }
+  pre {
+    @apply font-mono text-[0.9em];
+  }
+  pre code {
+    font-size: 1em;
   }
   /* Full width within the cork board (matches homepage); use max-w-3xl on inner prose where needed */
   .app-layout {
