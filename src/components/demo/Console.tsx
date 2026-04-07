@@ -36,12 +36,12 @@ function Console({
       }`}
     >
       <div
-        className={`shrink-0 flex items-center h-8 px-3 border-b border-skin-line ${
+        className={`shrink-0 flex items-center h-5 px-2 border-b border-skin-line ${
           isInverted ? "bg-skin-inverted" : "bg-skin-card-muted"
         }`}
       >
         <span
-          className={`text-xs font-semibold uppercase tracking-wider ${
+          className={`text-[10px] font-semibold uppercase tracking-wider ${
             isInverted
               ? "text-skin-inverted opacity-90"
               : "text-skin-base opacity-70"
@@ -52,7 +52,7 @@ function Console({
       </div>
       <div
         ref={scrollRef}
-        className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-3 py-2 font-mono text-sm ${
+        className={`flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-2 py-1 font-mono text-xs ${
           isInverted
             ? "console-scroll-inverted text-skin-inverted"
             : "text-skin-base"
@@ -60,7 +60,7 @@ function Console({
       >
         {log.length === 0 ? (
           <div
-            className={`text-sm italic ${isInverted ? "text-skin-inverted/60" : "text-skin-base/50"}`}
+            className={`text-xs italic ${isInverted ? "text-skin-inverted/60" : "text-skin-base/50"}`}
           >
             No messages
           </div>
@@ -76,16 +76,16 @@ function Console({
             return (
               <div
                 key={entry.id}
-                className={`py-1.5 pr-2 flex items-start gap-2 border-l-2 pl-2 -ml-px transition-all duration-500 ease-in-out ${opacity} ${
+                className={`py-0.5 pr-1 flex items-start gap-1 border-l-2 pl-1.5 -ml-px transition-all duration-500 ease-in-out ${opacity} ${
                   isLatest ? "border-skin-accent" : "border-skin-line"
                 }`}
               >
                 <span
-                  className={`shrink-0 select-none text-sm ${isInverted ? "text-skin-inverted/60" : "text-skin-base/50"}`}
+                  className={`shrink-0 select-none text-xs ${isInverted ? "text-skin-inverted/60" : "text-skin-base/50"}`}
                 >
                   &gt;
                 </span>
-                <span className="break-all leading-snug text-sm">
+                <span className="break-all leading-snug text-xs">
                   {entry.text}
                 </span>
               </div>

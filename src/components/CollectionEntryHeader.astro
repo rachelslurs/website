@@ -24,7 +24,7 @@ const {
     "collection-entry-title",
     "inline-block",
     variant === "blog" && !analogPostTitle && "post-page-title",
-    analogPostTitle && "post-title font-display",
+    analogPostTitle && "analog-post-title",
   ]}
 >
   {title}
@@ -32,10 +32,15 @@ const {
 {summary && <p class="my-6 text-lg leading-6">{summary}</p>}
 
 <style>
-  .collection-entry-title:not(.post-page-title):not(.post-title) {
+  .collection-entry-title:not(.post-page-title):not(.post-title):not(
+      .analog-post-title
+    ) {
     @apply mb-4 text-skin-accent;
   }
   .post-page-title {
+    @apply mb-4;
+  }
+  .analog-post-title {
     @apply mb-4;
   }
 </style>

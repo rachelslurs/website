@@ -23,7 +23,7 @@ export default function BlogDemo({ children, wide = false }: BlogDemoProps) {
     <figure
       className={`
         tape-c tc-pink
-        group not-prose relative z-10 my-10 w-full max-w-none
+        blog-demo group not-prose relative z-10 my-10 w-full max-w-none
         border border-skin-line/40 bg-skin-fill
         p-4 sm:p-6 lg:p-8
         shadow-[2px_4px_12px_rgba(var(--color-shadow),0.08)]
