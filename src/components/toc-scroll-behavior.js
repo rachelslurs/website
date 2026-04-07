@@ -7,10 +7,14 @@
  */
 (function () {
   let controller;
+  /** Bumps on each init so stale setTimeouts from a torn-down page are ignored. */
+  let runGeneration = 0;
 
   function init() {
     // Abort any previous instance (safety net for double-init).
     if (controller) controller.abort();
+    runGeneration += 1;
+    const generation = runGeneration;
     controller = new AbortController();
     const { signal } = controller;
 
@@ -131,6 +135,7 @@
 
           const scrollDuration = prefersReducedMotion ? 100 : 1000;
           window.setTimeout(() => {
+            if (generation !== runGeneration) return;
             isScrolling = false;
           }, scrollDuration);
 
@@ -154,5 +159,10 @@
 
   // Run on first load and after each view-transition swap.
   init();
-  document.addEventListener("astro:after-swap", init);
+  // Register once: inline scripts may re-run on VT navigations to another TOC page.
+  const afterSwapKey = "__tocScrollBehaviorAfterSwap";
+  if (!globalThis[afterSwapKey]) {
+    globalThis[afterSwapKey] = true;
+    document.addEventListener("astro:after-swap", init);
+  }
 })();
