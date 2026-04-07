@@ -1,7 +1,6 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import RisoBoardShell from "@components/RisoBoardShell.astro";
-import TableOfContents from "@components/TableOfContents.astro";
 import CollectionEntryHeader from "@components/CollectionEntryHeader.astro";
 import GhostEntryBack from "@components/riso/GhostEntryBack";
 import PostPagination from "@components/riso/PostPagination";
@@ -62,60 +61,54 @@ const nextDemo =
 <Layout {...layoutProps}>
   <RisoBoardShell>
     <main id="main-content" class="app-layout board-slot">
-      <div class="toc-layout-grid">
-        <aside class="toc-sidebar">
-          <TableOfContents headings={headings} />
-        </aside>
-
-        <article
-          id="article"
-          role="article"
-          class="post-detail w-full max-w-none"
-        >
-          <div class="analog-post">
-            <div class="post-container">
-              <div class="long-looseleaf tape-top-left tape-top-right">
-                <div class="header-zone">
-                  <GhostEntryBack fallbackHref="/demos" client:visible />
-                  <header class="post-header">
-                    <CollectionEntryHeader
-                      title={title}
-                      summary={summary}
-                      slug={demo.slug}
-                      variant="blog"
-                      analogPostTitle
-                    />
-                  </header>
-                </div>
-
-                <div
-                  class="analog-prose prose min-w-0 max-w-none prose-img:rounded prose-img:bg-skin-fill"
-                >
-                  <Content />
-                </div>
-
-                <div class="footer-zone">
-                  <footer class="post-footer"></footer>
-                </div>
-
-                <div
-                  class="analog-post__tape-bottom tape-bottom-left tape-bottom-right"
-                  aria-hidden="true"
-                >
-                </div>
+      <article
+        id="article"
+        role="article"
+        class="post-detail w-full max-w-none mx-auto"
+      >
+        <div class="analog-post">
+          <div class="post-container">
+            <div class="long-looseleaf tape-top-left tape-top-right">
+              <div class="header-zone">
+                <GhostEntryBack fallbackHref="/demos" client:visible />
+                <header class="post-header">
+                  <CollectionEntryHeader
+                    title={title}
+                    summary={summary}
+                    slug={demo.slug}
+                    variant="blog"
+                    analogPostTitle
+                  />
+                </header>
               </div>
 
-              <PostPagination
-                prevPost={prevDemo}
-                nextPost={nextDemo}
-                hrefBase="/demos"
-                navLabel="Demo navigation"
-                client:visible
-              />
+              <div
+                class="analog-prose prose min-w-0 max-w-none prose-img:rounded prose-img:bg-skin-fill"
+              >
+                <Content />
+              </div>
+
+              <div class="footer-zone">
+                <footer class="post-footer"></footer>
+              </div>
+
+              <div
+                class="analog-post__tape-bottom tape-bottom-left tape-bottom-right"
+                aria-hidden="true"
+              >
+              </div>
             </div>
+
+            <PostPagination
+              prevPost={prevDemo}
+              nextPost={nextDemo}
+              hrefBase="/demos"
+              navLabel="Demo navigation"
+              client:visible
+            />
           </div>
-        </article>
-      </div>
+        </div>
+      </article>
     </main>
   </RisoBoardShell>
 </Layout>

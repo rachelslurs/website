@@ -37,8 +37,10 @@
     --color-chart-3: 0, 169, 92; /* riso green */
     --max-3xl: 48rem;
   }
-  html, body {
-    overflow-x: hidden;
+  @media (max-width: 1279px) {
+    html, body {
+      overflow-x: hidden;
+    }
   }
   body {
     @apply flex min-h-[100svh] flex-col bg-skin-fill text-skin-base selection:bg-skin-accent selection:bg-opacity-70 selection:text-skin-inverted;
