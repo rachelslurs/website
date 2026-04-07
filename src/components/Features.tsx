@@ -147,7 +147,7 @@ function FeaturesMobile(props: FeaturesProps) {
     <>
       <div
         ref={slideContainerRef}
-        className="-mb-4 flex w-full snap-x snap-mandatory -space-x-0 overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-width:none] sm:-space-x-6 [&::-webkit-scrollbar]:hidden"
+        className="-mb-4 flex w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {features.map((feature, featureIndex) => (
           <div
@@ -157,7 +157,11 @@ function FeaturesMobile(props: FeaturesProps) {
           >
             <div className="relative transform overflow-hidden p-0">
               <Device className="relative mx-auto max-w-[366px]">
-                <img src={feature.src} alt={feature.alt} />
+                <img
+                  src={feature.src}
+                  alt={feature.alt}
+                  className="w-full h-full object-cover object-top"
+                />
               </Device>
               <div className="text-skin-base p-4">
                 <p className="text-center ui-not-focus-visible:outline-none">
