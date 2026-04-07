@@ -54,7 +54,8 @@ const {
   scrollSmooth = false,
 } = Astro.props;
 
-const isPost = Astro.url.toString().includes("/posts/");
+const pathname = Astro.url.pathname;
+const isPost = pathname === "/posts" || pathname.startsWith("/posts/");
 
 const socialImageURL = new URL(
   ogImage ?? SITE.ogImage ?? "og.png",
