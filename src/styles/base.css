@@ -88,8 +88,12 @@
   /* Desktop: sticky positioning alongside article only when it has content */
   @media (min-width: 1280px) {
     .toc-sidebar {
+      display: none;
+    }
+    .toc-sidebar:has(nav) {
       display: block;
       width: 220px;
+      margin-right: 3rem;
       flex-shrink: 0;
       align-self: flex-start;
       position: sticky;
