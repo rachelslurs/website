@@ -23,7 +23,7 @@ export default defineConfig({
     mdx(),
   ],
   markdown: {
-    remarkPlugins: [remarkToc],
+    remarkPlugins: [remarkToc as any],
     rehypePlugins: [rehypeTableWrap as any],
     shikiConfig: {
       theme: risoAnalogTheme,
