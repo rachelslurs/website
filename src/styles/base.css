@@ -6,7 +6,13 @@
   /* Root for all `rem` values (Tailwind spacing, text-base = 1rem, typography plugin, etc.).
      Percentage preserves user agent / accessibility font-size preferences (unlike a fixed px root). */
   html {
-    font-size: 125%;
+    font-size: 100%;
+  }
+
+  @screen md {
+    html {
+      font-size: 125%;
+    }
   }
 
   :root {
@@ -54,7 +60,7 @@
 
   /* The Bold Manual — heading roles + proximity (margin-top ≈ 2.5× margin-bottom) */
   h1 {
-    @apply font-display;
+    @apply font-display text-3xl sm:text-4xl md:text-5xl break-words;
     margin-top: 1.25em;
     margin-bottom: 0.5em;
   }
