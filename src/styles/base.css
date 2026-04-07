@@ -38,7 +38,8 @@
     --max-3xl: 48rem;
   }
   @media (max-width: 1279px) {
-    html, body {
+    html,
+    body {
       overflow-x: hidden;
     }
   }
@@ -71,9 +72,9 @@
     }
   }
 
-  /* Only add gap if the sidebar actually contains a generated nav */
+  /* Only add gap when a sidebar column exists (omitted when no TOC headings) */
   @media (min-width: 1280px) {
-    .toc-layout-grid:has(.toc-sidebar nav) {
+    .toc-layout-grid:has(.toc-sidebar) {
       gap: 3rem;
     }
   }
@@ -85,12 +86,9 @@
     display: none;
   }
 
-  /* Desktop: sticky positioning alongside article only when it has content */
+  /* Desktop: sticky sidebar; aside is only in the DOM when TOC has entries */
   @media (min-width: 1280px) {
     .toc-sidebar {
-      display: none;
-    }
-    .toc-sidebar:has(nav) {
       display: block;
       width: 220px;
       margin-right: 3rem;
@@ -440,14 +438,16 @@
     box-shadow: 2px 4px 12px rgba(var(--color-shadow), 0.15);
     position: relative;
     /* Removed tilt per user request */
-    
+
     /* Library Card Ruling Lines */
-    background-image: 
-      linear-gradient(rgb(var(--color-accent)) 2px, transparent 2px); /* Red top line */
+    background-image: linear-gradient(
+      rgb(var(--color-accent)) 2px,
+      transparent 2px
+    ); /* Red top line */
     background-position: 0 3rem;
     background-size: 100% 100%;
     background-repeat: no-repeat;
-    
+
     border-radius: 2px;
     animation: slideInToc 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   }
@@ -465,7 +465,7 @@
 
   /* ── TOC TYPOGRAPHY ── */
   .toc-header {
-    font-family: 'Space Mono', monospace;
+    font-family: "Space Mono", monospace;
     font-size: 0.65rem;
     font-weight: bold;
     text-transform: uppercase;
@@ -485,7 +485,7 @@
   }
 
   .toc-link {
-    font-family: 'DM Sans', sans-serif;
+    font-family: "DM Sans", sans-serif;
     font-size: 0.85rem;
     line-height: 1.4;
     color: rgba(var(--color-text-base), 0.7);
@@ -509,7 +509,7 @@
 
   /* Optional: Faux red dot next to active item */
   .toc-item.active .toc-link::before {
-    content: '';
+    content: "";
     position: absolute;
     left: -14px;
     top: calc(50% - 3px);
