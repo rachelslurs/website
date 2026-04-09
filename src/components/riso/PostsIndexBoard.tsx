@@ -27,8 +27,8 @@ const TWINE_PULL_STACK_OVERLAP = 10;
 const PULL_STACK_HEIGHT_PX = 168;
 /** When all posts are shown: knot tail extends below the twine column end. */
 const BOTTOM_KNOT_TAIL_BELOW_TWINE_PX = 52;
-/** Extra vertical stripe length so the bottom knot + pull sit lower (tune visually). */
-const TWINE_EXTRA_LENGTH_PX = 100;
+/** Extra vertical stripe length so the cord hangs further below the cards before the pull (tune visually). */
+const TWINE_EXTRA_LENGTH_PX = 200;
 const EDGE_PAD = 8;
 /** Below this width, add more vertical rhythm (RSS ↔ cards ↔ pull). */
 const NARROW_BOARD_MAX_PX = 640;
@@ -52,8 +52,25 @@ const CARD_BASE_Y_STACKED = 140;
 const EST_CARD_H_TWO_COL = 320;
 const EST_CARD_H_STACKED = 350;
 
+/** Max downward pull (px) for the “load more” cord gesture. */
+const PULL_CORD_MAX_PX = 56;
+/** Release past this offset to load more (px). */
+const PULL_CORD_THRESHOLD_PX = 28;
+/** Pulls above this offset suppress the button click (avoids duplicate after a drag). */
+const PULL_DRAG_SUPPRESS_CLICK_PX = 10;
+/** Snap-back duration for the cord stretch (matches riso.css easing). */
+const PULL_SNAP_TRANSITION = "height 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)";
+
+/**
+ * Integer board width avoids subpixel “shimmer” when reflow nudges
+ * `contentRect.width` (e.g. 605.3 ↔ 605.7) while the pull cord changes height.
+ */
+function layoutBoardWidthPx(width: number) {
+  return Math.round(Math.max(width, 320));
+}
+
 function cardXsForBoardWidth(width: number) {
-  const w = Math.max(width, 320);
+  const w = layoutBoardWidthPx(width);
   const center = w / 2;
   let leftX = center - HALF_TWINE - TWINE_GAP - CARD_WIDTH;
   const rightXRaw = center + HALF_TWINE + TWINE_GAP;
@@ -62,13 +79,15 @@ function cardXsForBoardWidth(width: number) {
   if (rightX + CARD_WIDTH > w - EDGE_PAD) {
     rightX = w - EDGE_PAD - CARD_WIDTH;
   }
-  return { leftX, rightX };
+  return { leftX: Math.round(leftX), rightX: Math.round(rightX) };
 }
 
 function boardLayout(boardWidth: number) {
-  const w = Math.max(boardWidth, 320);
+  const w = layoutBoardWidthPx(boardWidth);
   const stacked = w < TWO_COL_MIN_PX;
-  const cardW = stacked ? Math.min(CARD_WIDTH, w - EDGE_PAD * 2) : CARD_WIDTH;
+  const cardW = stacked
+    ? Math.min(CARD_WIDTH, Math.max(1, Math.round(w - EDGE_PAD * 2)))
+    : CARD_WIDTH;
   const stackedLeftX = Math.round((w - cardW) / 2);
   const twoCol = cardXsForBoardWidth(w);
   return {
@@ -209,6 +228,188 @@ function DraggableCard({
   );
 }
 
+function PullMoreCord({
+  baseTopPx,
+  prefersReducedMotion,
+  remainingPosts,
+  onLoadMore,
+}: {
+  baseTopPx: number;
+  prefersReducedMotion: boolean | null;
+  remainingPosts: number;
+  onLoadMore: () => void;
+}) {
+  const reduced = prefersReducedMotion === true;
+  const [stretchPx, setStretchPx] = useState(0);
+  const [pullDragActive, setPullDragActive] = useState(false);
+  const [snapping, setSnapping] = useState(false);
+  const pullStretchRef = useRef(0);
+  const pullStartYRef = useRef(0);
+  const pullDragActiveRef = useRef(false);
+  const suppressClickRef = useRef(false);
+
+  const endPullGesture = useCallback(
+    (opts?: { skipSnap?: boolean; abort?: boolean }) => {
+      const releasedAt = pullStretchRef.current;
+      pullDragActiveRef.current = false;
+      setPullDragActive(false);
+
+      if (opts?.abort) {
+        pullStretchRef.current = 0;
+        setStretchPx(0);
+        setSnapping(false);
+        return;
+      }
+
+      const meaningfulPull = releasedAt > PULL_DRAG_SUPPRESS_CLICK_PX;
+      const shouldLoad = releasedAt >= PULL_CORD_THRESHOLD_PX;
+      if (shouldLoad) {
+        onLoadMore();
+      }
+      if (shouldLoad || meaningfulPull) {
+        suppressClickRef.current = true;
+        window.setTimeout(() => {
+          suppressClickRef.current = false;
+        }, 450);
+      }
+
+      if (releasedAt <= 0) {
+        pullStretchRef.current = 0;
+        setStretchPx(0);
+        return;
+      }
+
+      if (reduced || opts?.skipSnap) {
+        pullStretchRef.current = 0;
+        setStretchPx(0);
+        setSnapping(false);
+        return;
+      }
+
+      setSnapping(true);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          pullStretchRef.current = 0;
+          setStretchPx(0);
+        });
+      });
+    },
+    [onLoadMore, reduced]
+  );
+
+  const handlePullPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (snapping) return;
+      if (e.button !== 0) return;
+      // Prevent native scroll/overscroll rubber-banding from “pulling” the page.
+      e.preventDefault();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      pullStartYRef.current = e.clientY;
+      pullStretchRef.current = 0;
+      setStretchPx(0);
+      pullDragActiveRef.current = true;
+      setPullDragActive(true);
+    },
+    [snapping]
+  );
+
+  const handlePullPointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!pullDragActiveRef.current) return;
+      const dy = e.clientY - pullStartYRef.current;
+      const v = Math.max(0, Math.min(PULL_CORD_MAX_PX, dy));
+      pullStretchRef.current = v;
+      setStretchPx(v);
+      if (v > 0) e.preventDefault();
+    },
+    []
+  );
+
+  const handlePullPointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!pullDragActiveRef.current) return;
+      e.preventDefault();
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {
+        /* capture may already be released */
+      }
+      endPullGesture();
+    },
+    [endPullGesture]
+  );
+
+  const handlePullPointerCancel = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!pullDragActiveRef.current) return;
+      e.preventDefault();
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {
+        /* ignore */
+      }
+      endPullGesture({ abort: true });
+    },
+    [endPullGesture]
+  );
+
+  const handleConnectorTransitionEnd = useCallback(
+    (e: React.TransitionEvent<HTMLDivElement>) => {
+      if (e.propertyName !== "height") return;
+      if (e.target !== e.currentTarget) return;
+      setSnapping(false);
+      pullStretchRef.current = 0;
+    },
+    []
+  );
+
+  const handleButtonClick = useCallback(() => {
+    if (suppressClickRef.current) return;
+    onLoadMore();
+  }, [onLoadMore]);
+
+  const stackClass = [
+    "pull-stack",
+    pullDragActive ? "pull-stack--dragging" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <div
+      className={`pull-container ${reduced ? "pull-container--no-motion" : ""}`}
+      style={{ top: baseTopPx }}
+      onPointerDown={handlePullPointerDown}
+      onPointerMove={handlePullPointerMove}
+      onPointerUp={handlePullPointerUp}
+      onPointerCancel={handlePullPointerCancel}
+    >
+      <div className={stackClass}>
+        <div
+          className="pull-connector"
+          aria-hidden="true"
+          style={{
+            height: stretchPx,
+            transition: snapping ? PULL_SNAP_TRANSITION : undefined,
+          }}
+          onTransitionEnd={handleConnectorTransitionEnd}
+        />
+        <div className="twine-knot knot-bottom" aria-hidden="true" />
+        <button
+          type="button"
+          className="pull-action"
+          onClick={handleButtonClick}
+          aria-label={`Load more posts. ${remainingPosts} remaining.`}
+        >
+          <span className="pull-tag-text" aria-hidden="true">
+            PULL FOR MORE
+          </span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function PostsIndexBoard({
   posts,
   pageSize,
@@ -235,10 +436,10 @@ export default function PostsIndexBoard({
     if (!el || typeof ResizeObserver === "undefined") return;
     const ro = new ResizeObserver(entries => {
       const cr = entries[0]?.contentRect.width;
-      if (cr) setBoardWidth(cr);
+      if (cr) setBoardWidth(layoutBoardWidthPx(cr));
     });
     ro.observe(el);
-    setBoardWidth(el.getBoundingClientRect().width);
+    setBoardWidth(layoutBoardWidthPx(el.getBoundingClientRect().width));
     return () => ro.disconnect();
   }, []);
 
@@ -365,24 +566,12 @@ export default function PostsIndexBoard({
       </div>
 
       {hasMore && (
-        <div
-          className={`pull-container ${prefersReducedMotion ? "pull-container--no-motion" : ""}`}
-          style={{
-            top: `${twineTop + stringHeight - TWINE_PULL_STACK_OVERLAP}px`,
-          }}
-        >
-          <div className="twine-knot knot-bottom" aria-hidden="true" />
-          <button
-            type="button"
-            className="pull-action"
-            onClick={handleLoadMore}
-            aria-label={`Load more posts. ${remainingPosts} remaining.`}
-          >
-            <span className="pull-tag-text" aria-hidden="true">
-              PULL FOR MORE
-            </span>
-          </button>
-        </div>
+        <PullMoreCord
+          baseTopPx={twineTop + stringHeight - TWINE_PULL_STACK_OVERLAP}
+          prefersReducedMotion={prefersReducedMotion}
+          remainingPosts={remainingPosts}
+          onLoadMore={handleLoadMore}
+        />
       )}
       <p
         className="sr-only"
@@ -428,6 +617,7 @@ export default function PostsIndexBoard({
               >
                 <a
                   href={post.href}
+                  title={post.title}
                   className="hover:text-[var(--red)] transition-colors focus-visible:outline-none"
                 >
                   {post.title}

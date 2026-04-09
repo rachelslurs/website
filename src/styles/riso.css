@@ -227,6 +227,12 @@ nav .group:hover .dust-note {
 /* Posts index (/posts): title → date → snippet rhythm; homepage cards keep base .post-* */
 .posts-index-board .post-title {
   font-weight: 600;
+  /* Fixed row grid: cap title height so cards don’t overlap neighbors (see rowStep in PostsIndexBoard). */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
 }
 .posts-index-board .post-date {
   display: block;
@@ -1535,12 +1541,23 @@ a.skip-to-content-board:focus {
 @keyframes pullBounce {
   0%,
   100% {
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
   }
   50% {
-    transform: translateX(-50%) translateY(6px);
+    transform: translateY(6px);
   }
 }
+
+@keyframes pullBounceCoarse {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
 .pull-container {
   position: absolute;
   left: 50%;
@@ -1549,17 +1566,63 @@ a.skip-to-content-board:focus {
   flex-direction: column;
   align-items: center;
   transform: translateX(-50%);
-  animation: pullBounce 2s infinite ease-in-out;
   transition: top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.pull-container--no-motion {
+
+/* Inner stack: knot + CTA — bounce only affects Y so pull-drag translateY can compose. */
+.pull-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: pullBounce 2s infinite ease-in-out;
+}
+
+.pull-connector {
+  width: 4px;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--cream),
+    var(--cream) 4px,
+    var(--red) 4px,
+    var(--red) 8px
+  );
+  border-radius: 2px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@media (pointer: coarse), (hover: none) {
+  .pull-stack:not(.pull-stack--dragging) {
+    animation: pullBounceCoarse 2.5s infinite ease-in-out;
+  }
+}
+
+.pull-stack--dragging {
+  animation: none !important;
+}
+
+.pull-container--no-motion .pull-stack {
   animation: none;
 }
+
 @media (prefers-reduced-motion: reduce) {
-  .pull-container {
+  .pull-stack {
     animation: none;
   }
 }
+
+/*
+ * Larger grab zone on touch / coarse pointers — vertical padding only so
+ * translateX(-50%) still centers the knot stack on the twine (horizontal
+ * padding widens the box and shifts the cord off the stripe).
+ */
+@media (pointer: coarse), (hover: none) {
+  .pull-container {
+    padding: 12px 0;
+    margin: -12px 0;
+    touch-action: none;
+  }
+}
+
 /* Bottom knot + dangling string live in the pull stack so they bounce with the button. */
 .pull-container .twine-knot.knot-bottom {
   position: relative;
@@ -1578,12 +1641,29 @@ a.skip-to-content-board:focus {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   padding: 10px 20px;
   transition: transform 0.15s;
+  touch-action: manipulation;
 }
-.pull-action:active {
+
+@media (pointer: coarse), (hover: none) {
+  .pull-action {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 14px 22px;
+  }
+}
+
+.pull-action:active:not(:disabled) {
   transform: translateY(15px);
+}
+
+@media (pointer: coarse), (hover: none) {
+  .pull-action:active:not(:disabled) {
+    transform: translateY(10px);
+  }
 }
 .pull-tag-text {
   @apply font-mono;
