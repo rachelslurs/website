@@ -183,7 +183,7 @@ function PullMoreCord({
     .filter(Boolean)
     .join(" ");
 
-  /** Elastic hidden at idle; when pulling, length is at least the knot body height, then grows with stretch. */
+  /** While pulling / snapping: JS height. At idle: CSS animates length in sync with the bounce layer. */
   const cordHeightPx =
     stretchPx === 0 ? 0 : Math.max(stretchPx, TWINE_KNOT_BODY_HEIGHT_PX);
   const cordHeightTransition = pullDragActive
@@ -191,6 +191,30 @@ function PullMoreCord({
     : snapping
       ? PULL_SNAP_TRANSITION
       : "none";
+
+  const idleDangle =
+    stretchPx === 0 && !pullDragActive && !snapping && !reduced;
+
+  const idleStatic = reduced && stretchPx === 0 && !pullDragActive && !snapping;
+
+  const connectorCollapsed =
+    cordHeightPx === 0 && !snapping && !idleDangle && !idleStatic;
+
+  const connectorClass = [
+    "pull-connector",
+    idleDangle ? "pull-connector--idle-dangle" : "",
+    idleStatic ? "pull-connector--idle-static" : "",
+    connectorCollapsed ? "pull-connector--rest" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const trackClass = [
+    "pull-connector-track",
+    connectorCollapsed ? "pull-connector-track--rest" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div
@@ -204,20 +228,21 @@ function PullMoreCord({
         onPointerCancel={handlePullPointerCancel}
         onLostPointerCapture={handleLostPointerCapture}
       >
-        <div
-          className={`pull-connector-track${cordHeightPx === 0 && !snapping ? " pull-connector-track--rest" : ""}`}
-          aria-hidden="true"
-        >
+        <div className={trackClass} aria-hidden="true">
           <div
-            className={`pull-connector${cordHeightPx === 0 && !snapping ? " pull-connector--rest" : ""}`}
-            style={{
-              height: cordHeightPx,
-              transition: reduced ? "none" : cordHeightTransition,
-            }}
+            className={connectorClass}
+            style={
+              idleDangle
+                ? undefined
+                : {
+                    height: cordHeightPx,
+                    transition: reduced ? "none" : cordHeightTransition,
+                  }
+            }
             onTransitionEnd={handleConnectorTransitionEnd}
           />
         </div>
-        {/* Idle bounce: .pull-bounce-layer (knot + tail + CTA); elastic only while stretching. */}
+        {/* Idle: only pullConnectorIdle animates elastic height — knot/tail/CTA ride flex below it. */}
         <div className="pull-bounce-layer">
           <div className="pull-knot-hit" aria-hidden="true">
             <div className="twine-knot knot-bottom" />

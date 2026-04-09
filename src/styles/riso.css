@@ -1360,8 +1360,9 @@ a.skip-to-content-board:focus {
   margin-inline: auto;
   container-type: inline-size;
   container-name: posts-board;
-  /* Match `.twine-knot { height }` — idle bounce travel + strand overlap derive from this. */
+  /* Match `.twine-knot { height }`; `--pull-idle-drop` sets how far the elastic “gives” at peak (knot follows via flex). */
   --twine-knot-body-h: 10px;
+  --pull-idle-drop: calc(2 * var(--twine-knot-body-h));
   /* Pull up under RisoBoardShell’s gap-8 so twine sits closer to the nav. */
   margin-top: -0.5rem;
   /* Tape pseudo-elements sit past the card; clip would shear them at the board edge. */
@@ -1437,9 +1438,14 @@ a.skip-to-content-board:focus {
   min-height: 12rem;
   flex: 1 1 auto;
   flex-direction: column;
-  /* No bottom padding — pull connector should meet the stripe with no visual gap. */
-  padding-bottom: 0;
-  /* Strand ends where the bottom knot caps it (one knot height). */
+  /*
+   * Match `.posts-index-pull-wrap { margin-top: calc(-2 * --twine-knot-body-h) }`: the pull stack
+   * overlaps this many pixels upward. Without bottom padding here, the stripe fills to the flex
+   * bottom and the twine-flow box extends through that band — past the bottom knot when retracted
+   * in DevTools and visually. Padding ends strand content at the join; the overlap is empty
+   * space covered by the pull layer (z-index).
+   */
+  padding-bottom: calc(2 * var(--twine-knot-body-h));
   margin-bottom: 0;
 }
 
@@ -1805,24 +1811,27 @@ a.skip-to-content-board:focus {
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Idle pull: bounce amplitude = 2× knot height (inherits --twine-knot-body-h from .posts-index-board). */
-@keyframes pullAfford {
+/*
+ * Idle pull: only the elastic’s *height* animates — the knot/tail/CTA sit in flex below it, so they
+ * move exactly with the connector (no separate translateY, which caused gaps vs user-tuned drop).
+ */
+@keyframes pullConnectorIdle {
   0%,
   100% {
-    transform: translateY(0);
+    height: var(--twine-knot-body-h, 10px);
   }
   50% {
-    transform: translateY(calc(2 * var(--twine-knot-body-h, 10px)));
+    height: calc(var(--twine-knot-body-h, 10px) + var(--pull-idle-drop, 20px));
   }
 }
 
-@keyframes pullAffordCoarse {
+@keyframes pullConnectorIdleCoarse {
   0%,
   100% {
-    transform: translateY(0);
+    height: var(--twine-knot-body-h, 10px);
   }
   50% {
-    transform: translateY(calc(2 * var(--twine-knot-body-h, 10px)));
+    height: calc(var(--twine-knot-body-h, 10px) + var(--pull-idle-drop, 20px));
   }
 }
 
@@ -1853,7 +1862,7 @@ a.skip-to-content-board:focus {
   justify-content: center;
 }
 
-/* Column: connector (elastic) then bounce layer (knot + tail + CTA). Cord does not idle-bounce. */
+/* Column: connector (elastic) then bounce layer (knot + tail + CTA). */
 .pull-stack {
   display: flex;
   flex-direction: column;
@@ -1867,13 +1876,6 @@ a.skip-to-content-board:focus {
   align-items: center;
   flex-shrink: 0;
   box-sizing: border-box;
-}
-
-/* DOM: .pull-container > .pull-stack > .pull-bounce-layer > … */
-.pull-container
-  .pull-stack:not(.pull-stack--dragging):not(.pull-stack--snapping)
-  .pull-bounce-layer {
-  animation: pullAfford 2s infinite ease-in-out;
 }
 
 /*
@@ -1906,6 +1908,36 @@ a.skip-to-content-board:focus {
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+.pull-container .pull-connector--idle-dangle {
+  animation: pullConnectorIdle 2s infinite ease-in-out;
+  min-height: var(--twine-knot-body-h, 10px);
+}
+
+@media (pointer: coarse), (hover: none) {
+  .pull-container .pull-connector--idle-dangle {
+    animation: pullConnectorIdleCoarse 2.5s infinite ease-in-out;
+  }
+}
+
+.pull-container .pull-connector--idle-static {
+  height: var(--twine-knot-body-h, 10px);
+}
+
+.pull-container .pull-stack--dragging .pull-connector--idle-dangle,
+.pull-container .pull-stack--snapping .pull-connector--idle-dangle {
+  animation: none !important;
+}
+
+.pull-container--no-motion .pull-connector--idle-dangle {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pull-connector--idle-dangle {
+    animation: none !important;
+  }
+}
+
 /* Idle: no elastic segment — knot sits on the main strand; track collapses. */
 .pull-container .pull-connector-track--rest {
   height: 0;
@@ -1917,35 +1949,12 @@ a.skip-to-content-board:focus {
   box-shadow: none;
 }
 
-@media (pointer: coarse), (hover: none) {
-  .pull-container
-    .pull-stack:not(.pull-stack--dragging):not(.pull-stack--snapping)
-    .pull-bounce-layer {
-    animation: pullAffordCoarse 2.5s infinite ease-in-out;
-  }
-}
-
 .pull-stack--dragging {
   cursor: grabbing !important;
 }
 
-.pull-container .pull-stack--dragging .pull-bounce-layer,
-.pull-container .pull-stack--snapping .pull-bounce-layer {
-  animation: none !important;
-}
-
 .pull-container .pull-stack {
   cursor: grab;
-}
-
-.pull-container--no-motion .pull-bounce-layer {
-  animation: none !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pull-container .pull-bounce-layer {
-    animation: none !important;
-  }
 }
 
 /* Extra vertical grab slop on coarse pointers only (horizontal handled on `.pull-stack`). */
