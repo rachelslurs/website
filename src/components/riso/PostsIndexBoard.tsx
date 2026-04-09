@@ -28,7 +28,7 @@ const PULL_STACK_HEIGHT_PX = 168;
 /** When all posts are shown: knot tail extends below the twine column end. */
 const BOTTOM_KNOT_TAIL_BELOW_TWINE_PX = 52;
 /** Extra vertical stripe length so the cord hangs further below the cards before the pull (tune visually). */
-const TWINE_EXTRA_LENGTH_PX = 200;
+const TWINE_EXTRA_LENGTH_PX = 250;
 const EDGE_PAD = 8;
 /** Below this width, add more vertical rhythm (RSS ↔ cards ↔ pull). */
 const NARROW_BOARD_MAX_PX = 640;
@@ -379,22 +379,27 @@ function PullMoreCord({
     <div
       className={`pull-container ${reduced ? "pull-container--no-motion" : ""}`}
       style={{ top: baseTopPx }}
-      onPointerDown={handlePullPointerDown}
-      onPointerMove={handlePullPointerMove}
-      onPointerUp={handlePullPointerUp}
-      onPointerCancel={handlePullPointerCancel}
     >
-      <div className={stackClass}>
-        <div
-          className="pull-connector"
-          aria-hidden="true"
-          style={{
-            height: stretchPx,
-            transition: snapping ? PULL_SNAP_TRANSITION : undefined,
-          }}
-          onTransitionEnd={handleConnectorTransitionEnd}
-        />
-        <div className="twine-knot knot-bottom" aria-hidden="true" />
+      <div
+        className={stackClass}
+        onPointerDown={handlePullPointerDown}
+        onPointerMove={handlePullPointerMove}
+        onPointerUp={handlePullPointerUp}
+        onPointerCancel={handlePullPointerCancel}
+      >
+        <div className="pull-connector-track" aria-hidden="true">
+          <div
+            className="pull-connector"
+            style={{
+              height: stretchPx,
+              transition: snapping ? PULL_SNAP_TRANSITION : undefined,
+            }}
+            onTransitionEnd={handleConnectorTransitionEnd}
+          />
+        </div>
+        <div className="pull-knot-hit" aria-hidden="true">
+          <div className="twine-knot knot-bottom" />
+        </div>
         <button
           type="button"
           className="pull-action"

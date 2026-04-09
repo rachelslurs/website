@@ -1567,6 +1567,8 @@ a.skip-to-content-board:focus {
   align-items: center;
   transform: translateX(-50%);
   transition: top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Let the cord pull gesture win over page scroll / touch gestures (all pointer types). */
+  touch-action: none;
 }
 
 /* Inner stack: knot + CTA — bounce only affects Y so pull-drag translateY can compose. */
@@ -1574,7 +1576,21 @@ a.skip-to-content-board:focus {
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-sizing: border-box;
   animation: pullBounce 2s infinite ease-in-out;
+}
+
+/*
+ * Wider invisible row for dragging; the painted cord is only `.pull-connector` (4px).
+ * Padding on the cord element made a tall pull show a wide shadow/stripe — avoid that.
+ */
+.pull-connector-track {
+  display: flex;
+  flex-shrink: 0;
+  align-self: stretch;
+  justify-content: center;
+  align-items: flex-start;
+  min-width: 3rem;
 }
 
 .pull-connector {
@@ -1598,6 +1614,11 @@ a.skip-to-content-board:focus {
 
 .pull-stack--dragging {
   animation: none !important;
+  cursor: grabbing !important;
+}
+
+.pull-container .pull-stack {
+  cursor: grab;
 }
 
 .pull-container--no-motion .pull-stack {
@@ -1610,17 +1631,23 @@ a.skip-to-content-board:focus {
   }
 }
 
-/*
- * Larger grab zone on touch / coarse pointers — vertical padding only so
- * translateX(-50%) still centers the knot stack on the twine (horizontal
- * padding widens the box and shifts the cord off the stripe).
- */
+/* Extra vertical grab slop on coarse pointers only (horizontal handled on `.pull-stack`). */
 @media (pointer: coarse), (hover: none) {
   .pull-container {
-    padding: 12px 0;
-    margin: -12px 0;
-    touch-action: none;
+    padding-block: 12px;
+    margin-block: -12px;
   }
+}
+
+/*
+ * Invisible row wider than the knot for easier grabs; knot keeps default .twine-knot size/paint.
+ */
+.pull-knot-hit {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: flex-start;
+  min-width: 3rem;
 }
 
 /* Bottom knot + dangling string live in the pull stack so they bounce with the button. */
@@ -1637,7 +1664,7 @@ a.skip-to-content-board:focus {
 .pull-action {
   background: transparent;
   border: none;
-  cursor: pointer;
+  cursor: inherit;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1645,7 +1672,9 @@ a.skip-to-content-board:focus {
   gap: 4px;
   padding: 10px 20px;
   transition: transform 0.15s;
-  touch-action: manipulation;
+  /* Inherit pull-container touch-action so drag works from the label, not only tap. */
+  touch-action: none;
+  user-select: none;
 }
 
 @media (pointer: coarse), (hover: none) {
