@@ -1352,7 +1352,14 @@ a.skip-to-content-board:focus {
   color: var(--analog-ink);
 }
 
-/* ── POSTS INDEX (twine + cards) — CSS grid / flow layout ── */
+/*
+ * ── POSTS INDEX (twine + cards) ──
+ * Intended behavior is documented on `PullStrandSource` / `usePullCord` in PostsIndexBoard.tsx.
+ * Summary: grid = elastic + pull chrome in `.posts-twine--flow` (in-flow); stacked = absolute deco
+ * stripe + `.pull-connector` in `.posts-index-stacked-pull`. Shared tokens: `--twine-knot-body-h`,
+ * `--pull-idle-drop`. Grid idle bounce syncs `.posts-twine-elastic` height with
+ * `.posts-index-twine-grow--idle-elastic-cancel` margin.
+ */
 .posts-index-board {
   position: relative;
   width: 100%;
@@ -1385,6 +1392,21 @@ a.skip-to-content-board:focus {
   gap: 0;
   /* Masonry-style stagger: columns use different gaps so rows don’t line up across the twine. */
   --posts-masonry-stagger: clamp(4rem, 14cqi, 10rem);
+}
+
+/* Tighter vertical rhythm on md-width boards (Tailwind md–lg); default gaps read very tall there. */
+@container posts-board (min-width: 768px) and (max-width: 1023px) {
+  .posts-index-grid {
+    --posts-masonry-stagger: clamp(2.25rem, 9cqi, 5.5rem);
+  }
+
+  .posts-index-col--left {
+    gap: clamp(4rem, 12cqi, 8.5rem);
+  }
+
+  .posts-index-col--right {
+    gap: clamp(7.5rem, 22cqi, 14rem);
+  }
 }
 
 .posts-index-col {
@@ -1715,11 +1737,17 @@ a.skip-to-content-board:focus {
   flex-direction: column;
   align-items: center;
   /*
-   * Stacked layout only (viewport below two-column breakpoint). Fixed 360px mimicked grid stagger
-   * but is excessive on narrow boards — scale with the board container instead.
+   * Stacked layout only (board below two-column breakpoint). Scale gap with container; sm/md
+   * use a second tighten so cards don’t feel miles apart.
    */
-  gap: clamp(3.5rem, 34cqi, 22rem);
+  gap: clamp(2.25rem, 24cqi, 14rem);
   padding-top: 2rem;
+}
+
+@container posts-board (max-width: 639px) {
+  .posts-index-stacked-cards {
+    gap: clamp(1.75rem, 18cqi, 10rem);
+  }
 }
 
 .posts-index-stacked-pull {

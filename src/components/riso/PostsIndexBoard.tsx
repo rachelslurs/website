@@ -12,15 +12,16 @@ import type { PortfolioPost } from "@components/PortfolioBoard";
 const CONTENT_ENTRANCE_DELAY_S = 0;
 const STAGGER_STEP_S = 0.14;
 
-const CARD_WIDTH = 360;
 const KNOT_TOP_TAIL_PX = 45;
-const EDGE_PAD = 8;
 const NARROW_BOARD_MAX_PX = 640;
 const BOARD_BOTTOM_PAD_DEFAULT = 260;
 const BOARD_BOTTOM_PAD_NARROW = 300;
 
-/** Below this width, two card columns + twine do not fit — single-column layout. */
-const TWO_COL_MIN_PX = CARD_WIDTH * 2 + 45 * 2 + 2 * 2 + EDGE_PAD * 2 + 24;
+/**
+ * Below this width, use single-column stacked layout. Matches Tailwind `md` (768px): the grid uses
+ * flexible `1fr` columns (cards cap at 360px in CSS), so two columns + center stripe fit from here.
+ */
+const TWO_COL_MIN_PX = 768;
 
 const PULL_CORD_MAX_PX = 56;
 /** Match `.twine-knot { height }` in riso.css — elastic segment is at least this tall when visible. */
@@ -33,7 +34,23 @@ function layoutBoardWidthPx(width: number) {
   return Math.round(Math.max(width, 320));
 }
 
-/** Grid: elastic segment lives in `.posts-twine--flow`; stacked: `.pull-connector` still stretches. */
+/**
+ * Posts index — pull cord behavior (keep DOM + CSS in sync when changing this):
+ *
+ * Two-column grid (`!stacked`, `hasMore`): The elastic strand is `.posts-twine-elastic` as the last
+ * segment before pull UI inside `.posts-twine--flow` (top knot → flex stripe → elastic → PullMoreCord).
+ * Idle bounce and drag length both change elastic height; knot, tail (::before), and the pull CTA
+ * must stay in-flow directly under the elastic so they move with the strand (no separate pull-wrap slot).
+ * `usePullCord` drives JS height when dragging/snapping; CSS keyframes when idle. To avoid the grid row
+ * jumping, `.posts-index-twine-grow` uses negative margin (idle keyframes or inline while pulling) to
+ * cancel extra elastic height — see `twineGrowCancel*` in this hook and `posts-index-twine-grow--idle-elastic-cancel`
+ * in riso.css. `TWINE_KNOT_BODY_HEIGHT_PX` / `--twine-knot-body-h` must match.
+ *
+ * Stacked layout: Decorative strand is absolute in `.posts-index-stacked-deco`; pull uses
+ * `.pull-connector` height for elastic + knot/CTA in `PullMoreCord` inside `.posts-index-stacked-pull`.
+ *
+ * `strandSource` selects which branch above.
+ */
 type PullStrandSource = "twine" | "connector";
 
 function usePullCord({
