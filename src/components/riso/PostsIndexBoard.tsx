@@ -601,7 +601,8 @@ export default function PostsIndexBoard({
           displayIdx % 2 === 0 ? "tc-pink" : "tc-yellow"
         }`;
 
-        const stackZ = 14 - displayIdx;
+        /* Higher index = lower z so earlier posts overlap later ones; base scales with count so z stays above .pull-container (riso.css). */
+        const stackZ = 100 + (nPosts - 1 - displayIdx);
         const stagger = displayIdx;
 
         return (
