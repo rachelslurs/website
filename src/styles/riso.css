@@ -1606,7 +1606,11 @@ a.skip-to-content-board:focus {
   width: 100%;
   flex-direction: column;
   align-items: center;
-  gap: 360px;
+  /*
+   * Stacked layout only (viewport below two-column breakpoint). Fixed 360px mimicked grid stagger
+   * but is excessive on narrow boards — scale with the board container instead.
+   */
+  gap: clamp(3.5rem, 34cqi, 22rem);
   padding-top: 2rem;
 }
 
@@ -1619,10 +1623,15 @@ a.skip-to-content-board:focus {
   margin-top: calc(-1 * var(--twine-knot-body-h));
 }
 
+/*
+ * Anchor pull chrome to the bottom of the reserved slot; top:0 left the CTA riding high in
+ * 11.5rem while the decorative strand runs to the layout foot — felt disconnected on small screens.
+ */
 .posts-index-stacked-pull .pull-container.pull-container--flow {
   position: absolute;
   z-index: 5;
-  top: 0;
+  top: auto;
+  bottom: 0;
   right: 0;
   left: 0;
   width: 100%;
