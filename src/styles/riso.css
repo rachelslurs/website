@@ -1429,8 +1429,16 @@ a.skip-to-content-board:focus {
   flex-direction: column;
   align-self: stretch;
   z-index: 1;
-  /* Rest-state height for pull chrome; stretch paints outside this slot (see .pull-container--flow). */
+  /* Stacked posts page uses this for `.posts-index-stacked-pull`; grid pull sits in `.posts-twine--flow`. */
   --posts-pull-slot-height: 11.5rem;
+}
+
+/*
+ * Grid + load-more: pull chrome (knot, CTA) lives inside `.posts-twine--flow` under the elastic so
+ * it moves with idle/pull strand motion. No separate `posts-index-pull-wrap` slot.
+ */
+.posts-index-center--twine-pull .posts-index-twine-grow {
+  padding-bottom: 0;
 }
 
 .posts-index-twine-grow {
@@ -1457,6 +1465,12 @@ a.skip-to-content-board:focus {
   flex: 1 1 auto;
   flex-direction: column;
   align-items: center;
+}
+
+/* Grid: `.pull-container` is a flex sibling below `.posts-twine-elastic` (not inside pull-wrap). */
+.posts-twine--flow > .pull-container.pull-container--flow {
+  flex-shrink: 0;
+  align-self: stretch;
 }
 
 /*
@@ -1486,6 +1500,100 @@ a.skip-to-content-board:focus {
     var(--red) 8px
   );
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/*
+ * Grid only: elastic segment in `.posts-twine--flow` (idle + pull height); knot + CTA follow in-flow
+ * below it. `.posts-index-twine-grow--idle-elastic-cancel` cancels extra height so the grid row stays
+ * stable during idle bounce.
+ */
+.posts-twine-elastic {
+  width: 4px;
+  flex-shrink: 0;
+  border-radius: 2px;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--cream),
+    var(--cream) 4px,
+    var(--red) 4px,
+    var(--red) 8px
+  );
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes postsTwineElasticIdle {
+  0%,
+  100% {
+    height: var(--twine-knot-body-h, 10px);
+  }
+  50% {
+    height: calc(var(--twine-knot-body-h, 10px) + var(--pull-idle-drop, 20px));
+  }
+}
+
+@keyframes postsTwineElasticIdleCoarse {
+  0%,
+  100% {
+    height: var(--twine-knot-body-h, 10px);
+  }
+  50% {
+    height: calc(var(--twine-knot-body-h, 10px) + var(--pull-idle-drop, 20px));
+  }
+}
+
+@keyframes postsTwineGrowIdleMarginCancel {
+  0%,
+  100% {
+    margin-bottom: 0;
+  }
+  50% {
+    margin-bottom: calc(-1 * var(--pull-idle-drop, 20px));
+  }
+}
+
+@keyframes postsTwineGrowIdleMarginCancelCoarse {
+  0%,
+  100% {
+    margin-bottom: 0;
+  }
+  50% {
+    margin-bottom: calc(-1 * var(--pull-idle-drop, 20px));
+  }
+}
+
+.posts-index-board .posts-twine-elastic--idle-dangle {
+  animation: postsTwineElasticIdle 2s infinite ease-in-out;
+  min-height: var(--twine-knot-body-h, 10px);
+}
+
+@media (pointer: coarse), (hover: none) {
+  .posts-index-board .posts-twine-elastic--idle-dangle {
+    animation: postsTwineElasticIdleCoarse 2.5s infinite ease-in-out;
+  }
+}
+
+.posts-index-board .posts-twine-elastic--idle-static {
+  height: var(--twine-knot-body-h, 10px);
+}
+
+.posts-index-board .posts-index-twine-grow--idle-elastic-cancel {
+  animation: postsTwineGrowIdleMarginCancel 2s infinite ease-in-out;
+}
+
+@media (pointer: coarse), (hover: none) {
+  .posts-index-board .posts-index-twine-grow--idle-elastic-cancel {
+    animation: postsTwineGrowIdleMarginCancelCoarse 2.5s infinite ease-in-out;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .posts-index-board .posts-twine-elastic--idle-dangle {
+    animation: none !important;
+  }
+
+  .posts-index-board .posts-index-twine-grow--idle-elastic-cancel {
+    animation: none !important;
+  }
 }
 
 /*
@@ -1869,6 +1977,13 @@ a.skip-to-content-board:focus {
   transition: none;
   z-index: 5;
   justify-content: center;
+}
+
+/* Grid: strand animates in `.posts-twine--flow`; pull stack is knot + CTA only. */
+.pull-container--strand-in-twine .pull-connector-track {
+  height: 0;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Column: connector (elastic) then bounce layer (knot + tail + CTA). */

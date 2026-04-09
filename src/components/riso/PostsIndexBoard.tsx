@@ -33,13 +33,14 @@ function layoutBoardWidthPx(width: number) {
   return Math.round(Math.max(width, 320));
 }
 
-function PullMoreCord({
+/** Grid: elastic segment lives in `.posts-twine--flow`; stacked: `.pull-connector` still stretches. */
+type PullStrandSource = "twine" | "connector";
+
+function usePullCord({
   prefersReducedMotion,
-  remainingPosts,
   onLoadMore,
 }: {
   prefersReducedMotion: boolean | null;
-  remainingPosts: number;
   onLoadMore: () => void;
 }) {
   const reduced = prefersReducedMotion === true;
@@ -160,7 +161,7 @@ function PullMoreCord({
     endPullGesture();
   }, [endPullGesture]);
 
-  const handleConnectorTransitionEnd = useCallback(
+  const handleStrandTransitionEnd = useCallback(
     (e: React.TransitionEvent<HTMLDivElement>) => {
       if (e.propertyName !== "height") return;
       if (e.target !== e.currentTarget) return;
@@ -216,9 +217,105 @@ function PullMoreCord({
     .filter(Boolean)
     .join(" ");
 
+  /** Grid: elastic is the last child of `.posts-twine--flow`; cancel extra height so the row does not grow. */
+  const gridElasticClassName = [
+    "posts-twine-elastic",
+    idleDangle ? "posts-twine-elastic--idle-dangle" : "",
+    idleStatic ? "posts-twine-elastic--idle-static" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const gridElasticStyle: React.CSSProperties | undefined =
+    idleDangle || idleStatic
+      ? undefined
+      : {
+          height: Math.max(cordHeightPx, TWINE_KNOT_BODY_HEIGHT_PX),
+          transition: reduced ? "none" : cordHeightTransition,
+        };
+
+  const twineGrowCancelClassName =
+    idleDangle && !reduced ? "posts-index-twine-grow--idle-elastic-cancel" : "";
+
+  const twinePullExtraPx =
+    idleDangle || idleStatic
+      ? 0
+      : Math.max(
+          0,
+          Math.max(cordHeightPx, TWINE_KNOT_BODY_HEIGHT_PX) -
+            TWINE_KNOT_BODY_HEIGHT_PX
+        );
+
+  const twineGrowCancelStyle: React.CSSProperties | undefined =
+    twinePullExtraPx > 0
+      ? { marginBottom: `-${twinePullExtraPx}px` }
+      : undefined;
+
+  return {
+    reduced,
+    stretchPx,
+    pullDragActive,
+    snapping,
+    cordHeightPx,
+    cordHeightTransition,
+    idleDangle,
+    idleStatic,
+    connectorCollapsed,
+    stackClass,
+    connectorClass,
+    trackClass,
+    gridElasticClassName,
+    gridElasticStyle,
+    twineGrowCancelClassName,
+    twineGrowCancelStyle,
+    handlePullPointerDown,
+    handlePullPointerMove,
+    handlePullPointerUp,
+    handlePullPointerCancel,
+    handleLostPointerCapture,
+    handleStrandTransitionEnd,
+    handleButtonClick,
+  };
+}
+
+function PullMoreCord({
+  pull,
+  remainingPosts,
+  strandSource,
+}: {
+  pull: ReturnType<typeof usePullCord>;
+  remainingPosts: number;
+  strandSource: PullStrandSource;
+}) {
+  const {
+    reduced,
+    stackClass,
+    connectorClass,
+    trackClass,
+    cordHeightPx,
+    cordHeightTransition,
+    idleDangle,
+    idleStatic,
+    handlePullPointerDown,
+    handlePullPointerMove,
+    handlePullPointerUp,
+    handlePullPointerCancel,
+    handleLostPointerCapture,
+    handleStrandTransitionEnd,
+    handleButtonClick,
+  } = pull;
+
+  const strandInTwineFlow = strandSource === "twine";
+
   return (
     <div
-      className={`pull-container pull-container--flow ${reduced ? "pull-container--no-motion" : ""}`}
+      className={[
+        "pull-container pull-container--flow",
+        strandInTwineFlow ? "pull-container--strand-in-twine" : "",
+        reduced ? "pull-container--no-motion" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
     >
       <div
         className={stackClass}
@@ -228,21 +325,28 @@ function PullMoreCord({
         onPointerCancel={handlePullPointerCancel}
         onLostPointerCapture={handleLostPointerCapture}
       >
-        <div className={trackClass} aria-hidden="true">
+        {strandInTwineFlow ? (
           <div
-            className={connectorClass}
-            style={
-              idleDangle
-                ? undefined
-                : {
-                    height: cordHeightPx,
-                    transition: reduced ? "none" : cordHeightTransition,
-                  }
-            }
-            onTransitionEnd={handleConnectorTransitionEnd}
+            className="pull-connector-track pull-connector-track--rest"
+            aria-hidden="true"
           />
-        </div>
-        {/* Idle: only pullConnectorIdle animates elastic height — knot/tail/CTA ride flex below it. */}
+        ) : (
+          <div className={trackClass} aria-hidden="true">
+            <div
+              className={connectorClass}
+              style={
+                idleDangle
+                  ? undefined
+                  : {
+                      height: cordHeightPx,
+                      transition: reduced ? "none" : cordHeightTransition,
+                    }
+              }
+              onTransitionEnd={handleStrandTransitionEnd}
+            />
+          </div>
+        )}
+        {/* Grid: knot/CTA sit in `.posts-twine--flow` under the elastic and move with it; stacked: connector above this layer. */}
         <div className="pull-bounce-layer">
           <div className="pull-knot-hit" aria-hidden="true">
             <div className="twine-knot knot-bottom" />
@@ -391,6 +495,11 @@ export default function PostsIndexBoard({
     setLoadMoreStatus(`${batch} more ${noun} loaded.`);
   }, [pageSize, remainingPosts]);
 
+  const pull = usePullCord({
+    prefersReducedMotion,
+    onLoadMore: handleLoadMore,
+  });
+
   const leftPosts = useMemo(
     () => displayedPosts.filter((_, i) => i % 2 === 0),
     [displayedPosts]
@@ -466,9 +575,9 @@ export default function PostsIndexBoard({
           {hasMore ? (
             <div className="posts-index-stacked-pull">
               <PullMoreCord
-                prefersReducedMotion={prefersReducedMotion}
+                pull={pull}
                 remainingPosts={remainingPosts}
-                onLoadMore={handleLoadMore}
+                strandSource="connector"
               />
             </div>
           ) : null}
@@ -492,23 +601,42 @@ export default function PostsIndexBoard({
             })}
           </div>
 
-          <div className="posts-index-center">
-            <div className="posts-index-twine-grow">
+          <div
+            className={
+              "posts-index-center" +
+              (hasMore ? " posts-index-center--twine-pull" : "")
+            }
+          >
+            <div
+              className={[
+                "posts-index-twine-grow",
+                hasMore ? pull.twineGrowCancelClassName : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              style={hasMore ? pull.twineGrowCancelStyle : undefined}
+            >
               <div className="posts-twine--flow">
                 <div className="twine-knot knot-top" />
                 <div className="posts-twine-stripe" />
+                {hasMore ? (
+                  <div
+                    className={pull.gridElasticClassName}
+                    style={pull.gridElasticStyle}
+                    aria-hidden="true"
+                    onTransitionEnd={pull.handleStrandTransitionEnd}
+                  />
+                ) : null}
+                {hasMore ? (
+                  <PullMoreCord
+                    pull={pull}
+                    remainingPosts={remainingPosts}
+                    strandSource="twine"
+                  />
+                ) : null}
                 {!hasMore ? <div className="twine-knot knot-bottom" /> : null}
               </div>
             </div>
-            {hasMore ? (
-              <div className="posts-index-pull-wrap">
-                <PullMoreCord
-                  prefersReducedMotion={prefersReducedMotion}
-                  remainingPosts={remainingPosts}
-                  onLoadMore={handleLoadMore}
-                />
-              </div>
-            ) : null}
           </div>
 
           <div className="posts-index-col posts-index-col--right">
