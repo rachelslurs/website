@@ -1383,8 +1383,8 @@ a.skip-to-content-board:focus {
  * Pull cord + strand structure: see the file-level comment above `usePullCord` in `PostsIndexBoard.tsx`.
  *
  * Cord tokens: `--twine-knot-body-h`, `--pull-idle-drop`, `--posts-tail-idle-layout-h`,
- * `--posts-pull-below-pull-stack-h`. Idle: `.posts-index-pull-below__elastic` min-height (tail max + pull
- * stack) with tail + knot + CTA in one column; tail uses `height` keyframes only (no `scaleY`).
+ * `--posts-pull-cord-max` (sync `PULL_CORD_MAX_PX`), `--posts-tail-max-any-h`, `--posts-pull-below-pull-stack-h`.
+ * `.posts-index-pull-below__elastic` min-height reserves tail + stack so idle and pull do not shift page height.
  *
  * Stripe min-heights apply only under `.posts-index-grid` so `.posts-index-pull-below__tail` stays
  * content-sized. Spacing: `--posts-sp` (0.25rem); breakpoints match Tailwind (`sm` 640px, `md` 768px,
@@ -1410,6 +1410,13 @@ a.skip-to-content-board:focus {
    */
   --posts-pull-below-pull-stack-h: calc(
     72px + 69px + var(--twine-knot-body-h) * 3 + clamp(4.5rem, 14cqi, 6rem)
+  );
+  /* Sync `PULL_CORD_MAX_PX` in PostsIndexBoard.tsx. */
+  --posts-pull-cord-max: 100px;
+  /* Larger of idle bounce tail vs knot + max drag stretch (reserved strip height). */
+  --posts-tail-max-any-h: max(
+    var(--posts-tail-idle-layout-h),
+    calc(var(--twine-knot-body-h) + var(--posts-pull-cord-max))
   );
   /* Pull up under RisoBoardShell’s gap-8 so twine sits closer to the nav. */
   margin-top: calc(var(--posts-sp) * -2);
@@ -1503,19 +1510,15 @@ a.skip-to-content-board:focus {
   flex-shrink: 0;
 }
 
-/* Tail + knot + CTA stack; idle min-height keeps the page stable while the knot rides the elastic. */
+/* Tail + knot + CTA stack; min-height covers max tail (idle or drag) so document height stays flat. */
 .posts-index-board .posts-index-pull-below__elastic {
   display: flex;
   width: 100%;
   flex-direction: column;
   flex-shrink: 0;
   align-items: center;
-}
-
-.posts-index-board
-  .posts-index-pull-below__elastic:has(.posts-twine-stripe__tail--idle-dangle) {
   min-height: calc(
-    var(--posts-tail-idle-layout-h) + var(--posts-pull-below-pull-stack-h)
+    var(--posts-tail-max-any-h) + var(--posts-pull-below-pull-stack-h)
   );
 }
 
@@ -1813,11 +1816,6 @@ a.skip-to-content-board:focus {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .posts-index-board
-    .posts-index-pull-below__elastic:has(.posts-twine-stripe__tail--idle-dangle) {
-    min-height: 0;
-  }
-
   .posts-index-board .posts-twine-stripe__tail--idle-dangle {
     animation: none !important;
     height: var(--twine-knot-body-h);

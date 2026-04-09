@@ -17,6 +17,7 @@ const NARROW_BOARD_MAX_PX = 640;
 const BOARD_BOTTOM_PAD_DEFAULT = 340;
 const BOARD_BOTTOM_PAD_NARROW = 380;
 
+/** Keep in sync with `.posts-index-board` `--posts-pull-cord-max` in riso.css (stable elastic slot). */
 const PULL_CORD_MAX_PX = 100;
 /** Match `.twine-knot { height }` in riso.css — elastic segment is at least this tall when visible. */
 const TWINE_KNOT_BODY_HEIGHT_PX = 10;
@@ -42,10 +43,10 @@ function layoutBoardWidthPx(width: number) {
  *   `__main` paint stops at that join (see `.posts-index-twine-grow` in riso.css).
  *
  * Elastic segment: the live cord is `.posts-twine-stripe__tail` (not a sibling `.pull-connector`
- * inside the center column). Idle: `.posts-index-pull-below__elastic` gets a min-height (tail max +
- * pull stack) while only the tail `height` keyframes animate (no `scaleY`). Drag / snap: `usePullCord`
- * drives tail height via `--posts-stripe-tail-h`. `PullMoreCord` uses `pull-container--strand-in-twine`
- * with a collapsed `.pull-connector-track`.
+ * inside the center column). `.posts-index-pull-below__elastic` uses a fixed min-height: max(idle tail,
+ * full drag stretch) plus the pull stack, so idle keyframes and drag do not change document length.
+ * Idle: tail `height` keyframes only (no `scaleY`). Drag / snap: `usePullCord` and `--posts-stripe-tail-h`.
+ * `PullMoreCord` uses `pull-container--strand-in-twine` with a collapsed `.pull-connector-track`.
  *
  * `usePullCord` returns pointer handlers, stretch state, and class names for the tail. It also
  * computes `connectorClass` / `trackClass` for a live `.pull-connector` if `PullMoreCord` is wired
