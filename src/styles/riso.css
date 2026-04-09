@@ -227,6 +227,10 @@ nav .group:hover .dust-note {
 /* Posts index (/posts): title → date → snippet rhythm; homepage cards keep base .post-* */
 .posts-index-board .post-title {
   font-weight: 600;
+  margin-bottom: var(--posts-sp);
+  /* Override global .post-title (text-xl … md:text-3xl); size tracks `--posts-sp` on the board. */
+  font-size: calc(var(--posts-sp) * 3);
+  line-height: 1.3;
   /* Cap title height in the posts index card grid (flow layout + gap). */
   overflow: hidden;
   display: -webkit-box;
@@ -234,25 +238,39 @@ nav .group:hover .dust-note {
   -webkit-line-clamp: 5;
   line-clamp: 5;
 }
+@media (min-width: 768px) {
+  .posts-index-board .post-title {
+    font-size: calc(var(--posts-sp) * 4);
+    line-height: 1.35;
+  }
+}
 .posts-index-board .post-date {
   display: block;
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
+  margin-bottom: calc(var(--posts-sp) * 2);
+  font-size: calc(var(--posts-sp) * 2.5);
+  letter-spacing: 0.1em;
   font-weight: 700;
+}
+@media (min-width: 768px) {
+  .posts-index-board .post-date {
+    margin-bottom: calc(var(--posts-sp) * 3);
+    font-size: calc(var(--posts-sp) * 3);
+    letter-spacing: 0.12em;
+  }
 }
 .posts-index-board .post-excerpt {
   @apply font-body;
   margin-top: 0;
-  font-size: 0.8125rem;
+  font-size: calc(var(--posts-sp) * 3.25);
   line-height: var(--riso-leading-relaxed);
   flex: 1;
 }
 
-/* Tailwind `md` (768px): compact cards below hide excerpt + smaller title in TSX */
+/* Tailwind `md` (768px): compact cards below hide excerpt + tag */
 @media (max-width: 767px) {
   .posts-index-board .post-title {
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
   }
 }
 
@@ -1362,8 +1380,15 @@ a.skip-to-content-board:focus {
 
 /*
  * ── POSTS INDEX (twine + cards) ──
- * Documented in `usePullCord` / `PostsIndexBoard.tsx`. Strand tail animates on `.posts-twine-stripe__tail`.
- * Breakpoints align with Tailwind (`sm` 640px, `md` 768px, `lg` 1024px).
+ * Pull cord + strand structure: see the file-level comment above `usePullCord` in `PostsIndexBoard.tsx`.
+ *
+ * Cord tokens: `--twine-knot-body-h`, `--pull-idle-drop`, `--posts-tail-idle-layout-h`,
+ * `--posts-pull-below-pull-stack-h`. Idle: `.posts-index-pull-below__elastic` min-height (tail max + pull
+ * stack) with tail + knot + CTA in one column; tail uses `height` keyframes only (no `scaleY`).
+ *
+ * Stripe min-heights apply only under `.posts-index-grid` so `.posts-index-pull-below__tail` stays
+ * content-sized. Spacing: `--posts-sp` (0.25rem); breakpoints match Tailwind (`sm` 640px, `md` 768px,
+ * `lg` 1024px).
  */
 .posts-index-board {
   position: relative;
@@ -1372,45 +1397,153 @@ a.skip-to-content-board:focus {
   margin-inline: auto;
   container-type: inline-size;
   container-name: posts-board;
-  /* Match `.twine-knot { height }`; `--pull-idle-drop` sets how far the elastic “gives” at peak (knot follows via flex). */
-  --twine-knot-body-h: 10px;
-  --pull-idle-drop: calc(2 * var(--twine-knot-body-h));
+  /* 4px grid: tape, padding, gaps, type, and in-card rhythm are multiples of this. */
+  --posts-sp: 0.25rem;
+  --twine-knot-body-h: calc(2.5 * var(--posts-sp));
+  /* Longer idle bounce for strand tail + elastic (keyframes use `--pull-idle-drop`). */
+  --pull-idle-drop: calc(3.5 * var(--twine-knot-body-h));
+  /* Max idle tail length. */
+  --posts-tail-idle-layout-h: calc(var(--twine-knot-body-h) + var(--pull-idle-drop));
+  /*
+   * Approximate block height for knot + ::before + pull CTA under the tail (posts index).
+   * Tune with `.posts-index-board .pull-container .knot-bottom::before` (72px) and `.pull-action` margin.
+   */
+  --posts-pull-below-pull-stack-h: calc(
+    72px + 69px + var(--twine-knot-body-h) * 3 + clamp(4.5rem, 14cqi, 6rem)
+  );
   /* Pull up under RisoBoardShell’s gap-8 so twine sits closer to the nav. */
-  margin-top: -0.5rem;
+  margin-top: calc(var(--posts-sp) * -2);
   /* Tape pseudo-elements sit past the card; clip would shear them at the board edge. */
   overflow-x: visible;
   overflow-y: visible;
-  /* Breathing room so tape clears the cork border / narrow viewports. */
-  padding-inline: clamp(0.5rem, 2.5cqi, 1.25rem);
+  padding-inline: clamp(calc(var(--posts-sp) * 1.5), 1.75cqi, calc(var(--posts-sp) * 3));
   color: var(--black);
+}
+
+@media (min-width: 768px) {
+  .posts-index-board {
+    padding-inline: clamp(calc(var(--posts-sp) * 2), 2.5cqi, calc(var(--posts-sp) * 5));
+  }
+}
+
+/* Corner tape + card inset scale with `--posts-sp`; below `md` tape is smaller than desktop. */
+.posts-index-board .tape-c::before,
+.posts-index-board .tape-c::after {
+  width: calc(var(--posts-sp) * 5);
+  height: calc(var(--posts-sp) * 2.5);
+}
+.posts-index-board .featured-post-tape.tape-c::before,
+.posts-index-board .featured-post-tape.tape-c::after {
+  width: calc(var(--posts-sp) * 7.5);
+  height: calc(var(--posts-sp) * 2.5);
+}
+.posts-index-board .card {
+  padding: calc(var(--posts-sp) * 3);
+}
+
+@media (min-width: 768px) {
+  .posts-index-board .tape-c::before,
+  .posts-index-board .tape-c::after {
+    width: calc(var(--posts-sp) * 10);
+    height: calc(var(--posts-sp) * 4.5);
+  }
+  .posts-index-board .featured-post-tape.tape-c::before,
+  .posts-index-board .featured-post-tape.tape-c::after {
+    width: calc(var(--posts-sp) * 14);
+    height: calc(var(--posts-sp) * 4.5);
+  }
+  .posts-index-board .card {
+    padding: calc(var(--posts-sp) * 5);
+  }
 }
 
 /* Two card columns + center twine (all breakpoints; spacing tracks Tailwind sm / md / lg). */
 .posts-index-grid {
   display: grid;
-  align-items: start;
+  /* Stretch row height to the tallest column; side columns opt out so cards stay content-height. */
+  align-items: stretch;
   gap: 0;
-  grid-template-columns: minmax(0, 1fr) minmax(2.5rem, 3.25rem) minmax(0, 1fr);
-  --posts-masonry-stagger: clamp(1.25rem, 5cqi, 2.5rem);
+  grid-template-columns:
+    minmax(0, 1fr) minmax(calc(var(--posts-sp) * 10), calc(var(--posts-sp) * 13)) minmax(0, 1fr);
+  --posts-masonry-stagger: clamp(calc(var(--posts-sp) * 5), 5cqi, calc(var(--posts-sp) * 10));
+}
+
+.posts-index-col--left,
+.posts-index-col--right {
+  align-self: start;
+  width: 100%;
+}
+
+/* Vertical stack: card grid (intrinsic height from masonry) then full-width pull row below. */
+.posts-index-stack {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Strand tail + pull UI sit in document flow under both card columns (responsive to grid height). */
+.posts-index-pull-below {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  /* Match `.posts-index-pull-wrap`: overlap upward so `__main` meets `__tail` + knot (no seam). */
+  margin-top: calc(-2 * var(--twine-knot-body-h));
+  position: relative;
+  z-index: 1;
+}
+
+.posts-index-pull-below__tail.posts-twine-stripe--pull {
+  flex: 0 0 auto;
+  width: 4px;
+  min-height: 0;
+  align-self: center;
+  flex-shrink: 0;
+}
+
+/* Tail + knot + CTA stack; idle min-height keeps the page stable while the knot rides the elastic. */
+.posts-index-board .posts-index-pull-below__elastic {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.posts-index-board
+  .posts-index-pull-below__elastic:has(.posts-twine-stripe__tail--idle-dangle) {
+  min-height: calc(
+    var(--posts-tail-idle-layout-h) + var(--posts-pull-below-pull-stack-h)
+  );
+}
+
+.posts-index-pull-below .pull-container.pull-container--flow {
+  margin-top: 0;
 }
 
 @media (min-width: 640px) {
   .posts-index-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(3.25rem, 4.5rem) minmax(0, 1fr);
-    --posts-masonry-stagger: clamp(2rem, 8cqi, 4rem);
+    grid-template-columns:
+      minmax(0, 1fr) minmax(calc(var(--posts-sp) * 13), calc(var(--posts-sp) * 18)) minmax(0, 1fr);
+    --posts-masonry-stagger: clamp(calc(var(--posts-sp) * 8), 8cqi, calc(var(--posts-sp) * 16));
   }
 }
 
 @media (min-width: 768px) {
   .posts-index-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(4.5rem, 5.875rem) minmax(0, 1fr);
-    --posts-masonry-stagger: clamp(2.25rem, 9cqi, 5.5rem);
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(calc(var(--posts-sp) * 18), calc(var(--posts-sp) * 23.5))
+      minmax(0, 1fr);
+    --posts-masonry-stagger: clamp(calc(var(--posts-sp) * 9), 9cqi, calc(var(--posts-sp) * 22));
   }
 }
 
 @media (min-width: 1024px) {
   .posts-index-grid {
-    --posts-masonry-stagger: clamp(4rem, 14cqi, 10rem);
+    --posts-masonry-stagger: clamp(calc(var(--posts-sp) * 16), 14cqi, calc(var(--posts-sp) * 40));
   }
 }
 
@@ -1418,50 +1551,56 @@ a.skip-to-content-board:focus {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding-top: 4.25rem;
+  padding-top: calc(var(--posts-sp) * 13);
   z-index: 2;
 }
 
 @media (min-width: 640px) {
   .posts-index-col {
-    padding-top: 5.25rem;
+    padding-top: calc(var(--posts-sp) * 18);
+  }
+}
+
+@media (min-width: 768px) {
+  .posts-index-col {
+    padding-top: calc(var(--posts-sp) * 21);
   }
 }
 
 @media (min-width: 1024px) {
   .posts-index-col {
-    padding-top: 6.5rem;
+    padding-top: calc(var(--posts-sp) * 26);
   }
 }
 
 /* Push cards toward the center stripe so left/right distances match (1fr | twine | 1fr). */
 .posts-index-col--left {
   align-items: flex-end;
-  gap: clamp(3rem, 14cqi, 6rem);
+  gap: clamp(calc(var(--posts-sp) * 12), 14cqi, calc(var(--posts-sp) * 24));
 }
 
 .posts-index-col--right {
   align-items: flex-start;
-  gap: clamp(5rem, 22cqi, 10rem);
+  gap: clamp(calc(var(--posts-sp) * 20), 22cqi, calc(var(--posts-sp) * 40));
 }
 
 @media (min-width: 768px) {
   .posts-index-col--left {
-    gap: clamp(4rem, 12cqi, 8.5rem);
+    gap: clamp(calc(var(--posts-sp) * 16), 12cqi, calc(var(--posts-sp) * 34));
   }
 
   .posts-index-col--right {
-    gap: clamp(7.5rem, 22cqi, 14rem);
+    gap: clamp(calc(var(--posts-sp) * 30), 22cqi, calc(var(--posts-sp) * 56));
   }
 }
 
 @media (min-width: 1024px) {
   .posts-index-col--left {
-    gap: clamp(8.5rem, 20cqi, 13rem);
+    gap: clamp(calc(var(--posts-sp) * 34), 20cqi, calc(var(--posts-sp) * 52));
   }
 
   .posts-index-col--right {
-    gap: clamp(15rem, 38cqi, 26rem);
+    gap: clamp(calc(var(--posts-sp) * 60), 38cqi, calc(var(--posts-sp) * 104));
   }
 }
 
@@ -1471,34 +1610,40 @@ a.skip-to-content-board:focus {
 
 /* Board container under 640px (JS): extra top offset + gaps for RSS / knot tail alignment. */
 .posts-index-board--narrow .posts-index-col--left {
-  gap: clamp(3.5rem, 16cqi, 7rem);
+  gap: clamp(calc(var(--posts-sp) * 14), 16cqi, calc(var(--posts-sp) * 28));
 }
 
 .posts-index-board--narrow .posts-index-col--right {
-  gap: clamp(6rem, 26cqi, 12rem);
+  gap: clamp(calc(var(--posts-sp) * 24), 26cqi, calc(var(--posts-sp) * 48));
 }
 
 .posts-index-board--narrow .posts-index-col {
-  padding-top: 6rem;
+  padding-top: calc(var(--posts-sp) * 19);
 }
 
 @media (min-width: 640px) {
   .posts-index-board--narrow .posts-index-col {
-    padding-top: 7rem;
+    padding-top: calc(var(--posts-sp) * 24);
+  }
+}
+
+@media (min-width: 768px) {
+  .posts-index-board--narrow .posts-index-col {
+    padding-top: calc(var(--posts-sp) * 28);
   }
 }
 
 @media (min-width: 1024px) {
   .posts-index-board--narrow .posts-index-col {
-    padding-top: 9.8125rem;
+    padding-top: calc(var(--posts-sp) * 39.25);
   }
 
   .posts-index-board--narrow .posts-index-col--left {
-    gap: clamp(9rem, 22cqi, 14rem);
+    gap: clamp(calc(var(--posts-sp) * 36), 22cqi, calc(var(--posts-sp) * 56));
   }
 
   .posts-index-board--narrow .posts-index-col--right {
-    gap: clamp(16rem, 42cqi, 28rem);
+    gap: clamp(calc(var(--posts-sp) * 64), 42cqi, calc(var(--posts-sp) * 112));
   }
 }
 
@@ -1508,22 +1653,16 @@ a.skip-to-content-board:focus {
   min-height: 0;
   flex-direction: column;
   align-self: stretch;
+  width: 100%;
   z-index: 1;
-  --posts-pull-slot-height: 11.5rem;
-}
-
-/*
- * Grid + load-more: pull chrome (knot, CTA) lives under `.posts-twine-stripe` (strand tail animates there).
- */
-.posts-index-center--twine-pull .posts-index-twine-grow {
-  padding-bottom: 0;
+  --posts-pull-slot-height: calc(var(--posts-sp) * 60);
 }
 
 .posts-index-twine-grow {
   display: flex;
-  min-height: 12rem;
   flex: 1 1 auto;
   flex-direction: column;
+  min-height: 0;
   /*
    * Match `.posts-index-pull-wrap { margin-top: calc(-2 * --twine-knot-body-h) }`: the pull stack
    * overlaps this many pixels upward. Without bottom padding here, the stripe fills to the flex
@@ -1539,13 +1678,13 @@ a.skip-to-content-board:focus {
   position: relative;
   display: flex;
   height: 100%;
-  min-height: 12rem;
   flex: 1 1 auto;
   flex-direction: column;
   align-items: center;
+  min-height: 0;
 }
 
-/* Grid: `.pull-container` is a flex sibling below `.posts-twine-stripe` (not inside pull-wrap). */
+/* Pull container lives in `.posts-index-pull-below` (below card grid), not inside `.posts-twine--flow`. */
 .posts-twine--flow > .pull-container.pull-container--flow {
   flex-shrink: 0;
   align-self: stretch;
@@ -1582,8 +1721,7 @@ a.skip-to-content-board:focus {
 }
 
 /*
- * With load-more: `.posts-twine-stripe--pull` wraps `__main` (flex strand) + `__tail` (idle/pull length).
- * `.posts-index-twine-grow--idle-elastic-cancel` still cancels extra tail height during idle bounce.
+ * With load-more: grid center uses `__main` only; `__tail` sits in `.posts-index-pull-below__tail` under the grid.
  */
 .posts-twine-stripe--pull {
   display: flex;
@@ -1612,6 +1750,16 @@ a.skip-to-content-board:focus {
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* Only the grid center column needs a tall strand; pull-below’s `posts-twine-stripe--pull` is tail-only. */
+.posts-index-board .posts-index-grid .posts-twine-stripe,
+.posts-index-board .posts-index-grid .posts-twine-stripe--pull {
+  min-height: calc(var(--posts-sp) * 20);
+}
+
+.posts-index-board .posts-index-grid .posts-twine-stripe__main {
+  min-height: calc(var(--posts-sp) * 10);
+}
+
 .posts-twine-stripe__tail {
   flex-shrink: 0;
   width: 4px;
@@ -1630,51 +1778,21 @@ a.skip-to-content-board:focus {
 @keyframes postsTwineStripeTailIdle {
   0%,
   100% {
-    height: var(--twine-knot-body-h, 10px);
+    height: var(--twine-knot-body-h);
   }
   50% {
-    height: calc(var(--twine-knot-body-h, 10px) + var(--pull-idle-drop, 20px));
-  }
-}
-
-@keyframes postsTwineStripeTailIdleCoarse {
-  0%,
-  100% {
-    height: var(--twine-knot-body-h, 10px);
-  }
-  50% {
-    height: calc(var(--twine-knot-body-h, 10px) + var(--pull-idle-drop, 20px));
-  }
-}
-
-@keyframes postsTwineGrowIdleMarginCancel {
-  0%,
-  100% {
-    margin-bottom: 0;
-  }
-  50% {
-    margin-bottom: calc(-1 * var(--pull-idle-drop, 20px));
-  }
-}
-
-@keyframes postsTwineGrowIdleMarginCancelCoarse {
-  0%,
-  100% {
-    margin-bottom: 0;
-  }
-  50% {
-    margin-bottom: calc(-1 * var(--pull-idle-drop, 20px));
+    height: var(--posts-tail-idle-layout-h);
   }
 }
 
 .posts-index-board .posts-twine-stripe__tail--idle-dangle {
+  flex-shrink: 0;
   animation: postsTwineStripeTailIdle 2s infinite ease-in-out;
-  min-height: var(--twine-knot-body-h, 10px);
 }
 
 @media (pointer: coarse), (hover: none) {
   .posts-index-board .posts-twine-stripe__tail--idle-dangle {
-    animation: postsTwineStripeTailIdleCoarse 2.5s infinite ease-in-out;
+    animation-duration: 2.5s;
   }
 }
 
@@ -1694,23 +1812,15 @@ a.skip-to-content-board:focus {
   transition: none !important;
 }
 
-.posts-index-board .posts-index-twine-grow--idle-elastic-cancel {
-  animation: postsTwineGrowIdleMarginCancel 2s infinite ease-in-out;
-}
-
-@media (pointer: coarse), (hover: none) {
-  .posts-index-board .posts-index-twine-grow--idle-elastic-cancel {
-    animation: postsTwineGrowIdleMarginCancelCoarse 2.5s infinite ease-in-out;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
+  .posts-index-board
+    .posts-index-pull-below__elastic:has(.posts-twine-stripe__tail--idle-dangle) {
+    min-height: 0;
+  }
+
   .posts-index-board .posts-twine-stripe__tail--idle-dangle {
     animation: none !important;
-  }
-
-  .posts-index-board .posts-index-twine-grow--idle-elastic-cancel {
-    animation: none !important;
+    height: var(--twine-knot-body-h);
   }
 }
 
@@ -1740,7 +1850,7 @@ a.skip-to-content-board:focus {
 .posts-rss-anchor--grid {
   position: absolute;
   z-index: 3;
-  right: 8px;
+  right: calc(var(--posts-sp) * 2);
   width: max-content;
 }
 
@@ -2119,9 +2229,19 @@ a.skip-to-content-board:focus {
   bottom: auto;
   flex-shrink: 0;
 }
+
+/* Posts index: longer knot tail + CTA offset (see `.knot-bottom::before` height). */
+.posts-index-board .pull-container .knot-bottom::before {
+  height: 72px;
+}
+
 /* Button sits below the main stripe: knot + ::before tail, then CTA. */
 .pull-container .pull-action {
   margin-top: 42px;
+}
+
+.posts-index-board .pull-container .pull-action {
+  margin-top: 69px;
 }
 .pull-action {
   background: transparent;
