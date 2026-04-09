@@ -8,233 +8,36 @@ import React, {
 import { motion, useReducedMotion } from "framer-motion";
 import DymoLabel from "@components/riso/DymoLabel";
 import type { PortfolioPost } from "@components/PortfolioBoard";
-/** Base delay before the first card (homepage waits for nav; /posts uses 0). */
+
 const CONTENT_ENTRANCE_DELAY_S = 0;
-/** Seconds between each card’s entrance — clearer than PortfolioBoard’s 0.08s step. */
 const STAGGER_STEP_S = 0.14;
 
 const CARD_WIDTH = 360;
-/** Gap (px) from twine edge to nearest card edge — keeps columns centered on the string at any board width. */
-const TWINE_GAP = 45;
-const HALF_TWINE = 2;
-/** Match `.knot-top::before { height }` in riso.css — dangling string above the knot. */
 const KNOT_TOP_TAIL_PX = 45;
-const ROW_STEP_DEFAULT = 270;
-const TWINE_TOP_DEFAULT = 52;
-/** Pull stack nudges up so the bottom knot meets the twine (no visible gap). */
-const TWINE_PULL_STACK_OVERLAP = 10;
-/** Pull column height (knot + tail + margin + button) — tune if layout/CSS changes. */
-const PULL_STACK_HEIGHT_PX = 168;
-/** When all posts are shown: knot tail extends below the twine column end. */
-const BOTTOM_KNOT_TAIL_BELOW_TWINE_PX = 52;
-/** Extra vertical stripe length so the cord hangs further below the cards before the pull (tune visually). */
-const TWINE_EXTRA_LENGTH_PX = 250;
 const EDGE_PAD = 8;
-/** Below this width, add more vertical rhythm (RSS ↔ cards ↔ pull). */
 const NARROW_BOARD_MAX_PX = 640;
-const ROW_STEP_NARROW = 300;
-const TWINE_TOP_NARROW = 74;
-const CARD_BASE_Y_DEFAULT = 104;
-const CARD_BASE_Y_NARROW = 157;
 const BOARD_BOTTOM_PAD_DEFAULT = 260;
 const BOARD_BOTTOM_PAD_NARROW = 300;
-/**
- * Below this width, two 360px columns + twine gap do not fit — use one centered column
- * so cards are not clipped or overlapping horizontally.
- */
-const TWO_COL_MIN_PX =
-  CARD_WIDTH * 2 + TWINE_GAP * 2 + HALF_TWINE * 2 + EDGE_PAD * 2 + 24;
-/** Vertical stride when stacked (must exceed typical card height incl. excerpt). */
-const STACK_ROW_STEP = 360;
-const TWINE_TOP_STACKED = 66;
-const CARD_BASE_Y_STACKED = 140;
-/** Conservative card block height for board sizing (content varies). */
-const EST_CARD_H_TWO_COL = 320;
-const EST_CARD_H_STACKED = 350;
 
-/** Max downward pull (px) for the “load more” cord gesture. */
+/** Below this width, two card columns + twine do not fit — single-column layout. */
+const TWO_COL_MIN_PX = CARD_WIDTH * 2 + 45 * 2 + 2 * 2 + EDGE_PAD * 2 + 24;
+
 const PULL_CORD_MAX_PX = 56;
-/** Release past this offset to load more (px). */
+/** Match `.twine-knot { height }` in riso.css — elastic segment is at least this tall when visible. */
+const TWINE_KNOT_BODY_HEIGHT_PX = 10;
 const PULL_CORD_THRESHOLD_PX = 28;
-/** Pulls above this offset suppress the button click (avoids duplicate after a drag). */
 const PULL_DRAG_SUPPRESS_CLICK_PX = 10;
-/** Snap-back duration for the cord stretch (matches riso.css easing). */
 const PULL_SNAP_TRANSITION = "height 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)";
 
-/**
- * Integer board width avoids subpixel “shimmer” when reflow nudges
- * `contentRect.width` (e.g. 605.3 ↔ 605.7) while the pull cord changes height.
- */
 function layoutBoardWidthPx(width: number) {
   return Math.round(Math.max(width, 320));
 }
 
-function cardXsForBoardWidth(width: number) {
-  const w = layoutBoardWidthPx(width);
-  const center = w / 2;
-  let leftX = center - HALF_TWINE - TWINE_GAP - CARD_WIDTH;
-  const rightXRaw = center + HALF_TWINE + TWINE_GAP;
-  leftX = Math.max(EDGE_PAD, leftX);
-  let rightX = rightXRaw;
-  if (rightX + CARD_WIDTH > w - EDGE_PAD) {
-    rightX = w - EDGE_PAD - CARD_WIDTH;
-  }
-  return { leftX: Math.round(leftX), rightX: Math.round(rightX) };
-}
-
-function boardLayout(boardWidth: number) {
-  const w = layoutBoardWidthPx(boardWidth);
-  const stacked = w < TWO_COL_MIN_PX;
-  const cardW = stacked
-    ? Math.min(CARD_WIDTH, Math.max(1, Math.round(w - EDGE_PAD * 2)))
-    : CARD_WIDTH;
-  const stackedLeftX = Math.round((w - cardW) / 2);
-  const twoCol = cardXsForBoardWidth(w);
-  return {
-    stacked,
-    cardW,
-    stackedLeftX,
-    leftX: twoCol.leftX,
-    rightX: twoCol.rightX,
-  };
-}
-
-function DraggableCard({
-  targetX,
-  targetY,
-  w,
-  zIndex,
-  dragDisabled,
-  stagger,
-  tapeClass,
-  children,
-}: {
-  targetX: number;
-  targetY: number;
-  w: number;
-  zIndex: number;
-  dragDisabled: boolean;
-  stagger: number;
-  tapeClass: string;
-  children: React.ReactNode;
-}) {
-  const prefersReducedMotion = useReducedMotion();
-  const [pos, setPos] = useState({ x: targetX, y: targetY });
-  const [dragRot, setDragRot] = useState<number | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const dragRef = useRef<HTMLDivElement>(null);
-
-  const entranceVariants = useMemo(
-    () => ({
-      hidden: {
-        opacity: 0,
-        y: 30,
-        rotate: 0,
-        scale: 0.95,
-        transition: { duration: 0.2 },
-      },
-      visible: (staggerIndex: number) => ({
-        opacity: 1,
-        y: 0,
-        rotate: 0,
-        scale: 1,
-        transition: {
-          type: "spring" as const,
-          stiffness: 260,
-          damping: 25,
-          delay: CONTENT_ENTRANCE_DELAY_S + staggerIndex * STAGGER_STEP_S,
-        },
-      }),
-    }),
-    []
-  );
-
-  const currentRot = dragRot !== null ? dragRot : 0;
-  const scale = isDragging ? 1.04 : isHovered && !dragDisabled ? 1.015 : 1;
-  const shadowClass = isDragging
-    ? "is-dragging"
-    : isHovered && !dragDisabled
-      ? "is-hovered"
-      : "";
-
-  useEffect(() => {
-    if (!isDragging) {
-      setPos({ x: targetX, y: targetY });
-    }
-  }, [targetX, targetY, isDragging]);
-
-  const onPointerDown = (e: React.PointerEvent) => {
-    if (dragDisabled) return;
-    if (
-      (e.target as HTMLElement).closest("a") ||
-      (e.target as HTMLElement).closest("button")
-    )
-      return;
-    e.preventDefault();
-    setIsDragging(true);
-    setDragRot(0);
-    dragRef.current?.setPointerCapture(e.pointerId);
-  };
-
-  const onPointerMove = (e: React.PointerEvent) => {
-    if (!isDragging) return;
-    setPos(p => ({ x: p.x + e.movementX, y: p.y + e.movementY }));
-  };
-
-  const onPointerUp = (e: React.PointerEvent) => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    setDragRot(0);
-    dragRef.current?.releasePointerCapture(e.pointerId);
-  };
-
-  return (
-    <div
-      ref={dragRef}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerCancel={onPointerUp}
-      onPointerEnter={() => setIsHovered(true)}
-      onPointerLeave={() => setIsHovered(false)}
-      className="pin"
-      style={{
-        position: "absolute",
-        left: Math.round(pos.x),
-        top: Math.round(pos.y),
-        width: w,
-        zIndex: isDragging ? 9999 : zIndex,
-        transform: `translate(0, 0) rotate(${currentRot}deg) scale(${scale})`,
-        pointerEvents: "auto",
-        cursor: dragDisabled ? "default" : isDragging ? "grabbing" : "grab",
-        transition: isDragging
-          ? "none"
-          : "left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
-        touchAction: dragDisabled ? "auto" : "none",
-        willChange: isDragging ? "transform" : "auto",
-      }}
-    >
-      <motion.div
-        className={`board-card relative flex h-full min-h-0 min-w-0 flex-col select-none ${tapeClass} ${shadowClass}`}
-        variants={entranceVariants}
-        custom={stagger}
-        initial={prefersReducedMotion ? "visible" : "hidden"}
-        animate="visible"
-      >
-        {children}
-      </motion.div>
-    </div>
-  );
-}
-
 function PullMoreCord({
-  baseTopPx,
   prefersReducedMotion,
   remainingPosts,
   onLoadMore,
 }: {
-  baseTopPx: number;
   prefersReducedMotion: boolean | null;
   remainingPosts: number;
   onLoadMore: () => void;
@@ -301,7 +104,6 @@ function PullMoreCord({
     (e: React.PointerEvent<HTMLDivElement>) => {
       if (snapping) return;
       if (e.button !== 0) return;
-      // Prevent native scroll/overscroll rubber-banding from “pulling” the page.
       e.preventDefault();
       e.currentTarget.setPointerCapture(e.pointerId);
       pullStartYRef.current = e.clientY;
@@ -332,7 +134,7 @@ function PullMoreCord({
       try {
         e.currentTarget.releasePointerCapture(e.pointerId);
       } catch {
-        /* capture may already be released */
+        /* ignore */
       }
       endPullGesture();
     },
@@ -353,6 +155,11 @@ function PullMoreCord({
     [endPullGesture]
   );
 
+  const handleLostPointerCapture = useCallback(() => {
+    if (!pullDragActiveRef.current) return;
+    endPullGesture();
+  }, [endPullGesture]);
+
   const handleConnectorTransitionEnd = useCallback(
     (e: React.TransitionEvent<HTMLDivElement>) => {
       if (e.propertyName !== "height") return;
@@ -371,14 +178,23 @@ function PullMoreCord({
   const stackClass = [
     "pull-stack",
     pullDragActive ? "pull-stack--dragging" : "",
+    snapping ? "pull-stack--snapping" : "",
   ]
     .filter(Boolean)
     .join(" ");
 
+  /** Elastic hidden at idle; when pulling, length is at least the knot body height, then grows with stretch. */
+  const cordHeightPx =
+    stretchPx === 0 ? 0 : Math.max(stretchPx, TWINE_KNOT_BODY_HEIGHT_PX);
+  const cordHeightTransition = pullDragActive
+    ? "none"
+    : snapping
+      ? PULL_SNAP_TRANSITION
+      : "none";
+
   return (
     <div
-      className={`pull-container ${reduced ? "pull-container--no-motion" : ""}`}
-      style={{ top: baseTopPx }}
+      className={`pull-container pull-container--flow ${reduced ? "pull-container--no-motion" : ""}`}
     >
       <div
         className={stackClass}
@@ -386,32 +202,122 @@ function PullMoreCord({
         onPointerMove={handlePullPointerMove}
         onPointerUp={handlePullPointerUp}
         onPointerCancel={handlePullPointerCancel}
+        onLostPointerCapture={handleLostPointerCapture}
       >
-        <div className="pull-connector-track" aria-hidden="true">
+        <div
+          className={`pull-connector-track${cordHeightPx === 0 && !snapping ? " pull-connector-track--rest" : ""}`}
+          aria-hidden="true"
+        >
           <div
-            className="pull-connector"
+            className={`pull-connector${cordHeightPx === 0 && !snapping ? " pull-connector--rest" : ""}`}
             style={{
-              height: stretchPx,
-              transition: snapping ? PULL_SNAP_TRANSITION : undefined,
+              height: cordHeightPx,
+              transition: reduced ? "none" : cordHeightTransition,
             }}
             onTransitionEnd={handleConnectorTransitionEnd}
           />
         </div>
-        <div className="pull-knot-hit" aria-hidden="true">
-          <div className="twine-knot knot-bottom" />
+        {/* Idle bounce: .pull-bounce-layer (knot + tail + CTA); elastic only while stretching. */}
+        <div className="pull-bounce-layer">
+          <div className="pull-knot-hit" aria-hidden="true">
+            <div className="twine-knot knot-bottom" />
+          </div>
+          <button
+            type="button"
+            className="pull-action"
+            onClick={handleButtonClick}
+            aria-label={`Load more posts. ${remainingPosts} remaining.`}
+          >
+            <span className="pull-tag-text" aria-hidden="true">
+              PULL FOR MORE
+            </span>
+          </button>
         </div>
-        <button
-          type="button"
-          className="pull-action"
-          onClick={handleButtonClick}
-          aria-label={`Load more posts. ${remainingPosts} remaining.`}
-        >
-          <span className="pull-tag-text" aria-hidden="true">
-            PULL FOR MORE
-          </span>
-        </button>
       </div>
     </div>
+  );
+}
+
+function PostCard({
+  post,
+  tapeClass,
+  stagger,
+}: {
+  post: PortfolioPost;
+  tapeClass: string;
+  stagger: number;
+}) {
+  const prefersReducedMotion = useReducedMotion();
+  const entranceVariants = useMemo(
+    () => ({
+      hidden: {
+        opacity: 0,
+        y: 30,
+        scale: 0.95,
+        transition: { duration: 0.2 },
+      },
+      visible: (staggerIndex: number) => ({
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        transition: {
+          type: "spring" as const,
+          stiffness: 260,
+          damping: 25,
+          delay: CONTENT_ENTRANCE_DELAY_S + staggerIndex * STAGGER_STEP_S,
+        },
+      }),
+    }),
+    []
+  );
+
+  return (
+    <motion.article
+      className={`board-card posts-index-card relative flex min-h-0 min-w-0 flex-col select-none ${tapeClass}`}
+      variants={entranceVariants}
+      custom={stagger}
+      initial={prefersReducedMotion ? "visible" : "hidden"}
+      animate="visible"
+    >
+      <div className="card flex flex-col">
+        <h2
+          className="post-title m-0 mb-1 font-semibold"
+          style={{ viewTransitionName: post.slug }}
+        >
+          <a
+            href={post.href}
+            title={post.title}
+            className="hover:text-[var(--red)] transition-colors focus-visible:outline-none"
+          >
+            {post.title}
+          </a>
+        </h2>
+        <time
+          className="post-date mb-3 font-mono text-xs uppercase tracking-widest text-[var(--ink-muted)]"
+          dateTime={post.dateTime}
+        >
+          {post.dateLabel}
+        </time>
+        {post.desc ? (
+          <p className="post-excerpt m-0 font-body leading-relaxed">
+            {post.desc}
+          </p>
+        ) : null}
+
+        <div className="mt-auto flex items-end justify-between pt-4">
+          <DymoLabel
+            text={post.tag}
+            size="section"
+            color={post.tagColor}
+            isInteractive={false}
+          />
+          <a href={post.href} className="card-link">
+            <span aria-hidden="true">&rarr;</span> Read
+            <span className="sr-only">: {post.title}</span>
+          </a>
+        </div>
+      </div>
+    </motion.article>
   );
 }
 
@@ -424,17 +330,9 @@ export default function PostsIndexBoard({
 }) {
   const [visibleCount, setVisibleCount] = useState(pageSize);
   const [loadMoreStatus, setLoadMoreStatus] = useState("");
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const boardRef = useRef<HTMLDivElement>(null);
   const [boardWidth, setBoardWidth] = useState(1200);
   const prefersReducedMotion = useReducedMotion();
-
-  useEffect(() => {
-    setIsTouchDevice(
-      typeof window !== "undefined" &&
-        ("ontouchstart" in window || navigator.maxTouchPoints > 0)
-    );
-  }, []);
 
   useEffect(() => {
     const el = boardRef.current;
@@ -448,30 +346,11 @@ export default function PostsIndexBoard({
     return () => ro.disconnect();
   }, []);
 
-  const layout = useMemo(() => boardLayout(boardWidth), [boardWidth]);
-
+  const stacked = boardWidth < TWO_COL_MIN_PX;
   const narrowBoard = boardWidth < NARROW_BOARD_MAX_PX;
-  const stacked = layout.stacked;
-  const twineTop = stacked
-    ? TWINE_TOP_STACKED
-    : narrowBoard
-      ? TWINE_TOP_NARROW
-      : TWINE_TOP_DEFAULT;
-  const rowStep = stacked
-    ? STACK_ROW_STEP
-    : narrowBoard
-      ? ROW_STEP_NARROW
-      : ROW_STEP_DEFAULT;
-  const cardBaseY = stacked
-    ? CARD_BASE_Y_STACKED
-    : narrowBoard
-      ? CARD_BASE_Y_NARROW
-      : CARD_BASE_Y_DEFAULT;
   const boardBottomPad = narrowBoard
     ? BOARD_BOTTOM_PAD_NARROW
     : BOARD_BOTTOM_PAD_DEFAULT;
-
-  const dragDisabled = isTouchDevice;
 
   const displayedPosts = useMemo(
     () => posts.slice(0, visibleCount),
@@ -487,97 +366,162 @@ export default function PostsIndexBoard({
     setLoadMoreStatus(`${batch} more ${noun} loaded.`);
   }, [pageSize, remainingPosts]);
 
-  const nPosts = displayedPosts.length;
-  const estCardH = stacked ? EST_CARD_H_STACKED : EST_CARD_H_TWO_COL;
-  /** Same as (top of first card − twine start): gap under top knot area to first card top. */
-  const topGap = cardBaseY - twineTop;
-  /**
-   * Twine length from topGap / last-card math, plus TWINE_EXTRA_LENGTH_PX so the pull + knot
-   * sit lower. Uses estCardH as stand-in for last card height.
-   */
-  const stringHeight =
-    nPosts === 0
-      ? 260
-      : hasMore
-        ? Math.max(
-            120,
-            2 * topGap +
-              (nPosts - 1) * rowStep +
-              estCardH +
-              TWINE_PULL_STACK_OVERLAP -
-              PULL_STACK_HEIGHT_PX +
-              TWINE_EXTRA_LENGTH_PX
-          )
-        : Math.max(
-            120,
-            2 * topGap +
-              (nPosts - 1) * rowStep +
-              estCardH -
-              BOTTOM_KNOT_TAIL_BELOW_TWINE_PX +
-              TWINE_EXTRA_LENGTH_PX
-          );
-  const stackBottomY =
-    nPosts === 0 ? twineTop : cardBaseY + (nPosts - 1) * rowStep + estCardH;
-  const boardHeight = Math.max(
-    800,
-    twineTop + stringHeight + boardBottomPad,
-    stackBottomY + boardBottomPad
+  const leftPosts = useMemo(
+    () => displayedPosts.filter((_, i) => i % 2 === 0),
+    [displayedPosts]
+  );
+  const rightPosts = useMemo(
+    () => displayedPosts.filter((_, i) => i % 2 === 1),
+    [displayedPosts]
   );
 
-  /** Tag top lines up with the top of the knot tail (`knot-top::before`), before the knot blob. */
-  const rssAnchorTop = twineTop - KNOT_TOP_TAIL_PX;
+  /** Stagger index follows global post order for consistent entrance timing. */
+  const staggerFor = (globalIndex: number) => globalIndex;
+
+  /** Vertical offset for absolutely positioned RSS in two-column mode (aligns with twine knot tail). */
+  const rssAnchorTop = useMemo(() => {
+    if (stacked) return undefined;
+    return (narrowBoard ? 74 : 52) - KNOT_TOP_TAIL_PX;
+  }, [narrowBoard, stacked]);
 
   return (
     <div
       ref={boardRef}
-      className={`posts-index-board not-prose${stacked ? " posts-index-board--stacked" : ""}`}
+      className={`posts-index-board not-prose${stacked ? " posts-index-board--stacked" : ""}${
+        narrowBoard && !stacked ? " posts-index-board--narrow" : ""
+      }`}
       style={{
-        height: `${boardHeight}px`,
-        transition: "height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
+        paddingBottom: `${boardBottomPad}px`,
+        transition: "padding-bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
       }}
     >
-      <div
-        className="posts-rss-anchor"
-        style={{
-          top: rssAnchorTop,
-          /* Right edge of RSS tag aligns with right edge of the card column. */
-          left: stacked
-            ? layout.stackedLeftX + layout.cardW
-            : layout.rightX + CARD_WIDTH,
-          transform: "translateX(-100%)",
-        }}
-      >
-        <a
-          href="/rss.xml"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rss-tag"
-          aria-label="RSS feed"
-          title="RSS Feed"
-        >
-          RSS
-        </a>
-      </div>
+      {stacked ? (
+        <div className="posts-index-stacked">
+          <div className="posts-index-stacked-deco" aria-hidden="true">
+            <div className="posts-index-stacked-stripe" />
+            <div className="posts-index-stacked-knot-top-wrap">
+              <div className="twine-knot knot-top" />
+            </div>
+            {!hasMore ? (
+              <div className="posts-index-stacked-knot-bottom-wrap">
+                <div className="twine-knot knot-bottom" />
+              </div>
+            ) : null}
+          </div>
 
-      <div
-        className="posts-twine"
-        style={{
-          top: twineTop,
-          height: `${stringHeight}px`,
-        }}
-      >
-        <div className="twine-knot knot-top" />
-        {!hasMore && <div className="twine-knot knot-bottom" />}
-      </div>
+          <div className="posts-index-stacked-rss-row">
+            <a
+              href="/rss.xml"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rss-tag"
+              aria-label="RSS feed"
+              title="RSS Feed"
+            >
+              RSS
+            </a>
+          </div>
 
-      {hasMore && (
-        <PullMoreCord
-          baseTopPx={twineTop + stringHeight - TWINE_PULL_STACK_OVERLAP}
-          prefersReducedMotion={prefersReducedMotion}
-          remainingPosts={remainingPosts}
-          onLoadMore={handleLoadMore}
-        />
+          <div className="posts-index-stacked-cards">
+            {displayedPosts.map((post, displayIdx) => {
+              const tapeClass = `${displayIdx === 0 ? "featured-post-tape " : ""}tape-c ${
+                displayIdx % 2 === 0 ? "tc-pink" : "tc-yellow"
+              }`;
+              return (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  tapeClass={tapeClass}
+                  stagger={staggerFor(displayIdx)}
+                />
+              );
+            })}
+          </div>
+
+          {hasMore ? (
+            <div className="posts-index-stacked-pull">
+              <PullMoreCord
+                prefersReducedMotion={prefersReducedMotion}
+                remainingPosts={remainingPosts}
+                onLoadMore={handleLoadMore}
+              />
+            </div>
+          ) : null}
+        </div>
+      ) : (
+        <div className="posts-index-grid">
+          <div className="posts-index-col posts-index-col--left">
+            {leftPosts.map((post, i) => {
+              const displayIdx = i * 2;
+              const tapeClass = `${displayIdx === 0 ? "featured-post-tape " : ""}tape-c ${
+                displayIdx % 2 === 0 ? "tc-pink" : "tc-yellow"
+              }`;
+              return (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  tapeClass={tapeClass}
+                  stagger={staggerFor(displayIdx)}
+                />
+              );
+            })}
+          </div>
+
+          <div className="posts-index-center">
+            <div className="posts-index-twine-grow">
+              <div className="posts-twine--flow">
+                <div className="twine-knot knot-top" />
+                <div className="posts-twine-stripe" />
+                {!hasMore ? <div className="twine-knot knot-bottom" /> : null}
+              </div>
+            </div>
+            {hasMore ? (
+              <div className="posts-index-pull-wrap">
+                <PullMoreCord
+                  prefersReducedMotion={prefersReducedMotion}
+                  remainingPosts={remainingPosts}
+                  onLoadMore={handleLoadMore}
+                />
+              </div>
+            ) : null}
+          </div>
+
+          <div className="posts-index-col posts-index-col--right">
+            <div
+              className="posts-rss-anchor posts-rss-anchor--grid"
+              style={
+                rssAnchorTop !== undefined ? { top: rssAnchorTop } : undefined
+              }
+            >
+              <a
+                href="/rss.xml"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rss-tag"
+                aria-label="RSS feed"
+                title="RSS Feed"
+              >
+                RSS
+              </a>
+            </div>
+            {rightPosts.map((post, i) => {
+              const displayIdx = i * 2 + 1;
+              const tapeClass = `tape-c ${
+                displayIdx % 2 === 0 ? "tc-pink" : "tc-yellow"
+              }`;
+              return (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  tapeClass={tapeClass}
+                  stagger={staggerFor(displayIdx)}
+                />
+              );
+            })}
+          </div>
+        </div>
       )}
+
       <p
         className="sr-only"
         role="status"
@@ -586,77 +530,6 @@ export default function PostsIndexBoard({
       >
         {loadMoreStatus}
       </p>
-
-      {displayedPosts.map((post, displayIdx) => {
-        const isLeft = displayIdx % 2 === 0;
-
-        const targetX = stacked
-          ? layout.stackedLeftX
-          : isLeft
-            ? layout.leftX
-            : layout.rightX;
-        const targetY = cardBaseY + displayIdx * rowStep;
-        /* Corner washi (tape-c): same centered diagonal strips as homepage Writing cards. */
-        const tapeClass = `${displayIdx === 0 ? "featured-post-tape " : ""}tape-c ${
-          displayIdx % 2 === 0 ? "tc-pink" : "tc-yellow"
-        }`;
-
-        /* Higher index = lower z so earlier posts overlap later ones; base scales with count so z stays above .pull-container (riso.css). */
-        const stackZ = 100 + (nPosts - 1 - displayIdx);
-        const stagger = displayIdx;
-
-        return (
-          <DraggableCard
-            key={post.id}
-            targetX={targetX}
-            targetY={targetY}
-            w={layout.cardW}
-            zIndex={stackZ}
-            dragDisabled={dragDisabled}
-            stagger={stagger}
-            tapeClass={tapeClass}
-          >
-            <article className="card flex flex-col">
-              <h2
-                className="post-title m-0 mb-1 font-semibold"
-                style={{ viewTransitionName: post.slug }}
-              >
-                <a
-                  href={post.href}
-                  title={post.title}
-                  className="hover:text-[var(--red)] transition-colors focus-visible:outline-none"
-                >
-                  {post.title}
-                </a>
-              </h2>
-              <time
-                className="post-date mb-3 font-mono text-xs uppercase tracking-widest text-[var(--ink-muted)]"
-                dateTime={post.dateTime}
-              >
-                {post.dateLabel}
-              </time>
-              {post.desc ? (
-                <p className="post-excerpt m-0 font-body leading-relaxed">
-                  {post.desc}
-                </p>
-              ) : null}
-
-              <div className="mt-auto flex items-end justify-between pt-4">
-                <DymoLabel
-                  text={post.tag}
-                  size="section"
-                  color={post.tagColor}
-                  isInteractive={false}
-                />
-                <a href={post.href} className="card-link">
-                  <span aria-hidden="true">&rarr;</span> Read
-                  <span className="sr-only">: {post.title}</span>
-                </a>
-              </div>
-            </article>
-          </DraggableCard>
-        );
-      })}
     </div>
   );
 }
