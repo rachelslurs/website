@@ -17,12 +17,6 @@ const NARROW_BOARD_MAX_PX = 640;
 const BOARD_BOTTOM_PAD_DEFAULT = 260;
 const BOARD_BOTTOM_PAD_NARROW = 300;
 
-/**
- * Below this width, use single-column stacked layout. Matches Tailwind `md` (768px): the grid uses
- * flexible `1fr` columns (cards cap at 360px in CSS), so two columns + center stripe fit from here.
- */
-const TWO_COL_MIN_PX = 768;
-
 const PULL_CORD_MAX_PX = 56;
 /** Match `.twine-knot { height }` in riso.css — elastic segment is at least this tall when visible. */
 const TWINE_KNOT_BODY_HEIGHT_PX = 10;
@@ -35,24 +29,11 @@ function layoutBoardWidthPx(width: number) {
 }
 
 /**
- * Posts index — pull cord behavior (keep DOM + CSS in sync when changing this):
- *
- * Two-column grid (`!stacked`, `hasMore`): The elastic strand is `.posts-twine-elastic` as the last
- * segment before pull UI inside `.posts-twine--flow` (top knot → flex stripe → elastic → PullMoreCord).
- * Idle bounce and drag length both change elastic height; knot, tail (::before), and the pull CTA
- * must stay in-flow directly under the elastic so they move with the strand (no separate pull-wrap slot).
- * `usePullCord` drives JS height when dragging/snapping; CSS keyframes when idle. To avoid the grid row
- * jumping, `.posts-index-twine-grow` uses negative margin (idle keyframes or inline while pulling) to
- * cancel extra elastic height — see `twineGrowCancel*` in this hook and `posts-index-twine-grow--idle-elastic-cancel`
- * in riso.css. `TWINE_KNOT_BODY_HEIGHT_PX` / `--twine-knot-body-h` must match.
- *
- * Stacked layout: Decorative strand is absolute in `.posts-index-stacked-deco`; pull uses
- * `.pull-connector` height for elastic + knot/CTA in `PullMoreCord` inside `.posts-index-stacked-pull`.
- *
- * `strandSource` selects which branch above.
+ * Posts index — pull cord (keep DOM + CSS in sync):
+ * Strand is `.posts-twine-stripe` in `.posts-twine--flow` (knot → stripe + `__tail` segment → PullMoreCord).
+ * `usePullCord` sets JS height while dragging; CSS keyframes when idle. `.posts-index-twine-grow--idle-elastic-cancel`
+ * cancels extra elastic height so the grid row stays stable. `TWINE_KNOT_BODY_HEIGHT_PX` matches `--twine-knot-body-h`.
  */
-type PullStrandSource = "twine" | "connector";
-
 function usePullCord({
   prefersReducedMotion,
   onLoadMore,
@@ -204,12 +185,6 @@ function usePullCord({
   /** While pulling / snapping: JS height. At idle: CSS animates length in sync with the bounce layer. */
   const cordHeightPx =
     stretchPx === 0 ? 0 : Math.max(stretchPx, TWINE_KNOT_BODY_HEIGHT_PX);
-  const cordHeightTransition = pullDragActive
-    ? "none"
-    : snapping
-      ? PULL_SNAP_TRANSITION
-      : "none";
-
   const idleDangle =
     stretchPx === 0 && !pullDragActive && !snapping && !reduced;
 
@@ -234,22 +209,22 @@ function usePullCord({
     .filter(Boolean)
     .join(" ");
 
-  /** Grid: elastic is the last child of `.posts-twine--flow`; cancel extra height so the row does not grow. */
-  const gridElasticClassName = [
-    "posts-twine-elastic",
-    idleDangle ? "posts-twine-elastic--idle-dangle" : "",
-    idleStatic ? "posts-twine-elastic--idle-static" : "",
+  /** Tail is `.posts-twine-stripe__tail` inside `.posts-twine-stripe--pull` (idle keyframes or `--posts-stripe-tail-h`). */
+  const stripeTailClassName = [
+    "posts-twine-stripe__tail",
+    idleDangle ? "posts-twine-stripe__tail--idle-dangle" : "",
+    idleStatic ? "posts-twine-stripe__tail--idle-static" : "",
+    !idleDangle && !idleStatic ? "posts-twine-stripe__tail--js" : "",
   ]
     .filter(Boolean)
     .join(" ");
 
-  const gridElasticStyle: React.CSSProperties | undefined =
+  const stripeTailStyle: React.CSSProperties | undefined =
     idleDangle || idleStatic
       ? undefined
-      : {
-          height: Math.max(cordHeightPx, TWINE_KNOT_BODY_HEIGHT_PX),
-          transition: reduced ? "none" : cordHeightTransition,
-        };
+      : ({
+          ["--posts-stripe-tail-h" as string]: `${Math.max(cordHeightPx, TWINE_KNOT_BODY_HEIGHT_PX)}px`,
+        } as React.CSSProperties);
 
   const twineGrowCancelClassName =
     idleDangle && !reduced ? "posts-index-twine-grow--idle-elastic-cancel" : "";
@@ -274,15 +249,14 @@ function usePullCord({
     pullDragActive,
     snapping,
     cordHeightPx,
-    cordHeightTransition,
     idleDangle,
     idleStatic,
     connectorCollapsed,
     stackClass,
     connectorClass,
     trackClass,
-    gridElasticClassName,
-    gridElasticStyle,
+    stripeTailClassName,
+    stripeTailStyle,
     twineGrowCancelClassName,
     twineGrowCancelStyle,
     handlePullPointerDown,
@@ -298,37 +272,25 @@ function usePullCord({
 function PullMoreCord({
   pull,
   remainingPosts,
-  strandSource,
 }: {
   pull: ReturnType<typeof usePullCord>;
   remainingPosts: number;
-  strandSource: PullStrandSource;
 }) {
   const {
     reduced,
     stackClass,
-    connectorClass,
-    trackClass,
-    cordHeightPx,
-    cordHeightTransition,
-    idleDangle,
-    idleStatic,
     handlePullPointerDown,
     handlePullPointerMove,
     handlePullPointerUp,
     handlePullPointerCancel,
     handleLostPointerCapture,
-    handleStrandTransitionEnd,
     handleButtonClick,
   } = pull;
-
-  const strandInTwineFlow = strandSource === "twine";
 
   return (
     <div
       className={[
-        "pull-container pull-container--flow",
-        strandInTwineFlow ? "pull-container--strand-in-twine" : "",
+        "pull-container pull-container--flow pull-container--strand-in-twine",
         reduced ? "pull-container--no-motion" : "",
       ]
         .filter(Boolean)
@@ -342,28 +304,10 @@ function PullMoreCord({
         onPointerCancel={handlePullPointerCancel}
         onLostPointerCapture={handleLostPointerCapture}
       >
-        {strandInTwineFlow ? (
-          <div
-            className="pull-connector-track pull-connector-track--rest"
-            aria-hidden="true"
-          />
-        ) : (
-          <div className={trackClass} aria-hidden="true">
-            <div
-              className={connectorClass}
-              style={
-                idleDangle
-                  ? undefined
-                  : {
-                      height: cordHeightPx,
-                      transition: reduced ? "none" : cordHeightTransition,
-                    }
-              }
-              onTransitionEnd={handleStrandTransitionEnd}
-            />
-          </div>
-        )}
-        {/* Grid: knot/CTA sit in `.posts-twine--flow` under the elastic and move with it; stacked: connector above this layer. */}
+        <div
+          className="pull-connector-track pull-connector-track--rest"
+          aria-hidden="true"
+        />
         <div className="pull-bounce-layer">
           <div className="pull-knot-hit" aria-hidden="true">
             <div className="twine-knot knot-bottom" />
@@ -419,7 +363,7 @@ function PostCard({
 
   return (
     <motion.article
-      className={`board-card posts-index-card relative flex min-h-0 min-w-0 flex-col select-none ${tapeClass}`}
+      className={`board-card posts-index-card relative flex min-h-0 min-w-0 max-w-full flex-col select-none ${tapeClass}`}
       variants={entranceVariants}
       custom={stagger}
       initial={prefersReducedMotion ? "visible" : "hidden"}
@@ -427,7 +371,7 @@ function PostCard({
     >
       <div className="card flex flex-col">
         <h2
-          className="post-title m-0 mb-1 font-semibold"
+          className="post-title m-0 mb-1 text-sm font-semibold md:text-base"
           style={{ viewTransitionName: post.slug }}
         >
           <a
@@ -439,18 +383,18 @@ function PostCard({
           </a>
         </h2>
         <time
-          className="post-date mb-3 font-mono text-xs uppercase tracking-widest text-[var(--ink-muted)]"
+          className="post-date mb-2 font-mono text-[0.625rem] uppercase tracking-widest text-[var(--ink-muted)] md:mb-3 md:text-xs"
           dateTime={post.dateTime}
         >
           {post.dateLabel}
         </time>
         {post.desc ? (
-          <p className="post-excerpt m-0 font-body leading-relaxed">
+          <p className="post-excerpt m-0 hidden font-body leading-relaxed md:block">
             {post.desc}
           </p>
         ) : null}
 
-        <div className="mt-auto flex items-end justify-between pt-4">
+        <div className="mt-auto flex items-end justify-between pt-2 md:pt-4">
           <DymoLabel
             text={post.tag}
             size="section"
@@ -492,7 +436,6 @@ export default function PostsIndexBoard({
     return () => ro.disconnect();
   }, []);
 
-  const stacked = boardWidth < TWO_COL_MIN_PX;
   const narrowBoard = boardWidth < NARROW_BOARD_MAX_PX;
   const boardBottomPad = narrowBoard
     ? BOARD_BOTTOM_PAD_NARROW
@@ -530,37 +473,94 @@ export default function PostsIndexBoard({
   const staggerFor = (globalIndex: number) => globalIndex;
 
   /** Vertical offset for absolutely positioned RSS in two-column mode (aligns with twine knot tail). */
-  const rssAnchorTop = useMemo(() => {
-    if (stacked) return undefined;
-    return (narrowBoard ? 74 : 52) - KNOT_TOP_TAIL_PX;
-  }, [narrowBoard, stacked]);
+  const rssAnchorTop = useMemo(
+    () => (narrowBoard ? 74 : 52) - KNOT_TOP_TAIL_PX,
+    [narrowBoard]
+  );
 
   return (
     <div
       ref={boardRef}
-      className={`posts-index-board not-prose${stacked ? " posts-index-board--stacked" : ""}${
-        narrowBoard && !stacked ? " posts-index-board--narrow" : ""
+      className={`posts-index-board not-prose${
+        narrowBoard ? " posts-index-board--narrow" : ""
       }`}
       style={{
         paddingBottom: `${boardBottomPad}px`,
         transition: "padding-bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
       }}
     >
-      {stacked ? (
-        <div className="posts-index-stacked">
-          <div className="posts-index-stacked-deco" aria-hidden="true">
-            <div className="posts-index-stacked-stripe" />
-            <div className="posts-index-stacked-knot-top-wrap">
-              <div className="twine-knot knot-top" />
-            </div>
-            {!hasMore ? (
-              <div className="posts-index-stacked-knot-bottom-wrap">
-                <div className="twine-knot knot-bottom" />
-              </div>
-            ) : null}
-          </div>
+      <div className="posts-index-grid">
+        <div className="posts-index-col posts-index-col--left">
+          {leftPosts.map((post, i) => {
+            const displayIdx = i * 2;
+            const tapeClass = `${displayIdx === 0 ? "featured-post-tape " : ""}tape-c ${
+              displayIdx % 2 === 0 ? "tc-pink" : "tc-yellow"
+            }`;
+            return (
+              <PostCard
+                key={post.id}
+                post={post}
+                tapeClass={tapeClass}
+                stagger={staggerFor(displayIdx)}
+              />
+            );
+          })}
+        </div>
 
-          <div className="posts-index-stacked-rss-row">
+        <div
+          className={
+            "posts-index-center" +
+            (hasMore ? " posts-index-center--twine-pull" : "")
+          }
+        >
+          <div
+            className={[
+              "posts-index-twine-grow",
+              hasMore ? pull.twineGrowCancelClassName : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            style={hasMore ? pull.twineGrowCancelStyle : undefined}
+          >
+            <div className="posts-twine--flow">
+              <div className="twine-knot knot-top" />
+              {hasMore ? (
+                <div
+                  className={[
+                    "posts-twine-stripe",
+                    "posts-twine-stripe--pull",
+                    pull.reduced ? "posts-twine-stripe--reduced-motion" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  aria-hidden
+                >
+                  <div className="posts-twine-stripe__main" aria-hidden />
+                  <div
+                    className={pull.stripeTailClassName}
+                    style={pull.stripeTailStyle}
+                    aria-hidden
+                    onTransitionEnd={pull.handleStrandTransitionEnd}
+                  />
+                </div>
+              ) : (
+                <div className="posts-twine-stripe" />
+              )}
+              {hasMore ? (
+                <PullMoreCord pull={pull} remainingPosts={remainingPosts} />
+              ) : null}
+              {!hasMore ? <div className="twine-knot knot-bottom" /> : null}
+            </div>
+          </div>
+        </div>
+
+        <div className="posts-index-col posts-index-col--right">
+          <div
+            className="posts-rss-anchor posts-rss-anchor--grid"
+            style={
+              rssAnchorTop !== undefined ? { top: rssAnchorTop } : undefined
+            }
+          >
             <a
               href="/rss.xml"
               target="_blank"
@@ -572,125 +572,22 @@ export default function PostsIndexBoard({
               RSS
             </a>
           </div>
-
-          <div className="posts-index-stacked-cards">
-            {displayedPosts.map((post, displayIdx) => {
-              const tapeClass = `${displayIdx === 0 ? "featured-post-tape " : ""}tape-c ${
-                displayIdx % 2 === 0 ? "tc-pink" : "tc-yellow"
-              }`;
-              return (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  tapeClass={tapeClass}
-                  stagger={staggerFor(displayIdx)}
-                />
-              );
-            })}
-          </div>
-
-          {hasMore ? (
-            <div className="posts-index-stacked-pull">
-              <PullMoreCord
-                pull={pull}
-                remainingPosts={remainingPosts}
-                strandSource="connector"
+          {rightPosts.map((post, i) => {
+            const displayIdx = i * 2 + 1;
+            const tapeClass = `tape-c ${
+              displayIdx % 2 === 0 ? "tc-pink" : "tc-yellow"
+            }`;
+            return (
+              <PostCard
+                key={post.id}
+                post={post}
+                tapeClass={tapeClass}
+                stagger={staggerFor(displayIdx)}
               />
-            </div>
-          ) : null}
+            );
+          })}
         </div>
-      ) : (
-        <div className="posts-index-grid">
-          <div className="posts-index-col posts-index-col--left">
-            {leftPosts.map((post, i) => {
-              const displayIdx = i * 2;
-              const tapeClass = `${displayIdx === 0 ? "featured-post-tape " : ""}tape-c ${
-                displayIdx % 2 === 0 ? "tc-pink" : "tc-yellow"
-              }`;
-              return (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  tapeClass={tapeClass}
-                  stagger={staggerFor(displayIdx)}
-                />
-              );
-            })}
-          </div>
-
-          <div
-            className={
-              "posts-index-center" +
-              (hasMore ? " posts-index-center--twine-pull" : "")
-            }
-          >
-            <div
-              className={[
-                "posts-index-twine-grow",
-                hasMore ? pull.twineGrowCancelClassName : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              style={hasMore ? pull.twineGrowCancelStyle : undefined}
-            >
-              <div className="posts-twine--flow">
-                <div className="twine-knot knot-top" />
-                <div className="posts-twine-stripe" />
-                {hasMore ? (
-                  <div
-                    className={pull.gridElasticClassName}
-                    style={pull.gridElasticStyle}
-                    aria-hidden="true"
-                    onTransitionEnd={pull.handleStrandTransitionEnd}
-                  />
-                ) : null}
-                {hasMore ? (
-                  <PullMoreCord
-                    pull={pull}
-                    remainingPosts={remainingPosts}
-                    strandSource="twine"
-                  />
-                ) : null}
-                {!hasMore ? <div className="twine-knot knot-bottom" /> : null}
-              </div>
-            </div>
-          </div>
-
-          <div className="posts-index-col posts-index-col--right">
-            <div
-              className="posts-rss-anchor posts-rss-anchor--grid"
-              style={
-                rssAnchorTop !== undefined ? { top: rssAnchorTop } : undefined
-              }
-            >
-              <a
-                href="/rss.xml"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rss-tag"
-                aria-label="RSS feed"
-                title="RSS Feed"
-              >
-                RSS
-              </a>
-            </div>
-            {rightPosts.map((post, i) => {
-              const displayIdx = i * 2 + 1;
-              const tapeClass = `tape-c ${
-                displayIdx % 2 === 0 ? "tc-pink" : "tc-yellow"
-              }`;
-              return (
-                <PostCard
-                  key={post.id}
-                  post={post}
-                  tapeClass={tapeClass}
-                  stagger={staggerFor(displayIdx)}
-                />
-              );
-            })}
-          </div>
-        </div>
-      )}
+      </div>
 
       <p
         className="sr-only"
