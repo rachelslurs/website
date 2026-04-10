@@ -1784,6 +1784,28 @@ a.skip-to-content-board:focus {
   margin-bottom: calc(-1 * var(--posts-thread-stretch, 0px));
 }
 
+/* Snap-back: ease the painted extension + knot shift (not while dragging — board gets `--thread-dragging`). */
+.posts-index-board--thread-snap .posts-twine-stripe__main--thread-cord {
+  transition: padding-bottom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    margin-bottom 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.posts-index-board--thread-snap .posts-index-pull-below__pull-shift {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.posts-index-board--thread-dragging .posts-twine-stripe__main--thread-cord,
+.posts-index-board--thread-dragging .posts-index-pull-below__pull-shift {
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .posts-index-board--thread-snap .posts-twine-stripe__main--thread-cord,
+  .posts-index-board--thread-snap .posts-index-pull-below__pull-shift {
+    transition: none !important;
+  }
+}
+
 /* Only the grid center column needs a tall strand. */
 .posts-index-board .posts-index-grid .posts-twine-stripe,
 .posts-index-board .posts-index-grid .posts-twine-stripe--pull {

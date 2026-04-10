@@ -38,6 +38,8 @@ function layoutBoardWidthPx(width: number) {
  * `padding-bottom` + matching negative `margin-bottom` on `__main` (background paints into padding) and
  * `translateY` on `.posts-index-pull-below__pull-shift` so knot + CTA track the visual end. Idle bounce
  * animates the variable on `.posts-index-stack--thread-idle-bounce`; drag/snap set it on the board.
+ * Snap-back eases `padding-bottom` / `margin-bottom` / `transform` via `.posts-index-board--thread-snap`;
+ * dragging uses `--thread-dragging` so the cord stays 1:1 with the pointer.
  * Keep `PULL_CORD_MAX_PX` in sync with `--posts-pull-cord-max` in riso.css.
  *
  * `usePullCord` returns pointer handlers, stretch state, and `connectorClass` / `trackClass` for
@@ -182,12 +184,7 @@ function usePullCord({
   const handleThreadSnapTransitionEnd = useCallback(
     (e: React.TransitionEvent<HTMLDivElement>) => {
       if (e.target !== e.currentTarget) return;
-      if (
-        e.propertyName !== "--posts-thread-stretch" &&
-        !e.propertyName.includes("posts-thread-stretch")
-      ) {
-        return;
-      }
+      if (e.propertyName !== "padding-bottom") return;
       setSnapping(false);
       pullStretchRef.current = 0;
     },
@@ -470,11 +467,9 @@ export default function PostsIndexBoard({
 
   const boardStyle = useMemo((): React.CSSProperties => {
     const padTrans = "padding-bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)";
-    const threadSnapTrans =
-      "--posts-thread-stretch 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)";
     const style: React.CSSProperties = {
       paddingBottom: `${boardBottomPad}px`,
-      transition: pull.snapping ? `${padTrans}, ${threadSnapTrans}` : padTrans,
+      transition: padTrans,
     };
     if (!hasMore) return style;
     if (pull.reduced) {
@@ -507,11 +502,17 @@ export default function PostsIndexBoard({
   return (
     <div
       ref={boardRef}
-      className={`posts-index-board not-prose${
-        narrowBoard ? " posts-index-board--narrow" : ""
-      }`}
+      className={[
+        "posts-index-board not-prose",
+        narrowBoard ? "posts-index-board--narrow" : "",
+        hasMore && pull.snapping ? "posts-index-board--thread-snap" : "",
+        hasMore && pull.pullDragActive
+          ? "posts-index-board--thread-dragging"
+          : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       style={boardStyle}
-      onTransitionEnd={hasMore ? pull.handleThreadSnapTransitionEnd : undefined}
     >
       <div
         className={[
@@ -567,6 +568,9 @@ export default function PostsIndexBoard({
                         "posts-twine-stripe__main--thread-cord",
                       ].join(" ")}
                       aria-hidden
+                      onTransitionEnd={
+                        hasMore ? pull.handleThreadSnapTransitionEnd : undefined
+                      }
                     />
                   </div>
                 ) : (
