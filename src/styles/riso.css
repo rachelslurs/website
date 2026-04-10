@@ -1380,16 +1380,22 @@ a.skip-to-content-board:focus {
 
 /*
  * ── POSTS INDEX (twine + cards) ──
- * Pull cord + strand structure: see the file-level comment above `usePullCord` in `PostsIndexBoard.tsx`.
+ * Pull cord + strand structure: see `usePullCord` in `PostsIndexBoard.tsx`.
  *
  * Cord tokens: `--twine-knot-body-h`, `--pull-idle-drop`, `--posts-tail-idle-layout-h`,
- * `--posts-pull-cord-max` (sync `PULL_CORD_MAX_PX`), `--posts-tail-max-any-h`, `--posts-pull-below-pull-stack-h`.
- * `.posts-index-pull-below__elastic` min-height reserves tail + stack so idle and pull do not shift page height.
+ * `--posts-pull-cord-max` (sync `PULL_CORD_MAX_PX`), `--posts-thread-stretch`, `--posts-pull-below-pull-stack-h`.
+ * Continuous thread: `__main` uses padding-bottom + matching negative margin from `--posts-thread-stretch`;
+ * `.posts-index-pull-below__pull-shift` translates knot + CTA by the same amount.
  *
- * Stripe min-heights apply only under `.posts-index-grid` so `.posts-index-pull-below__tail` stays
- * content-sized. Spacing: `--posts-sp` (0.25rem); breakpoints match Tailwind (`sm` 640px, `md` 768px,
- * `lg` 1024px).
+ * Stripe min-heights apply under `.posts-index-grid` only. Spacing: `--posts-sp` (0.25rem); breakpoints
+ * match Tailwind (`sm` 640px, `md` 768px, `lg` 1024px).
  */
+
+@property --posts-thread-stretch {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
 .posts-index-board {
   position: relative;
   width: 100%;
@@ -1413,11 +1419,6 @@ a.skip-to-content-board:focus {
   );
   /* Sync `PULL_CORD_MAX_PX` in PostsIndexBoard.tsx. */
   --posts-pull-cord-max: 100px;
-  /* Larger of idle bounce tail vs knot + max drag stretch (reserved strip height). */
-  --posts-tail-max-any-h: max(
-    var(--posts-tail-idle-layout-h),
-    calc(var(--twine-knot-body-h) + var(--posts-pull-cord-max))
-  );
   /* Pull up under RisoBoardShell’s gap-8 so twine sits closer to the nav. */
   margin-top: calc(var(--posts-sp) * -2);
   /* Tape pseudo-elements sit past the card; clip would shear them at the board edge. */
@@ -1489,6 +1490,34 @@ a.skip-to-content-board:focus {
   align-items: stretch;
 }
 
+@keyframes postsThreadStretchIdle {
+  0%,
+  100% {
+    --posts-thread-stretch: var(--twine-knot-body-h);
+  }
+
+  50% {
+    --posts-thread-stretch: var(--posts-tail-idle-layout-h);
+  }
+}
+
+.posts-index-stack--thread-idle-bounce {
+  animation: postsThreadStretchIdle 2s infinite ease-in-out;
+}
+
+@media (pointer: coarse), (hover: none) {
+  .posts-index-stack--thread-idle-bounce {
+    animation-duration: 2.5s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .posts-index-stack--thread-idle-bounce {
+    animation: none !important;
+    --posts-thread-stretch: var(--twine-knot-body-h);
+  }
+}
+
 /* Strand tail + pull UI sit in document flow under both card columns (responsive to grid height). */
 .posts-index-pull-below {
   display: flex;
@@ -1502,24 +1531,23 @@ a.skip-to-content-board:focus {
   z-index: 1;
 }
 
-.posts-index-pull-below__tail.posts-twine-stripe--pull {
-  flex: 0 0 auto;
-  width: 4px;
-  min-height: 0;
-  align-self: center;
-  flex-shrink: 0;
-}
-
-/* Tail + knot + CTA stack; min-height covers max tail (idle or drag) so document height stays flat. */
+/* Knot + CTA column; thread stretch is painted in the grid `__main`, not extra tail height here. */
 .posts-index-board .posts-index-pull-below__elastic {
   display: flex;
   width: 100%;
   flex-direction: column;
   flex-shrink: 0;
   align-items: center;
-  min-height: calc(
-    var(--posts-tail-max-any-h) + var(--posts-pull-below-pull-stack-h)
-  );
+  min-height: var(--posts-pull-below-pull-stack-h);
+}
+
+.posts-index-pull-below__pull-shift {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: center;
+  transform: translateY(var(--posts-thread-stretch, 0px));
 }
 
 .posts-index-pull-below .pull-container.pull-container--flow {
@@ -1723,9 +1751,7 @@ a.skip-to-content-board:focus {
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/*
- * With load-more: grid center uses `__main` only; `__tail` sits in `.posts-index-pull-below__tail` under the grid.
- */
+/* With load-more: grid center uses `__main` only; elastic knot + CTA sit under the grid. */
 .posts-twine-stripe--pull {
   display: flex;
   flex-direction: column;
@@ -1753,7 +1779,12 @@ a.skip-to-content-board:focus {
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Only the grid center column needs a tall strand; pull-below’s `posts-twine-stripe--pull` is tail-only. */
+.posts-index-board .posts-twine-stripe__main--thread-cord {
+  padding-bottom: var(--posts-thread-stretch, 0px);
+  margin-bottom: calc(-1 * var(--posts-thread-stretch, 0px));
+}
+
+/* Only the grid center column needs a tall strand. */
 .posts-index-board .posts-index-grid .posts-twine-stripe,
 .posts-index-board .posts-index-grid .posts-twine-stripe--pull {
   min-height: calc(var(--posts-sp) * 20);
@@ -1761,65 +1792,6 @@ a.skip-to-content-board:focus {
 
 .posts-index-board .posts-index-grid .posts-twine-stripe__main {
   min-height: calc(var(--posts-sp) * 10);
-}
-
-.posts-twine-stripe__tail {
-  flex-shrink: 0;
-  width: 4px;
-  margin-top: -1px;
-  border-radius: 0 0 2px 2px;
-  background: repeating-linear-gradient(
-    45deg,
-    var(--cream),
-    var(--cream) 4px,
-    var(--red) 4px,
-    var(--red) 8px
-  );
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-@keyframes postsTwineStripeTailIdle {
-  0%,
-  100% {
-    height: var(--twine-knot-body-h);
-  }
-  50% {
-    height: var(--posts-tail-idle-layout-h);
-  }
-}
-
-.posts-index-board .posts-twine-stripe__tail--idle-dangle {
-  flex-shrink: 0;
-  animation: postsTwineStripeTailIdle 2s infinite ease-in-out;
-}
-
-@media (pointer: coarse), (hover: none) {
-  .posts-index-board .posts-twine-stripe__tail--idle-dangle {
-    animation-duration: 2.5s;
-  }
-}
-
-.posts-index-board .posts-twine-stripe__tail--idle-static {
-  height: var(--twine-knot-body-h, 10px);
-}
-
-.posts-index-board .posts-twine-stripe__tail--js {
-  height: var(--posts-stripe-tail-h, 10px);
-  min-height: var(--twine-knot-body-h, 10px);
-  transition: height 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.posts-index-board
-  .posts-twine-stripe--reduced-motion
-  .posts-twine-stripe__tail--js {
-  transition: none !important;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .posts-index-board .posts-twine-stripe__tail--idle-dangle {
-    animation: none !important;
-    height: var(--twine-knot-body-h);
-  }
 }
 
 /*

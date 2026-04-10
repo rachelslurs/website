@@ -23,7 +23,6 @@ const PULL_CORD_MAX_PX = 100;
 const TWINE_KNOT_BODY_HEIGHT_PX = 10;
 const PULL_CORD_THRESHOLD_PX = 28;
 const PULL_DRAG_SUPPRESS_CLICK_PX = 10;
-const PULL_SNAP_TRANSITION = "height 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)";
 
 function layoutBoardWidthPx(width: number) {
   return Math.round(Math.max(width, 320));
@@ -32,28 +31,17 @@ function layoutBoardWidthPx(width: number) {
 /**
  * Posts index: pull cord and twine layout (keep DOM + `riso.css` in sync).
  *
- * Grid + `hasMore`: the load-more block must sit under the full card masonry, not only the center
- * track. DOM is split:
- * - `.posts-index-grid` > `.posts-index-center`: top knot, then `posts-twine-stripe--pull` with
- *   `.posts-twine-stripe__main` only (rigid strand for the row height).
- * - After the grid: `.posts-index-pull-below` > `.posts-index-pull-below__elastic` wraps the tail and
- *   `PullMoreCord` in one column so the knot and CTA move with the elastic. Negative `margin-top` on
- *   `.posts-index-pull-below`
- *   overlaps the tail up to the main strand; `.posts-index-twine-grow` keeps bottom padding so
- *   `__main` paint stops at that join (see `.posts-index-twine-grow` in riso.css).
+ * Grid + `hasMore`: center column = top knot + `posts-twine-stripe__main` only. Load-more sits in
+ * `.posts-index-pull-below` under the masonry.
  *
- * Elastic segment: the live cord is `.posts-twine-stripe__tail` (not a sibling `.pull-connector`
- * inside the center column). `.posts-index-pull-below__elastic` uses a fixed min-height: max(idle tail,
- * full drag stretch) plus the pull stack, so idle keyframes and drag do not change document length.
- * Idle: tail `height` keyframes only (no `scaleY`). Drag / snap: `usePullCord` and `--posts-stripe-tail-h`.
- * `PullMoreCord` uses `pull-container--strand-in-twine` with a collapsed `.pull-connector-track`.
+ * Continuous thread (no separate `__tail` strip): `--posts-thread-stretch` (registered in CSS) drives
+ * `padding-bottom` + matching negative `margin-bottom` on `__main` (background paints into padding) and
+ * `translateY` on `.posts-index-pull-below__pull-shift` so knot + CTA track the visual end. Idle bounce
+ * animates the variable on `.posts-index-stack--thread-idle-bounce`; drag/snap set it on the board.
+ * Keep `PULL_CORD_MAX_PX` in sync with `--posts-pull-cord-max` in riso.css.
  *
- * `usePullCord` returns pointer handlers, stretch state, and class names for the tail. It also
- * computes `connectorClass` / `trackClass` for a live `.pull-connector` if `PullMoreCord` is wired
- * that way again. Keep `TWINE_KNOT_BODY_HEIGHT_PX` aligned with `.posts-index-board` `--twine-knot-body-h`
- * (drag / min segment floor).
- *
- * Narrow board (`posts-index-board--narrow`): same DOM; tape and gaps scale only.
+ * `usePullCord` returns pointer handlers, stretch state, and `connectorClass` / `trackClass` for
+ * `PullMoreCord`. `TWINE_KNOT_BODY_HEIGHT_PX` aligns with `--twine-knot-body-h`.
  */
 function usePullCord({
   prefersReducedMotion,
@@ -70,6 +58,15 @@ function usePullCord({
   const pullStartYRef = useRef(0);
   const pullDragActiveRef = useRef(false);
   const suppressClickRef = useRef(false);
+
+  useEffect(() => {
+    if (!snapping) return;
+    const id = window.setTimeout(() => {
+      setSnapping(false);
+      pullStretchRef.current = 0;
+    }, 450);
+    return () => window.clearTimeout(id);
+  }, [snapping]);
 
   const endPullGesture = useCallback(
     (opts?: { skipSnap?: boolean; abort?: boolean }) => {
@@ -110,6 +107,8 @@ function usePullCord({
       }
 
       setSnapping(true);
+      pullStretchRef.current = releasedAt;
+      setStretchPx(releasedAt);
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           pullStretchRef.current = 0;
@@ -180,10 +179,15 @@ function usePullCord({
     endPullGesture();
   }, [endPullGesture]);
 
-  const handleStrandTransitionEnd = useCallback(
+  const handleThreadSnapTransitionEnd = useCallback(
     (e: React.TransitionEvent<HTMLDivElement>) => {
-      if (e.propertyName !== "height") return;
       if (e.target !== e.currentTarget) return;
+      if (
+        e.propertyName !== "--posts-thread-stretch" &&
+        !e.propertyName.includes("posts-thread-stretch")
+      ) {
+        return;
+      }
       setSnapping(false);
       pullStretchRef.current = 0;
     },
@@ -230,23 +234,6 @@ function usePullCord({
     .filter(Boolean)
     .join(" ");
 
-  /** Tail is `.posts-twine-stripe__tail` in `.posts-index-pull-below__tail` (idle keyframes or `--posts-stripe-tail-h`). */
-  const stripeTailClassName = [
-    "posts-twine-stripe__tail",
-    idleDangle ? "posts-twine-stripe__tail--idle-dangle" : "",
-    idleStatic ? "posts-twine-stripe__tail--idle-static" : "",
-    !idleDangle && !idleStatic ? "posts-twine-stripe__tail--js" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  const stripeTailStyle: React.CSSProperties | undefined =
-    idleDangle || idleStatic
-      ? undefined
-      : ({
-          ["--posts-stripe-tail-h" as string]: `${Math.max(cordHeightPx, TWINE_KNOT_BODY_HEIGHT_PX)}px`,
-        } as React.CSSProperties);
-
   return {
     reduced,
     stretchPx,
@@ -259,14 +246,12 @@ function usePullCord({
     stackClass,
     connectorClass,
     trackClass,
-    stripeTailClassName,
-    stripeTailStyle,
     handlePullPointerDown,
     handlePullPointerMove,
     handlePullPointerUp,
     handlePullPointerCancel,
     handleLostPointerCapture,
-    handleStrandTransitionEnd,
+    handleThreadSnapTransitionEnd,
     handleButtonClick,
   };
 }
@@ -483,18 +468,61 @@ export default function PostsIndexBoard({
     [narrowBoard]
   );
 
+  const boardStyle = useMemo((): React.CSSProperties => {
+    const padTrans = "padding-bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)";
+    const threadSnapTrans =
+      "--posts-thread-stretch 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)";
+    const style: React.CSSProperties = {
+      paddingBottom: `${boardBottomPad}px`,
+      transition: pull.snapping ? `${padTrans}, ${threadSnapTrans}` : padTrans,
+    };
+    if (!hasMore) return style;
+    if (pull.reduced) {
+      (style as Record<string, string>)["--posts-thread-stretch"] =
+        "var(--twine-knot-body-h)";
+      return style;
+    }
+    if (pull.idleDangle) return style;
+    let stretchPxOut = 0;
+    if (pull.stretchPx > 0 || pull.pullDragActive) {
+      stretchPxOut = Math.max(pull.stretchPx, TWINE_KNOT_BODY_HEIGHT_PX);
+    } else if (pull.snapping) {
+      stretchPxOut = 0;
+    } else {
+      return style;
+    }
+    (style as Record<string, string>)["--posts-thread-stretch"] =
+      `${stretchPxOut}px`;
+    return style;
+  }, [
+    boardBottomPad,
+    hasMore,
+    pull.idleDangle,
+    pull.pullDragActive,
+    pull.reduced,
+    pull.snapping,
+    pull.stretchPx,
+  ]);
+
   return (
     <div
       ref={boardRef}
       className={`posts-index-board not-prose${
         narrowBoard ? " posts-index-board--narrow" : ""
       }`}
-      style={{
-        paddingBottom: `${boardBottomPad}px`,
-        transition: "padding-bottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
-      }}
+      style={boardStyle}
+      onTransitionEnd={hasMore ? pull.handleThreadSnapTransitionEnd : undefined}
     >
-      <div className="posts-index-stack">
+      <div
+        className={[
+          "posts-index-stack",
+          hasMore && !pull.reduced && pull.idleDangle
+            ? "posts-index-stack--thread-idle-bounce"
+            : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
         <div className="posts-index-grid">
           <div className="posts-index-col posts-index-col--left">
             {leftPosts.map((post, i) => {
@@ -533,7 +561,13 @@ export default function PostsIndexBoard({
                       .join(" ")}
                     aria-hidden
                   >
-                    <div className="posts-twine-stripe__main" aria-hidden />
+                    <div
+                      className={[
+                        "posts-twine-stripe__main",
+                        "posts-twine-stripe__main--thread-cord",
+                      ].join(" ")}
+                      aria-hidden
+                    />
                   </div>
                 ) : (
                   <div className="posts-twine-stripe" />
@@ -581,25 +615,9 @@ export default function PostsIndexBoard({
         {hasMore ? (
           <div className="posts-index-pull-below">
             <div className="posts-index-pull-below__elastic">
-              <div
-                className={[
-                  "posts-index-pull-below__tail",
-                  "posts-twine-stripe",
-                  "posts-twine-stripe--pull",
-                  pull.reduced ? "posts-twine-stripe--reduced-motion" : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                aria-hidden
-              >
-                <div
-                  className={pull.stripeTailClassName}
-                  style={pull.stripeTailStyle}
-                  aria-hidden
-                  onTransitionEnd={pull.handleStrandTransitionEnd}
-                />
+              <div className="posts-index-pull-below__pull-shift">
+                <PullMoreCord pull={pull} remainingPosts={remainingPosts} />
               </div>
-              <PullMoreCord pull={pull} remainingPosts={remainingPosts} />
             </div>
           </div>
         ) : null}
