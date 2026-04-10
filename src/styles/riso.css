@@ -2228,9 +2228,15 @@ a.skip-to-content-board:focus {
   flex-shrink: 0;
 }
 
-/* Posts index: longer knot tail + CTA offset (see `.knot-bottom::before` height). */
+/*
+ * Posts index: longer knot tail + CTA offset.
+ * Nudge left vs default `left: 2px` + `rotate(8deg)` so the strand lines up with the 4px twine column.
+ */
 .posts-index-board .pull-container .knot-bottom::before {
   height: 72px;
+  left: 0;
+  transform-origin: top center;
+  transform: rotate(3deg);
 }
 
 /* Button sits below the main stripe: knot + ::before tail, then CTA. */
