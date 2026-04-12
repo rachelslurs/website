@@ -1,15 +1,15 @@
+import { PlayIcon, TvIcon } from "@heroicons/react/24/outline";
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import {
   useCallback,
   useEffect,
+  useId,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-
-const useIsoLayoutEffect =
-  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+import type { MouseEvent, PointerEvent, ReactNode } from "react";
 import type {
   PegboardCardDTO,
   PegboardPanelDTO,
@@ -25,6 +25,9 @@ import {
 } from "@utils/workshopPegboardPhysics";
 
 import "../../styles/workshop-pegboard.css";
+
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 const spring = { type: "spring" as const, stiffness: 420, damping: 36 };
 
@@ -82,6 +85,107 @@ function mobileViewportInnerH(vh: number): number {
   return Math.floor((vh - 80) / PEG_GRID) * PEG_GRID;
 }
 
+function externalLinkProps(href: string) {
+  if (href.startsWith("http")) {
+    return { target: "_blank" as const, rel: "noreferrer" as const };
+  }
+  return {};
+}
+
+function CaseStudyClipboard({
+  item,
+  dragVisual,
+}: {
+  item: PegboardCardDTO;
+  dragVisual: boolean;
+}) {
+  const rawId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const gradId = `pegClipSteel-${rawId}`;
+  const ext = externalLinkProps(item.href);
+
+  const stopPick = (e: MouseEvent | PointerEvent) => {
+    e.stopPropagation();
+  };
+
+  const label = item.caseStudyLabel ?? "Case Study";
+  const year = item.caseStudyYear ?? "—";
+
+  return (
+    <div
+      className={`masonite-bg ${dragVisual ? "peg-clipboard--dragging" : ""}`}
+    >
+      <div className="peg-clipboard__clip-row" aria-hidden>
+        <span className="straight-hook" />
+        <svg
+          className="peg-clipboard__svg-clip"
+          viewBox="0 0 120 52"
+          width={112}
+          height={48}
+        >
+          <defs>
+            <linearGradient id={gradId} x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#f8fafc" />
+              <stop offset="45%" stopColor="#94a3b8" />
+              <stop offset="100%" stopColor="#334155" />
+            </linearGradient>
+          </defs>
+          <path
+            fill={`url(#${gradId})`}
+            stroke="#1e293b"
+            strokeWidth={1}
+            d="M12 10 h96 a6 6 0 0 1 6 6 v26 a6 6 0 0 1 -6 6 H12 a6 6 0 0 1 -6 -6 V16 a6 6 0 0 1 6 -6z"
+          />
+          <ellipse
+            cx="60"
+            cy="31"
+            rx="12"
+            ry="8"
+            fill="#0f172a"
+            opacity={0.88}
+          />
+        </svg>
+      </div>
+      <div className="peg-clipboard__papers">
+        <div className="peg-clipboard__paper-back" aria-hidden />
+        <div className="peg-clipboard__paper-front">
+          <div className="peg-clipboard-wireframe" aria-hidden>
+            <div className="peg-clipboard-wireframe__chrome">
+              <TvIcon className="peg-clipboard-wireframe__icon" />
+              <PlayIcon className="peg-clipboard-wireframe__play" />
+            </div>
+            <div className="peg-clipboard-wireframe__bar peg-clipboard-wireframe__bar--blue" />
+            <div className="peg-clipboard-wireframe__row">
+              <span className="peg-clipboard-wireframe__block peg-clipboard-wireframe__block--orange" />
+              <span className="peg-clipboard-wireframe__block peg-clipboard-wireframe__block--blue" />
+            </div>
+          </div>
+          <div className="peg-clipboard-meta-pill">
+            <span className="peg-clipboard-meta-pill__dot" />
+            <span>
+              {label} / {year}
+            </span>
+          </div>
+          <a href={item.href} className="peg-clipboard-title" {...ext}>
+            {item.title}
+          </a>
+          {item.description ? (
+            <p className="peg-clipboard-desc">{item.description}</p>
+          ) : null}
+          <a
+            href={item.href}
+            className="polished-btn"
+            {...ext}
+            onPointerDown={stopPick}
+            onClick={stopPick}
+          >
+            View case study
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PegCard({
   item,
   x,
@@ -115,6 +219,9 @@ function PegCard({
   const snapOffsetY = useTransform(rawY, v => snapToGrid(v) - v);
   const draggingRef = useRef(false);
   const dragOrigin = useRef({ x: 0, y: 0 });
+  const [clipboardDragVisual, setClipboardDragVisual] = useState(false);
+
+  const isClipboard = item.hardware === "clipboard";
 
   useEffect(() => {
     if (!draggingRef.current) {
@@ -133,60 +240,65 @@ function PegCard({
     dragDisabled && screenWidth < w + padding ? (screenWidth - padding) / w : 1;
 
   const hwClass =
-    item.hardware === "clipboard"
-      ? "peg-hardware-clipboard"
-      : item.hardware === "lcd"
-        ? "peg-hardware-lcd"
-        : "peg-hardware-blueprint";
+    item.hardware === "lcd"
+      ? "peg-hardware-lcd"
+      : item.hardware === "blueprint"
+        ? "peg-hardware-blueprint"
+        : "";
 
-  const cardInner = (
-    <div
-      className={`peg-card__inner ${hwClass}`}
-      style={{ width: w, height: h, position: "relative" }}
-    >
-      {item.hardware === "clipboard" ? (
-        <div className="peg-card__clip-bar" aria-hidden />
-      ) : null}
-      {item.hardware === "lcd" ? (
-        <div className="peg-card__screen">
-          <a
-            href={item.href}
-            className="peg-card__title"
-            {...(item.href.startsWith("http")
-              ? { target: "_blank", rel: "noreferrer" }
-              : {})}
-          >
-            {item.title}
-          </a>
-          {item.subtitle ? (
-            <p className="peg-card__subtitle">{item.subtitle}</p>
-          ) : null}
-          <p className="peg-card__meta">{item.dateLabel}</p>
-        </div>
-      ) : (
-        <div className="peg-card__body">
-          <a
-            href={item.href}
-            className="peg-card__title"
-            {...(item.href.startsWith("http")
-              ? { target: "_blank", rel: "noreferrer" }
-              : {})}
-          >
-            {item.title}
-          </a>
-          {item.subtitle ? (
-            <p className="peg-card__subtitle">{item.subtitle}</p>
-          ) : null}
-          <p className="peg-card__meta">{item.dateLabel}</p>
-        </div>
-      )}
-    </div>
-  );
+  const cardInner =
+    item.hardware === "clipboard" ? (
+      <div
+        className="peg-card__inner peg-card__inner--clipboard"
+        style={{ width: w, height: h, position: "relative" }}
+      >
+        <CaseStudyClipboard item={item} dragVisual={clipboardDragVisual} />
+      </div>
+    ) : (
+      <div
+        className={`peg-card__inner ${hwClass}`}
+        style={{ width: w, height: h, position: "relative" }}
+      >
+        {item.hardware === "lcd" ? (
+          <div className="peg-card__screen">
+            <a
+              href={item.href}
+              className="peg-card__title"
+              {...externalLinkProps(item.href)}
+            >
+              {item.title}
+            </a>
+            {item.subtitle ? (
+              <p className="peg-card__subtitle">{item.subtitle}</p>
+            ) : null}
+            <p className="peg-card__meta">{item.dateLabel}</p>
+          </div>
+        ) : (
+          <div className="peg-card__body">
+            <a
+              href={item.href}
+              className="peg-card__title"
+              {...externalLinkProps(item.href)}
+            >
+              {item.title}
+            </a>
+            {item.subtitle ? (
+              <p className="peg-card__subtitle">{item.subtitle}</p>
+            ) : null}
+            <p className="peg-card__meta">{item.dateLabel}</p>
+          </div>
+        )}
+      </div>
+    );
+
+  const rootClass = `peg-card ${isClipboard ? "peg-card--clipboard" : ""} ${
+    dragDisabled ? "peg-card--static" : "peg-card--drag"
+  }`;
 
   if (dragDisabled) {
     return (
       <div
-        className="peg-card peg-card--static"
+        className={rootClass}
         style={{
           width: w,
           height: h,
@@ -202,7 +314,7 @@ function PegCard({
 
   return (
     <motion.div
-      className="peg-card peg-card--drag"
+      className={rootClass}
       style={{
         x: rawX,
         y: rawY,
@@ -212,9 +324,13 @@ function PegCard({
       drag
       dragMomentum={false}
       dragElastic={0}
+      whileDrag={
+        isClipboard ? { scale: 1.01, zIndex: 50 } : { scale: 1, zIndex: 40 }
+      }
       onDragStart={() => {
         draggingRef.current = true;
         dragOrigin.current = { x: rawX.get(), y: rawY.get() };
+        if (isClipboard) setClipboardDragVisual(true);
       }}
       onDragEnd={(_e, info) => {
         const ox = dragOrigin.current.x;
@@ -239,19 +355,21 @@ function PegCard({
           innerW,
           innerH
         );
+        const finishDrag = () => {
+          draggingRef.current = false;
+          if (isClipboard) setClipboardDragVisual(false);
+        };
         if (hit) {
           void Promise.all([
             animate(rawX, ox, spring),
             animate(rawY, oy, spring),
-          ]).then(() => {
-            draggingRef.current = false;
-          });
+          ]).then(finishDrag);
         } else {
           void Promise.all([
             animate(rawX, prop.x, spring),
             animate(rawY, prop.y, spring),
           ]).then(() => {
-            draggingRef.current = false;
+            finishDrag();
             onDragCommit(item.id, prop.x, prop.y);
           });
         }
@@ -387,7 +505,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     </div>
   ));
 
-  const mobileBlocks: React.ReactNode[] = [];
+  const mobileBlocks: ReactNode[] = [];
   panels.forEach((_, i) => {
     if (i > 0) {
       mobileBlocks.push(

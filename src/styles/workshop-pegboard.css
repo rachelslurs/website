@@ -208,8 +208,13 @@
 }
 
 .peg-card--drag {
-  z-index: 20;
+  z-index: 10;
   cursor: grabbing;
+}
+
+.peg-card--drag.peg-card--clipboard,
+.peg-card--static.peg-card--clipboard {
+  z-index: 20;
 }
 
 .peg-card--static {
@@ -236,49 +241,288 @@
   text-underline-offset: 2px;
 }
 
-/* Clipboard */
-.peg-hardware-clipboard {
-  background: var(--cream);
-  border: 2px solid var(--black);
+/* Case study clipboard (masonite + paper + clip) */
+.peg-card__inner--clipboard {
+  overflow: visible;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.masonite-bg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #b59b6f 0%, #9c8052 100%);
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.02) 0px,
+      rgba(0, 0, 0, 0.02) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    linear-gradient(135deg, #b59b6f 0%, #9c8052 100%);
+  border: 1px solid #7d653f;
   box-shadow:
-    3px 6px 0 rgba(26, 26, 46, 0.12),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+    10px 15px 25px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
 }
 
-.peg-hardware-clipboard::before {
-  content: "";
+.masonite-bg.peg-clipboard--dragging {
+  box-shadow:
+    20px 30px 40px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.peg-clipboard__clip-row {
   position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 72px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.straight-hook {
+  position: absolute;
+  top: 18px;
   left: 50%;
-  top: -14px;
-  transform: translateX(-50%);
-  width: 44%;
-  height: 36px;
-  background: linear-gradient(180deg, #cbd5e1 0%, #64748b 55%, #334155 100%);
-  border: 2px solid var(--black);
-  border-radius: 4px 4px 2px 2px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.35);
-  z-index: -1;
+  width: 10px;
+  height: 22px;
+  margin-left: -5px;
+  border-radius: 3px 3px 2px 2px;
+  background: linear-gradient(90deg, #475569, #94a3b8 40%, #64748b);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 2px 4px rgba(0, 0, 0, 0.45);
+  z-index: 0;
 }
 
-.peg-hardware-clipboard .peg-card__clip-bar {
-  height: 8px;
-  margin: 10px 12px 0;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--black) 0 3px,
-    transparent 3px 6px
-  );
-  opacity: 0.35;
-  border-radius: 1px;
+.peg-clipboard__svg-clip {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin-top: 6px;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.35));
 }
 
-.peg-hardware-clipboard .peg-card__body {
-  flex: 1;
-  padding: 10px 14px 12px;
+.peg-clipboard__papers {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 85px;
+  bottom: 12px;
+  pointer-events: auto;
+}
+
+.peg-clipboard__paper-back {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 6px;
+  bottom: 4px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  transform: rotate(-1deg);
+  box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.peg-clipboard__paper-front {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: #fff;
+  border-radius: 4px;
+  border: 1px solid rgba(26, 26, 46, 0.08);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  padding: 12px 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.peg-clipboard-wireframe {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  min-height: 0;
+  padding: 8px;
+  border: 1px dashed rgba(0, 120, 191, 0.35);
+  border-radius: 6px;
+  background: rgba(0, 120, 191, 0.04);
+}
+
+.peg-clipboard-wireframe__chrome {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+}
+
+.peg-clipboard-wireframe__icon {
+  width: 28px;
+  height: 28px;
+  color: var(--blue);
+}
+
+.peg-clipboard-wireframe__play {
+  width: 22px;
+  height: 22px;
+  color: var(--orange);
+}
+
+.peg-clipboard-wireframe__bar--blue {
+  height: 6px;
+  border-radius: 2px;
+  background: var(--blue);
+  opacity: 0.85;
+}
+
+.peg-clipboard-wireframe__row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.peg-clipboard-wireframe__block {
+  flex: 1;
+  height: 22px;
+  border-radius: 2px;
+}
+
+.peg-clipboard-wireframe__block--orange {
+  background: var(--orange);
+  opacity: 0.9;
+}
+
+.peg-clipboard-wireframe__block--blue {
+  background: var(--blue);
+  opacity: 0.35;
+}
+
+.peg-clipboard-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 3px 10px 3px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--black);
+  background: rgba(26, 26, 46, 0.06);
+  border: 1px solid rgba(26, 26, 46, 0.12);
+  border-radius: 999px;
+}
+
+.peg-clipboard-meta-pill__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--red);
+  animation: pegClipboardPulse 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .peg-clipboard-meta-pill__dot {
+    animation: none;
+  }
+}
+
+@keyframes pegClipboardPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+}
+
+.peg-clipboard-title {
+  font-family: var(--font-heading, ui-serif, Georgia, serif);
+  font-size: 1.25rem;
+  line-height: 1.25;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--black);
+  text-decoration: none;
+}
+
+.peg-clipboard-title:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.peg-clipboard-desc {
+  margin: 0;
+  font-family: var(--font-body, ui-sans-serif, system-ui, sans-serif);
+  font-size: 12px;
+  line-height: 1.65;
+  color: rgba(26, 26, 46, 0.78);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.polished-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #1a1a2e 0%, #0d0d17 100%);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.2),
+    inset 1px 2px 1px rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.polished-btn:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+.polished-btn:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.peg-card__inner--clipboard a.peg-clipboard-title {
+  color: var(--black);
+}
+
+.peg-card__inner--clipboard a.polished-btn {
+  color: #fff;
 }
 
 /* LCD */
