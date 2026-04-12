@@ -2,10 +2,14 @@
 import type { Page } from "astro";
 import LinkButton from "./LinkButton.astro";
 import type { CollectionEntry } from "astro:content";
+import type { WorkshopPanel } from "@utils/buildWorkshopPanels";
 
 export interface Props {
   page: Page<
-    CollectionEntry<"work"> | CollectionEntry<"blog"> | CollectionEntry<"demos">
+    | CollectionEntry<"work">
+    | CollectionEntry<"blog">
+    | CollectionEntry<"demos">
+    | WorkshopPanel
   >;
 }
 
@@ -26,7 +30,7 @@ const nextUrl = stripTrailingSlash(page.url.next as string | undefined);
     <nav class="pagination-wrapper" aria-label="Pagination">
       <LinkButton
         disabled={!prevUrl}
-        href={prevUrl}
+        href={prevUrl ?? "#"}
         className={`mr-4 select-none flex items-center gap-1 ${prevUrl ? "" : "disabled"}`}
         ariaLabel="Previous"
       >
@@ -44,7 +48,7 @@ const nextUrl = stripTrailingSlash(page.url.next as string | undefined);
       </span>
       <LinkButton
         disabled={!nextUrl}
-        href={nextUrl}
+        href={nextUrl ?? "#"}
         className={`mx-4 select-none flex items-center gap-1 ${nextUrl ? "" : "disabled"}`}
         ariaLabel="Next"
       >
