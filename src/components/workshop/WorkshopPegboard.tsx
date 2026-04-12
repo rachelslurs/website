@@ -303,7 +303,7 @@ function PegboardPanelView({
 
   const [innerH, setInnerH] = useState(() => Math.max(viewportH, PEG_GRID * 8));
 
-  useLayoutEffect(() => {
+  useIsoLayoutEffect(() => {
     const { positions: packed, contentHeight } = initialPackPositions(
       items.map(i => ({ id: i.id, hardware: i.hardware })),
       innerW
