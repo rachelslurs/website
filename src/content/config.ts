@@ -82,4 +82,27 @@ const demos = defineCollection({
     }),
 });
 
-export const collections = { blog, work, demos };
+const links = defineCollection({
+  type: "content_layer",
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/links" }),
+  schema: ({ image }) =>
+    z.object({
+      author: z.string().default(SITE.author),
+      pubDatetime: z.coerce.date(),
+      modDatetime: z.coerce.date().optional().nullable(),
+      title: z.string(),
+      subtitle: z.string().optional(),
+      /** Destination URL (video, article, tool, etc.). */
+      url: z.string().url(),
+      /**
+       * Optional preview (GIF/WebP). Tina image field → `/uploads/...` string;
+       * can also be a remote URL or colocated image via `image()`.
+       */
+      gifLink: image().or(z.string()).optional(),
+      /** Controls how the workshop / future UI renders this entry. */
+      linkType: z.enum(["default", "video"]).default("default"),
+      draft: z.boolean().optional(),
+    }),
+});
+
+export const collections = { blog, work, demos, links };
