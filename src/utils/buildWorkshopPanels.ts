@@ -45,7 +45,7 @@ function sortAllQueues(
 
 /**
  * Group work, links, and demos into panels of at most 4 items.
- * Per panel: next work → next link → demos until full → global date backfill.
+ * Per panel: next work → next link → up to 2 demos → global date backfill.
  */
 export default function buildWorkshopPanels(
   work: CollectionEntry<"work">[],
@@ -68,8 +68,10 @@ export default function buildWorkshopPanels(
     if (linkQ.length) {
       panel.push({ kind: "links", entry: linkQ.shift()! });
     }
-    while (panel.length < 4 && demoQ.length) {
+    let demoSlots = Math.min(2, 4 - panel.length);
+    while (demoSlots > 0 && demoQ.length) {
       panel.push({ kind: "demos", entry: demoQ.shift()! });
+      demoSlots -= 1;
     }
 
     if (panel.length < 4) {
