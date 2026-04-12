@@ -59,6 +59,12 @@ export function cardInBoardBounds(
   return x >= 0 && y >= 0 && x + w <= innerW && y + h <= innerH;
 }
 
+/** Horizontal slack from one side of centered pegboard to viewport edge (panel has p-10). */
+export function desktopPegboardSideGap(vw: number, innerW: number): number {
+  const panelPadX = 80;
+  return Math.max(0, (vw - panelPadX - innerW) / 2);
+}
+
 export function hardwareDims(hardware: PegboardHardware): {
   w: number;
   h: number;
@@ -67,9 +73,9 @@ export function hardwareDims(hardware: PegboardHardware): {
     case "clipboard":
       return { w: 300, h: 480 };
     case "lcd":
-      return { w: 240, h: 180 };
-    case "blueprint":
       return { w: 360, h: 240 };
+    case "blueprint":
+      return { w: 240, h: 240 };
   }
 }
 

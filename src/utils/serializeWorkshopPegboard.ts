@@ -15,6 +15,8 @@ export interface PegboardCardDTO {
   description?: string;
   caseStudyYear?: string;
   caseStudyLabel?: string;
+  /** Blueprint: cycling Riso accent for subtitle */
+  subtitleColor?: string;
 }
 
 export interface PegboardPanelDTO {
@@ -60,15 +62,34 @@ function serializeItem(item: WorkshopPanelItem): PegboardCardDTO {
         href: `/demos/${item.entry.slug}`,
         subtitle: d.summary,
         dateLabel: formatPostDate(new Date(raw)),
+        description:
+          (d.description?.trim() && d.description) || d.summary || undefined,
       };
     }
   }
 }
 
+const RISO_ACCENTS = [
+  "var(--blue)",
+  "var(--red)",
+  "var(--violet)",
+  "var(--green)",
+  "var(--orange)",
+  "var(--pink)",
+] as const;
+
 export function serializeWorkshopPanelsForPegboard(
   panels: WorkshopPanel[]
 ): PegboardPanelDTO[] {
-  return panels.map(panel => ({
-    items: panel.map(serializeItem),
+  const rows = panels.map(panel => panel.map(serializeItem));
+  let demoOrdinal = 0;
+  return rows.map(items => ({
+    items: items.map(item => {
+      if (item.hardware !== "blueprint") return item;
+      const subtitleColor =
+        RISO_ACCENTS[demoOrdinal % RISO_ACCENTS.length] ?? "var(--blue)";
+      demoOrdinal += 1;
+      return { ...item, subtitleColor };
+    }),
   }));
 }
