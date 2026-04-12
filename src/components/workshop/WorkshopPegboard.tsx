@@ -415,30 +415,34 @@ function PegboardPanelView({
     });
   }, [itemsKey, items]);
 
-  const [positions, setPositions] = useState<
-    Record<string, { x: number; y: number }>
-  >({});
-
-  const [innerH, setInnerH] = useState(() => Math.max(viewportH, PEG_GRID * 8));
-
-  useIsoLayoutEffect(() => {
+  /** Sync layout on SSR + first paint; effects alone left `positions` {} on the server. */
+  const packedLayout = useMemo(() => {
     const { positions: packed, contentHeight } = initialPackPositions(
       items.map(i => ({ id: i.id, hardware: i.hardware })),
       innerW
     );
     const ih = Math.max(viewportH, contentHeight);
-    setInnerH(ih);
+    return {
+      innerH: ih,
+      positions: resolveLayoutAfterResize(packed, specs, innerW, ih),
+    };
+  }, [itemsKey, innerW, viewportH, specs, items]);
+
+  const [positions, setPositions] = useState(packedLayout.positions);
+  const innerH = packedLayout.innerH;
+
+  useEffect(() => {
     setPositions(prev => {
       const nextIds = new Set(specs.map(s => s.id));
       const prevKeys = Object.keys(prev);
       const sameSet =
         prevKeys.length === nextIds.size && prevKeys.every(k => nextIds.has(k));
       if (!sameSet) {
-        return resolveLayoutAfterResize(packed, specs, innerW, ih);
+        return packedLayout.positions;
       }
-      return resolveLayoutAfterResize(prev, specs, innerW, ih);
+      return resolveLayoutAfterResize(prev, specs, innerW, packedLayout.innerH);
     });
-  }, [itemsKey, innerW, viewportH, specs, items]);
+  }, [packedLayout, itemsKey, innerW, viewportH, specs, items]);
 
   const onDragCommit = useCallback((id: string, nx: number, ny: number) => {
     setPositions(p => ({ ...p, [id]: { x: nx, y: ny } }));
@@ -497,6 +501,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
       }
     >
       <PegboardPanelView
+        key={panel.items.map(i => i.id).join("|")}
         items={panel.items}
         isMobile={isMobile}
         vw={vw}
