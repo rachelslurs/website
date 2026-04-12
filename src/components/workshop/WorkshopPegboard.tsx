@@ -1,4 +1,10 @@
-import { PlayIcon, TvIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  PlayIcon,
+  TvIcon,
+  WrenchScrewdriverIcon,
+} from "@heroicons/react/24/outline";
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import {
   useCallback,
@@ -15,6 +21,7 @@ import type {
   PegboardPanelDTO,
 } from "@utils/serializeWorkshopPegboard";
 import {
+  desktopPegboardSideGap,
   hardwareDims,
   hasPlacementCollision,
   initialPackPositions,
@@ -41,6 +48,10 @@ type CardSpec = {
   w: number;
   h: number;
 };
+
+function stopDragChain(e: MouseEvent | PointerEvent) {
+  e.stopPropagation();
+}
 
 function useViewportPegboard() {
   const [vw, setVw] = useState(1024);
@@ -99,13 +110,10 @@ function CaseStudyClipboard({
   item: PegboardCardDTO;
   dragVisual: boolean;
 }) {
-  const rawId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
-  const gradId = `pegClipSteel-${rawId}`;
+  const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const metalId = `clipMetal-${uid}`;
+  const darkId = `clipDark-${uid}`;
   const ext = externalLinkProps(item.href);
-
-  const stopPick = (e: MouseEvent | PointerEvent) => {
-    e.stopPropagation();
-  };
 
   const label = item.caseStudyLabel ?? "Case Study";
   const year = item.caseStudyYear ?? "—";
@@ -114,37 +122,61 @@ function CaseStudyClipboard({
     <div
       className={`masonite-bg ${dragVisual ? "peg-clipboard--dragging" : ""}`}
     >
-      <div className="peg-clipboard__clip-row" aria-hidden>
-        <span className="straight-hook" />
-        <svg
-          className="peg-clipboard__svg-clip"
-          viewBox="0 0 120 52"
-          width={112}
-          height={48}
-        >
-          <defs>
-            <linearGradient id={gradId} x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#f8fafc" />
-              <stop offset="45%" stopColor="#94a3b8" />
-              <stop offset="100%" stopColor="#334155" />
-            </linearGradient>
-          </defs>
-          <path
-            fill={`url(#${gradId})`}
-            stroke="#1e293b"
-            strokeWidth={1}
-            d="M12 10 h96 a6 6 0 0 1 6 6 v26 a6 6 0 0 1 -6 6 H12 a6 6 0 0 1 -6 -6 V16 a6 6 0 0 1 6 -6z"
-          />
-          <ellipse
-            cx="60"
-            cy="31"
-            rx="12"
-            ry="8"
-            fill="#0f172a"
-            opacity={0.88}
-          />
-        </svg>
-      </div>
+      <svg
+        width={240}
+        height={100}
+        viewBox="0 0 240 100"
+        fill="none"
+        className="peg-clipboard-spec-svg"
+        style={{ filter: "drop-shadow(3px 5px 4px rgba(0,0,0,0.3))" }}
+        aria-hidden
+      >
+        <defs>
+          <linearGradient id={metalId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#f8fafc" />
+            <stop offset="15%" stopColor="#cbd5e1" />
+            <stop offset="35%" stopColor="#64748b" />
+            <stop offset="45%" stopColor="#0f172a" />
+            <stop offset="50%" stopColor="#e2e8f0" />
+            <stop offset="80%" stopColor="#94a3b8" />
+            <stop offset="100%" stopColor="#334155" />
+          </linearGradient>
+          <linearGradient id={darkId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#334155" />
+            <stop offset="100%" stopColor="#0f172a" />
+          </linearGradient>
+        </defs>
+        <rect
+          x="70"
+          y="50"
+          width="100"
+          height="16"
+          rx="4"
+          fill={`url(#${darkId})`}
+        />
+        <path
+          d="M 120 8 C 138 8, 145 18, 148 30 C 152 48, 160 52, 175 52 C 192 52, 196 60, 196 75 C 196 88, 192 94, 185 94 L 55 94 C 48 94, 44 88, 44 75 C 44 60, 48 52, 65 52 C 80 52, 88 48, 92 30 C 95 18, 102 8, 120 8 Z M 120 22 A 8 8 0 1 0 120 38 A 8 8 0 1 0 120 22"
+          fill={`url(#${metalId})`}
+          fillRule="evenodd"
+        />
+        <circle
+          cx="120"
+          cy="30"
+          r="14"
+          fill="none"
+          stroke={`url(#${metalId})`}
+          strokeWidth="4"
+        />
+        <circle
+          cx="120"
+          cy="30"
+          r="16"
+          fill="none"
+          stroke="#cbd5e1"
+          strokeWidth="1"
+          opacity="0.8"
+        />
+      </svg>
       <div className="peg-clipboard__papers">
         <div className="peg-clipboard__paper-back" aria-hidden />
         <div className="peg-clipboard__paper-front">
@@ -165,7 +197,13 @@ function CaseStudyClipboard({
               {label} / {year}
             </span>
           </div>
-          <a href={item.href} className="peg-clipboard-title" {...ext}>
+          <a
+            href={item.href}
+            className="peg-clipboard-title"
+            {...ext}
+            onPointerDown={stopDragChain}
+            onClick={stopDragChain}
+          >
             {item.title}
           </a>
           {item.description ? (
@@ -175,10 +213,92 @@ function CaseStudyClipboard({
             href={item.href}
             className="polished-btn"
             {...ext}
-            onPointerDown={stopPick}
-            onClick={stopPick}
+            onPointerDown={stopDragChain}
+            onClick={stopDragChain}
           >
             View case study
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LinkLcdCard({ item }: { item: PegboardCardDTO }) {
+  const ext = externalLinkProps(item.href);
+  return (
+    <div className="lcd-hardware">
+      <div className="lcd-hardware__tilt">
+        <div className="lcd-shadow-base" aria-hidden />
+        <div className="lcd-pcb">
+          <div className="lcd-slate">
+            <a
+              href={item.href}
+              className="lcd-screen-link"
+              {...ext}
+              onPointerDown={stopDragChain}
+              onClick={stopDragChain}
+            >
+              <span className="lcd-see-video-hit">See video</span>
+            </a>
+            <div className="lcd-meta-row">
+              <strong>{item.title}</strong>
+              {item.subtitle ? <span>{item.subtitle}</span> : null}
+              <span>{item.dateLabel}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DemoBlueprintCard({
+  item,
+  dragVisual,
+}: {
+  item: PegboardCardDTO;
+  dragVisual: boolean;
+}) {
+  const ext = externalLinkProps(item.href);
+  const accent = item.subtitleColor ?? "var(--blue)";
+
+  return (
+    <div
+      className={`blueprint-card ${dragVisual ? "blueprint-card--dragging" : ""}`}
+    >
+      <div className="blueprint-bg blueprint-mask">
+        <span className="blueprint-hook blueprint-hook--tl" aria-hidden />
+        <span className="blueprint-hook blueprint-hook--tr" aria-hidden />
+        <div className="blueprint-body">
+          <div className="blueprint-icon-recess" aria-hidden>
+            <WrenchScrewdriverIcon />
+          </div>
+          <a
+            href={item.href}
+            className="blueprint-title"
+            {...ext}
+            onPointerDown={stopDragChain}
+            onClick={stopDragChain}
+          >
+            {item.title}
+          </a>
+          {item.subtitle ? (
+            <p className="blueprint-subtitle" style={{ color: accent }}>
+              {item.subtitle}
+            </p>
+          ) : null}
+          {item.description ? (
+            <p className="blueprint-desc">{item.description}</p>
+          ) : null}
+          <a
+            href={item.href}
+            className="mech-switch"
+            {...ext}
+            onPointerDown={stopDragChain}
+            onClick={stopDragChain}
+          >
+            Open demo
           </a>
         </div>
       </div>
@@ -220,8 +340,11 @@ function PegCard({
   const draggingRef = useRef(false);
   const dragOrigin = useRef({ x: 0, y: 0 });
   const [clipboardDragVisual, setClipboardDragVisual] = useState(false);
+  const [blueprintDragVisual, setBlueprintDragVisual] = useState(false);
 
   const isClipboard = item.hardware === "clipboard";
+  const isLcd = item.hardware === "lcd";
+  const isBlueprint = item.hardware === "blueprint";
 
   useEffect(() => {
     if (!draggingRef.current) {
@@ -239,12 +362,13 @@ function PegCard({
   const scaleFactor =
     dragDisabled && screenWidth < w + padding ? (screenWidth - padding) / w : 1;
 
-  const hwClass =
-    item.hardware === "lcd"
-      ? "peg-hardware-lcd"
-      : item.hardware === "blueprint"
-        ? "peg-hardware-blueprint"
-        : "";
+  const whileDrag = isClipboard
+    ? { scale: 1.01, zIndex: 50 }
+    : isLcd
+      ? { scale: 1.05, zIndex: 45 }
+      : isBlueprint
+        ? { scale: 1.02, zIndex: 50 }
+        : { scale: 1, zIndex: 40 };
 
   const cardInner =
     item.hardware === "clipboard" ? (
@@ -254,46 +378,31 @@ function PegCard({
       >
         <CaseStudyClipboard item={item} dragVisual={clipboardDragVisual} />
       </div>
-    ) : (
+    ) : item.hardware === "lcd" ? (
       <div
-        className={`peg-card__inner ${hwClass}`}
+        className="peg-card__inner peg-card__inner--lcd"
         style={{ width: w, height: h, position: "relative" }}
       >
-        {item.hardware === "lcd" ? (
-          <div className="peg-card__screen">
-            <a
-              href={item.href}
-              className="peg-card__title"
-              {...externalLinkProps(item.href)}
-            >
-              {item.title}
-            </a>
-            {item.subtitle ? (
-              <p className="peg-card__subtitle">{item.subtitle}</p>
-            ) : null}
-            <p className="peg-card__meta">{item.dateLabel}</p>
-          </div>
-        ) : (
-          <div className="peg-card__body">
-            <a
-              href={item.href}
-              className="peg-card__title"
-              {...externalLinkProps(item.href)}
-            >
-              {item.title}
-            </a>
-            {item.subtitle ? (
-              <p className="peg-card__subtitle">{item.subtitle}</p>
-            ) : null}
-            <p className="peg-card__meta">{item.dateLabel}</p>
-          </div>
-        )}
+        <LinkLcdCard item={item} />
+      </div>
+    ) : (
+      <div
+        className="peg-card__inner peg-card__inner--blueprint"
+        style={{ width: w, height: h, position: "relative" }}
+      >
+        <DemoBlueprintCard item={item} dragVisual={blueprintDragVisual} />
       </div>
     );
 
-  const rootClass = `peg-card ${isClipboard ? "peg-card--clipboard" : ""} ${
-    dragDisabled ? "peg-card--static" : "peg-card--drag"
-  }`;
+  const rootClass = [
+    "peg-card",
+    dragDisabled ? "peg-card--static" : "peg-card--drag",
+    isClipboard && "peg-card--clipboard",
+    isLcd && "peg-card--lcd",
+    isBlueprint && "peg-card--blueprint",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   if (dragDisabled) {
     return (
@@ -324,13 +433,12 @@ function PegCard({
       drag
       dragMomentum={false}
       dragElastic={0}
-      whileDrag={
-        isClipboard ? { scale: 1.01, zIndex: 50 } : { scale: 1, zIndex: 40 }
-      }
+      whileDrag={whileDrag}
       onDragStart={() => {
         draggingRef.current = true;
         dragOrigin.current = { x: rawX.get(), y: rawY.get() };
         if (isClipboard) setClipboardDragVisual(true);
+        if (isBlueprint) setBlueprintDragVisual(true);
       }}
       onDragEnd={(_e, info) => {
         const ox = dragOrigin.current.x;
@@ -358,6 +466,7 @@ function PegCard({
         const finishDrag = () => {
           draggingRef.current = false;
           if (isClipboard) setClipboardDragVisual(false);
+          if (isBlueprint) setBlueprintDragVisual(false);
         };
         if (hit) {
           void Promise.all([
@@ -415,7 +524,6 @@ function PegboardPanelView({
     });
   }, [itemsKey, items]);
 
-  /** Sync layout on SSR + first paint; effects alone left `positions` {} on the server. */
   const packedLayout = useMemo(() => {
     const { positions: packed, contentHeight } = initialPackPositions(
       items.map(i => ({ id: i.id, hardware: i.hardware })),
@@ -482,6 +590,42 @@ function PegboardPanelView({
 
 export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   const { vw, vh, isMobile } = useViewportPegboard();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activePanelIndex, setActivePanelIndex] = useState(0);
+
+  const desktopInner = useMemo(() => desktopInnerW(vw), [vw]);
+  const sideGap = useMemo(
+    () => desktopPegboardSideGap(vw, desktopInner),
+    [vw, desktopInner]
+  );
+
+  const syncScrollIndex = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const w = typeof window !== "undefined" ? window.innerWidth : vw;
+    const idx = Math.round(el.scrollLeft / w);
+    setActivePanelIndex(
+      Math.min(Math.max(0, idx), Math.max(0, panels.length - 1))
+    );
+  }, [panels.length, vw]);
+
+  useEffect(() => {
+    syncScrollIndex();
+  }, [syncScrollIndex, panels.length, vw]);
+
+  const scrollPrev = useCallback(() => {
+    scrollRef.current?.scrollBy({
+      left: -window.innerWidth,
+      behavior: "smooth",
+    });
+  }, []);
+
+  const scrollNext = useCallback(() => {
+    scrollRef.current?.scrollBy({
+      left: window.innerWidth,
+      behavior: "smooth",
+    });
+  }, []);
 
   if (panels.length === 0) {
     return (
@@ -493,25 +637,8 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     );
   }
 
-  const panelNodes = panels.map((panel, i) => (
-    <div
-      key={`panel-${i}`}
-      className={
-        isMobile ? "workshop-panel--mobile" : "workshop-panel--desktop"
-      }
-    >
-      <PegboardPanelView
-        key={panel.items.map(i => i.id).join("|")}
-        items={panel.items}
-        isMobile={isMobile}
-        vw={vw}
-        vh={vh}
-      />
-    </div>
-  ));
-
   const mobileBlocks: ReactNode[] = [];
-  panels.forEach((_, i) => {
+  panels.forEach((panel, i) => {
     if (i > 0) {
       mobileBlocks.push(
         <div key={`seam-${i}`} className="slab-seam" aria-hidden>
@@ -520,26 +647,94 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
         </div>
       );
     }
-    mobileBlocks.push(panelNodes[i]);
+    mobileBlocks.push(
+      <div key={`panel-${i}`} className="workshop-panel--mobile">
+        <PegboardPanelView
+          key={panel.items.map(x => x.id).join("|")}
+          items={panel.items}
+          isMobile
+          vw={vw}
+          vh={vh}
+        />
+      </div>
+    );
   });
+
+  const atFirst = activePanelIndex <= 0;
+  const atLast = activePanelIndex >= panels.length - 1;
 
   return (
     <div className="workshop-pegboard-root workshop-fullbleed workshop-wall not-prose">
-      <div className="workshop-scroll--desktop">
-        {panels.flatMap((_, i) =>
-          i < panels.length - 1
-            ? [
-                panelNodes[i],
-                <div
-                  key={`bracket-${i}`}
-                  className="metal-bracket"
-                  aria-hidden
-                />,
-              ]
-            : [panelNodes[i]]
-        )}
-      </div>
-      <div className="workshop-scroll--mobile">{mobileBlocks}</div>
+      {!isMobile ? (
+        <>
+          <div
+            ref={scrollRef}
+            onScroll={syncScrollIndex}
+            className="workshop-scroll--desktop-strip hide-scrollbar"
+          >
+            {panels.map((panel, i) => (
+              <div key={`panel-${i}`} className="workshop-panel--desktop">
+                <PegboardPanelView
+                  key={panel.items.map(x => x.id).join("|")}
+                  items={panel.items}
+                  isMobile={false}
+                  vw={vw}
+                  vh={vh}
+                />
+                {i < panels.length - 1 ? (
+                  <>
+                    <div
+                      aria-hidden
+                      className="metal-bracket metal-bracket--band"
+                      style={{
+                        width: sideGap + 80,
+                        right: -(sideGap + 40),
+                        top: 98,
+                        transform: "translateY(-50%)",
+                      }}
+                    />
+                    <div
+                      aria-hidden
+                      className="metal-bracket metal-bracket--band"
+                      style={{
+                        width: sideGap + 80,
+                        right: -(sideGap + 40),
+                        bottom: 98,
+                        transform: "translateY(50%)",
+                      }}
+                    />
+                  </>
+                ) : null}
+              </div>
+            ))}
+          </div>
+          {panels.length > 1 ? (
+            <nav className="workshop-panel-nav" aria-label="Workshop panels">
+              <button
+                type="button"
+                className="workshop-panel-nav__btn"
+                disabled={atFirst}
+                aria-label="Previous panel"
+                onClick={scrollPrev}
+              >
+                <ChevronLeftIcon className="h-5 w-5" aria-hidden />
+              </button>
+              <button
+                type="button"
+                className="workshop-panel-nav__btn"
+                disabled={atLast}
+                aria-label="Next panel"
+                onClick={scrollNext}
+              >
+                <ChevronRightIcon className="h-5 w-5" aria-hidden />
+              </button>
+            </nav>
+          ) : null}
+        </>
+      ) : null}
+      {isMobile ? (
+        <div className="workshop-scroll--mobile">{mobileBlocks}</div>
+      ) : null}
     </div>
   );
 }
