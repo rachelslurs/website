@@ -11,6 +11,10 @@ export interface PegboardCardDTO {
   href: string;
   subtitle?: string;
   dateLabel: string;
+  /** Case study clipboard: body copy (description or summary). */
+  description?: string;
+  caseStudyYear?: string;
+  caseStudyLabel?: string;
 }
 
 export interface PegboardPanelDTO {
@@ -22,13 +26,16 @@ function serializeItem(item: WorkshopPanelItem): PegboardCardDTO {
     case "work": {
       const d = item.entry.data;
       const raw = d.modDatetime ?? d.pubDatetime;
+      const date = new Date(raw);
       return {
         id: `work:${item.entry.slug}`,
         hardware: "clipboard",
         title: d.title,
         href: `/work/${item.entry.slug}`,
-        subtitle: d.summary,
-        dateLabel: formatPostDate(new Date(raw)),
+        dateLabel: formatPostDate(date),
+        description: (d.description?.trim() && d.description) || d.summary,
+        caseStudyYear: d.year ?? String(date.getFullYear()),
+        caseStudyLabel: "Case Study",
       };
     }
     case "links": {
