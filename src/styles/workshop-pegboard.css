@@ -1,0 +1,401 @@
+/* Workshop pegboard — wall, cork grid, brackets, slab seams (pairs with WorkshopPegboard.tsx) */
+
+.workshop-pegboard-root {
+  --cork: #c4a97d;
+  --cream: #f5f0e8;
+  --black: #1a1a2e;
+  --blue: #0078bf;
+  --red: #e8453c;
+  --yellow: #ffb511;
+  --green: #00a95c;
+  --pink: #f5a0b1;
+  --orange: #f47a2d;
+  --violet: #7b68ae;
+}
+
+.workshop-fullbleed {
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
+.workshop-wall {
+  background: linear-gradient(135deg, #111827 0%, #0f172a 100%);
+  background-image:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.02) 1px,
+      transparent 1px
+    ),
+    linear-gradient(135deg, #111827 0%, #0f172a 100%);
+  background-size: 20px 20px, 100% 100%;
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.8);
+}
+
+.workshop-scroll--desktop {
+  display: none;
+  flex-direction: row;
+  align-items: stretch;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
+
+.workshop-scroll--mobile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
+.workshop-panel--desktop {
+  flex: 0 0 100vw;
+  width: 100vw;
+  min-height: min(100vh, 100dvh);
+  height: min(100vh, 100dvh);
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem;
+  box-sizing: border-box;
+}
+
+.workshop-panel--mobile {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 1rem 2rem;
+  box-sizing: border-box;
+}
+
+.metal-bracket {
+  flex: 0 0 28px;
+  width: 28px;
+  min-height: min(100vh, 100dvh);
+  align-self: stretch;
+  background: linear-gradient(
+    90deg,
+    #1e293b 0%,
+    #475569 45%,
+    #64748b 50%,
+    #334155 100%
+  );
+  box-shadow:
+    inset 2px 0 4px rgba(255, 255, 255, 0.12),
+    inset -3px 0 8px rgba(0, 0, 0, 0.65);
+  position: relative;
+}
+
+.metal-bracket::before,
+.metal-bracket::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #94a3b8, #0f172a 70%);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.35),
+    0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.metal-bracket::before {
+  top: 18%;
+}
+
+.metal-bracket::after {
+  bottom: 18%;
+}
+
+.slab-seam {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  height: 0;
+  margin: 0 auto;
+  border-top: 2px solid rgba(26, 26, 46, 0.2);
+  pointer-events: none;
+}
+
+.slab-seam .heavy-screw {
+  position: absolute;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  margin-top: -11px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #64748b, #0f172a 75%);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.25),
+    0 2px 4px rgba(0, 0, 0, 0.85);
+}
+
+.slab-seam .heavy-screw--left {
+  left: 10px;
+}
+
+.slab-seam .heavy-screw--right {
+  right: 10px;
+}
+
+.pegboard-bg {
+  position: relative;
+  background-color: var(--cork);
+  background-image: radial-gradient(
+    circle at 30px 30px,
+    rgba(26, 26, 46, 0.45) 4px,
+    transparent 5px
+  );
+  background-size: 60px 60px;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px rgba(26, 26, 46, 0.12);
+  border-radius: 2px;
+}
+
+.pegboard-bg .heavy-screw {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #64748b, #0f172a 78%);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.3),
+    0 2px 5px rgba(0, 0, 0, 0.75);
+  z-index: 4;
+  pointer-events: none;
+}
+
+.pegboard-bg .heavy-screw--tl {
+  top: 16px;
+  left: 16px;
+}
+
+.pegboard-bg .heavy-screw--tr {
+  top: 16px;
+  right: 16px;
+}
+
+.pegboard-bg .heavy-screw--bl {
+  bottom: 16px;
+  left: 16px;
+}
+
+.pegboard-bg .heavy-screw--br {
+  bottom: 16px;
+  right: 16px;
+}
+
+/* Hardware cards */
+.peg-card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  z-index: 2;
+  user-select: none;
+}
+
+.peg-card--drag {
+  z-index: 20;
+  cursor: grabbing;
+}
+
+.peg-card--static {
+  cursor: default;
+}
+
+.peg-card__inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-body, ui-sans-serif, system-ui, sans-serif);
+}
+
+.peg-card__inner a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.peg-card__inner a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Clipboard */
+.peg-hardware-clipboard {
+  background: var(--cream);
+  border: 2px solid var(--black);
+  box-shadow:
+    3px 6px 0 rgba(26, 26, 46, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.peg-hardware-clipboard::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -14px;
+  transform: translateX(-50%);
+  width: 44%;
+  height: 36px;
+  background: linear-gradient(180deg, #cbd5e1 0%, #64748b 55%, #334155 100%);
+  border: 2px solid var(--black);
+  border-radius: 4px 4px 2px 2px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.35);
+  z-index: -1;
+}
+
+.peg-hardware-clipboard .peg-card__clip-bar {
+  height: 8px;
+  margin: 10px 12px 0;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--black) 0 3px,
+    transparent 3px 6px
+  );
+  opacity: 0.35;
+  border-radius: 1px;
+}
+
+.peg-hardware-clipboard .peg-card__body {
+  flex: 1;
+  padding: 10px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+}
+
+/* LCD */
+.peg-hardware-lcd {
+  background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+  border: 4px solid #334155;
+  box-shadow:
+    inset 0 0 24px rgba(0, 0, 0, 0.65),
+    0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.peg-hardware-lcd .peg-card__screen {
+  flex: 1;
+  margin: 10px;
+  padding: 10px 12px;
+  background: radial-gradient(
+    ellipse at 50% 30%,
+    rgba(0, 120, 191, 0.25),
+    rgba(15, 23, 42, 0.95)
+  );
+  border: 2px solid #0ea5e9;
+  border-radius: 4px;
+  box-shadow: inset 0 0 12px rgba(14, 165, 233, 0.15);
+  color: #bae6fd;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 0;
+}
+
+.peg-hardware-lcd .peg-card__meta {
+  color: rgba(186, 230, 253, 0.65);
+}
+
+/* Blueprint */
+.peg-hardware-blueprint {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 120, 191, 0.12) 0%,
+    var(--cream) 28%
+  );
+  border: 2px solid var(--blue);
+  box-shadow:
+    2px 4px 0 rgba(0, 120, 191, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  background-image: linear-gradient(
+      rgba(0, 120, 191, 0.06) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba(0, 120, 191, 0.06) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.peg-hardware-blueprint .peg-card__body {
+  flex: 1;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+}
+
+.peg-card__title {
+  font-family: var(--font-display, ui-serif, Georgia, serif);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--black);
+}
+
+.peg-hardware-lcd .peg-card__title {
+  color: #e0f2fe;
+}
+
+.peg-card__subtitle {
+  font-size: 11px;
+  line-height: 1.4;
+  color: rgba(26, 26, 46, 0.72);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.peg-hardware-lcd .peg-card__subtitle {
+  color: rgba(186, 230, 253, 0.75);
+}
+
+.peg-card__meta {
+  margin-top: auto;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-family: ui-monospace, monospace;
+  color: rgba(26, 26, 46, 0.55);
+}
+
+.peg-hardware-lcd .peg-card__meta {
+  color: rgba(186, 230, 253, 0.5);
+}
+
+@media (max-width: 767px) {
+  .metal-bracket {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .slab-seam {
+    display: none;
+  }
+
+  .workshop-scroll--desktop {
+    display: flex;
+  }
+
+  .workshop-scroll--mobile {
+    display: none;
+  }
+}
