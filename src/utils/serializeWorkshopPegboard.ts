@@ -1,3 +1,4 @@
+import type { BlueprintPegboardIconKey } from "@components/workshop/blueprintPegboardIcons";
 import type { WorkshopPanel, WorkshopPanelItem } from "./buildWorkshopPanels";
 import { formatPostDate } from "./mapBlogToPortfolioPost";
 import type { PegboardHardware } from "./workshopPegboardPhysics";
@@ -19,6 +20,8 @@ export interface PegboardCardDTO {
   caseStudyLabel?: string;
   /** Blueprint: cycling Riso accent for subtitle */
   subtitleColor?: string;
+  /** Blueprint: optional Heroicon key from frontmatter */
+  pegboardIcon?: BlueprintPegboardIconKey;
 }
 
 export interface PegboardPanelDTO {
@@ -68,15 +71,18 @@ function serializeItem(item: WorkshopPanelItem): PegboardCardDTO {
     case "demos": {
       const d = item.entry.data;
       const raw = d.modDatetime ?? d.pubDatetime;
+      const summaryLine = d.summary?.trim() || undefined;
+      const desc = d.description?.trim() || undefined;
       return {
         id: `demos:${item.entry.slug}`,
         hardware: "blueprint",
         title: d.title,
         href: `/demos/${item.entry.slug}`,
-        subtitle: d.summary,
+        subtitle: summaryLine,
         dateLabel: formatPostDate(new Date(raw)),
         description:
-          (d.description?.trim() && d.description) || d.summary || undefined,
+          desc && summaryLine && desc === summaryLine ? undefined : desc,
+        pegboardIcon: d.pegboardIcon,
       };
     }
   }
