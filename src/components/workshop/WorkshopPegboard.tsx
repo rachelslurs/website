@@ -171,6 +171,7 @@ function CaseStudyClipboard({
           opacity="0.8"
         />
       </svg>
+      <span className="peg-clipboard-eyelet-hook" aria-hidden />
       <div className="peg-clipboard__papers">
         <div className="peg-clipboard__paper-back" aria-hidden />
         <div className="peg-clipboard__paper-front">
