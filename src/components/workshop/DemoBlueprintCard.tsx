@@ -18,11 +18,13 @@ export default function DemoBlueprintCard({
       aria-label={`${item.title} blueprint demo`}
       className={`blueprint-card ${dragVisual ? "blueprint-card--dragging" : ""}`}
     >
-      <div className="blueprint-bg blueprint-mask">
-        <span className="blueprint-peg blueprint-peg--tl" aria-hidden />
-        <span className="blueprint-peg blueprint-peg--tr" aria-hidden />
-        <span className="blueprint-hook blueprint-hook--tl" aria-hidden />
-        <span className="blueprint-hook blueprint-hook--tr" aria-hidden />
+      <div className="blueprint-bg">
+        <div className="blueprint-hardware" aria-hidden>
+          <span className="blueprint-peg blueprint-peg--tl" />
+          <span className="blueprint-peg blueprint-peg--tr" />
+          <span className="blueprint-hook blueprint-hook--tl" />
+          <span className="blueprint-hook blueprint-hook--tr" />
+        </div>
 
         <div className="blueprint-body">
           <header className="blueprint-header">
