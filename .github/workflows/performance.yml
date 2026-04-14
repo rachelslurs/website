@@ -40,6 +40,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Astro check
+        run: npm run check
+
       - name: Build
         run: npm run build
 

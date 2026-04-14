@@ -193,7 +193,7 @@ export function resolveLayoutAfterResize(
   for (const spec of sorted) {
     let x = snapToGrid(next[spec.id]?.x ?? PEG_GRID);
     let y = snapToGrid(next[spec.id]?.y ?? PEG_GRID);
-    const { w, h } = spec;
+    const { h } = spec;
 
     let guard = 0;
     while (
