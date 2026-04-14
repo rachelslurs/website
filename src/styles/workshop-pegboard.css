@@ -1193,13 +1193,18 @@
   transform: translateX(50%);
 }
 
-/* Blueprint (§4.3) */
+/* Blueprint demo cards — shadow system (physical layers):
+   1) Main card: soft Z-axis drop shadow (rest ↔ drag).
+   2) Paper layer .blueprint-bg::before: die-cut holes via mask + inset hole depth + rim highlight.
+   3) .mech-switch: hard plastic switch shadow + translate on press. */
+
 .peg-card__inner--blueprint {
   overflow: visible;
   border-radius: 0;
   background: transparent;
 }
 
+/* 1) Main drop shadow (dynamic Z-axis depth) */
 .blueprint-card {
   width: 100%;
   height: 100%;
@@ -1265,6 +1270,7 @@
   mask-size: 51% 100%, 51% 100%;
   mask-position: left, right;
   mask-repeat: no-repeat;
+  /* 2) Die-cut peg holes: hole depth + rim highlight (masked paper layer) */
   box-shadow:
     inset 2px 4px 5px rgba(0, 0, 0, 0.8),
     1px 1px 0 rgba(255, 255, 255, 0.6);
@@ -1398,6 +1404,7 @@
   overflow: hidden;
 }
 
+/* 3) Execute build: hard mechanical switch (flat offset shadow, no blur) */
 .mech-switch {
   display: inline-flex;
   align-items: center;
@@ -1406,7 +1413,7 @@
   padding: 8px 12px;
   background-color: var(--cream);
   border: 2px solid var(--black);
-  box-shadow: 3px 3px 0 var(--black);
+  box-shadow: 3px 3px 0px var(--black);
   text-decoration: none;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
   flex-shrink: 0;
@@ -1424,8 +1431,8 @@
 }
 
 .mech-switch:active {
-  transform: translateY(3px) translateX(3px);
-  box-shadow: 0 0 0 var(--black);
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px var(--black);
 }
 
 @media (prefers-reduced-motion: reduce) {
