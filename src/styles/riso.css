@@ -568,6 +568,7 @@ nav .group:hover .dust-note {
 .breadcrumb-dymo .dymo {
   @apply min-h-[44px] sm:min-h-0;
 }
+/* Default: vertical ribs (‖) — emboss runs along the short edge of the tape */
 .dymo::before {
   content: "";
   position: absolute;
@@ -581,6 +582,17 @@ nav .group:hover .dust-note {
     rgba(255, 255, 255, 0.02) 4px
   );
   pointer-events: none;
+}
+
+/* Horizontal striations (≡) — along the length of the tape, like feed direction */
+.dymo.dymo--grain-horizontal::before {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.02) 2px,
+    rgba(255, 255, 255, 0.02) 4px
+  );
 }
 .dymo-text {
   @apply font-mono;

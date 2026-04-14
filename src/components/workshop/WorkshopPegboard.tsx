@@ -294,7 +294,29 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
               : "portal-bezel"
           }
         >
-          <DymoLabel text="WORKSHOP" size="large" isInteractive={false} />
+          <div
+            className="flex shrink-0 items-center justify-center gap-3 max-[380px]:gap-2"
+            aria-hidden="true"
+          >
+            <DymoLabel
+              text="WORKSHOP"
+              size="large"
+              isInteractive={false}
+              grain="vertical"
+              title="Vertical grain (default)"
+            />
+            <DymoLabel
+              text="WORKSHOP"
+              size="large"
+              isInteractive={false}
+              grain="horizontal"
+              title="Horizontal grain"
+            />
+          </div>
+          <span className="sr-only">
+            Workshop — two label textures shown for comparison: vertical and
+            horizontal tape grain.
+          </span>
           {panels.length > 1 ? (
             <nav className="workshop-panel-nav" aria-label="Workshop panels">
               <button
