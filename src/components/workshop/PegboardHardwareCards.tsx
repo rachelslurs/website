@@ -35,7 +35,6 @@ export function CaseStudyClipboard({
         viewBox="0 0 240 100"
         fill="none"
         className="peg-clipboard-spec-svg"
-        style={{ filter: "drop-shadow(3px 5px 4px rgba(0,0,0,0.3))" }}
         aria-hidden
       >
         <defs>
