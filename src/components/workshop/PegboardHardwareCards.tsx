@@ -211,6 +211,8 @@ export function LinkLcdCard({
                     className="lcd-screen-gif"
                     loading="eager"
                     decoding="async"
+                    draggable={false}
+                    onDragStart={e => e.preventDefault()}
                   />
                 ) : null}
                 {!gifPlaying ? (
@@ -233,7 +235,6 @@ export function LinkLcdCard({
               <div className="lcd-headline">
                 <span className="lcd-headline__text">{item.title}</span>
               </div>
-              <p className="lcd-date-line">{item.dateLabel}</p>
             </div>
           </div>
         </div>
