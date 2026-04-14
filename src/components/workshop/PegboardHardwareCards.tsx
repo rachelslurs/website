@@ -96,7 +96,7 @@ export function CaseStudyClipboard({
               <span className="peg-clipboard-wireframe__block peg-clipboard-wireframe__block--blue" />
             </div>
           </div>
-          <div className="peg-clipboard-meta-pill">
+          <div className="peg-clipboard-meta-pill font-mono text-[10px] font-bold uppercase tracking-[1.5px]">
             <span className="peg-clipboard-meta-pill__dot" />
             <span>
               {label} / {year}
@@ -104,7 +104,7 @@ export function CaseStudyClipboard({
           </div>
           <a
             href={item.href}
-            className="peg-clipboard-title"
+            className="peg-clipboard-title font-heading text-xl font-semibold leading-tight tracking-tight text-[var(--black)] no-underline hover:underline hover:underline-offset-2"
             {...ext}
             onPointerDown={stopDragChain}
             onClick={stopDragChain}
@@ -112,11 +112,13 @@ export function CaseStudyClipboard({
             {item.title}
           </a>
           {item.description ? (
-            <p className="peg-clipboard-desc">{item.description}</p>
+            <p className="peg-clipboard-desc text-xs leading-[1.65] text-[rgba(26,26,46,0.78)]">
+              {item.description}
+            </p>
           ) : null}
           <a
             href={item.href}
-            className="polished-btn"
+            className="polished-btn font-mono text-[11px] font-bold uppercase tracking-[1.5px]"
             {...ext}
             onPointerDown={stopDragChain}
             onClick={stopDragChain}
