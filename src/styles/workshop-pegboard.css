@@ -1011,9 +1011,12 @@
   margin: -10px;
   padding: 10px;
   text-decoration: none;
+  /* Beats `.peg-card__inner a { color: inherit }` */
+  color: var(--orange);
 }
 
 .peg-card__inner a.lcd-see-external:hover {
+  color: var(--yellow);
   text-decoration: none;
 }
 
