@@ -192,7 +192,7 @@ export function LinkLcdCard({
                 </span>
                 <a
                   href={item.href}
-                  className="lcd-see-external focus-outline no-underline hover:no-underline font-mono text-[11px] font-bold uppercase tracking-[1.5px] text-[var(--orange)] hover:text-[var(--yellow)]"
+                  className="lcd-see-external focus-outline no-underline hover:no-underline font-mono text-[11px] font-bold uppercase tracking-[1.5px]"
                   {...ext}
                   onPointerDown={stopDragChain}
                   onClick={stopDragChain}
