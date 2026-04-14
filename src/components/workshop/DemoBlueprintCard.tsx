@@ -35,7 +35,7 @@ export default function DemoBlueprintCard({
             <div className="blueprint-header__main">
               <a
                 href={item.href}
-                className="blueprint-title"
+                className="blueprint-title font-display text-base font-bold uppercase leading-none tracking-wide text-[var(--black)] no-underline hover:underline hover:underline-offset-2"
                 {...ext}
                 onPointerDown={stopDragChain}
                 onClick={stopDragChain}
@@ -43,7 +43,10 @@ export default function DemoBlueprintCard({
                 {item.title}
               </a>
               {item.subtitle ? (
-                <p className="blueprint-subtitle" style={{ color: accent }}>
+                <p
+                  className="blueprint-subtitle font-mono text-xs font-bold leading-snug tracking-[1.5px]"
+                  style={{ color: accent }}
+                >
                   {item.subtitle}
                 </p>
               ) : null}
@@ -54,12 +57,14 @@ export default function DemoBlueprintCard({
           </header>
 
           {item.description ? (
-            <p className="blueprint-desc">{item.description}</p>
+            <p className="blueprint-desc text-xs leading-[1.65] text-[rgba(26,26,46,0.78)]">
+              {item.description}
+            </p>
           ) : null}
 
           <a
             href={item.href}
-            className="mech-switch mech-switch--block focus-outline"
+            className="mech-switch mech-switch--block focus-outline font-mono text-[10px] font-bold uppercase tracking-[1.5px]"
             aria-label={`Execute build: open demo ${item.title}`}
             {...ext}
             onPointerDown={stopDragChain}
