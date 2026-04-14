@@ -170,12 +170,12 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   if (panels.length === 0) {
     return (
       <div
-        className="workshop-pegboard-root workshop-wall not-prose w-full min-w-0"
+        className="workshop-pegboard-root workshop-wall not-prose font-body w-full min-w-0"
         data-pegboard-layout="desktop"
       >
         <div className="portal-frame">
           <div className="portal-inner flex min-h-[12rem] items-center justify-center">
-            <p className="font-body text-sm text-slate-400">
+            <p className="text-sm text-slate-400">
               Nothing on the pegboard yet.
             </p>
           </div>
@@ -226,7 +226,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
 
   return (
     <div
-      className="workshop-pegboard-root workshop-wall not-prose w-full min-w-0"
+      className="workshop-pegboard-root workshop-wall not-prose font-body w-full min-w-0"
       data-pegboard-layout={isMobile ? "mobile" : "desktop"}
     >
       <div className="portal-frame">

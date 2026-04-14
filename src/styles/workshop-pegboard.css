@@ -2,8 +2,11 @@
    Riso palette tokens come from :root in riso.css (--cork, --blue, --black, etc.). */
 
 .workshop-pegboard-root {
-  /* Matches tailwind `fontFamily.display` — stamped blueprint titles */
-  --font-display: "Archivo Black", ui-sans-serif, system-ui, sans-serif;
+  /* Mirrors tailwind.config fontFamily — use theme() so stacks stay single-sourced */
+  --font-display: theme("fontFamily.display");
+  --font-body: theme("fontFamily.body");
+  --font-heading: theme("fontFamily.heading");
+  --font-mono: theme("fontFamily.mono");
   /* Blueprint — reference mock z-order */
   --blueprint-paper: 10;
   --blueprint-body: 30;
@@ -475,7 +478,6 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  font-family: var(--font-body, ui-sans-serif, system-ui, sans-serif);
 }
 
 .peg-card__inner a {
