@@ -1,6 +1,11 @@
 /* Workshop pegboard — wall, cork grid, brackets, slab seams (pairs with WorkshopPegboard.tsx)
    Riso palette tokens come from :root in riso.css (--cork, --blue, --black, etc.). */
 
+.workshop-pegboard-root {
+  /* Matches tailwind `fontFamily.display` — stamped blueprint titles */
+  --font-display: "Archivo Black", ui-sans-serif, system-ui, sans-serif;
+}
+
 /* Cork “shop floor” behind the portal — matches site .board grain (reference mock). */
 .workshop-wall {
   background-color: var(--cork);
@@ -480,6 +485,32 @@
   text-underline-offset: 2px;
 }
 
+/* Universal metal peg — 6×18 capsule, 135° light, lip highlight */
+.straight-hook {
+  position: relative;
+  flex-shrink: 0;
+  width: 6px;
+  height: 18px;
+  border-radius: 3px;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #f3f4f6 0%, #4b5563 100%);
+  box-shadow:
+    3px 4px 5px rgba(0, 0, 0, 0.4),
+    inset 1px 2px 2px rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+}
+
+.straight-hook::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: rgba(255, 255, 255, 0.35);
+}
+
 /* Case study clipboard (masonite + paper + clip) */
 .peg-card__inner--clipboard {
   overflow: visible;
@@ -508,7 +539,7 @@
   border: 1px solid #7d653f;
   box-shadow:
     10px 15px 25px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 1px 2px 1px rgba(255, 255, 255, 0.2),
     inset 0 -2px 6px rgba(0, 0, 0, 0.08);
   box-sizing: border-box;
 }
@@ -516,7 +547,7 @@
 .masonite-bg.peg-clipboard--dragging {
   box-shadow:
     20px 30px 40px rgba(0, 0, 0, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 1px 2px 1px rgba(255, 255, 255, 0.22),
     inset 0 -2px 8px rgba(0, 0, 0, 0.12);
 }
 
@@ -535,33 +566,14 @@
   top: 30px;
   left: 50%;
   z-index: 25;
-  width: 6px;
-  height: 22px;
   transform: translateX(-50%);
-  border-radius: 3px;
-  pointer-events: none;
-  background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 40%, #4b5563 100%);
-  box-shadow:
-    3px 4px 5px rgba(0, 0, 0, 0.35),
-    inset 1px 2px 2px rgba(255, 255, 255, 0.85);
-}
-
-.peg-clipboard-eyelet-hook::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
-  background: rgba(255, 255, 255, 0.35);
 }
 
 .peg-clipboard__papers {
   position: absolute;
-  left: 10px;
-  right: 10px;
-  top: 100px;
+  left: 16px;
+  right: 16px;
+  top: 85px;
   bottom: 12px;
   pointer-events: auto;
 }
@@ -794,17 +806,18 @@
 
 .lcd-shadow-base {
   position: absolute;
-  left: 16px;
-  right: 16px;
-  top: 12px;
-  bottom: 30px;
+  left: 18px;
+  right: 18px;
+  top: 14px;
+  bottom: 28px;
   z-index: 0;
   border-radius: 4px;
-  background: #050b14;
-  opacity: 0.2;
-  filter: blur(7px);
-  transform: translate(6px, 10px) skewX(2.5deg) scaleY(1.01);
-  transform-origin: top left;
+  background: #000;
+  opacity: 0.22;
+  /* Hard plane: skew fans shadow toward bottom without soft halo at wall contact */
+  filter: blur(0.5px);
+  transform: translate(5px, 12px) skewX(2.5deg) scale(0.97, 1.02);
+  transform-origin: top center;
 }
 
 .lcd-pcb {
@@ -1047,34 +1060,9 @@
   bottom: 22px;
   z-index: 25;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
   pointer-events: none;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.55));
-}
-
-.lcd-mount-hook::before {
-  content: "";
-  width: 7px;
-  height: 20px;
-  border-radius: 3px;
-  background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 40%, #4b5563 100%);
-  box-shadow:
-    3px 4px 5px rgba(0, 0, 0, 0.45),
-    inset 1px 2px 2px rgba(255, 255, 255, 0.9);
-}
-
-.lcd-mount-hook::after {
-  content: "";
-  width: 7px;
-  height: 7px;
-  margin-top: -1px;
-  border-radius: 0 0 3px 3px;
-  background: linear-gradient(
-    180deg,
-    #4b5563 0%,
-    rgba(26, 26, 46, 0.95) 100%
-  );
 }
 
 .lcd-mount-hook--l {
@@ -1164,26 +1152,8 @@
 
 .blueprint-hook {
   position: absolute;
-  width: 6px;
-  height: 18px;
-  background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 40%, #4b5563 100%);
-  border-radius: 3px;
-  box-shadow:
-    3px 4px 5px rgba(0, 0, 0, 0.4),
-    inset 1px 2px 2px rgba(255, 255, 255, 0.9);
   z-index: 2;
   pointer-events: none;
-}
-
-.blueprint-hook::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
-  background: rgba(255, 255, 255, 0.4);
 }
 
 .blueprint-peg {
@@ -1276,7 +1246,13 @@
 }
 
 .blueprint-title {
-  font-family: var(--font-display, ui-serif, Georgia, serif);
+  font-family: var(
+    --font-display,
+    "Archivo Black",
+    ui-sans-serif,
+    system-ui,
+    sans-serif
+  );
   font-size: 1rem;
   line-height: 1;
   font-weight: 700;
@@ -1352,6 +1328,16 @@
   box-shadow: 0 0 0 var(--black);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .mech-switch {
+    transition: none;
+  }
+
+  .mech-switch__icon {
+    transition: none;
+  }
+}
+
 .mech-switch--block {
   width: 100%;
   box-sizing: border-box;
@@ -1372,7 +1358,13 @@
 }
 
 .peg-card__title {
-  font-family: var(--font-display, ui-serif, Georgia, serif);
+  font-family: var(
+    --font-display,
+    "Archivo Black",
+    ui-sans-serif,
+    system-ui,
+    sans-serif
+  );
   font-size: 15px;
   font-weight: 600;
   line-height: 1.25;
