@@ -10,6 +10,20 @@
   /* Blueprint — reference mock z-order */
   --blueprint-paper: 10;
   --blueprint-body: 30;
+  /* Single key light: drops fall down + to the right (blueprint/masonite/LCD share this ratio) */
+  --pegboard-card-shadow-rest: 15px 20px 30px rgba(0, 0, 0, 0.12);
+  --pegboard-card-shadow-drag: 25px 35px 45px rgba(0, 0, 0, 0.25);
+  /* Metal clip SVG — same offset ratio at ~0.2× */
+  --pegboard-spec-svg-drop: drop-shadow(3px 4px 6px rgba(0, 0, 0, 0.22));
+  /* LCD faux wall cast: same 15:20 vector at ~0.4× (thin module), lighter blur */
+  --lcd-cast-offset-x: 6px;
+  --lcd-cast-offset-y: 8px;
+  --lcd-cast-offset-x-drag: 10px;
+  --lcd-cast-offset-y-drag: 14px;
+  --lcd-cast-blur: 7px;
+  --lcd-cast-blur-drag: 11px;
+  --lcd-cast-opacity: 0.16;
+  --lcd-cast-opacity-drag: 0.22;
 }
 
 /* Cork “shop floor” behind the portal — matches site .board grain (reference mock). */
@@ -551,7 +565,7 @@
   box-shadow:
     inset 1px 2px 1px rgba(255, 255, 255, 0.2),
     inset -1px -2px 2px rgba(0, 0, 0, 0.4),
-    15px 20px 30px rgba(0, 0, 0, 0.12);
+    var(--pegboard-card-shadow-rest);
   transition: box-shadow 0.38s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
 }
@@ -560,7 +574,7 @@
   box-shadow:
     inset 1px 2px 1px rgba(255, 255, 255, 0.2),
     inset -1px -2px 2px rgba(0, 0, 0, 0.4),
-    25px 35px 45px rgba(0, 0, 0, 0.25);
+    var(--pegboard-card-shadow-drag);
 }
 
 .peg-clipboard-spec-svg {
@@ -570,6 +584,7 @@
   z-index: 30;
   transform: translateX(-50%);
   pointer-events: none;
+  filter: var(--pegboard-spec-svg-drop);
 }
 
 .peg-clipboard-mount {
@@ -831,7 +846,7 @@
   transform-origin: top center;
 }
 
-/* Same inset + 3D tilt as .lcd-hardware__tilt; skew was fighting rotateX */
+/* Same inset + 3D tilt as .lcd-hardware__tilt; cast vector = --pegboard-card-shadow * ~0.4 */
 .lcd-shadow-base {
   position: absolute;
   top: 10px;
@@ -840,57 +855,23 @@
   left: 10px;
   z-index: 0;
   border-radius: 4px;
-  /* Upper-left key light: cast falls sideways + slightly down; hinge (top) stays faint */
-  background: linear-gradient(
-    155deg,
-    rgba(5, 11, 20, 0.12) 0%,
-    rgba(5, 11, 20, 0.55) 48%,
-    rgba(5, 11, 20, 1) 100%
-  );
-  opacity: 0.22;
-  /* Softer than 7px so the cast reads like diffuse light, not a crisp plate */
-  filter: blur(11px);
-  /* Emphasize translateX over Y so it reads on the pegboard plane, not only “under” the panel */
-  transform: perspective(1000px) rotateX(4deg) translate(18px, 4px);
+  background: #050b14;
+  opacity: var(--lcd-cast-opacity, 0.16);
+  filter: blur(var(--lcd-cast-blur, 7px));
+  transform: perspective(1000px) rotateX(4deg)
+    translate(var(--lcd-cast-offset-x, 6px), var(--lcd-cast-offset-y, 8px));
   transform-origin: top center;
   transition:
     filter 0.38s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.38s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
-  -webkit-mask-image:
-    radial-gradient(
-      circle at 20px calc(100% - 28px),
-      transparent 10px,
-      black 10.5px
-    ),
-    radial-gradient(
-      circle at calc(100% - 20px) calc(100% - 28px),
-      transparent 10px,
-      black 10.5px
-    );
-  -webkit-mask-size: 51% 100%, 51% 100%;
-  -webkit-mask-position: left bottom, right bottom;
-  -webkit-mask-repeat: no-repeat;
-  mask-image:
-    radial-gradient(
-      circle at 20px calc(100% - 28px),
-      transparent 10px,
-      black 10.5px
-    ),
-    radial-gradient(
-      circle at calc(100% - 20px) calc(100% - 28px),
-      transparent 10px,
-      black 10.5px
-    );
-  mask-size: 51% 100%, 51% 100%;
-  mask-position: left bottom, right bottom;
-  mask-repeat: no-repeat;
 }
 
 .lcd-hardware--dragging .lcd-shadow-base {
-  filter: blur(19px);
-  opacity: 0.32;
-  transform: perspective(1000px) rotateX(4deg) scale(1.05) translate(26px, 10px);
+  opacity: var(--lcd-cast-opacity-drag, 0.22);
+  filter: blur(var(--lcd-cast-blur-drag, 11px));
+  transform: perspective(1000px) rotateX(4deg) scale(1.05)
+    translate(var(--lcd-cast-offset-x-drag, 10px), var(--lcd-cast-offset-y-drag, 14px));
 }
 
 .lcd-pcb {
@@ -1196,12 +1177,12 @@
   width: 100%;
   height: 100%;
   border-radius: 4px;
-  box-shadow: 15px 20px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--pegboard-card-shadow-rest);
   transition: box-shadow 0.38s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .blueprint-card--dragging {
-  box-shadow: 25px 35px 45px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--pegboard-card-shadow-drag);
 }
 
 @media (prefers-reduced-motion: reduce) {
