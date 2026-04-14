@@ -840,11 +840,18 @@
   left: 10px;
   z-index: 0;
   border-radius: 4px;
-  background: #050b14;
-  opacity: 0.2;
+  /* Upper-left key light: cast falls sideways + slightly down; hinge (top) stays faint */
+  background: linear-gradient(
+    155deg,
+    rgba(5, 11, 20, 0.12) 0%,
+    rgba(5, 11, 20, 0.55) 48%,
+    rgba(5, 11, 20, 1) 100%
+  );
+  opacity: 0.22;
   /* Softer than 7px so the cast reads like diffuse light, not a crisp plate */
   filter: blur(11px);
-  transform: perspective(1000px) rotateX(4deg) translate(6px, 10px);
+  /* Emphasize translateX over Y so it reads on the pegboard plane, not only “under” the panel */
+  transform: perspective(1000px) rotateX(4deg) translate(18px, 4px);
   transform-origin: top center;
   transition:
     filter 0.38s cubic-bezier(0.4, 0, 0.2, 1),
@@ -882,8 +889,8 @@
 
 .lcd-hardware--dragging .lcd-shadow-base {
   filter: blur(19px);
-  opacity: 0.3;
-  transform: perspective(1000px) rotateX(4deg) scale(1.05) translate(15px, 20px);
+  opacity: 0.32;
+  transform: perspective(1000px) rotateX(4deg) scale(1.05) translate(26px, 10px);
 }
 
 .lcd-pcb {
