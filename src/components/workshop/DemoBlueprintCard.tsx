@@ -22,8 +22,8 @@ export default function DemoBlueprintCard({
         <div className="blueprint-hardware" aria-hidden>
           <span className="blueprint-peg blueprint-peg--tl" />
           <span className="blueprint-peg blueprint-peg--tr" />
-          <span className="blueprint-hook blueprint-hook--tl" />
-          <span className="blueprint-hook blueprint-hook--tr" />
+          <span className="blueprint-hook blueprint-hook--tl straight-hook" />
+          <span className="blueprint-hook blueprint-hook--tr straight-hook" />
         </div>
 
         <div className="blueprint-body">
