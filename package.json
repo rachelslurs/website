@@ -14,6 +14,7 @@
     "cz": "cz",
     "prepare": "husky install",
     "lint": "eslint .",
+    "check": "astro check",
     "perf:report": "node scripts/perf-baseline.mjs",
     "perf:baseline": "npm run build && npm run perf:report"
   },
