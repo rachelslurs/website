@@ -841,7 +841,8 @@
   border-radius: 4px;
   background: #050b14;
   opacity: 0.2;
-  filter: blur(7px);
+  /* Softer than 7px so the cast reads like diffuse light, not a crisp plate */
+  filter: blur(11px);
   transform: translate(6px, 10px) skewX(2.5deg) scaleY(1.01);
   transform-origin: top left;
   transition:
@@ -879,7 +880,7 @@
 }
 
 .lcd-hardware--dragging .lcd-shadow-base {
-  filter: blur(15px);
+  filter: blur(19px);
   opacity: 0.3;
   transform: translate(15px, 20px) scale(1.02);
 }
@@ -972,7 +973,8 @@
   border: 1px solid #334155;
   background: #1e293b;
   box-shadow:
-    3px 6px 12px rgba(0, 0, 0, 0.6),
+    4px 10px 22px rgba(0, 0, 0, 0.45),
+    2px 4px 10px rgba(0, 0, 0, 0.35),
     inset 1px 2px 2px rgba(255, 255, 255, 0.1);
 }
 
@@ -1042,8 +1044,9 @@
   border: 3px solid #020617;
   background: linear-gradient(145deg, #0f172a 0%, #000 100%);
   box-shadow:
-    inset 2px 4px 10px rgba(0, 0, 0, 0.8),
-    1px 1px 0 rgba(255, 255, 255, 0.05);
+    inset 2px 5px 14px rgba(0, 0, 0, 0.62),
+    inset 0 0 22px rgba(0, 0, 0, 0.38),
+    1px 2px 2px rgba(255, 255, 255, 0.045);
 }
 
 .lcd-screen-stage__scanlines {
