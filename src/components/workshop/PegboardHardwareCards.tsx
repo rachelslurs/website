@@ -187,10 +187,12 @@ export function LinkLcdCard({
           <div className="lcd-slate">
             <div className="lcd-slate__chrome">
               <div className="lcd-slate__top">
-                <span className="lcd-chip-label">{chipLabel}</span>
+                <span className="lcd-chip-label font-mono text-[10px] font-bold uppercase tracking-[1.5px]">
+                  {chipLabel}
+                </span>
                 <a
                   href={item.href}
-                  className="lcd-see-external focus-outline"
+                  className="lcd-see-external focus-outline no-underline hover:no-underline font-mono text-[11px] font-bold uppercase tracking-[1.5px] text-[var(--orange)] hover:text-[var(--yellow)]"
                   {...ext}
                   onPointerDown={stopDragChain}
                   onClick={stopDragChain}
@@ -230,12 +232,16 @@ export function LinkLcdCard({
                     onPointerDown={stopDragChain}
                   >
                     <PlayIcon className="lcd-play-trigger__icon" aria-hidden />
-                    <span className="lcd-play-trigger__label">Play</span>
+                    <span className="lcd-play-trigger__label font-mono text-[10px] font-bold uppercase tracking-[1.5px]">
+                      Play
+                    </span>
                   </button>
                 ) : null}
               </div>
               <div className="lcd-headline">
-                <span className="lcd-headline__text">{item.title}</span>
+                <span className="lcd-headline__text font-heading text-center text-[13px] font-medium uppercase leading-tight tracking-[0.06em] text-[#f8fafc]">
+                  {item.title}
+                </span>
               </div>
             </div>
           </div>
