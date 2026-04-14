@@ -77,7 +77,7 @@ export default function PegCard({
   const whileDrag = isClipboard
     ? { scale: 1.01, zIndex: 50 }
     : isLcd
-      ? { scale: 1.02, zIndex: 45 }
+      ? { scale: 1.05, zIndex: 45 }
       : isBlueprint
         ? { scale: 1.02, zIndex: 50 }
         : { scale: 1, zIndex: 40 };

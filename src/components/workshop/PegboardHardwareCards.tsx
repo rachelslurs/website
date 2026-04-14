@@ -82,7 +82,7 @@ export function CaseStudyClipboard({
           opacity="0.8"
         />
       </svg>
-      <span className="peg-clipboard-eyelet-hook" aria-hidden />
+      <span className="peg-clipboard-eyelet-hook straight-hook" aria-hidden />
       <div className="peg-clipboard__papers">
         <div className="peg-clipboard__paper-back" aria-hidden />
         <div className="peg-clipboard__paper-front">
@@ -229,8 +229,12 @@ export function LinkLcdCard({ item }: { item: PegboardCardDTO }) {
           </div>
         </div>
       </div>
-      <span className="lcd-mount-hook lcd-mount-hook--l" aria-hidden />
-      <span className="lcd-mount-hook lcd-mount-hook--r" aria-hidden />
+      <span className="lcd-mount-hook lcd-mount-hook--l" aria-hidden>
+        <span className="straight-hook" />
+      </span>
+      <span className="lcd-mount-hook lcd-mount-hook--r" aria-hidden>
+        <span className="straight-hook" />
+      </span>
     </div>
   );
 }
