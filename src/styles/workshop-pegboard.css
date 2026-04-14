@@ -831,32 +831,33 @@
   transform-origin: top center;
 }
 
+/* Same inset + 3D tilt as .lcd-hardware__tilt; skew was fighting rotateX */
 .lcd-shadow-base {
   position: absolute;
-  top: 12px;
-  right: 16px;
+  top: 10px;
+  right: 10px;
   bottom: 30px;
-  left: 16px;
+  left: 10px;
   z-index: 0;
   border-radius: 4px;
   background: #050b14;
   opacity: 0.2;
   /* Softer than 7px so the cast reads like diffuse light, not a crisp plate */
   filter: blur(11px);
-  transform: translate(6px, 10px) skewX(2.5deg) scaleY(1.01);
-  transform-origin: top left;
+  transform: perspective(1000px) rotateX(4deg) translate(6px, 10px);
+  transform-origin: top center;
   transition:
     filter 0.38s cubic-bezier(0.4, 0, 0.2, 1),
     opacity 0.38s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
   -webkit-mask-image:
     radial-gradient(
-      circle at 14px calc(100% - 28px),
+      circle at 20px calc(100% - 28px),
       transparent 10px,
       black 10.5px
     ),
     radial-gradient(
-      circle at calc(100% - 14px) calc(100% - 28px),
+      circle at calc(100% - 20px) calc(100% - 28px),
       transparent 10px,
       black 10.5px
     );
@@ -865,12 +866,12 @@
   -webkit-mask-repeat: no-repeat;
   mask-image:
     radial-gradient(
-      circle at 14px calc(100% - 28px),
+      circle at 20px calc(100% - 28px),
       transparent 10px,
       black 10.5px
     ),
     radial-gradient(
-      circle at calc(100% - 14px) calc(100% - 28px),
+      circle at calc(100% - 20px) calc(100% - 28px),
       transparent 10px,
       black 10.5px
     );
@@ -882,7 +883,7 @@
 .lcd-hardware--dragging .lcd-shadow-base {
   filter: blur(19px);
   opacity: 0.3;
-  transform: translate(15px, 20px) scale(1.02);
+  transform: perspective(1000px) rotateX(4deg) scale(1.05) translate(15px, 20px);
 }
 
 .lcd-pcb {
