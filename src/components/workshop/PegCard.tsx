@@ -50,6 +50,7 @@ export default function PegCard({
   const draggingRef = useRef(false);
   const dragOrigin = useRef({ x: 0, y: 0 });
   const [clipboardDragVisual, setClipboardDragVisual] = useState(false);
+  const [lcdDragVisual, setLcdDragVisual] = useState(false);
   const [blueprintDragVisual, setBlueprintDragVisual] = useState(false);
 
   const isClipboard = item.hardware === "clipboard";
@@ -95,7 +96,7 @@ export default function PegCard({
         className="peg-card__inner peg-card__inner--lcd"
         style={{ width: w, height: h, position: "relative" }}
       >
-        <LinkLcdCard item={item} />
+        <LinkLcdCard item={item} dragVisual={lcdDragVisual} />
       </div>
     ) : (
       <div
@@ -155,6 +156,7 @@ export default function PegCard({
         draggingRef.current = true;
         dragOrigin.current = { x: rawX.get(), y: rawY.get() };
         if (isClipboard) setClipboardDragVisual(true);
+        if (isLcd) setLcdDragVisual(true);
         if (isBlueprint) setBlueprintDragVisual(true);
       }}
       onDragEnd={(_e, info) => {
@@ -183,6 +185,7 @@ export default function PegCard({
         const finishDrag = () => {
           draggingRef.current = false;
           if (isClipboard) setClipboardDragVisual(false);
+          if (isLcd) setLcdDragVisual(false);
           if (isBlueprint) setBlueprintDragVisual(false);
         };
         if (hit) {
