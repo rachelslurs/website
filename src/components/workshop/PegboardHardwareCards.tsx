@@ -27,6 +27,12 @@ export function CaseStudyClipboard({
     <div
       className={`masonite-bg ${dragVisual ? "peg-clipboard--dragging" : ""}`}
     >
+      <span
+        className="peg-clipboard-hook__shaft straight-hook__shaft"
+        aria-hidden
+      >
+        <span className="straight-hook__spec" aria-hidden />
+      </span>
       <svg
         width={240}
         height={100}
@@ -64,25 +70,8 @@ export function CaseStudyClipboard({
           fill={`url(#${metalId})`}
           fillRule="evenodd"
         />
-        <circle
-          cx="120"
-          cy="30"
-          r="14"
-          fill="none"
-          stroke={`url(#${metalId})`}
-          strokeWidth="4"
-        />
-        <circle
-          cx="120"
-          cy="30"
-          r="16"
-          fill="none"
-          stroke="#cbd5e1"
-          strokeWidth="1"
-          opacity="0.8"
-        />
       </svg>
-      <span className="peg-clipboard-eyelet-hook straight-hook" aria-hidden />
+      <span className="peg-clipboard-hook__rim" aria-hidden />
       <div className="peg-clipboard__papers">
         <div className="peg-clipboard__paper-back" aria-hidden />
         <div className="peg-clipboard__paper-front">
@@ -230,10 +219,20 @@ export function LinkLcdCard({ item }: { item: PegboardCardDTO }) {
         </div>
       </div>
       <span className="lcd-mount-hook lcd-mount-hook--l" aria-hidden>
-        <span className="straight-hook" />
+        <span className="straight-hook">
+          <span className="straight-hook__shaft">
+            <span className="straight-hook__spec" aria-hidden />
+          </span>
+          <span className="straight-hook__j" aria-hidden />
+        </span>
       </span>
       <span className="lcd-mount-hook lcd-mount-hook--r" aria-hidden>
-        <span className="straight-hook" />
+        <span className="straight-hook">
+          <span className="straight-hook__shaft">
+            <span className="straight-hook__spec" aria-hidden />
+          </span>
+          <span className="straight-hook__j" aria-hidden />
+        </span>
       </span>
     </div>
   );
