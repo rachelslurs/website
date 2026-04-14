@@ -827,7 +827,7 @@
 }
 
 .lcd-hardware__tilt--dragging {
-  transform: scale(1.05);
+  transform: perspective(1000px) rotateX(4deg) scale(1.05);
   transform-origin: top center;
 }
 
@@ -999,12 +999,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: ui-monospace, monospace;
-  font-size: 10px;
-  font-weight: 600;
   line-height: 1.2;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: #94a3b8;
 }
 
@@ -1015,17 +1010,11 @@
   gap: 4px;
   margin: -10px;
   padding: 10px;
-  font-family: ui-monospace, monospace;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
   text-decoration: none;
-  color: var(--orange);
 }
 
 .peg-card__inner a.lcd-see-external:hover {
-  color: var(--yellow);
+  text-decoration: none;
 }
 
 .lcd-see-external__icon {
@@ -1111,11 +1100,6 @@
 }
 
 .lcd-play-trigger__label {
-  font-family: ui-monospace, monospace;
-  font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
   color: var(--pink);
   transition: color 0.15s ease;
 }
@@ -1126,17 +1110,6 @@
   align-items: center;
   justify-content: center;
   padding: 0 4px;
-}
-
-.lcd-headline__text {
-  font-family: var(--font-sans, system-ui, sans-serif);
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.2;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #f8fafc;
 }
 
 .lcd-mount-hook {
