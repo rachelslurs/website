@@ -1195,7 +1195,7 @@
 
 /* Blueprint demo cards — shadow system (physical layers):
    1) Main card: soft Z-axis drop shadow (rest ↔ drag).
-   2) Paper layer .blueprint-bg::before: die-cut holes via mask + inset hole depth + rim highlight.
+   2) .blueprint-hole-depth: inset + rim only on hole-sized discs (below masked paper).
    3) .mech-switch: hard plastic switch shadow + translate on press. */
 
 .peg-card__inner--blueprint {
@@ -1270,10 +1270,31 @@
   mask-size: 51% 100%, 51% 100%;
   mask-position: left, right;
   mask-repeat: no-repeat;
-  /* 2) Die-cut peg holes: hole depth + rim highlight (masked paper layer) */
+}
+
+/* 2) Die-cut peg holes — depth only at hole openings (sits under masked paper, z-index 8) */
+.blueprint-hole-depth {
+  position: absolute;
+  z-index: 8;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  pointer-events: none;
   box-shadow:
     inset 2px 4px 5px rgba(0, 0, 0, 0.8),
     1px 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.blueprint-hole-depth--tl {
+  top: 30px;
+  left: 30px;
+  transform: translate(-50%, -50%);
+}
+
+.blueprint-hole-depth--tr {
+  top: 30px;
+  right: 30px;
+  transform: translate(50%, -50%);
 }
 
 .blueprint-hardware {
