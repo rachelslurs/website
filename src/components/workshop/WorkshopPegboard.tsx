@@ -1,5 +1,6 @@
 import DymoLabel from "@components/riso/DymoLabel";
 import {
+  ArrowTopRightOnSquareIcon,
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -229,29 +230,105 @@ function CaseStudyClipboard({
 
 function LinkLcdCard({ item }: { item: PegboardCardDTO }) {
   const ext = externalLinkProps(item.href);
+  const chipLabel = (item.subtitle ?? "").trim() || "Link";
+  const gifSrc = item.gifLink;
+  const [gifPlaying, setGifPlaying] = useState(false);
+
+  useEffect(() => {
+    if (!gifSrc || typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => {
+      setGifPlaying(!mq.matches);
+    };
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, [gifSrc]);
+
+  const openVideoUrl = () => {
+    if (typeof window === "undefined") return;
+    window.open(item.href, ext.target ?? "_blank", "noopener,noreferrer");
+  };
+
+  const handlePlay = (e: MouseEvent<HTMLButtonElement>) => {
+    stopDragChain(e);
+    if (gifSrc) {
+      setGifPlaying(true);
+    } else {
+      openVideoUrl();
+    }
+  };
+
   return (
     <div className="lcd-hardware">
       <div className="lcd-hardware__tilt">
         <div className="lcd-shadow-base" aria-hidden />
         <div className="lcd-pcb">
+          <div className="lcd-pcb__substrate" aria-hidden>
+            <div className="lcd-pcb__pin-strip">
+              {Array.from({ length: 16 }, (_, i) => (
+                <span key={i} className="lcd-pcb__pin" />
+              ))}
+            </div>
+          </div>
           <div className="lcd-slate">
-            <a
-              href={item.href}
-              className="lcd-screen-link"
-              {...ext}
-              onPointerDown={stopDragChain}
-              onClick={stopDragChain}
-            >
-              <span className="lcd-see-video-hit">See video</span>
-            </a>
-            <div className="lcd-meta-row">
-              <strong>{item.title}</strong>
-              {item.subtitle ? <span>{item.subtitle}</span> : null}
-              <span>{item.dateLabel}</span>
+            <div className="lcd-slate__chrome">
+              <div className="lcd-slate__top">
+                <span className="lcd-chip-label">{chipLabel}</span>
+                <a
+                  href={item.href}
+                  className="lcd-see-external focus-outline"
+                  {...ext}
+                  onPointerDown={stopDragChain}
+                  onClick={stopDragChain}
+                >
+                  <span>See video</span>
+                  <ArrowTopRightOnSquareIcon
+                    className="lcd-see-external__icon"
+                    aria-hidden
+                  />
+                </a>
+              </div>
+              <div className="lcd-screen-stage">
+                {!(gifPlaying && gifSrc) ? (
+                  <span className="lcd-screen-stage__scanlines" aria-hidden />
+                ) : null}
+                {gifPlaying && gifSrc ? (
+                  <img
+                    src={gifSrc}
+                    alt=""
+                    className="lcd-screen-gif"
+                    loading="eager"
+                    decoding="async"
+                  />
+                ) : null}
+                {!gifPlaying ? (
+                  <button
+                    type="button"
+                    className="lcd-play-trigger focus-outline"
+                    aria-label={
+                      gifSrc
+                        ? `Play animated preview for ${item.title}`
+                        : `Open video for ${item.title}`
+                    }
+                    onClick={handlePlay}
+                    onPointerDown={stopDragChain}
+                  >
+                    <PlayIcon className="lcd-play-trigger__icon" aria-hidden />
+                    <span className="lcd-play-trigger__label">Play</span>
+                  </button>
+                ) : null}
+              </div>
+              <div className="lcd-headline">
+                <span className="lcd-headline__text">{item.title}</span>
+              </div>
+              <p className="lcd-date-line">{item.dateLabel}</p>
             </div>
           </div>
         </div>
       </div>
+      <span className="lcd-mount-hook lcd-mount-hook--l" aria-hidden />
+      <span className="lcd-mount-hook lcd-mount-hook--r" aria-hidden />
     </div>
   );
 }
@@ -608,8 +685,8 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     w: number;
     h: number;
   } | null>(null);
-  const [mobileAtStart, setMobileAtStart] = useState(true);
-  const [mobileAtEnd, setMobileAtEnd] = useState(false);
+  /** Mobile column: panel index at ends, or -1 when mid-scroll (reference: both nav buttons stay enabled). */
+  const [mobilePanelIdx, setMobilePanelIdx] = useState(0);
 
   const layoutW = layoutSize?.w ?? vw;
   const layoutH = layoutSize?.h ?? vh;
@@ -651,9 +728,19 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     const el = mobileScrollRef.current;
     if (!el) return;
     const { scrollTop, scrollHeight, clientHeight } = el;
-    setMobileAtStart(scrollTop <= 10);
-    setMobileAtEnd(Math.ceil(scrollTop + clientHeight) >= scrollHeight - 10);
-  }, []);
+    const atTop = scrollTop <= 10;
+    const atBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight - 10;
+    const n = panels.length;
+    if (atTop && atBottom) {
+      setMobilePanelIdx(-1);
+    } else if (atTop) {
+      setMobilePanelIdx(0);
+    } else if (atBottom) {
+      setMobilePanelIdx(Math.max(0, n - 1));
+    } else {
+      setMobilePanelIdx(-1);
+    }
+  }, [panels.length]);
 
   useEffect(() => {
     syncScrollIndex();
@@ -696,11 +783,9 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     });
   }, []);
 
-  /* Mobile nav: edge-only disabled (top/bottom of column); mid-scroll keeps both buttons enabled. */
-
   if (panels.length === 0) {
     return (
-      <div className="workshop-pegboard-root workshop-fullbleed workshop-wall not-prose">
+      <div className="workshop-pegboard-root workshop-wall not-prose w-full min-w-0">
         <div className="portal-frame">
           <div className="portal-inner flex min-h-[12rem] items-center justify-center">
             <p className="font-body text-sm text-slate-400">
@@ -722,8 +807,16 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
         </div>
       );
     }
+    const slabClass = [
+      "workshop-panel--mobile",
+      "workshop-panel--mobile-slab",
+      i === 0 ? "workshop-panel--mobile-slab--first" : "",
+      i === panels.length - 1 ? "workshop-panel--mobile-slab--last" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
     mobileBlocks.push(
-      <div key={`panel-${i}`} className="workshop-panel--mobile">
+      <div key={`panel-${i}`} className={slabClass}>
         <PegboardPanelView
           key={panel.items.map(x => x.id).join("|")}
           items={panel.items}
@@ -739,11 +832,13 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
 
   const atFirst = activePanelIndex <= 0;
   const atLast = activePanelIndex >= panels.length - 1;
-  const navDisabledPrev = isMobile ? mobileAtStart : atFirst;
-  const navDisabledNext = isMobile ? mobileAtEnd : atLast;
+  const navDisabledPrev = isMobile ? mobilePanelIdx === 0 : atFirst;
+  const navDisabledNext = isMobile
+    ? mobilePanelIdx === panels.length - 1
+    : atLast;
 
   return (
-    <div className="workshop-pegboard-root workshop-fullbleed workshop-wall not-prose">
+    <div className="workshop-pegboard-root workshop-wall not-prose w-full min-w-0">
       <div className="portal-frame">
         <div ref={portalInnerRef} className="portal-inner">
           <div className="shadowbox-portal" aria-hidden />
