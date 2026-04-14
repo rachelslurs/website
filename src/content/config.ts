@@ -59,6 +59,17 @@ const work = defineCollection({
     }),
 });
 
+const demoPegboardIcon = z.enum([
+  "terminal",
+  "cpu",
+  "code",
+  "link",
+  "monitor",
+  "zap",
+  "database",
+  "wrench",
+]);
+
 const demos = defineCollection({
   type: "content_layer",
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/demos" }),
@@ -78,6 +89,8 @@ const demos = defineCollection({
         .optional(),
       description: z.string().optional(),
       summary: z.string().optional(),
+      /** Workshop pegboard: which Heroicon to show on the blueprint card */
+      pegboardIcon: demoPegboardIcon.optional(),
       canonicalURL: z.string().optional(),
     }),
 });

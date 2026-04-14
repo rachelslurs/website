@@ -7,8 +7,8 @@ import {
   ChevronUpIcon,
   PlayIcon,
   TvIcon,
-  WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
+import DemoBlueprintCard from "@components/workshop/DemoBlueprintCard";
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import {
   useCallback,
@@ -34,6 +34,7 @@ import {
   resolveLayoutAfterResize,
   snapToGrid,
 } from "@utils/workshopPegboardPhysics";
+import { externalLinkProps, stopDragChain } from "./pegboardCardUtils";
 
 import "../../styles/workshop-pegboard.css";
 
@@ -52,10 +53,6 @@ type CardSpec = {
   w: number;
   h: number;
 };
-
-function stopDragChain(e: MouseEvent | PointerEvent) {
-  e.stopPropagation();
-}
 
 function useViewportPegboard() {
   const [vw, setVw] = useState(1024);
@@ -98,13 +95,6 @@ function mobileInnerW(vw: number): number {
 
 function mobileViewportInnerH(vh: number): number {
   return Math.floor((vh - 80) / PEG_GRID) * PEG_GRID;
-}
-
-function externalLinkProps(href: string) {
-  if (href.startsWith("http")) {
-    return { target: "_blank" as const, rel: "noreferrer" as const };
-  }
-  return {};
 }
 
 function CaseStudyClipboard({
@@ -329,59 +319,6 @@ function LinkLcdCard({ item }: { item: PegboardCardDTO }) {
       </div>
       <span className="lcd-mount-hook lcd-mount-hook--l" aria-hidden />
       <span className="lcd-mount-hook lcd-mount-hook--r" aria-hidden />
-    </div>
-  );
-}
-
-function DemoBlueprintCard({
-  item,
-  dragVisual,
-}: {
-  item: PegboardCardDTO;
-  dragVisual: boolean;
-}) {
-  const ext = externalLinkProps(item.href);
-  const accent = item.subtitleColor ?? "var(--blue)";
-
-  return (
-    <div
-      className={`blueprint-card ${dragVisual ? "blueprint-card--dragging" : ""}`}
-    >
-      <div className="blueprint-bg blueprint-mask">
-        <span className="blueprint-hook blueprint-hook--tl" aria-hidden />
-        <span className="blueprint-hook blueprint-hook--tr" aria-hidden />
-        <div className="blueprint-body">
-          <div className="blueprint-icon-recess" aria-hidden>
-            <WrenchScrewdriverIcon />
-          </div>
-          <a
-            href={item.href}
-            className="blueprint-title"
-            {...ext}
-            onPointerDown={stopDragChain}
-            onClick={stopDragChain}
-          >
-            {item.title}
-          </a>
-          {item.subtitle ? (
-            <p className="blueprint-subtitle" style={{ color: accent }}>
-              {item.subtitle}
-            </p>
-          ) : null}
-          {item.description ? (
-            <p className="blueprint-desc">{item.description}</p>
-          ) : null}
-          <a
-            href={item.href}
-            className="mech-switch"
-            {...ext}
-            onPointerDown={stopDragChain}
-            onClick={stopDragChain}
-          >
-            Open demo
-          </a>
-        </div>
-      </div>
     </div>
   );
 }
