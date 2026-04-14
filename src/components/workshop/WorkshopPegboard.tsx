@@ -19,7 +19,7 @@ import {
   useRef,
   useState,
 } from "react";
-import type { MouseEvent, PointerEvent, ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 import type {
   PegboardCardDTO,
   PegboardPanelDTO,
@@ -57,25 +57,20 @@ type CardSpec = {
 function useViewportPegboard() {
   const [vw, setVw] = useState(1024);
   const [vh, setVh] = useState(768);
-  const [isMobile, setIsMobile] = useState(false);
 
   useIsoLayoutEffect(() => {
     function read() {
       setVw(window.innerWidth);
       setVh(window.innerHeight);
-      setIsMobile(window.matchMedia("(max-width: 767px)").matches);
     }
     read();
     window.addEventListener("resize", read);
-    const mq = window.matchMedia("(max-width: 767px)");
-    mq.addEventListener("change", read);
     return () => {
       window.removeEventListener("resize", read);
-      mq.removeEventListener("change", read);
     };
   }, []);
 
-  return { vw, vh, isMobile };
+  return { vw, vh };
 }
 
 function desktopInnerW(vw: number): number {
@@ -335,7 +330,8 @@ function PegCard({
   specs,
   positions,
   dragDisabled,
-  screenWidth,
+  availableWidth,
+  mobileFlexStack,
   onDragCommit,
 }: {
   item: PegboardCardDTO;
@@ -348,7 +344,10 @@ function PegCard({
   specs: CardSpec[];
   positions: Record<string, { x: number; y: number }>;
   dragDisabled: boolean;
-  screenWidth: number;
+  /** Portal / container width for shrink-to-fit (not hardware width). */
+  availableWidth: number;
+  /** Mobile column: flex stack without absolute grid. */
+  mobileFlexStack?: boolean;
   onDragCommit: (id: string, nx: number, ny: number) => void;
 }) {
   const rawX = useMotionValue(x);
@@ -378,12 +377,14 @@ function PegCard({
 
   const padding = 32;
   const scaleFactor =
-    dragDisabled && screenWidth < w + padding ? (screenWidth - padding) / w : 1;
+    dragDisabled && availableWidth < w + padding
+      ? (availableWidth - padding) / w
+      : 1;
 
   const whileDrag = isClipboard
     ? { scale: 1.01, zIndex: 50 }
     : isLcd
-      ? { scale: 1.05, zIndex: 45 }
+      ? { scale: 1.02, zIndex: 45 }
       : isBlueprint
         ? { scale: 1.02, zIndex: 50 }
         : { scale: 1, zIndex: 40 };
@@ -423,13 +424,18 @@ function PegCard({
     .join(" ");
 
   if (dragDisabled) {
+    const stack = mobileFlexStack === true;
     return (
       <div
-        className={rootClass}
+        className={[rootClass, stack ? "peg-card--mobile-stack" : ""]
+          .filter(Boolean)
+          .join(" ")}
         style={{
           width: w,
           height: h,
-          transform: `translate(${x}px, ${y}px) scale(${scaleFactor})`,
+          transform: stack
+            ? `scale(${scaleFactor})`
+            : `translate(${x}px, ${y}px) scale(${scaleFactor})`,
           transformOrigin: "top center",
           marginBottom: `${-h * (1 - scaleFactor)}px`,
         }}
@@ -517,28 +523,74 @@ function PegCard({
   );
 }
 
-function PegboardPanelView({
+function PegboardPanelMobile({
   items,
-  isMobile,
+  vw,
+  layoutWidth,
+}: {
+  items: PegboardCardDTO[];
+  vw: number;
+  layoutWidth?: number;
+}) {
+  const w = layoutWidth ?? vw;
+  const innerW = mobileInnerW(w);
+  const noopCommit = useCallback(() => {}, []);
+  const emptySpecs = useMemo<CardSpec[]>(() => [], []);
+  const emptyPositions = useMemo(() => ({}), []);
+
+  return (
+    <div
+      className="pegboard-bg pegboard-bg--mobile-flow"
+      style={{ width: innerW, minHeight: "8rem" }}
+    >
+      <span className="heavy-screw heavy-screw--tl" aria-hidden />
+      <span className="heavy-screw heavy-screw--tr" aria-hidden />
+      <span className="heavy-screw heavy-screw--bl" aria-hidden />
+      <span className="heavy-screw heavy-screw--br" aria-hidden />
+      <div className="pegboard-mobile-stack">
+        {items.map(it => {
+          const { w: cw, h } = hardwareDims(it.hardware);
+          return (
+            <PegCard
+              key={it.id}
+              item={it}
+              x={0}
+              y={0}
+              w={cw}
+              h={h}
+              innerW={innerW}
+              innerH={0}
+              specs={emptySpecs}
+              positions={emptyPositions}
+              dragDisabled
+              availableWidth={innerW}
+              mobileFlexStack
+              onDragCommit={noopCommit}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function PegboardPanelDesktop({
+  items,
   vw,
   vh,
   layoutWidth,
   layoutHeight,
 }: {
   items: PegboardCardDTO[];
-  isMobile: boolean;
   vw: number;
   vh: number;
-  /** When set (e.g. from portal-inner ResizeObserver), drives grid size instead of window. */
   layoutWidth?: number;
   layoutHeight?: number;
 }) {
   const w = layoutWidth ?? vw;
   const h = layoutHeight ?? vh;
-  const innerW = isMobile ? mobileInnerW(w) : desktopInnerW(w);
-  const viewportH = isMobile
-    ? mobileViewportInnerH(h)
-    : desktopViewportInnerH(h);
+  const innerW = desktopInnerW(w);
+  const viewportH = desktopViewportInnerH(h);
 
   const itemsKey = useMemo(() => items.map(i => i.id).join("|"), [items]);
 
@@ -603,8 +655,8 @@ function PegboardPanelView({
             innerH={innerH}
             specs={specs}
             positions={positions}
-            dragDisabled={isMobile}
-            screenWidth={w}
+            dragDisabled={false}
+            availableWidth={innerW}
             onDragCommit={onDragCommit}
           />
         );
@@ -613,21 +665,54 @@ function PegboardPanelView({
   );
 }
 
+function PegboardPanelView({
+  items,
+  isMobile,
+  vw,
+  vh,
+  layoutWidth,
+  layoutHeight,
+}: {
+  items: PegboardCardDTO[];
+  isMobile: boolean;
+  vw: number;
+  vh: number;
+  layoutWidth?: number;
+  layoutHeight?: number;
+}) {
+  if (isMobile) {
+    return (
+      <PegboardPanelMobile items={items} vw={vw} layoutWidth={layoutWidth} />
+    );
+  }
+  return (
+    <PegboardPanelDesktop
+      items={items}
+      vw={vw}
+      vh={vh}
+      layoutWidth={layoutWidth}
+      layoutHeight={layoutHeight}
+    />
+  );
+}
+
 export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
-  const { vw, vh, isMobile } = useViewportPegboard();
+  const { vw, vh } = useViewportPegboard();
   const portalInnerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const [activePanelIndex, setActivePanelIndex] = useState(0);
-  const [layoutSize, setLayoutSize] = useState<{
+  const [portalLayout, setPortalLayout] = useState<{
     w: number;
     h: number;
+    isMobile: boolean;
   } | null>(null);
   /** Mobile column: panel index at ends, or -1 when mid-scroll (reference: both nav buttons stay enabled). */
   const [mobilePanelIdx, setMobilePanelIdx] = useState(0);
 
-  const layoutW = layoutSize?.w ?? vw;
-  const layoutH = layoutSize?.h ?? vh;
+  const layoutW = portalLayout?.w ?? vw;
+  const layoutH = portalLayout?.h ?? vh;
+  const isMobile = portalLayout?.isMobile ?? false;
 
   const desktopInner = useMemo(() => desktopInnerW(layoutW), [layoutW]);
   const sideGap = useMemo(
@@ -639,7 +724,11 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     const el = portalInnerRef.current;
     if (!el) return;
     const apply = (width: number, height: number) => {
-      setLayoutSize({ w: width, h: height });
+      setPortalLayout({
+        w: width,
+        h: height,
+        isMobile: width <= 768,
+      });
     };
     apply(el.clientWidth, el.clientHeight);
     const ro = new ResizeObserver(entries => {
@@ -704,18 +793,24 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   }, []);
 
   const scrollMobilePrev = useCallback(() => {
-    const delta =
-      typeof window !== "undefined" ? window.innerHeight * 0.8 : 600;
-    mobileScrollRef.current?.scrollBy({
+    const el = mobileScrollRef.current;
+    const ch =
+      el?.clientHeight ??
+      (typeof window !== "undefined" ? window.innerHeight : 600);
+    const delta = ch * 0.8;
+    el?.scrollBy({
       top: -delta,
       behavior: "smooth",
     });
   }, []);
 
   const scrollMobileNext = useCallback(() => {
-    const delta =
-      typeof window !== "undefined" ? window.innerHeight * 0.8 : 600;
-    mobileScrollRef.current?.scrollBy({
+    const el = mobileScrollRef.current;
+    const ch =
+      el?.clientHeight ??
+      (typeof window !== "undefined" ? window.innerHeight : 600);
+    const delta = ch * 0.8;
+    el?.scrollBy({
       top: delta,
       behavior: "smooth",
     });
@@ -723,7 +818,10 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
 
   if (panels.length === 0) {
     return (
-      <div className="workshop-pegboard-root workshop-wall not-prose w-full min-w-0">
+      <div
+        className="workshop-pegboard-root workshop-wall not-prose w-full min-w-0"
+        data-pegboard-layout="desktop"
+      >
         <div className="portal-frame">
           <div className="portal-inner flex min-h-[12rem] items-center justify-center">
             <p className="font-body text-sm text-slate-400">
@@ -776,7 +874,10 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     : atLast;
 
   return (
-    <div className="workshop-pegboard-root workshop-wall not-prose w-full min-w-0">
+    <div
+      className="workshop-pegboard-root workshop-wall not-prose w-full min-w-0"
+      data-pegboard-layout={isMobile ? "mobile" : "desktop"}
+    >
       <div className="portal-frame">
         <div ref={portalInnerRef} className="portal-inner">
           <div className="shadowbox-portal" aria-hidden />

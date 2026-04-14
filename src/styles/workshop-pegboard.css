@@ -411,6 +411,24 @@
   right: 12px;
 }
 
+/* Mobile column: flex stack (no absolute grid) inside cork frame */
+.pegboard-bg--mobile-flow .pegboard-mobile-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+  padding: 2.5rem 0;
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+}
+
+.workshop-pegboard-root .pegboard-bg--mobile-flow .peg-card.peg-card--mobile-stack {
+  position: relative;
+  left: auto;
+  top: auto;
+}
+
 /* Hardware cards */
 .peg-card {
   position: absolute;
@@ -1380,23 +1398,28 @@
   color: rgba(26, 26, 46, 0.55);
 }
 
-@media (max-width: 767px) {
-  .metal-bracket--band {
-    display: none;
-  }
+/* Portal layout mode (React data-pegboard-layout) — not viewport media queries */
+.workshop-pegboard-root[data-pegboard-layout="mobile"] .metal-bracket--band {
+  display: none;
 }
 
-@media (min-width: 768px) {
-  .slab-seam {
-    display: none;
-  }
+.workshop-pegboard-root[data-pegboard-layout="desktop"] .slab-seam {
+  display: none;
+}
 
-  .workshop-pegboard-root .workshop-scroll--desktop-strip {
-    display: flex;
-    min-height: 0;
-  }
+.workshop-pegboard-root[data-pegboard-layout="desktop"] .workshop-scroll--desktop-strip {
+  display: flex;
+  min-height: 0;
+}
 
-  .workshop-pegboard-root .workshop-scroll--mobile {
-    display: none;
-  }
+.workshop-pegboard-root[data-pegboard-layout="desktop"] .workshop-scroll--mobile {
+  display: none;
+}
+
+.workshop-pegboard-root[data-pegboard-layout="mobile"] .workshop-scroll--desktop-strip {
+  display: none;
+}
+
+.workshop-pegboard-root[data-pegboard-layout="mobile"] .workshop-scroll--mobile {
+  display: flex;
 }
