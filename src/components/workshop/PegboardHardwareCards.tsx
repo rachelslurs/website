@@ -24,15 +24,11 @@ export function CaseStudyClipboard({
   const year = item.caseStudyYear ?? "—";
 
   return (
-    <div
-      className={`masonite-bg ${dragVisual ? "peg-clipboard--dragging" : ""}`}
-    >
-      <span
-        className="peg-clipboard-hook__shaft straight-hook__shaft"
+    <div className="peg-clipboard-root">
+      <div
+        className={`masonite-plate ${dragVisual ? "masonite-plate--dragging" : ""}`}
         aria-hidden
-      >
-        <span className="straight-hook__spec" aria-hidden />
-      </span>
+      />
       <svg
         width={240}
         height={100}
@@ -70,8 +66,22 @@ export function CaseStudyClipboard({
           fill={`url(#${metalId})`}
           fillRule="evenodd"
         />
+        <circle
+          cx="120"
+          cy="30"
+          r="14"
+          fill="none"
+          stroke={`url(#${metalId})`}
+          strokeWidth="4"
+        />
       </svg>
-      <span className="peg-clipboard-hook__rim" aria-hidden />
+      <div className="peg-clipboard-mount" aria-hidden>
+        <div className="peg-clipboard-hook-mock">
+          <div className="peg-clipboard-hook-mock__shaft">
+            <div className="peg-clipboard-hook-mock__spec" />
+          </div>
+        </div>
+      </div>
       <div className="peg-clipboard__papers">
         <div className="peg-clipboard__paper-back" aria-hidden />
         <div className="peg-clipboard__paper-front">
@@ -119,7 +129,13 @@ export function CaseStudyClipboard({
   );
 }
 
-export function LinkLcdCard({ item }: { item: PegboardCardDTO }) {
+export function LinkLcdCard({
+  item,
+  dragVisual = false,
+}: {
+  item: PegboardCardDTO;
+  dragVisual?: boolean;
+}) {
   const ext = externalLinkProps(item.href);
   const chipLabel = (item.subtitle ?? "").trim() || "Link";
   const gifSrc = item.gifLink;
@@ -151,9 +167,13 @@ export function LinkLcdCard({ item }: { item: PegboardCardDTO }) {
   };
 
   return (
-    <div className="lcd-hardware">
-      <div className="lcd-hardware__tilt">
-        <div className="lcd-shadow-base" aria-hidden />
+    <div
+      className={`lcd-hardware ${dragVisual ? "lcd-hardware--dragging" : ""}`}
+    >
+      <div className="lcd-shadow-base" aria-hidden />
+      <div
+        className={`lcd-hardware__tilt ${dragVisual ? "lcd-hardware__tilt--dragging" : ""}`}
+      >
         <div className="lcd-pcb">
           <div className="lcd-pcb__substrate" aria-hidden>
             <div className="lcd-pcb__pin-strip">
@@ -219,20 +239,16 @@ export function LinkLcdCard({ item }: { item: PegboardCardDTO }) {
         </div>
       </div>
       <span className="lcd-mount-hook lcd-mount-hook--l" aria-hidden>
-        <span className="straight-hook">
-          <span className="straight-hook__shaft">
-            <span className="straight-hook__spec" aria-hidden />
-          </span>
-          <span className="straight-hook__j" aria-hidden />
+        <span className="lcd-hook-shaft">
+          <span className="lcd-hook-shaft__spec" aria-hidden />
         </span>
+        <span className="lcd-hook-foot" aria-hidden />
       </span>
       <span className="lcd-mount-hook lcd-mount-hook--r" aria-hidden>
-        <span className="straight-hook">
-          <span className="straight-hook__shaft">
-            <span className="straight-hook__spec" aria-hidden />
-          </span>
-          <span className="straight-hook__j" aria-hidden />
+        <span className="lcd-hook-shaft">
+          <span className="lcd-hook-shaft__spec" aria-hidden />
         </span>
+        <span className="lcd-hook-foot" aria-hidden />
       </span>
     </div>
   );
