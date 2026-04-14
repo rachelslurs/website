@@ -11,6 +11,8 @@ export interface PegboardCardDTO {
   href: string;
   subtitle?: string;
   dateLabel: string;
+  /** Links (LCD): optional GIF for in-card preview; resolved to URL string. */
+  gifLink?: string;
   /** Case study clipboard: body copy (description or summary). */
   description?: string;
   caseStudyYear?: string;
@@ -21,6 +23,16 @@ export interface PegboardCardDTO {
 
 export interface PegboardPanelDTO {
   items: PegboardCardDTO[];
+}
+
+function resolveGifLink(gifLink: unknown): string | undefined {
+  if (gifLink == null) return undefined;
+  if (typeof gifLink === "string") return gifLink;
+  if (typeof gifLink === "object" && gifLink !== null && "src" in gifLink) {
+    const src = (gifLink as { src: unknown }).src;
+    return typeof src === "string" ? src : undefined;
+  }
+  return undefined;
 }
 
 function serializeItem(item: WorkshopPanelItem): PegboardCardDTO {
@@ -50,6 +62,7 @@ function serializeItem(item: WorkshopPanelItem): PegboardCardDTO {
         href: d.url,
         subtitle: d.subtitle,
         dateLabel: formatPostDate(new Date(raw)),
+        gifLink: resolveGifLink(d.gifLink),
       };
     }
     case "demos": {
