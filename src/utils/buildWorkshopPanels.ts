@@ -44,14 +44,15 @@ function sortAllQueues(
 }
 
 /**
- * Group work, links, and demos into panels of at most 4 items.
- * Per panel: next work → next link → up to 2 demos → global date backfill.
+ * Group work, links, and demos into panels of at most 3 items.
+ * Per panel: next work → next link → up to 1 demo → global date backfill.
  */
 export default function buildWorkshopPanels(
   work: CollectionEntry<"work">[],
   demos: CollectionEntry<"demos">[],
   links: CollectionEntry<"links">[]
 ): WorkshopPanel[] {
+  const MAX_ITEMS_PER_PANEL = 3;
   const workQ = [...work];
   const linkQ = [...links];
   const demoQ = [...demos];
@@ -68,13 +69,13 @@ export default function buildWorkshopPanels(
     if (linkQ.length) {
       panel.push({ kind: "links", entry: linkQ.shift()! });
     }
-    let demoSlots = Math.min(2, 4 - panel.length);
+    let demoSlots = Math.min(1, MAX_ITEMS_PER_PANEL - panel.length);
     while (demoSlots > 0 && demoQ.length) {
       panel.push({ kind: "demos", entry: demoQ.shift()! });
       demoSlots -= 1;
     }
 
-    if (panel.length < 4) {
+    if (panel.length < MAX_ITEMS_PER_PANEL) {
       const pool: Tagged[] = [
         ...workQ.map(entry => ({ kind: "work" as const, entry })),
         ...linkQ.map(entry => ({ kind: "links" as const, entry })),
@@ -85,7 +86,7 @@ export default function buildWorkshopPanels(
       linkQ.length = 0;
       demoQ.length = 0;
 
-      while (panel.length < 4 && pool.length) {
+      while (panel.length < MAX_ITEMS_PER_PANEL && pool.length) {
         panel.push(pool.shift()!);
       }
 
