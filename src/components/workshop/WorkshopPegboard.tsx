@@ -188,10 +188,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   panels.forEach((panel, i) => {
     if (i > 0) {
       mobileBlocks.push(
-        <div key={`seam-${i}`} className="slab-seam" aria-hidden>
-          <span className="heavy-screw heavy-screw--left" />
-          <span className="heavy-screw heavy-screw--right" />
-        </div>
+        <div key={`seam-${i}`} className="slab-seam" aria-hidden />
       );
     }
     const slabClass = [
@@ -251,13 +248,18 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
                   />
                   {i < panels.length - 1 ? (
                     <>
+                      {/*
+                       * Align connector bands to the pegboard corner screw centers.
+                       * Pegboard holes are centered at 30px offsets (PEG_GRID = 60).
+                       * Desktop panel padding is 2.5rem (40px).
+                       */}
                       <div
                         aria-hidden
                         className="metal-bracket--band"
                         style={{
                           width: sideGap + 80,
                           right: -(sideGap + 40),
-                          top: 98,
+                          top: 70,
                           transform: "translateY(-50%)",
                         }}
                       />
@@ -267,7 +269,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
                         style={{
                           width: sideGap + 80,
                           right: -(sideGap + 40),
-                          bottom: 98,
+                          bottom: 70,
                           transform: "translateY(50%)",
                         }}
                       />
