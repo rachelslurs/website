@@ -247,16 +247,10 @@ export function LinkLcdCard({
         </div>
       </div>
       <span className="lcd-mount-hook lcd-mount-hook--l" aria-hidden>
-        <span className="lcd-hook-shaft">
-          <span className="lcd-hook-shaft__spec" aria-hidden />
-        </span>
-        <span className="lcd-hook-foot" aria-hidden />
+        <span className="lcd-hook" />
       </span>
       <span className="lcd-mount-hook lcd-mount-hook--r" aria-hidden>
-        <span className="lcd-hook-shaft">
-          <span className="lcd-hook-shaft__spec" aria-hidden />
-        </span>
-        <span className="lcd-hook-foot" aria-hidden />
+        <span className="lcd-hook" />
       </span>
     </div>
   );
