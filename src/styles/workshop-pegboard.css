@@ -97,7 +97,8 @@
   margin-right: auto;
   display: flex;
   justify-content: center;
-  padding: 1.5rem 1rem 2rem;
+  /* Mobile uses vertical scrolling; avoid extra gaps between stacked panels. */
+  padding: 0 1rem;
   box-sizing: border-box;
 }
 
@@ -109,12 +110,10 @@
 }
 
 .workshop-panel--mobile-slab--first {
-  margin-top: 2rem;
   border-top: 8px solid #8b7355;
 }
 
 .workshop-panel--mobile-slab--last {
-  margin-bottom: 2rem;
   border-bottom: 8px solid #8b7355;
 }
 
@@ -191,6 +190,27 @@
     border-width: 8px;
     border-radius: 12px;
     padding: 24px;
+  }
+}
+
+/* Small screens: lighten portal chrome so content gets more space. */
+@media (max-width: 480px) {
+  .workshop-pegboard-root .portal-frame {
+    border-width: 4px;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow:
+      0 16px 28px -10px rgba(0, 0, 0, 0.7),
+      0 6px 12px -4px rgba(0, 0, 0, 0.5);
+  }
+
+  .workshop-pegboard-root .shadowbox-portal {
+    box-shadow:
+      inset 50px 0 90px -30px rgba(0, 0, 0, 0.6),
+      inset -50px 0 90px -30px rgba(0, 0, 0, 0.6),
+      inset 0 50px 90px -30px rgba(0, 0, 0, 0.68),
+      inset 0 -50px 90px -30px rgba(0, 0, 0, 0.68),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.035);
   }
 }
 
@@ -417,23 +437,27 @@
 }
 
 .pegboard-bg .heavy-screw--tl {
-  top: 12px;
-  left: 12px;
+  top: 30px;
+  left: 30px;
+  transform: translate(-50%, -50%);
 }
 
 .pegboard-bg .heavy-screw--tr {
-  top: 12px;
-  right: 12px;
+  top: 30px;
+  right: 30px;
+  transform: translate(50%, -50%);
 }
 
 .pegboard-bg .heavy-screw--bl {
-  bottom: 12px;
-  left: 12px;
+  bottom: 30px;
+  left: 30px;
+  transform: translate(-50%, 50%);
 }
 
 .pegboard-bg .heavy-screw--br {
-  bottom: 12px;
-  right: 12px;
+  bottom: 30px;
+  right: 30px;
+  transform: translate(50%, 50%);
 }
 
 /* Mobile column: flex stack (no absolute grid) inside cork frame */
