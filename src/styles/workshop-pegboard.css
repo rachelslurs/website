@@ -841,11 +841,6 @@
   transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.lcd-hardware__tilt--dragging {
-  transform: perspective(1000px) rotateX(4deg) scale(1.05);
-  transform-origin: top center;
-}
-
 /* Same inset + 3D tilt as .lcd-hardware__tilt; cast vector = --pegboard-card-shadow * ~0.4 */
 .lcd-shadow-base {
   position: absolute;
@@ -870,7 +865,7 @@
 .lcd-hardware--dragging .lcd-shadow-base {
   opacity: var(--lcd-cast-opacity-drag, 0.22);
   filter: blur(var(--lcd-cast-blur-drag, 11px));
-  transform: perspective(1000px) rotateX(4deg) scale(1.05)
+  transform: perspective(1000px) rotateX(4deg)
     translate(var(--lcd-cast-offset-x-drag, 10px), var(--lcd-cast-offset-y-drag, 14px));
 }
 
