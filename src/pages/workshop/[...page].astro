@@ -53,27 +53,11 @@ const layoutTitle =
 
 <Layout title={layoutTitle}>
   <Main
+    showPageHeader={false}
+    showBreadcrumbs={false}
     pageTitle="Workshop"
     pageDesc="Drag cards on the pegboard (desktop). Panels scroll horizontally; under 768px slabs stack with scale-to-fit. Paginated like the rest of the site."
   >
-    <div
-      class="not-prose mb-4 max-w-3xl font-body text-sm text-[var(--ink-muted)]"
-    >
-      <span class="text-[var(--ink-secondary)]">
-        <strong class="font-mono text-[var(--black)]">{totalEntries}</strong> entries
-      </span>
-      <span class="mx-2 opacity-40" aria-hidden>·</span>
-      work <strong class="font-mono">{workCount}</strong>
-      <span class="mx-1.5 opacity-40" aria-hidden>·</span>
-      demos <strong class="font-mono">{demoCount}</strong>
-      <span class="mx-1.5 opacity-40" aria-hidden>·</span>
-      links <strong class="font-mono">{linkCount}</strong>
-      <span class="mx-1.5 opacity-40" aria-hidden>·</span>
-      <strong class="font-mono">{page.total}</strong> panel{
-        page.total === 1 ? "" : "s"
-      } this page
-    </div>
-
     <WorkshopPegboard client:load panels={pegboardPanels} />
 
     <Pagination page={page} />

@@ -89,6 +89,19 @@
   box-sizing: border-box;
 }
 
+/* Desktop: reclaim vertical space on short viewports (no vertical scrolling). */
+@media (max-height: 820px) {
+  .workshop-panel--desktop {
+    padding: 2rem;
+  }
+}
+
+@media (max-height: 720px) {
+  .workshop-panel--desktop {
+    padding: 1.5rem;
+  }
+}
+
 .workshop-panel--mobile {
   position: relative;
   width: 92%;
@@ -255,6 +268,18 @@
   pointer-events: none;
 }
 
+@media (max-height: 720px) {
+  .workshop-pegboard-root .portal-bezel {
+    height: 56px;
+    margin-top: 10px;
+  }
+
+  .workshop-pegboard-root .workshop-panel-nav__btn {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+}
+
 @media (min-width: 640px) {
   .workshop-pegboard-root .portal-bezel {
     height: 76px;
@@ -385,6 +410,7 @@
 
 .pegboard-bg {
   position: relative;
+  z-index: 2;
   background-color: var(--cork);
   background-image: radial-gradient(
     circle at 30px 30px,

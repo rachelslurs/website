@@ -7,7 +7,7 @@ import {
 } from "@utils/workshopPegboardPhysics";
 import {
   desktopInnerW,
-  desktopViewportInnerH,
+  desktopPortalInnerH,
   mobileInnerW,
 } from "./pegboardDimensions";
 import type { PegboardCardSpec } from "./pegboardTypes";
@@ -70,17 +70,19 @@ function PegboardPanelDesktop({
   vh,
   layoutWidth,
   layoutHeight,
+  desktopPanelPadY,
 }: {
   items: PegboardCardDTO[];
   vw: number;
   vh: number;
   layoutWidth?: number;
   layoutHeight?: number;
+  desktopPanelPadY?: number;
 }) {
   const w = layoutWidth ?? vw;
   const h = layoutHeight ?? vh;
   const innerW = desktopInnerW(w);
-  const viewportH = desktopViewportInnerH(h);
+  const viewportH = desktopPortalInnerH(h, desktopPanelPadY ?? 40);
 
   const itemsKey = useMemo(() => items.map(i => i.id).join("|"), [items]);
 
@@ -96,7 +98,8 @@ function PegboardPanelDesktop({
       items.map(i => ({ id: i.id, hardware: i.hardware })),
       innerW
     );
-    const ih = Math.max(viewportH, contentHeight);
+    void contentHeight;
+    const ih = viewportH;
     return {
       innerH: ih,
       positions: resolveLayoutAfterResize(packed, specs, innerW, ih),
@@ -162,6 +165,7 @@ export default function PegboardPanelView({
   vh,
   layoutWidth,
   layoutHeight,
+  desktopPanelPadY,
 }: {
   items: PegboardCardDTO[];
   isMobile: boolean;
@@ -169,6 +173,7 @@ export default function PegboardPanelView({
   vh: number;
   layoutWidth?: number;
   layoutHeight?: number;
+  desktopPanelPadY?: number;
 }) {
   if (isMobile) {
     return (
@@ -182,6 +187,7 @@ export default function PegboardPanelView({
       vh={vh}
       layoutWidth={layoutWidth}
       layoutHeight={layoutHeight}
+      desktopPanelPadY={desktopPanelPadY}
     />
   );
 }
