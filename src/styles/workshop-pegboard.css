@@ -492,6 +492,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  /* Enable CSS container queries for card-density decisions. */
+  container-type: inline-size;
 }
 
 .peg-card__inner a {
@@ -1347,6 +1349,31 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Blueprint density tweaks (container queries) */
+@container (max-width: 260px) {
+  .peg-card__inner--blueprint .blueprint-desc {
+    display: none;
+  }
+
+  .peg-card__inner--blueprint .blueprint-body {
+    padding: 34px 16px 10px;
+    gap: 6px;
+  }
+
+  .peg-card__inner--blueprint .blueprint-header {
+    padding-bottom: 6px;
+    margin-bottom: 2px;
+  }
+
+  .peg-card__inner--blueprint .mech-switch--block {
+    padding: 9px 10px;
+  }
+
+  .peg-card__inner--blueprint .blueprint-bg::before {
+    --blueprint-grid-line: 1px;
+  }
 }
 
 /* 3) Execute build: hard mechanical switch (flat offset shadow, no blur) */
