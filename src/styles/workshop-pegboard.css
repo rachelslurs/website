@@ -1218,22 +1218,23 @@
   background-size: 15px 15px;
   background-position: 0 0;
   border: 1px solid rgba(26, 26, 46, 0.15);
+  /* Hard hole edge — 8px/8.5px feather read as a gray ring on the cream paper */
   -webkit-mask-image:
-    radial-gradient(circle at 30px 30px, transparent 8px, black 8.5px),
+    radial-gradient(circle at 30px 30px, transparent 8px, black 8px),
     radial-gradient(
       circle at calc(100% - 30px) 30px,
       transparent 8px,
-      black 8.5px
+      black 8px
     );
   -webkit-mask-size: 51% 100%, 51% 100%;
   -webkit-mask-position: left, right;
   -webkit-mask-repeat: no-repeat;
   mask-image:
-    radial-gradient(circle at 30px 30px, transparent 8px, black 8.5px),
+    radial-gradient(circle at 30px 30px, transparent 8px, black 8px),
     radial-gradient(
       circle at calc(100% - 30px) 30px,
       transparent 8px,
-      black 8.5px
+      black 8px
     );
   mask-size: 51% 100%, 51% 100%;
   mask-position: left, right;
