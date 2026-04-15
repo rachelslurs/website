@@ -172,9 +172,7 @@ export function LinkLcdCard({
       className={`lcd-hardware ${dragVisual ? "lcd-hardware--dragging" : ""}`}
     >
       <div className="lcd-shadow-base" aria-hidden />
-      <div
-        className={`lcd-hardware__tilt ${dragVisual ? "lcd-hardware__tilt--dragging" : ""}`}
-      >
+      <div className="lcd-hardware__tilt">
         <div className="lcd-pcb">
           <div className="lcd-pcb__substrate" aria-hidden>
             <div className="lcd-pcb__pin-strip">
