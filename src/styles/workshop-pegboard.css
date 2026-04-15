@@ -100,20 +100,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2.5rem;
+  padding: 2rem;
   box-sizing: border-box;
 }
 
 /* Desktop: reclaim vertical space on short viewports (no vertical scrolling). */
 @media (max-height: 820px) {
   .workshop-panel--desktop {
-    padding: 2rem;
+    padding: 1.75rem;
   }
 }
 
 @media (max-height: 720px) {
   .workshop-panel--desktop {
-    padding: 1.5rem;
+    padding: 1.25rem;
   }
 }
 

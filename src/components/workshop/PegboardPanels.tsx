@@ -98,16 +98,18 @@ function PegboardPanelDesktop({
       items.map(i => ({ id: i.id, hardware: i.hardware })),
       innerW
     );
-    void contentHeight;
-    const ih = viewportH;
+    const ih = contentHeight;
+    const scale = ih > 0 ? Math.min(1, viewportH / ih) : 1;
     return {
       innerH: ih,
+      scale,
       positions: resolveLayoutAfterResize(packed, specs, innerW, ih),
     };
   }, [itemsKey, innerW, viewportH, specs, items]);
 
   const [positions, setPositions] = useState(packedLayout.positions);
   const innerH = packedLayout.innerH;
+  const scale = packedLayout.scale;
 
   useEffect(() => {
     setPositions(prev => {
@@ -127,33 +129,51 @@ function PegboardPanelDesktop({
   }, []);
 
   return (
-    <div className="pegboard-bg" style={{ width: innerW, height: innerH }}>
-      <span className="heavy-screw heavy-screw--tl" aria-hidden />
-      <span className="heavy-screw heavy-screw--tr" aria-hidden />
-      <span className="heavy-screw heavy-screw--bl" aria-hidden />
-      <span className="heavy-screw heavy-screw--br" aria-hidden />
-      {items.map(it => {
-        const { w, h } = hardwareDims(it.hardware);
-        const pos = positions[it.id];
-        if (!pos) return null;
-        return (
-          <PegCard
-            key={it.id}
-            item={it}
-            x={pos.x}
-            y={pos.y}
-            w={w}
-            h={h}
-            innerW={innerW}
-            innerH={innerH}
-            specs={specs}
-            positions={positions}
-            dragDisabled={false}
-            availableWidth={innerW}
-            onDragCommit={onDragCommit}
-          />
-        );
-      })}
+    <div
+      style={{
+        width: innerW,
+        height: viewportH,
+        overflow: "hidden",
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
+      <div
+        className="pegboard-bg"
+        style={{
+          width: innerW,
+          height: innerH,
+          transform: `scale(${scale})`,
+          transformOrigin: "top center",
+        }}
+      >
+        <span className="heavy-screw heavy-screw--tl" aria-hidden />
+        <span className="heavy-screw heavy-screw--tr" aria-hidden />
+        <span className="heavy-screw heavy-screw--bl" aria-hidden />
+        <span className="heavy-screw heavy-screw--br" aria-hidden />
+        {items.map(it => {
+          const { w, h } = hardwareDims(it.hardware);
+          const pos = positions[it.id];
+          if (!pos) return null;
+          return (
+            <PegCard
+              key={it.id}
+              item={it}
+              x={pos.x}
+              y={pos.y}
+              w={w}
+              h={h}
+              innerW={innerW}
+              innerH={innerH}
+              specs={specs}
+              positions={positions}
+              dragDisabled={false}
+              availableWidth={innerW}
+              onDragCommit={onDragCommit}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }
