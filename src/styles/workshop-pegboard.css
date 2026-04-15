@@ -1,6 +1,21 @@
 /* Workshop pegboard — wall, cork grid, brackets, slab seams (pairs with WorkshopPegboard.tsx)
    Riso palette tokens come from :root in riso.css (--cork, --blue, --black, etc.). */
 
+.workshop-page-stack {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.workshop-page-stack > .workshop-pegboard-root {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.workshop-page-stack__footer {
+  flex: 0 0 auto;
+}
+
 .workshop-pegboard-root {
   /* Mirrors tailwind.config fontFamily — use theme() so stacks stay single-sourced */
   --font-display: theme("fontFamily.display");
@@ -163,7 +178,7 @@
   flex-direction: column;
   flex: 1 1 auto;
   width: 100%;
-  min-height: min(100vh, 100dvh);
+  min-height: 0;
   box-sizing: border-box;
   background-color: #4a3018;
   background-image:
