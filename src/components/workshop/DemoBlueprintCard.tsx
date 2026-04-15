@@ -1,6 +1,5 @@
 import { CodeBracketIcon } from "@heroicons/react/24/outline";
 import type { PegboardCardDTO } from "@utils/serializeWorkshopPegboard";
-import { BlueprintCardIcon } from "./blueprintPegboardIcons";
 import { externalLinkProps, stopDragChain } from "./pegboardCardUtils";
 
 export default function DemoBlueprintCard({
@@ -12,6 +11,7 @@ export default function DemoBlueprintCard({
 }) {
   const ext = externalLinkProps(item.href);
   const accent = item.subtitleColor ?? "var(--blue)";
+  const demoTag = item.tags?.[0]?.trim() || undefined;
 
   return (
     <article
@@ -41,24 +41,28 @@ export default function DemoBlueprintCard({
             <div className="blueprint-header__main">
               <a
                 href={item.href}
-                className="blueprint-title font-display text-base font-bold uppercase leading-none tracking-wide text-[var(--black)] no-underline hover:underline hover:underline-offset-2"
+                className="blueprint-title font-display text-sm font-bold uppercase leading-none tracking-wide text-[var(--black)] no-underline hover:underline hover:underline-offset-2"
                 {...ext}
                 onPointerDown={stopDragChain}
                 onClick={stopDragChain}
               >
                 {item.title}
               </a>
-              {item.subtitle ? (
+              {demoTag ? (
                 <p
-                  className="blueprint-subtitle font-mono text-xs font-bold leading-snug tracking-[1.5px]"
+                  className="blueprint-subtitle font-mono text-xs font-bold leading-snug tracking-tightest"
+                  style={{ color: accent }}
+                >
+                  {demoTag}
+                </p>
+              ) : item.subtitle ? (
+                <p
+                  className="blueprint-subtitle font-mono text-xs font-bold leading-snug tracking-tightest"
                   style={{ color: accent }}
                 >
                   {item.subtitle}
                 </p>
               ) : null}
-            </div>
-            <div className="blueprint-icon-recess" aria-hidden>
-              <BlueprintCardIcon name={item.pegboardIcon} />
             </div>
           </header>
 
@@ -71,13 +75,13 @@ export default function DemoBlueprintCard({
           <a
             href={item.href}
             className="mech-switch mech-switch--block focus-outline font-mono text-[10px] font-bold uppercase tracking-[1.5px]"
-            aria-label={`Execute build: open demo ${item.title}`}
+            aria-label={`Open demo ${item.title}`}
             {...ext}
             onPointerDown={stopDragChain}
             onClick={stopDragChain}
           >
             <CodeBracketIcon className="mech-switch__icon" aria-hidden />
-            <span>Execute build</span>
+            <span>Open demo</span>
           </a>
         </div>
       </div>
