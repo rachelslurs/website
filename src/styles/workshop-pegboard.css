@@ -1280,15 +1280,15 @@
   border-radius: 50%;
   pointer-events: none;
   /* Smooth dome — hard transparent→metal stops at 6/7px read as a ring at the paper hole */
-  background: radial-gradient(
+  /* background: radial-gradient(
     circle at 50% 40%,
     #f1f5f9 0%,
     #cbd5e1 42%,
     #64748b 88%,
     #475569 100%
-  );
+  ); */
   /* Inset rim only — outer shadows land on cream and mimic a second ring */
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3);
+  /* box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3); */
 }
 
 .blueprint-peg--tl {
