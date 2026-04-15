@@ -767,6 +767,7 @@
 .peg-clipboard-desc {
   margin: 0;
   display: -webkit-box;
+  line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -1331,6 +1332,7 @@
   min-height: 0;
   flex: 1 1 auto;
   display: -webkit-box;
+  line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;

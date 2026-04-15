@@ -11,6 +11,7 @@ export interface PegboardCardDTO {
   title: string;
   href: string;
   subtitle?: string;
+  tags?: string[];
   dateLabel: string;
   /** Links (LCD): optional GIF for in-card preview; resolved to URL string. */
   gifLink?: string;
@@ -79,6 +80,7 @@ function serializeItem(item: WorkshopPanelItem): PegboardCardDTO {
         title: d.title,
         href: `/demos/${item.entry.slug}`,
         subtitle: summaryLine,
+        tags: d.tags,
         dateLabel: formatPostDate(new Date(raw)),
         description:
           desc && summaryLine && desc === summaryLine ? undefined : desc,
