@@ -1218,7 +1218,6 @@
   background-size: 15px 15px;
   background-position: 0 0;
   border: 1px solid rgba(26, 26, 46, 0.15);
-  /* Hard hole edge — 8px/8.5px feather read as a gray ring on the cream paper */
   -webkit-mask-image:
     radial-gradient(circle at 30px 30px, transparent 8px, black 8px),
     radial-gradient(
@@ -1249,9 +1248,8 @@
   height: 16px;
   border-radius: 50%;
   pointer-events: none;
-  box-shadow:
-    inset 2px 4px 5px rgba(0, 0, 0, 0.8),
-    1px 1px 0 rgba(255, 255, 255, 0.6);
+  /* Inset only — outer 1px highlight read as a rim/border at the paper hole */
+  box-shadow: inset 2px 4px 6px rgba(0, 0, 0, 0.78);
 }
 
 .blueprint-hole-depth--tl {
