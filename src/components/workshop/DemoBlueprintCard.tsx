@@ -19,6 +19,14 @@ export default function DemoBlueprintCard({
       className={`blueprint-card ${dragVisual ? "blueprint-card--dragging" : ""}`}
     >
       <div className="blueprint-bg">
+        <span
+          className="blueprint-hole-depth blueprint-hole-depth--tl"
+          aria-hidden
+        />
+        <span
+          className="blueprint-hole-depth blueprint-hole-depth--tr"
+          aria-hidden
+        />
         <div className="blueprint-hardware" aria-hidden>
           <span className="blueprint-peg blueprint-peg--tl" />
           <span className="blueprint-peg blueprint-peg--tr" />
