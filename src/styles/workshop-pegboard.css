@@ -1197,25 +1197,36 @@
   box-sizing: border-box;
   pointer-events: none;
   background-color: var(--cream);
+  --blueprint-grid-cells: 16;
+  --blueprint-grid-line: 1.25px;
   background-image:
-    linear-gradient(rgba(0, 120, 191, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 120, 191, 0.05) 1px, transparent 1px);
-  background-size: 15px 15px;
+    linear-gradient(
+      rgba(0, 120, 191, 0.05) var(--blueprint-grid-line),
+      transparent var(--blueprint-grid-line)
+    ),
+    linear-gradient(
+      90deg,
+      rgba(0, 120, 191, 0.05) var(--blueprint-grid-line),
+      transparent var(--blueprint-grid-line)
+    );
+  /* Keep a consistent cell count; scale both cell size + line thickness. */
+  background-size:
+    calc(100% / var(--blueprint-grid-cells))
+    calc(100% / var(--blueprint-grid-cells));
   background-position: 0 0;
   border: 1px solid rgba(26, 26, 46, 0.15);
   /*
-   * Die-cut holes via clip-path (evenodd), not mask-image — true transparency to cork,
-   * no luminance polarity bugs from SVG data-URL masks, sharper than gradient feather.
-   * hardwareDims blueprint = 240×240; path is user units matching the card box.
+   * Die-cut holes via SVG mask (scales with element size).
+   * ViewBox is 300×300; holes are centered at (30,30) and (270,30) with r=8 (16px dia).
    */
-  -webkit-clip-path: path(
-    evenodd,
-    "M 4 0 H 236 A 4 4 0 0 1 240 4 V 236 A 4 4 0 0 1 236 240 H 4 A 4 4 0 0 1 0 236 V 4 A 4 4 0 0 1 4 0 Z M 30 22 A 8 8 0 1 0 30 38 A 8 8 0 1 0 30 22 Z M 210 22 A 8 8 0 1 0 210 38 A 8 8 0 1 0 210 22 Z"
-  );
-  clip-path: path(
-    evenodd,
-    "M 4 0 H 236 A 4 4 0 0 1 240 4 V 236 A 4 4 0 0 1 236 240 H 4 A 4 4 0 0 1 0 236 V 4 A 4 4 0 0 1 4 0 Z M 30 22 A 8 8 0 1 0 30 38 A 8 8 0 1 0 30 22 Z M 210 22 A 8 8 0 1 0 210 38 A 8 8 0 1 0 210 22 Z"
-  );
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Crect x='0' y='0' width='300' height='300' rx='4' ry='4' fill='white'/%3E%3Ccircle cx='30' cy='30' r='8' fill='black'/%3E%3Ccircle cx='270' cy='30' r='8' fill='black'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Crect x='0' y='0' width='300' height='300' rx='4' ry='4' fill='white'/%3E%3Ccircle cx='30' cy='30' r='8' fill='black'/%3E%3Ccircle cx='270' cy='30' r='8' fill='black'/%3E%3C/svg%3E");
+  -webkit-mask-mode: luminance;
+  mask-mode: luminance;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
 }
 
 /* 2) Die-cut peg holes — depth only at hole openings (sits under masked paper, z-index 8) */

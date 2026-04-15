@@ -73,9 +73,9 @@ export function hardwareDims(hardware: PegboardHardware): {
     case "clipboard":
       return { w: 300, h: 480 };
     case "lcd":
-      return { w: 360, h: 240 };
+      return { w: 420, h: 300 };
     case "blueprint":
-      return { w: 240, h: 240 };
+      return { w: 300, h: 300 };
   }
 }
 
