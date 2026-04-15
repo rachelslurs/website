@@ -363,18 +363,11 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
             aria-hidden="true"
           >
             <DymoLabel
-              text="WORKSHOP"
+              text="Workshop"
               size="large"
               isInteractive={false}
               grain="vertical"
               title="Vertical grain (default)"
-            />
-            <DymoLabel
-              text="WORKSHOP"
-              size="large"
-              isInteractive={false}
-              grain="horizontal"
-              title="Horizontal grain"
             />
           </div>
           <span className="sr-only">
