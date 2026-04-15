@@ -1111,17 +1111,16 @@
   position: absolute;
   bottom: 26px;
   z-index: 40;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   pointer-events: none;
 }
 
-.lcd-hook-shaft {
+/* Single piece: same metal + highlight as .blueprint-hook-anchor .straight-hook */
+.lcd-hook {
   position: relative;
   z-index: 10;
+  display: block;
   width: 6px;
-  height: 18px;
+  height: 23px;
   border-radius: 3px;
   background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 40%, #4b5563 100%);
   box-shadow:
@@ -1129,7 +1128,8 @@
     inset 1px 2px 2px rgba(255, 255, 255, 0.9);
 }
 
-.lcd-hook-shaft__spec {
+.lcd-hook::before {
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -1137,18 +1137,7 @@
   height: 3px;
   border-radius: 3px 3px 0 0;
   background: rgba(255, 255, 255, 0.4);
-}
-
-.lcd-hook-foot {
-  width: 6px;
-  height: 6px;
-  margin-top: -1px;
-  border-radius: 0 0 3px 3px;
-  background: linear-gradient(
-    180deg,
-    #4b5563 0%,
-    rgba(26, 26, 46, 0.9) 100%
-  );
+  pointer-events: none;
 }
 
 .lcd-mount-hook--l {
@@ -1431,6 +1420,7 @@
   line-height: 1.4;
   color: rgba(26, 26, 46, 0.72);
   display: -webkit-box;
+  line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
