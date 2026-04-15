@@ -60,6 +60,10 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   } | null>(null);
   /** Mobile column: panel index at ends, or -1 when mid-scroll (reference: both nav buttons stay enabled). */
   const [mobilePanelIdx, setMobilePanelIdx] = useState(0);
+  const [connectorBands, setConnectorBands] = useState<
+    Record<number, { left: number; width: number; top: number; bottom: number }>
+  >({});
+  const [desktopPanelPadY, setDesktopPanelPadY] = useState(40);
 
   const layoutW = portalLayout?.w ?? vw;
   const layoutH = portalLayout?.h ?? vh;
@@ -70,6 +74,63 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     () => desktopPegboardSideGap(layoutW, desktopInner),
     [layoutW, desktopInner]
   );
+
+  useIsoLayoutEffect(() => {
+    if (isMobile) return;
+    const strip = scrollRef.current;
+    if (!strip) return;
+    const n = panels.length;
+    if (n < 2) return;
+
+    const firstPanel = strip.querySelector(
+      ".workshop-panel--desktop"
+    ) as HTMLElement | null;
+    if (firstPanel) {
+      const s = window.getComputedStyle(firstPanel);
+      const pt = parseFloat(s.paddingTop || "0") || 0;
+      setDesktopPanelPadY(pt);
+    }
+
+    const next: Record<
+      number,
+      { left: number; width: number; top: number; bottom: number }
+    > = {};
+
+    for (let i = 0; i < n - 1; i += 1) {
+      const panelEl = strip.children.item(i) as HTMLElement | null;
+      const nextPanelEl = strip.children.item(i + 1) as HTMLElement | null;
+      if (!panelEl || !nextPanelEl) continue;
+      const boardEl = panelEl.querySelector(
+        ".pegboard-bg"
+      ) as HTMLElement | null;
+      const nextBoardEl = nextPanelEl.querySelector(
+        ".pegboard-bg"
+      ) as HTMLElement | null;
+      if (!boardEl || !nextBoardEl) continue;
+
+      const panelRect = panelEl.getBoundingClientRect();
+      const boardRect = boardEl.getBoundingClientRect();
+      const nextBoardRect = nextBoardEl.getBoundingClientRect();
+
+      const borderW = Math.max(
+        0,
+        parseFloat(window.getComputedStyle(boardEl).borderTopWidth || "0") || 0
+      );
+      const screwCenterInset = borderW + 30;
+      const overlap = 10;
+
+      const left = boardRect.right - panelRect.left - overlap;
+      const width = nextBoardRect.left - boardRect.right + overlap * 2;
+      const top = boardRect.top - panelRect.top + screwCenterInset;
+      const bottom = panelRect.bottom - boardRect.bottom + screwCenterInset;
+
+      if (Number.isFinite(left) && Number.isFinite(width) && width > 0) {
+        next[i] = { left, width, top, bottom };
+      }
+    }
+
+    setConnectorBands(next);
+  }, [isMobile, panels.length, layoutW, layoutH, desktopInner]);
 
   useIsoLayoutEffect(() => {
     const el = portalInnerRef.current;
@@ -245,6 +306,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
                     vh={vh}
                     layoutWidth={layoutW}
                     layoutHeight={layoutH}
+                    desktopPanelPadY={desktopPanelPadY}
                   />
                   {i < panels.length - 1 ? (
                     <>
@@ -257,9 +319,9 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
                         aria-hidden
                         className="metal-bracket--band"
                         style={{
-                          width: sideGap + 80,
-                          right: -(sideGap + 40),
-                          top: 70,
+                          width: connectorBands[i]?.width ?? sideGap + 80,
+                          left: connectorBands[i]?.left,
+                          top: connectorBands[i]?.top ?? 70,
                           transform: "translateY(-50%)",
                         }}
                       />
@@ -267,9 +329,9 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
                         aria-hidden
                         className="metal-bracket--band"
                         style={{
-                          width: sideGap + 80,
-                          right: -(sideGap + 40),
-                          bottom: 70,
+                          width: connectorBands[i]?.width ?? sideGap + 80,
+                          left: connectorBands[i]?.left,
+                          bottom: connectorBands[i]?.bottom ?? 70,
                           transform: "translateY(50%)",
                         }}
                       />
