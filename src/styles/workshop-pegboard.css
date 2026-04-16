@@ -421,6 +421,11 @@
   position: relative;
   z-index: 2;
   --peg-grid-px: 60px;
+  /* Desktop cork: set by JS — column/row count for CSS grid (holes + screws share the same pitch). */
+  --peg-cols: 1;
+  --peg-rows: 1;
+  /* Match .heavy-screw width/height — keeps corner math on the same grid as holes */
+  --peg-screw-px: 20px;
   background-color: var(--cork);
   background-image: radial-gradient(
     circle at calc(var(--peg-grid-px) / 2) calc(var(--peg-grid-px) / 2),
@@ -440,11 +445,20 @@
   box-sizing: content-box;
 }
 
+/* Desktop: explicit cell grid — corner screws sit on the same lattice as the radial hole tiling. */
+.pegboard-bg--desktop-cork {
+  display: grid;
+  grid-template-columns: repeat(var(--peg-cols), var(--peg-grid-px));
+  grid-template-rows: repeat(var(--peg-rows), var(--peg-grid-px));
+  align-content: start;
+  justify-content: start;
+}
+
 /* Reference hardware screws on pegboard corners */
 .pegboard-bg .heavy-screw {
   position: absolute;
-  width: 20px;
-  height: 20px;
+  width: var(--peg-screw-px);
+  height: var(--peg-screw-px);
   border-radius: 50%;
   background: radial-gradient(
     circle at 25% 25%,
@@ -475,28 +489,56 @@
     1px 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-.pegboard-bg .heavy-screw--tl {
-  top: calc(var(--peg-grid-px) / 2);
-  left: calc(var(--peg-grid-px) / 2);
-  transform: translate(-50%, -50%);
+/* Desktop cork: screws are grid items centered on corner cells (same centers as first/last hole dots). */
+.pegboard-bg--desktop-cork .heavy-screw {
+  position: relative;
+  left: auto;
+  top: auto;
+  right: auto;
+  bottom: auto;
+  place-self: center;
 }
 
-.pegboard-bg .heavy-screw--tr {
-  top: calc(var(--peg-grid-px) / 2);
-  right: calc(var(--peg-grid-px) / 2);
-  transform: translate(50%, -50%);
+/* Lone `-1` is the last grid line, not the last track — TR/BR need `-2 / -1`. */
+.pegboard-bg--desktop-cork .heavy-screw--tl {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
 }
 
-.pegboard-bg .heavy-screw--bl {
-  bottom: calc(var(--peg-grid-px) / 2);
-  left: calc(var(--peg-grid-px) / 2);
-  transform: translate(-50%, 50%);
+.pegboard-bg--desktop-cork .heavy-screw--tr {
+  grid-column: -2 / -1;
+  grid-row: 1 / 2;
 }
 
-.pegboard-bg .heavy-screw--br {
-  bottom: calc(var(--peg-grid-px) / 2);
-  right: calc(var(--peg-grid-px) / 2);
-  transform: translate(50%, 50%);
+.pegboard-bg--desktop-cork .heavy-screw--bl {
+  grid-column: 1 / 2;
+  grid-row: -2 / -1;
+}
+
+.pegboard-bg--desktop-cork .heavy-screw--br {
+  grid-column: -2 / -1;
+  grid-row: -2 / -1;
+}
+
+/* Mobile cork: absolute corners (flow layout + scale wrapper; no --peg-cols rows). */
+.pegboard-bg--mobile-flow .heavy-screw--tl {
+  left: calc(var(--peg-grid-px) / 2 - var(--peg-screw-px) / 2);
+  top: calc(var(--peg-grid-px) / 2 - var(--peg-screw-px) / 2);
+}
+
+.pegboard-bg--mobile-flow .heavy-screw--tr {
+  left: calc(100% - var(--peg-grid-px) / 2 - var(--peg-screw-px) / 2);
+  top: calc(var(--peg-grid-px) / 2 - var(--peg-screw-px) / 2);
+}
+
+.pegboard-bg--mobile-flow .heavy-screw--bl {
+  left: calc(var(--peg-grid-px) / 2 - var(--peg-screw-px) / 2);
+  top: calc(100% - var(--peg-grid-px) / 2 - var(--peg-screw-px) / 2);
+}
+
+.pegboard-bg--mobile-flow .heavy-screw--br {
+  left: calc(100% - var(--peg-grid-px) / 2 - var(--peg-screw-px) / 2);
+  top: calc(100% - var(--peg-grid-px) / 2 - var(--peg-screw-px) / 2);
 }
 
 /* Phase 2g: fixed 60px design board; JS sets slot size and scale on .pegboard-mobile-scale-surface */

@@ -33,22 +33,32 @@ import "../../styles/workshop-pegboard.css";
 const useIsoLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
+/** One side of `.workshop-panel--desktop { padding: 2rem }` in px (tracks `html` font-size, e.g. `md` 125%). */
+function workshopPanelRemPaddingPx(): number {
+  if (typeof document === "undefined") return 32;
+  const rootPx = parseFloat(
+    getComputedStyle(document.documentElement).fontSize || "16"
+  );
+  const fontPx = Number.isFinite(rootPx) && rootPx > 0 ? rootPx : 16;
+  return Math.round(2 * fontPx);
+}
+
 export interface WorkshopPegboardProps {
   panels: PegboardPanelDTO[];
 }
 
 function useViewportPegboard() {
   const [vw, setVw] = useState(() =>
-    typeof window !== "undefined" ? window.innerWidth : 1024
+    typeof window !== "undefined" ? Math.round(window.innerWidth) : 1024
   );
   const [vh, setVh] = useState(() =>
-    typeof window !== "undefined" ? window.innerHeight : 768
+    typeof window !== "undefined" ? Math.round(window.innerHeight) : 768
   );
 
   useIsoLayoutEffect(() => {
     function read() {
-      setVw(window.innerWidth);
-      setVh(window.innerHeight);
+      setVw(Math.round(window.innerWidth));
+      setVh(Math.round(window.innerHeight));
     }
     read();
     window.addEventListener("resize", read);
@@ -76,11 +86,18 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   const [connectorBands, setConnectorBands] = useState<
     Record<number, { left: number; width: number; top: number; bottom: number }>
   >({});
-  const [desktopPanelPadY, setDesktopPanelPadY] = useState(40);
-  const [desktopPanelPadX, setDesktopPanelPadX] = useState(32);
+  /** Measured `.workshop-panel--desktop` content width (avoids portal−padding drift at odd viewports). */
+  const [desktopPegboardContentInnerW, setDesktopPegboardContentInnerW] =
+    useState<number | null>(null);
+  const [desktopPanelPadY, setDesktopPanelPadY] = useState(() =>
+    workshopPanelRemPaddingPx()
+  );
+  const [desktopPanelPadX, setDesktopPanelPadX] = useState(() =>
+    workshopPanelRemPaddingPx()
+  );
 
-  const layoutW = portalLayout?.w ?? vw;
-  const layoutH = portalLayout?.h ?? vh;
+  const layoutW = Math.round(portalLayout?.w ?? vw);
+  const layoutH = Math.round(portalLayout?.h ?? vh);
   const isMobile = portalLayout?.isMobile ?? false;
   const isLayoutReady = portalLayout !== null;
 
@@ -113,11 +130,43 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   }, [isMobile, layoutW, panels]);
 
   useIsoLayoutEffect(() => {
+    if (isMobile) {
+      setDesktopPegboardContentInnerW(null);
+      return;
+    }
+    const strip = scrollRef.current;
+    if (!strip) return;
+
+    const readPanelContentInnerW = (panel: HTMLElement) => {
+      const cs = getComputedStyle(panel);
+      const pl = parseFloat(cs.paddingLeft || "0") || 0;
+      const pr = parseFloat(cs.paddingRight || "0") || 0;
+      return Math.max(0, Math.round(panel.clientWidth - pl - pr));
+    };
+
+    const measureContentInnerW = () => {
+      const panel = strip.querySelector(
+        ".workshop-panel--desktop"
+      ) as HTMLElement | null;
+      if (!panel) return;
+      setDesktopPegboardContentInnerW(readPanelContentInnerW(panel));
+    };
+
+    measureContentInnerW();
+    const ro = new ResizeObserver(() => measureContentInnerW());
+    const firstForRo = strip.querySelector(
+      ".workshop-panel--desktop"
+    ) as HTMLElement | null;
+    if (firstForRo) ro.observe(firstForRo);
+
+    return () => ro.disconnect();
+  }, [isMobile, panels.length, layoutW, layoutH, isLayoutReady]);
+
+  useIsoLayoutEffect(() => {
     if (isMobile) return;
     const strip = scrollRef.current;
     if (!strip) return;
     const n = panels.length;
-    if (n < 2) return;
 
     const firstPanel = strip.querySelector(
       ".workshop-panel--desktop"
@@ -128,6 +177,11 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
       const pl = parseFloat(s.paddingLeft || "0") || 0;
       setDesktopPanelPadY(pt);
       setDesktopPanelPadX(pl);
+    }
+
+    if (n < 2) {
+      setConnectorBands({});
+      return;
     }
 
     const next: Record<
@@ -179,10 +233,14 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     const el = portalInnerRef.current;
     if (!el) return;
     const apply = (width: number, height: number) => {
+      // ResizeObserver contentRect can be sub-pixel; peg math uses floor(inner/grid)*grid.
+      // Rounding avoids TR/BR screw vs hole drift when a 1px budget flips (e.g. 1023 vs 1024).
+      const w = Math.round(width);
+      const h = Math.round(height);
       setPortalLayout({
-        w: width,
-        h: height,
-        isMobile: width <= 768,
+        w,
+        h,
+        isMobile: w <= 768,
       });
     };
     apply(el.clientWidth, el.clientHeight);
@@ -356,6 +414,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
                     layoutHeight={layoutH}
                     desktopPanelPadY={desktopPanelPadY}
                     desktopPanelPadX={desktopPanelPadX}
+                    desktopContentInnerW={desktopPegboardContentInnerW}
                   />
                   {i < panels.length - 1 ? (
                     <>
