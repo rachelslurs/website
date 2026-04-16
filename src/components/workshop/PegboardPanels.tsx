@@ -2,8 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { PegboardCardDTO } from "@utils/serializeWorkshopPegboard";
 import {
   hardwareDims,
+  hardwareDimsWithGrid,
   initialPackPositions,
+  initialPackPositionsWithGrid,
   resolveLayoutAfterResize,
+  resolveLayoutAfterResizeWithGrid,
 } from "@utils/workshopPegboardPhysics";
 import {
   desktopInnerW,
@@ -12,6 +15,9 @@ import {
 } from "./pegboardDimensions";
 import type { PegboardCardSpec } from "./pegboardTypes";
 import PegCard from "./PegCard";
+
+/** Matches `.pegboard-bg { border: 8px solid ... }` — outer box is cork + 2×8 when box-sizing is content-box. */
+const PEGBOARD_BORDER_OUTSET = 16;
 
 function PegboardPanelMobile({
   items,
@@ -71,6 +77,7 @@ function PegboardPanelDesktop({
   layoutWidth,
   layoutHeight,
   desktopPanelPadY,
+  desktopPanelPadX,
 }: {
   items: PegboardCardDTO[];
   vw: number;
@@ -78,38 +85,84 @@ function PegboardPanelDesktop({
   layoutWidth?: number;
   layoutHeight?: number;
   desktopPanelPadY?: number;
+  desktopPanelPadX?: number;
 }) {
   const w = layoutWidth ?? vw;
   const h = layoutHeight ?? vh;
-  const innerW = desktopInnerW(w);
+  const innerW = desktopInnerW(w, desktopPanelPadX ?? 32);
   const viewportH = desktopPortalInnerH(h, desktopPanelPadY ?? 40);
 
   const itemsKey = useMemo(() => items.map(i => i.id).join("|"), [items]);
 
-  const specs: PegboardCardSpec[] = useMemo(() => {
-    return items.map(it => {
-      const { w, h } = hardwareDims(it.hardware);
-      return { id: it.id, hardware: it.hardware, w, h };
-    });
-  }, [itemsKey, items]);
-
   const packedLayout = useMemo(() => {
-    const { positions: packed, contentHeight } = initialPackPositions(
-      items.map(i => ({ id: i.id, hardware: i.hardware })),
-      innerW
-    );
-    const ih = contentHeight;
-    const scale = ih > 0 ? Math.min(1, viewportH / ih) : 1;
-    return {
-      innerH: ih,
-      scale,
-      positions: resolveLayoutAfterResize(packed, specs, innerW, ih),
+    const grids = [60, 54, 48, 42];
+    const pick = () => {
+      for (const grid of grids) {
+        const iw = Math.floor(innerW / grid) * grid;
+        const ih = Math.floor(viewportH / grid) * grid;
+        if (iw <= 0 || ih <= 0) continue;
+
+        const specs: PegboardCardSpec[] = items.map(it => {
+          const { w, h } = hardwareDimsWithGrid(it.hardware, grid);
+          return { id: it.id, hardware: it.hardware, w, h };
+        });
+
+        const { positions: packed } = initialPackPositionsWithGrid(
+          items.map(i => ({ id: i.id, hardware: i.hardware })),
+          iw,
+          grid
+        );
+        const resolved = resolveLayoutAfterResizeWithGrid(
+          packed,
+          specs,
+          iw,
+          ih,
+          grid
+        );
+
+        const allFit = specs.every(s => {
+          const p = resolved[s.id];
+          return (
+            p && p.x >= 0 && p.y >= 0 && p.x + s.w <= iw && p.y + s.h <= ih
+          );
+        });
+        if (allFit)
+          return { grid, innerW: iw, innerH: ih, specs, positions: resolved };
+      }
+      const grid = 42;
+      const iw = Math.floor(innerW / grid) * grid;
+      const ih = Math.floor(viewportH / grid) * grid;
+      const specs: PegboardCardSpec[] = items.map(it => {
+        const { w, h } = hardwareDimsWithGrid(it.hardware, grid);
+        return { id: it.id, hardware: it.hardware, w, h };
+      });
+      const { positions: packed } = initialPackPositionsWithGrid(
+        items.map(i => ({ id: i.id, hardware: i.hardware })),
+        iw,
+        grid
+      );
+      return {
+        grid,
+        innerW: iw,
+        innerH: ih,
+        specs,
+        positions: resolveLayoutAfterResizeWithGrid(
+          packed,
+          specs,
+          iw,
+          ih,
+          grid
+        ),
+      };
     };
-  }, [itemsKey, innerW, viewportH, specs, items]);
+    return pick();
+  }, [itemsKey, items, innerW, viewportH]);
 
   const [positions, setPositions] = useState(packedLayout.positions);
   const innerH = packedLayout.innerH;
-  const scale = packedLayout.scale;
+  const grid = packedLayout.grid;
+  const specs = packedLayout.specs;
+  const innerWFinal = packedLayout.innerW;
 
   useEffect(() => {
     setPositions(prev => {
@@ -120,9 +173,15 @@ function PegboardPanelDesktop({
       if (!sameSet) {
         return packedLayout.positions;
       }
-      return resolveLayoutAfterResize(prev, specs, innerW, packedLayout.innerH);
+      return resolveLayoutAfterResizeWithGrid(
+        prev,
+        specs,
+        innerWFinal,
+        packedLayout.innerH,
+        grid
+      );
     });
-  }, [packedLayout, itemsKey, innerW, viewportH, specs, items]);
+  }, [packedLayout, itemsKey, innerWFinal, viewportH, specs, items, grid]);
 
   const onDragCommit = useCallback((id: string, nx: number, ny: number) => {
     setPositions(p => ({ ...p, [id]: { x: nx, y: ny } }));
@@ -131,8 +190,8 @@ function PegboardPanelDesktop({
   return (
     <div
       style={{
-        width: innerW,
-        height: viewportH,
+        width: innerWFinal + PEGBOARD_BORDER_OUTSET,
+        height: innerH + PEGBOARD_BORDER_OUTSET,
         overflow: "hidden",
         display: "flex",
         justifyContent: "center",
@@ -141,10 +200,9 @@ function PegboardPanelDesktop({
       <div
         className="pegboard-bg"
         style={{
-          width: innerW,
+          width: innerWFinal,
           height: innerH,
-          transform: `scale(${scale})`,
-          transformOrigin: "top center",
+          ["--peg-grid-px" as never]: `${grid}px`,
         }}
       >
         <span className="heavy-screw heavy-screw--tl" aria-hidden />
@@ -152,7 +210,7 @@ function PegboardPanelDesktop({
         <span className="heavy-screw heavy-screw--bl" aria-hidden />
         <span className="heavy-screw heavy-screw--br" aria-hidden />
         {items.map(it => {
-          const { w, h } = hardwareDims(it.hardware);
+          const { w, h } = hardwareDimsWithGrid(it.hardware, grid);
           const pos = positions[it.id];
           if (!pos) return null;
           return (
@@ -163,12 +221,13 @@ function PegboardPanelDesktop({
               y={pos.y}
               w={w}
               h={h}
-              innerW={innerW}
+              innerW={innerWFinal}
               innerH={innerH}
+              gridPx={grid}
               specs={specs}
               positions={positions}
               dragDisabled={false}
-              availableWidth={innerW}
+              availableWidth={innerWFinal}
               onDragCommit={onDragCommit}
             />
           );
@@ -186,6 +245,7 @@ export default function PegboardPanelView({
   layoutWidth,
   layoutHeight,
   desktopPanelPadY,
+  desktopPanelPadX,
 }: {
   items: PegboardCardDTO[];
   isMobile: boolean;
@@ -194,6 +254,7 @@ export default function PegboardPanelView({
   layoutWidth?: number;
   layoutHeight?: number;
   desktopPanelPadY?: number;
+  desktopPanelPadX?: number;
 }) {
   if (isMobile) {
     return (
@@ -208,6 +269,7 @@ export default function PegboardPanelView({
       layoutWidth={layoutWidth}
       layoutHeight={layoutHeight}
       desktopPanelPadY={desktopPanelPadY}
+      desktopPanelPadX={desktopPanelPadX}
     />
   );
 }

@@ -125,24 +125,14 @@
   margin-right: auto;
   display: flex;
   justify-content: center;
-  /* Mobile uses vertical scrolling; avoid extra gaps between stacked panels. */
-  padding: 0 1rem;
+  /* Mobile: single frame is `.pegboard-bg`; keep only a light gutter here. */
+  padding: 0 0.5rem;
   box-sizing: border-box;
 }
 
-/* Physical slab: pegboard strip with wood-toned sides (reference PegboardPanel mobile). */
+/* Slab depth only — wood borders removed so they do not stack outside `.pegboard-bg`. */
 .workshop-panel--mobile-slab {
-  border-left: 8px solid #8b7355;
-  border-right: 8px solid #8b7355;
   box-shadow: 15px 30px 60px rgba(0, 0, 0, 0.7);
-}
-
-.workshop-panel--mobile-slab--first {
-  border-top: 8px solid #8b7355;
-}
-
-.workshop-panel--mobile-slab--last {
-  border-bottom: 8px solid #8b7355;
 }
 
 /* Horizontal bridge strips between viewport-width panels (reference .metal-bracket) */
@@ -373,10 +363,11 @@
 
 .slab-seam {
   position: relative;
-  width: 100%;
+  width: 92%;
   max-width: 420px;
   height: 0;
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
   border-top: 2px solid rgba(26, 26, 46, 0.2);
   pointer-events: none;
 }
@@ -423,23 +414,25 @@
   right: 10px;
 }
 
+/* Cork width/height are grid-snapped content sizes; border sits outside (content-box). */
 .pegboard-bg {
   position: relative;
   z-index: 2;
+  --peg-grid-px: 60px;
   background-color: var(--cork);
   background-image: radial-gradient(
-    circle at 30px 30px,
-    rgba(26, 26, 46, 0.45) 4px,
-    transparent 5px
+    circle at calc(var(--peg-grid-px) / 2) calc(var(--peg-grid-px) / 2),
+    rgba(26, 26, 46, 0.45) calc(var(--peg-grid-px) * 0.067),
+    transparent calc(var(--peg-grid-px) * 0.083)
   );
-  background-size: 60px 60px;
+  background-size: var(--peg-grid-px) var(--peg-grid-px);
   background-position: 0 0;
   border: 8px solid rgb(var(--color-border));
   box-shadow:
     15px 30px 60px rgba(0, 0, 0, 0.7),
     inset 0 0 0 1px rgba(26, 26, 46, 0.08);
   border-radius: 2px;
-  box-sizing: border-box;
+  box-sizing: content-box;
 }
 
 /* Reference hardware screws on pegboard corners */
@@ -478,26 +471,26 @@
 }
 
 .pegboard-bg .heavy-screw--tl {
-  top: 30px;
-  left: 30px;
+  top: calc(var(--peg-grid-px) / 2);
+  left: calc(var(--peg-grid-px) / 2);
   transform: translate(-50%, -50%);
 }
 
 .pegboard-bg .heavy-screw--tr {
-  top: 30px;
-  right: 30px;
+  top: calc(var(--peg-grid-px) / 2);
+  right: calc(var(--peg-grid-px) / 2);
   transform: translate(50%, -50%);
 }
 
 .pegboard-bg .heavy-screw--bl {
-  bottom: 30px;
-  left: 30px;
+  bottom: calc(var(--peg-grid-px) / 2);
+  left: calc(var(--peg-grid-px) / 2);
   transform: translate(-50%, 50%);
 }
 
 .pegboard-bg .heavy-screw--br {
-  bottom: 30px;
-  right: 30px;
+  bottom: calc(var(--peg-grid-px) / 2);
+  right: calc(var(--peg-grid-px) / 2);
   transform: translate(50%, 50%);
 }
 
