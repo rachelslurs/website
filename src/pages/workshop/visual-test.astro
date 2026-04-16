@@ -1,0 +1,65 @@
+---
+import WorkshopPegboard from "@components/workshop/WorkshopPegboard";
+import Layout from "@layouts/Layout.astro";
+import Main from "@layouts/Main.astro";
+import type { PegboardPanelDTO } from "@utils/serializeWorkshopPegboard";
+
+const pegboardPanels: PegboardPanelDTO[] = [
+  {
+    items: [
+      {
+        id: "vt:clipboard:1",
+        hardware: "clipboard",
+        title: "Case Study Fixture",
+        href: "/work/example",
+        dateLabel: "Jan 2026",
+        description:
+          "Deterministic workshop fixture card for visual regression testing.",
+        caseStudyYear: "2026",
+        caseStudyLabel: "Case Study",
+      },
+    ],
+  },
+  {
+    items: [
+      {
+        id: "vt:lcd:1",
+        hardware: "lcd",
+        title: "External Link Fixture",
+        href: "https://example.com",
+        subtitle: "Video link",
+        dateLabel: "Jan 2026",
+      },
+    ],
+  },
+  {
+    items: [
+      {
+        id: "vt:blueprint:1",
+        hardware: "blueprint",
+        title: "Demo Fixture",
+        href: "/demos/example",
+        subtitle: "Blueprint demo",
+        tags: ["fixture"],
+        dateLabel: "Jan 2026",
+        description:
+          "A stable blueprint description long enough to test wrapping and density.",
+        subtitleColor: "var(--blue)",
+      },
+    ],
+  },
+];
+---
+
+<Layout title="Workshop Visual Test">
+  <Main
+    showPageHeader={false}
+    showBreadcrumbs={false}
+    pageTitle="Workshop Visual Test"
+    pageDesc="Deterministic fixture for Playwright screenshot tests."
+  >
+    <div class="workshop-page-stack">
+      <WorkshopPegboard client:load panels={pegboardPanels} />
+    </div>
+  </Main>
+</Layout>
