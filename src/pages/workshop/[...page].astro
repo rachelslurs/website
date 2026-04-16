@@ -59,7 +59,7 @@ const layoutTitle =
     pageDesc="Drag cards on the pegboard (desktop). Panels scroll horizontally; under 768px slabs stack with scale-to-fit. Paginated like the rest of the site."
   >
     <div class="workshop-page-stack">
-      <WorkshopPegboard client:load panels={pegboardPanels} />
+      <WorkshopPegboard client:only="react" panels={pegboardPanels} />
       <div class="workshop-page-stack__footer">
         <Pagination page={page} />
       </div>
