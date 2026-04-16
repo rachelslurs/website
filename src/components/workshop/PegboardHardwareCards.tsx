@@ -11,9 +11,11 @@ import { externalLinkProps, stopDragChain } from "./pegboardCardUtils";
 export function CaseStudyClipboard({
   item,
   dragVisual,
+  blockParentDragHandlers = true,
 }: {
   item: PegboardCardDTO;
   dragVisual: boolean;
+  blockParentDragHandlers?: boolean;
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const metalId = `clipMetal-${uid}`;
@@ -22,6 +24,7 @@ export function CaseStudyClipboard({
 
   const label = item.caseStudyLabel ?? "Case Study";
   const year = item.caseStudyYear ?? "—";
+  const stopIfNeeded = blockParentDragHandlers ? stopDragChain : undefined;
 
   return (
     <div className="peg-clipboard-root">
@@ -105,8 +108,8 @@ export function CaseStudyClipboard({
             href={item.href}
             className="peg-clipboard-title font-heading text-xl font-semibold leading-tight tracking-tight text-[var(--black)] no-underline hover:underline hover:underline-offset-2"
             {...ext}
-            onPointerDown={stopDragChain}
-            onClick={stopDragChain}
+            onPointerDown={stopIfNeeded}
+            onClick={stopIfNeeded}
           >
             {item.title}
           </a>
@@ -119,8 +122,8 @@ export function CaseStudyClipboard({
             href={item.href}
             className="polished-btn font-mono text-[11px] font-bold uppercase tracking-[1.5px]"
             {...ext}
-            onPointerDown={stopDragChain}
-            onClick={stopDragChain}
+            onPointerDown={stopIfNeeded}
+            onClick={stopIfNeeded}
           >
             View case study
           </a>
@@ -133,13 +136,16 @@ export function CaseStudyClipboard({
 export function LinkLcdCard({
   item,
   dragVisual = false,
+  blockParentDragHandlers = true,
 }: {
   item: PegboardCardDTO;
   dragVisual?: boolean;
+  blockParentDragHandlers?: boolean;
 }) {
   const ext = externalLinkProps(item.href);
   const chipLabel = (item.subtitle ?? "").trim() || "Link";
   const gifSrc = item.gifLink;
+  const stopIfNeeded = blockParentDragHandlers ? stopDragChain : undefined;
   const [gifPlaying, setGifPlaying] = useState(false);
 
   useEffect(() => {
@@ -159,7 +165,7 @@ export function LinkLcdCard({
   };
 
   const handlePlay = (e: MouseEvent<HTMLButtonElement>) => {
-    stopDragChain(e);
+    if (blockParentDragHandlers) stopDragChain(e);
     if (gifSrc) {
       setGifPlaying(true);
     } else {
@@ -191,8 +197,8 @@ export function LinkLcdCard({
                   href={item.href}
                   className="lcd-see-external focus-outline no-underline hover:no-underline font-mono text-[11px] font-bold uppercase tracking-[1.5px]"
                   {...ext}
-                  onPointerDown={stopDragChain}
-                  onClick={stopDragChain}
+                  onPointerDown={stopIfNeeded}
+                  onClick={stopIfNeeded}
                 >
                   <span>See video</span>
                   <ArrowTopRightOnSquareIcon
@@ -226,7 +232,7 @@ export function LinkLcdCard({
                         : `Open video for ${item.title}`
                     }
                     onClick={handlePlay}
-                    onPointerDown={stopDragChain}
+                    onPointerDown={stopIfNeeded}
                   >
                     <PlayIcon className="lcd-play-trigger__icon" aria-hidden />
                     <span className="lcd-play-trigger__label font-mono text-[10px] font-bold uppercase tracking-[1.5px]">
