@@ -24,8 +24,6 @@ tags:
   - Node.js
 ---
 
-## Table of Contents
-
 ## Client
 
 RecipeCast is a self-founded Micro-SaaS platform designed for home cooks. It provides a modern solution for casting recipes to TVs and smart displays, offering a hands-free cooking experience that works with any recipe site.

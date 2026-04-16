@@ -32,8 +32,6 @@ features:
     caption: Using the theme picker and theme preview to select a theme
 ---
 
-## Table of Contents
-
 ## Client
 
 Hype is an all-in-one marketing and payments platform for anyone using social media to grow their business. The software enables creators to build a website in minutes, earn revenue from subscriptions and tips, send message blasts to followers, and track key business analytics.

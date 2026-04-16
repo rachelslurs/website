@@ -12,8 +12,6 @@ tags:
   - github
 ---
 
-## Table of Contents
-
 Here's a scenario you've probably experienced: You push a commit to your pull request and GitHub Actions starts running your tests. Two minutes later, you spot a typo and push another commit. Now you have two test runs executing in parallel—one testing code you've already replaced.
 
 By default, GitHub Actions doesn't cancel old runs when you push new commits. If you're iterating quickly during development, you might have 3-4 runs stacking up, all testing outdated code. You're paying for all of them.

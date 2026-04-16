@@ -15,8 +15,6 @@ tags:
   - wasp
 ---
 
-## Table of Contents
-
 _If you'd like a hand in building this or anything like it, I'm open to taking on new clients. See [the end of this article](#about-the-author) to learn more._
 
 ---

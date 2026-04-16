@@ -21,8 +21,6 @@ import ConstraintLayers from "@components/demo/ConstraintLayers";
 
 That's a different conversation than the one most people were having. This isn't a code style preference. It's an architectural constraint designed for a codebase where AI agents are first-class contributors.
 
-### Table of Contents
-
 ## What Factory Actually Did
 
 [Alvin Sng's post](https://x.com/alvinsng/status/2033969062834045089) walks through the full rationale and the replacement patterns, so I won't rehash those here. The short version: direct `useEffect` calls are banned via lint rule. A single `useMountEffect` wrapper exists for genuine mount-time side effects. Everything else (derived state, data fetching, event responses) uses the tool that was always the right tool: inline computation, event handlers, or a data-fetching library.
