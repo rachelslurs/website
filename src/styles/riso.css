@@ -289,8 +289,10 @@ nav .group:hover .dust-note {
   letter-spacing: 2px;
 }
 .demo-sub {
-  @apply font-heading;
+  /* Sans reads clearer than Zilla at riso card sizes on black demo tiles. */
+  @apply font-sans;
   font-size: var(--riso-type-lg);
+  line-height: var(--riso-leading-normal);
   margin-top: 3px;
   opacity: 0.85;
 }
