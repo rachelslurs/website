@@ -4,8 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { PegboardCardDTO } from "@utils/serializeWorkshopPegboard";
 import {
   hasPlacementCollision,
+  hasPlacementCollisionWithGrid,
   proposedDragPosition,
+  proposedDragPositionWithGrid,
   snapToGrid,
+  snapToGridWithGrid,
 } from "@utils/workshopPegboardPhysics";
 import type { PegboardCardSpec } from "./pegboardTypes";
 import { CaseStudyClipboard, LinkLcdCard } from "./PegboardHardwareCards";
@@ -20,6 +23,7 @@ export default function PegCard({
   h,
   innerW,
   innerH,
+  gridPx,
   specs,
   positions,
   dragDisabled,
@@ -34,6 +38,7 @@ export default function PegCard({
   h: number;
   innerW: number;
   innerH: number;
+  gridPx?: number;
   specs: PegboardCardSpec[];
   positions: Record<string, { x: number; y: number }>;
   dragDisabled: boolean;
@@ -43,10 +48,11 @@ export default function PegCard({
   mobileFlexStack?: boolean;
   onDragCommit: (id: string, nx: number, ny: number) => void;
 }) {
+  const grid = gridPx ?? 60;
   const rawX = useMotionValue(x);
   const rawY = useMotionValue(y);
-  const snapOffsetX = useTransform(rawX, v => snapToGrid(v) - v);
-  const snapOffsetY = useTransform(rawY, v => snapToGrid(v) - v);
+  const snapOffsetX = useTransform(rawX, v => snapToGridWithGrid(v, grid) - v);
+  const snapOffsetY = useTransform(rawY, v => snapToGridWithGrid(v, grid) - v);
   const draggingRef = useRef(false);
   const dragOrigin = useRef({ x: 0, y: 0 });
   const [clipboardDragVisual, setClipboardDragVisual] = useState(false);
@@ -162,7 +168,7 @@ export default function PegCard({
       onDragEnd={(_e, info) => {
         const ox = dragOrigin.current.x;
         const oy = dragOrigin.current.y;
-        const prop = proposedDragPosition(
+        const prop = proposedDragPositionWithGrid(
           ox,
           oy,
           info.offset.x,
@@ -170,9 +176,10 @@ export default function PegCard({
           w,
           h,
           innerW,
-          innerH
+          innerH,
+          grid
         );
-        const hit = hasPlacementCollision(
+        const hit = hasPlacementCollisionWithGrid(
           item.id,
           prop.x,
           prop.y,
@@ -180,7 +187,8 @@ export default function PegCard({
           specs,
           positions,
           innerW,
-          innerH
+          innerH,
+          grid
         );
         const finishDrag = () => {
           draggingRef.current = false;

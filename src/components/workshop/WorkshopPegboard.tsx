@@ -29,8 +29,12 @@ export interface WorkshopPegboardProps {
 }
 
 function useViewportPegboard() {
-  const [vw, setVw] = useState(1024);
-  const [vh, setVh] = useState(768);
+  const [vw, setVw] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth : 1024
+  );
+  const [vh, setVh] = useState(() =>
+    typeof window !== "undefined" ? window.innerHeight : 768
+  );
 
   useIsoLayoutEffect(() => {
     function read() {
@@ -64,12 +68,17 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     Record<number, { left: number; width: number; top: number; bottom: number }>
   >({});
   const [desktopPanelPadY, setDesktopPanelPadY] = useState(40);
+  const [desktopPanelPadX, setDesktopPanelPadX] = useState(32);
 
   const layoutW = portalLayout?.w ?? vw;
   const layoutH = portalLayout?.h ?? vh;
   const isMobile = portalLayout?.isMobile ?? false;
+  const isLayoutReady = portalLayout !== null;
 
-  const desktopInner = useMemo(() => desktopInnerW(layoutW), [layoutW]);
+  const desktopInner = useMemo(
+    () => desktopInnerW(layoutW, desktopPanelPadX),
+    [layoutW, desktopPanelPadX]
+  );
   const sideGap = useMemo(
     () => desktopPegboardSideGap(layoutW, desktopInner),
     [layoutW, desktopInner]
@@ -88,7 +97,9 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     if (firstPanel) {
       const s = window.getComputedStyle(firstPanel);
       const pt = parseFloat(s.paddingTop || "0") || 0;
+      const pl = parseFloat(s.paddingLeft || "0") || 0;
       setDesktopPanelPadY(pt);
+      setDesktopPanelPadX(pl);
     }
 
     const next: Record<
@@ -116,7 +127,11 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
         0,
         parseFloat(window.getComputedStyle(boardEl).borderTopWidth || "0") || 0
       );
-      const screwCenterInset = borderW + 30;
+      const gridPx =
+        parseFloat(
+          window.getComputedStyle(boardEl).getPropertyValue("--peg-grid-px")
+        ) || 60;
+      const screwCenterInset = borderW + gridPx / 2;
       const overlap = 10;
 
       const left = boardRect.right - panelRect.left - overlap;
@@ -288,7 +303,11 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
       data-pegboard-layout={isMobile ? "mobile" : "desktop"}
     >
       <div className="portal-frame">
-        <div ref={portalInnerRef} className="portal-inner">
+        <div
+          ref={portalInnerRef}
+          className="portal-inner"
+          style={{ visibility: isLayoutReady ? "visible" : "hidden" }}
+        >
           <div className="shadowbox-portal" aria-hidden />
           {!isMobile ? (
             <div
@@ -307,13 +326,13 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
                     layoutWidth={layoutW}
                     layoutHeight={layoutH}
                     desktopPanelPadY={desktopPanelPadY}
+                    desktopPanelPadX={desktopPanelPadX}
                   />
                   {i < panels.length - 1 ? (
                     <>
                       {/*
                        * Align connector bands to the pegboard corner screw centers.
-                       * Pegboard holes are centered at 30px offsets (PEG_GRID = 60).
-                       * Desktop panel padding is 2.5rem (40px).
+                       * Peg hole / screw spacing follows `--peg-grid-px` on `.pegboard-bg`.
                        */}
                       <div
                         aria-hidden
