@@ -232,22 +232,23 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   useIsoLayoutEffect(() => {
     const el = portalInnerRef.current;
     if (!el) return;
-    const apply = (width: number, height: number) => {
-      // ResizeObserver contentRect can be sub-pixel; peg math uses floor(inner/grid)*grid.
-      // Rounding avoids TR/BR screw vs hole drift when a 1px budget flips (e.g. 1023 vs 1024).
-      const w = Math.round(width);
-      const h = Math.round(height);
+    const apply = (target: HTMLElement) => {
+      // Use border-box pixel size from layout (not contentRect), so flex-constrained
+      // portal-inner height matches what the user sees after ADR-003 height chain.
+      const w = Math.round(target.clientWidth);
+      const h = Math.round(target.clientHeight);
+      // Do not bail on 0×0: first paint can be before flex insets size the portal; we
+      // still need portalLayout set so `visibility` clears and ResizeObserver can settle.
       setPortalLayout({
         w,
         h,
         isMobile: w <= 768,
       });
     };
-    apply(el.clientWidth, el.clientHeight);
+    apply(el);
     const ro = new ResizeObserver(entries => {
       for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        apply(width, height);
+        if (entry.target instanceof HTMLElement) apply(entry.target);
       }
     });
     ro.observe(el);

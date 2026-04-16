@@ -7,6 +7,15 @@
   min-height: 0;
 }
 
+/*
+ * ADR-003: `workshop-viewport-slot` (Main fillViewportSlot) — stack fills main so
+ * pegboard + portal-bezel stay in view; only .workshop-scroll--* scrolls.
+ */
+#main-content.workshop-viewport-slot .workshop-page-stack {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .workshop-page-stack > .workshop-pegboard-root {
   flex: 1 1 auto;
   min-height: 0;
@@ -17,6 +26,10 @@
 }
 
 .workshop-pegboard-root {
+  /* Column flex so `.portal-frame` flex/min-height-0 participate (ADR-003); block parent lets content expand page height after hydration. */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   /* Mirrors tailwind.config fontFamily — use theme() so stacks stay single-sourced */
   --font-display: theme("fontFamily.display");
   --font-body: theme("fontFamily.body");
@@ -275,9 +288,50 @@
   pointer-events: none;
 }
 
+/*
+ * Mobile: if anything above still lets the document grow, keep slab nav in the
+ * viewport (ADR-003). Wood fill matches .portal-frame so scrolling content does
+ * not show through the bezel band.
+ */
+.workshop-pegboard-root[data-pegboard-layout="mobile"] .portal-bezel {
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
+  align-self: stretch;
+  box-sizing: border-box;
+  /* Do not use margin-top: auto here — it absorbs flex free space and collapses
+   * `.portal-inner` (flex 1 1 0) to zero height in the column. */
+  background-color: #4a3018;
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.03) 0%,
+      transparent 10%,
+      rgba(255, 255, 255, 0.02) 20%,
+      transparent 30%,
+      rgba(0, 0, 0, 0.04) 50%,
+      transparent 60%,
+      rgba(255, 255, 255, 0.01) 80%,
+      transparent 100%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.05) 3px,
+      rgba(0, 0, 0, 0.05) 4px
+    );
+  box-shadow:
+    0 -10px 24px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
 @media (max-height: 720px) {
   .workshop-pegboard-root .portal-bezel {
     height: 56px;
+  }
+
+  .workshop-pegboard-root:not([data-pegboard-layout="mobile"]) .portal-bezel {
     margin-top: 10px;
   }
 
@@ -292,6 +346,9 @@
     height: 76px;
     justify-content: space-between;
     padding: 0 0.5rem;
+  }
+
+  .workshop-pegboard-root:not([data-pegboard-layout="mobile"]) .portal-bezel {
     margin-top: 16px;
   }
 }

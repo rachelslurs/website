@@ -49,6 +49,8 @@ We adopt an explicit **frame chrome visibility** invariant for the workshop rout
 ## Consequences
 
 - Layout work on `Workshop*` / workshop CSS must treat **frame + scrollable body** as a **bounded-height** problem, not “content defines page height.”
+- **Implementation (2026-04-16):** Workshop routes use `Main` **`fillViewportSlot`** (omit **`prose`** on `#main-content` so typography `prose` rules do not fight flex sizing) → `RisoBoardShell` **`fillViewportChain`** (**`h-svh`** + column flex — `min-h-dvh` alone can leave flex descendants with an indefinite height in WebKit) → `#main-content.workshop-viewport-slot` + `.workshop-page-stack` **`flex: 1 1 auto; min-height: 0`** so `WorkshopPegboard`’s `portal-frame` / `.workshop-scroll--*` chain receives a definite height and **inner** vertical scroll wins.
+- **`.workshop-pegboard-root` must be `display: flex; flex-direction: column; min-height: 0`** so `.portal-frame`’s `flex: 1; min-height: 0` is meaningful. A **block** root lets the TV frame grow with peg content after hydration (`client:only`), restoring document scroll past the arrows.
 - **Manual QA:** At **320, 375, 430, 768, 1024, 1280** (or the project’s standard set), confirm arrows visible **without** outer scroll on load.
 - **ADR-001** should be read together with this ADR for mobile: lattice rules (001) + chrome visibility (003).
 - Supersede or amend this ADR if the workshop shell changes materially (e.g. arrows move to a different region).
