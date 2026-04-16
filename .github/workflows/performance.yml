@@ -4,8 +4,14 @@ name: Performance baseline
 on:
   pull_request:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
   # Run on every branch so feature work is checked before it reaches main
   push:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
   workflow_dispatch:
 
 concurrency:
