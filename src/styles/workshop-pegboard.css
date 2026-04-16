@@ -1362,8 +1362,8 @@
    * Die-cut holes via SVG mask (scales with element size).
    * ViewBox is 300×300; holes are centered at (30,30) and (270,30) with r=8 (16px dia).
    */
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Crect x='0' y='0' width='300' height='300' rx='4' ry='4' fill='white'/%3E%3Ccircle cx='30' cy='30' r='8' fill='black'/%3E%3Ccircle cx='270' cy='30' r='8' fill='black'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Crect x='0' y='0' width='300' height='300' rx='4' ry='4' fill='white'/%3E%3Ccircle cx='30' cy='30' r='8' fill='black'/%3E%3Ccircle cx='270' cy='30' r='8' fill='black'/%3E%3C/svg%3E");
+  -webkit-mask-image: var(--blueprint-mask-image);
+  mask-image: var(--blueprint-mask-image);
   -webkit-mask-mode: luminance;
   mask-mode: luminance;
   -webkit-mask-repeat: no-repeat;
@@ -1514,11 +1514,19 @@
 
   .peg-card__inner--blueprint .blueprint-bg::before {
     --blueprint-grid-line: 1px;
-    /*
-     * Mask selection hook:
-     * When we introduce alternate hole sizes/positions, override
-     * `--blueprint-mask-image` here (and/or in other container ranges).
-     */
+    /* Variant A: slightly smaller die-cut holes for narrow cards. */
+    --blueprint-hole-diameter-px: 14px;
+    --blueprint-hole-offset-px: 28px;
+    --blueprint-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Crect x='0' y='0' width='300' height='300' rx='4' ry='4' fill='white'/%3E%3Ccircle cx='30' cy='30' r='7' fill='black'/%3E%3Ccircle cx='270' cy='30' r='7' fill='black'/%3E%3C/svg%3E");
+  }
+}
+
+@container (max-width: 220px) {
+  .peg-card__inner--blueprint .blueprint-bg::before {
+    /* Variant B: smallest readable holes for very narrow cards. */
+    --blueprint-hole-diameter-px: 12px;
+    --blueprint-hole-offset-px: 26px;
+    --blueprint-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Crect x='0' y='0' width='300' height='300' rx='4' ry='4' fill='white'/%3E%3Ccircle cx='30' cy='30' r='6' fill='black'/%3E%3Ccircle cx='270' cy='30' r='6' fill='black'/%3E%3C/svg%3E");
   }
 }
 
