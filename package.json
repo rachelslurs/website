@@ -14,8 +14,11 @@
     "cz": "cz",
     "prepare": "husky install",
     "lint": "eslint .",
+    "check": "astro check",
     "perf:report": "node scripts/perf-baseline.mjs",
-    "perf:baseline": "npm run build && npm run perf:report"
+    "perf:baseline": "npm run build && npm run perf:report",
+    "test:visual": "playwright test",
+    "test:visual:update": "playwright test --update-snapshots"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
@@ -44,6 +47,7 @@
     "@astrojs/react": "^3.6.2",
     "@astrojs/sitemap": "3.1.6",
     "@astrojs/tailwind": "^5.1.1",
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/forms": "0.5.7",
     "@tailwindcss/typography": "^0.5.15",
     "@tinacms/cli": "^1.5.46",
@@ -77,5 +81,8 @@
     "*.{js,jsx,ts,tsx,md,mdx,json,astro}": [
       "prettier --write --plugin=prettier-plugin-astro"
     ]
+  },
+  "overrides": {
+    "better-sqlite3": "^12.9.0"
   }
 }
