@@ -13,6 +13,10 @@ function namePortalFrame(width: number) {
   return `portal-frame--w${width}.png`;
 }
 
+function namePageWithChrome(width: number) {
+  return `workshop-page-with-chrome--w${width}.png`;
+}
+
 async function gotoWorkshopVisualFixture(page: Page) {
   await page.goto("/workshop/visual-test", { waitUntil: "networkidle" });
   await page.waitForFunction(() => {
@@ -137,4 +141,29 @@ test.describe("Workshop frame chrome (ADR-003)", () => {
       ratio: 0.1,
     });
   });
+});
+
+/**
+ * Entire first paint: `RisoBoardShell` main nav + workshop + `Footer` inside the
+ * `h-svh` board shell. Default `page` screenshot is viewport-sized (not `fullPage`),
+ * so this matches what users see without scrolling the document.
+ */
+test.describe("Workshop page with site chrome (viewport)", () => {
+  for (const width of WIDTHS) {
+    test(`viewport screenshot @ ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await gotoWorkshopVisualFixture(page);
+
+      await expect(
+        page.getByRole("navigation", { name: "Main navigation" })
+      ).toBeInViewport();
+      await expect(page.getByRole("contentinfo")).toBeInViewport();
+
+      await expect(page).toHaveScreenshot(namePageWithChrome(width), {
+        animations: "disabled",
+        timeout: 15_000,
+      });
+    });
+  }
 });
