@@ -5,7 +5,10 @@ import {
   ChevronRightIcon,
   ChevronUpIcon,
 } from "@heroicons/react/24/outline";
-import { desktopPegboardSideGap } from "@utils/workshopPegboardPhysics";
+import {
+  desktopPegboardSideGap,
+  pickMobileGridLayout,
+} from "@utils/workshopPegboardPhysics";
 import {
   useCallback,
   useEffect,
@@ -17,12 +20,15 @@ import {
 import type { ReactNode } from "react";
 import type { PegboardPanelDTO } from "@utils/serializeWorkshopPegboard";
 import PegboardPanelView from "./PegboardPanels";
-import { desktopInnerW } from "./pegboardDimensions";
+import { desktopInnerW, mobileInnerW } from "./pegboardDimensions";
 
 import "../../styles/workshop-pegboard.css";
 
 const useIsoLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+/** At/above this portal width (and 2+ slabs), slabs share one peg layout. Below: per-slab pick + looser stack CSS. */
+const MOBILE_UNIFIED_PEG_LAYOUT_MIN_PX = 480;
 
 export interface WorkshopPegboardProps {
   panels: PegboardPanelDTO[];
@@ -83,6 +89,16 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     () => desktopPegboardSideGap(layoutW, desktopInner),
     [layoutW, desktopInner]
   );
+
+  /** Shared mobile peg layout only on wider mobile/tablet; narrow phones pick per slab for fit. */
+  const unifiedMobilePegLayout = useMemo(() => {
+    if (!isMobile || panels.length < 2) return undefined;
+    if (layoutW < MOBILE_UNIFIED_PEG_LAYOUT_MIN_PX) return undefined;
+    return pickMobileGridLayout(
+      mobileInnerW(layoutW),
+      panels.flatMap(p => p.items)
+    );
+  }, [isMobile, layoutW, panels]);
 
   useIsoLayoutEffect(() => {
     if (isMobile) return;
@@ -285,6 +301,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
           vh={vh}
           layoutWidth={layoutW}
           layoutHeight={layoutH}
+          mobilePegLayout={unifiedMobilePegLayout}
         />
       </div>
     );
@@ -297,10 +314,14 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     ? mobilePanelIdx === panels.length - 1
     : atLast;
 
+  const narrowMobilePortal =
+    isMobile && layoutW < MOBILE_UNIFIED_PEG_LAYOUT_MIN_PX;
+
   return (
     <div
       className="workshop-pegboard-root workshop-wall not-prose font-body w-full min-w-0"
       data-pegboard-layout={isMobile ? "mobile" : "desktop"}
+      data-workshop-narrow-mobile={narrowMobilePortal ? "true" : undefined}
     >
       <div className="portal-frame">
         <div
