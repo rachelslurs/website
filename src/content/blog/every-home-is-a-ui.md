@@ -7,8 +7,8 @@ draft: false
 author: Rachel Cantor
 pubDatetime: 2026-02-23T05:00:00.000Z
 tags:
-  - web accessibility
   - a11y
+  - web accessibility
   - user experience
   - aging in place
 ---

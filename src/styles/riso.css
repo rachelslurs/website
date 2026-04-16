@@ -127,6 +127,9 @@ nav .group:hover .dust-note {
   flex-direction: column;
   box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.18);
   transition: box-shadow 0.25s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 .is-hovered .card {
   box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.22);
@@ -184,7 +187,8 @@ nav .group:hover .dust-note {
 /* ── POST TYPOGRAPHY ── */
 .post-date {
   @apply font-mono;
-  font-size: var(--riso-type-2xs);
+  font-size: var(--riso-type-sm);
+  line-height: var(--analog-baseline);
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--ink-muted);
@@ -193,7 +197,7 @@ nav .group:hover .dust-note {
 }
 .post-title {
   @apply font-display;
-  @apply text-xl sm:text-2xl md:text-3xl break-words leading-tight md:leading-[1.15];
+  @apply mt-4 text-xl sm:text-2xl md:text-3xl break-words leading-tight md:leading-[1.15];
   color: var(--black);
   font-weight: 400;
 }
@@ -212,13 +216,16 @@ nav .group:hover .dust-note {
 /* Editorial “looseleaf” post layout: stamped title (outside `.analog-prose`). */
 .analog-post-title {
   @apply font-display;
-  @apply text-2xl sm:text-3xl md:text-4xl break-words leading-tight md:leading-[1.15];
+  @apply mt-4 text-2xl sm:text-3xl md:text-4xl break-words leading-tight md:leading-[1.15];
   color: var(--black);
   font-weight: 400;
 }
+/* Body copy sizing matches `.analog-prose` on PostDetails; use `--analog-baseline`
+   (not `--baseline`) so cards work outside `.analog-post`. */
 .post-excerpt {
-  font-size: var(--riso-type-lg);
-  line-height: var(--riso-leading-normal);
+  @apply font-body;
+  font-size: 1rem;
+  line-height: var(--analog-baseline);
   color: var(--ink-secondary);
   margin-top: 0.5rem;
   flex: 1;
@@ -241,10 +248,7 @@ nav .group:hover .dust-note {
   font-weight: 700;
 }
 .posts-index-board .post-excerpt {
-  @apply font-body;
   margin-top: 0;
-  font-size: 0.8125rem;
-  line-height: var(--riso-leading-relaxed);
   flex: 1;
 }
 
@@ -288,7 +292,7 @@ nav .group:hover .dust-note {
   @apply font-heading;
   font-size: var(--riso-type-lg);
   margin-top: 3px;
-  opacity: 0.6;
+  opacity: 0.85;
 }
 
 /* ── QUOTE ── */
@@ -334,7 +338,7 @@ nav .group:hover .dust-note {
 .card-link {
   @apply font-mono;
   font-size: var(--riso-type-md);
-  margin-top: 0.75rem;
+  margin-top: 0;
   color: var(--blue);
   font-weight: bold;
   text-decoration: none;
@@ -350,6 +354,45 @@ nav .group:hover .dust-note {
 .card-link:hover {
   color: var(--red);
   border-bottom-color: var(--red);
+}
+
+/* Circular arrow-only variant for post cards (homepage + /posts). */
+.card-link-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--black);
+  color: #fff;
+  background-color: var(--black);
+  /* Swatch-style subtle dot pattern */
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.35) 0.7px,
+    transparent 0.7px
+  );
+  background-size: 5px 5px;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+  padding-bottom: 0;
+}
+
+.card-link-circle:hover {
+  /* Red patterned button on hover: keep dot pattern, swap ink → red */
+  color: #fff;
+  border-color: var(--red);
+  background-color: var(--red);
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.35) 0.7px,
+    transparent 0.7px
+  );
 }
 .demo-link {
   color: rgba(255, 255, 255, 0.5);
@@ -615,7 +658,7 @@ nav .group:hover .dust-note {
   font-size: var(--riso-type-md);
 }
 .dymo-section {
-  padding: 4px 10px 3px;
+  padding: 4px 10px;
   background-image: linear-gradient(180deg, #444 0%, #333 40%, #111 100%);
   cursor: default;
 }
@@ -933,7 +976,7 @@ a.skip-to-content-board:focus {
 }
 
 .analog-post .post-meta {
-  margin-bottom: var(--baseline);
+  margin-bottom: 1rem;
 }
 
 .analog-post .post-tags-heading {

@@ -18,6 +18,29 @@ import { seededOffset } from "@utils/seededOffset";
 
 export type TagColor = "red" | "blue" | "green";
 
+const ArrowRightCircle = ({
+  className,
+  ...props
+}: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+    className={className}
+    {...props}
+  >
+    {/* Chunky chevron right, centered for use inside the circular button */}
+    <path
+      d="M10.25 8.25 14 12l-3.75 3.75"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export interface PortfolioPost {
   id: string;
   /** Matches `CollectionEntry.slug` / post URL segment; shared-element VT name with post page title. */
@@ -160,7 +183,8 @@ const BoardCard = React.memo(
     );
 
     const currentRot = dragRot !== null ? dragRot : rot;
-    const scale = isDragging ? 1.04 : isHovered && !isTouchDevice ? 1.015 : 1;
+    /* Scale only while dragging — hover scale made body text look like it “changed font” (AA re-raster). */
+    const scale = isDragging ? 1.04 : 1;
 
     const entranceVariants = useMemo(
       () => ({
@@ -420,16 +444,16 @@ export default function PortfolioBoard({
                   {post.desc ? (
                     <p className="post-excerpt">{post.desc}</p>
                   ) : null}
-                  <div className="mt-auto flex items-end justify-between pt-4">
+                  <div className="mt-auto flex items-center justify-between pt-4">
                     <DymoLabel
                       text={post.tag}
                       size="section"
                       color={post.tagColor}
                       isInteractive={false}
                     />
-                    <a href={post.href} className="card-link">
-                      <span aria-hidden="true">&rarr;</span> Read
-                      <span className="sr-only">: {post.title}</span>
+                    <a href={post.href} className="card-link card-link-circle">
+                      <ArrowRightCircle className="h-[1.15rem] w-[1.15rem]" />
+                      <span className="sr-only">Read: {post.title}</span>
                     </a>
                   </div>
                 </article>

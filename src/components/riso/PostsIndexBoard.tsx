@@ -8,6 +8,29 @@ import React, {
 import { motion, useReducedMotion } from "framer-motion";
 import DymoLabel from "@components/riso/DymoLabel";
 import type { PortfolioPost } from "@components/PortfolioBoard";
+
+const ArrowRightCircle = ({
+  className,
+  ...props
+}: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+    className={className}
+    {...props}
+  >
+    {/* Chunky chevron right, centered for use inside the circular button */}
+    <path
+      d="M10.25 8.25 14 12l-3.75 3.75"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 /** Base delay before the first card (homepage waits for nav; /posts uses 0). */
 const CONTENT_ENTRANCE_DELAY_S = 0;
 /** Seconds between each card’s entrance — clearer than PortfolioBoard’s 0.08s step. */
@@ -151,7 +174,7 @@ function DraggableCard({
   );
 
   const currentRot = dragRot !== null ? dragRot : 0;
-  const scale = isDragging ? 1.04 : isHovered && !dragDisabled ? 1.015 : 1;
+  const scale = isDragging ? 1.04 : 1;
   const shadowClass = isDragging
     ? "is-dragging"
     : isHovered && !dragDisabled
@@ -618,7 +641,7 @@ export default function PostsIndexBoard({
           >
             <article className="card flex flex-col">
               <h2
-                className="post-title m-0 mb-1 font-semibold"
+                className="post-title m-0 mb-2 font-semibold"
                 style={{ viewTransitionName: post.slug }}
               >
                 <a
@@ -629,28 +652,23 @@ export default function PostsIndexBoard({
                   {post.title}
                 </a>
               </h2>
-              <time
-                className="post-date mb-3 font-mono text-xs uppercase tracking-widest text-[var(--ink-muted)]"
-                dateTime={post.dateTime}
-              >
+              <time className="post-date" dateTime={post.dateTime}>
                 {post.dateLabel}
               </time>
               {post.desc ? (
-                <p className="post-excerpt m-0 font-body leading-relaxed">
-                  {post.desc}
-                </p>
+                <p className="post-excerpt m-0">{post.desc}</p>
               ) : null}
 
-              <div className="mt-auto flex items-end justify-between pt-4">
+              <div className="mt-auto flex items-center justify-between pt-4">
                 <DymoLabel
                   text={post.tag}
                   size="section"
                   color={post.tagColor}
                   isInteractive={false}
                 />
-                <a href={post.href} className="card-link">
-                  <span aria-hidden="true">&rarr;</span> Read
-                  <span className="sr-only">: {post.title}</span>
+                <a href={post.href} className="card-link card-link-circle">
+                  <ArrowRightCircle className="h-[1.15rem] w-[1.15rem]" />
+                  <span className="sr-only">Read: {post.title}</span>
                 </a>
               </div>
             </article>
