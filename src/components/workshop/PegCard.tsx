@@ -91,27 +91,41 @@ export default function PegCard({
         ? { scale: 1.02, zIndex: 50 }
         : { scale: 1, zIndex: 40 };
 
+  const blockParentDragHandlers = !dragDisabled;
+
   const cardInner =
     item.hardware === "clipboard" ? (
       <div
         className="peg-card__inner peg-card__inner--clipboard"
         style={{ width: w, height: h, position: "relative" }}
       >
-        <CaseStudyClipboard item={item} dragVisual={clipboardDragVisual} />
+        <CaseStudyClipboard
+          item={item}
+          dragVisual={clipboardDragVisual}
+          blockParentDragHandlers={blockParentDragHandlers}
+        />
       </div>
     ) : item.hardware === "lcd" ? (
       <div
         className="peg-card__inner peg-card__inner--lcd"
         style={{ width: w, height: h, position: "relative" }}
       >
-        <LinkLcdCard item={item} dragVisual={lcdDragVisual} />
+        <LinkLcdCard
+          item={item}
+          dragVisual={lcdDragVisual}
+          blockParentDragHandlers={blockParentDragHandlers}
+        />
       </div>
     ) : (
       <div
         className="peg-card__inner peg-card__inner--blueprint"
         style={{ width: w, height: h, position: "relative" }}
       >
-        <DemoBlueprintCard item={item} dragVisual={blueprintDragVisual} />
+        <DemoBlueprintCard
+          item={item}
+          dragVisual={blueprintDragVisual}
+          blockParentDragHandlers={blockParentDragHandlers}
+        />
       </div>
     );
 
