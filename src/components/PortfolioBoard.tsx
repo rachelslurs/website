@@ -176,15 +176,15 @@ const BoardCard = React.memo(
       (e: React.PointerEvent) => {
         if (!isDragging) return;
         setIsDragging(false);
-        setDragRot(flat ? 0 : seededOffset(Date.now(), 3));
+        // Return to the original rest rotation so tape/pins feel physically attached.
+        setDragRot(flat ? 0 : rot);
         dragRef.current?.releasePointerCapture(e.pointerId);
       },
-      [isDragging, flat]
+      [isDragging, flat, rot]
     );
 
     const currentRot = dragRot !== null ? dragRot : rot;
-    /* Scale only while dragging — hover scale made body text look like it “changed font” (AA re-raster). */
-    const scale = isDragging ? 1.04 : 1;
+    const scale = isDragging ? 1.01 : 1;
 
     const entranceVariants = useMemo(
       () => ({

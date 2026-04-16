@@ -174,7 +174,7 @@ function DraggableCard({
   );
 
   const currentRot = dragRot !== null ? dragRot : 0;
-  const scale = isDragging ? 1.04 : 1;
+  const scale = isDragging ? 1.01 : 1;
   const shadowClass = isDragging
     ? "is-dragging"
     : isHovered && !dragDisabled
