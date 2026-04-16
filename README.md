@@ -59,6 +59,10 @@ The compose services also install a small build toolchain (`make`, `g++`) as a f
   - the Playwright HTML report
   - screenshot `*-diff.png` and `*-actual.png` images
 
+## Architecture decisions
+
+Design rationale for larger choices lives in **Architecture Decision Records** under [`docs/decisions/`](docs/decisions/) (for example [ADR-001: Workshop mobile pegboard layout contract](docs/decisions/001-workshop-mobile-pegboard-contract.md)).
+
 Projects
 
 - [TidyText: Clean ChatGPT Text for Google Docs and Microsoft Word](https://tidytext.cc)
