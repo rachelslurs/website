@@ -19,7 +19,7 @@ tags:
   - wasp
 ---
 
-_If you’d like a hand in building this or anything like it, I’m open to taking on new clients. See [the end of this article](https://rachel.fyi/posts/production-ready-external-auth-cors-token-refresh-api-implementation-with-wasp/#about-the-author) to learn more._
+_If you’d like a hand in building this or anything like it, I’m open to taking on new clients. See [the end of this article](https://rachel.fyi/posts/production-ready-external-auth-cors-token-refresh-api-implementation-with-wasp#about-the-author) to learn more._
 
 ---
 

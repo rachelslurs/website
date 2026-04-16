@@ -13,7 +13,7 @@ tags:
   - how i work
 ---
 
-I've written before about [setting up Cursor rules](https://rachel.ai/posts/say-less-with-cursor-rules/) and [using plans to sequence work](https://rachel.fyi/posts/how-i-use-cursor-to-plan-and-ship/). Those posts covered my system: rules for consistency, plans for sequencing, a Plan-Audit-Execute loop for confidence. It worked. But there were gaps I was papering over with habit instead of structure.
+I've written before about [setting up Cursor rules](https://rachel.ai/posts/say-less-with-cursor-rules) and [using plans to sequence work](https://rachel.fyi/posts/how-i-use-cursor-to-plan-and-ship). Those posts covered my system: rules for consistency, plans for sequencing, a Plan-Audit-Execute loop for confidence. It worked. But there were gaps I was papering over with habit instead of structure.
 
 Then I found Addy Osmani's [`agent-skills`](https://github.com/addyosmani/agent-skills) repo. It's a collection of structured workflows for AI coding agents, organized by development phase: define, plan, build, verify, review, ship. Each skill is a markdown file with concrete steps, verification gates, and tables of common excuses agents use to skip steps (with rebuttals). There are around 20 skills total, and I'm not going to walk through all of them. I've only been using the repo for a few days, but four skills have already changed how I work.
 
@@ -49,7 +49,7 @@ A concrete example: I asked the agent whether our current session had enough con
 
 The skill also pushed me to consolidate context sources. I had two plan files covering overlapping work. After invoking `context-engineering` alongside the `planning-and-task-breakdown` skill, the agent merged them into a single canonical plan and marked the other as superseded.
 
-Rules files sit at Level 1 in the context hierarchy: always loaded, always setting the baseline. I'd already landed on this with my [Cursor rules setup](https://rachel.fyi/posts/say-less-with-cursor-rules/), but the `context-engineering` skill gave me a framework for understanding _why_ it works, and where the other levels fit.
+Rules files sit at Level 1 in the context hierarchy: always loaded, always setting the baseline. I'd already landed on this with my [Cursor rules setup](https://rachel.fyi/posts/say-less-with-cursor-rules), but the `context-engineering` skill gave me a framework for understanding _why_ it works, and where the other levels fit.
 
 ## Documentation and ADRs
 
