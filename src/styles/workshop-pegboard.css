@@ -87,6 +87,8 @@
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  /* Phase 2f: scroll-primary mobile — vertical pan wins over horizontal gestures */
+  touch-action: pan-y;
 }
 
 .workshop-panel--desktop {
@@ -505,6 +507,7 @@
   position: relative;
   z-index: 2;
   box-sizing: border-box;
+  touch-action: pan-y;
 }
 
 /* Narrow portal (<480px): centered stack + rem spacing so cards stay readable; per-slab grid from JS. */
@@ -520,6 +523,8 @@
   position: relative;
   left: auto;
   top: auto;
+  touch-action: pan-y;
+  user-select: text;
 }
 
 /* Hardware cards */
