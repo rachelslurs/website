@@ -43,8 +43,6 @@ const { page, workCount, demoCount, linkCount } = Astro.props;
 
 const pegboardPanels = serializeWorkshopPanelsForPegboard(page.data ?? []);
 
-const totalEntries = workCount + demoCount + linkCount;
-
 const layoutTitle =
   page.currentPage > 1
     ? `Workshop (page ${page.currentPage}) | ${SITE.title}`
