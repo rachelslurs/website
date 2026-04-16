@@ -1,10 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { PegboardCardDTO } from "@utils/serializeWorkshopPegboard";
 import {
   hardwareDims,
   hardwareDimsWithGrid,
   initialPackPositions,
   initialPackPositionsWithGrid,
+  PEG_GRID,
   resolveLayoutAfterResize,
   resolveLayoutAfterResizeWithGrid,
 } from "@utils/workshopPegboardPhysics";
@@ -18,6 +26,9 @@ import PegCard from "./PegCard";
 
 /** Matches `.pegboard-bg { border: 8px solid ... }` — outer box is cork + 2×8 when box-sizing is content-box. */
 const PEGBOARD_BORDER_OUTSET = 16;
+
+/** Minimum cork content height (grid rows) when the stack is nearly empty. */
+const MOBILE_PEGBOARD_MIN_GRID_ROWS = 3;
 
 function PegboardPanelMobile({
   items,
@@ -33,17 +44,48 @@ function PegboardPanelMobile({
   const noopCommit = useCallback(() => {}, []);
   const emptySpecs = useMemo<PegboardCardSpec[]>(() => [], []);
   const emptyPositions = useMemo(() => ({}), []);
+  const stackRef = useRef<HTMLDivElement>(null);
+  const [snappedContentH, setSnappedContentH] = useState(
+    MOBILE_PEGBOARD_MIN_GRID_ROWS * PEG_GRID
+  );
+
+  const itemsKey = useMemo(() => items.map(i => i.id).join("|"), [items]);
+
+  useLayoutEffect(() => {
+    const el = stackRef.current;
+    if (!el) return;
+
+    const minH = MOBILE_PEGBOARD_MIN_GRID_ROWS * PEG_GRID;
+    const snapFromBorderHeight = (h: number) =>
+      Math.max(minH, Math.ceil(h / PEG_GRID) * PEG_GRID);
+
+    const apply = (entry?: ResizeObserverEntry) => {
+      const h = entry
+        ? (entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height)
+        : el.getBoundingClientRect().height;
+      const snapped = snapFromBorderHeight(h);
+      setSnappedContentH(prev => (prev === snapped ? prev : snapped));
+    };
+
+    apply();
+    const ro = new ResizeObserver(entries => {
+      const entry = entries[0];
+      if (entry) apply(entry);
+    });
+    ro.observe(el, { box: "border-box" });
+    return () => ro.disconnect();
+  }, [itemsKey, innerW]);
 
   return (
     <div
       className="pegboard-bg pegboard-bg--mobile-flow"
-      style={{ width: innerW, minHeight: "8rem" }}
+      style={{ width: innerW, height: snappedContentH }}
     >
       <span className="heavy-screw heavy-screw--tl" aria-hidden />
       <span className="heavy-screw heavy-screw--tr" aria-hidden />
       <span className="heavy-screw heavy-screw--bl" aria-hidden />
       <span className="heavy-screw heavy-screw--br" aria-hidden />
-      <div className="pegboard-mobile-stack">
+      <div ref={stackRef} className="pegboard-mobile-stack">
         {items.map(it => {
           const { w: cw, h } = hardwareDims(it.hardware);
           return (
