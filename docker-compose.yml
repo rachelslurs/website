@@ -20,7 +20,7 @@ services:
       - npm_cache:/root/.npm
       - playwright_node_modules:/work/node_modules
     # better-sqlite3 (via Tina) may compile from source; install a small build toolchain.
-    command: bash -lc "apt-get update && apt-get install -y --no-install-recommends g++ make python3 && rm -rf /var/lib/apt/lists/* && npm ci --prefer-offline --no-audit --no-fund && npm run test:visual"
+    command: bash -lc "apt-get update && apt-get install -y --no-install-recommends g++ make python3 && rm -rf /var/lib/apt/lists/* && HUSKY=0 npm ci --prefer-offline --no-audit --no-fund && npm run test:visual"
 
   # Local speed: bake build deps into an image (no apt-get every run).
   # CI should still use the official image path above for parity.
@@ -34,7 +34,7 @@ services:
       - ./:/work
       - npm_cache:/root/.npm
       - playwright_node_modules:/work/node_modules
-    command: bash -lc "npm ci --prefer-offline --no-audit --no-fund && npm run test:visual"
+    command: bash -lc "HUSKY=0 npm ci --prefer-offline --no-audit --no-fund && npm run test:visual"
 
   # Regenerate baselines (Linux) and write them into the mounted repo.
   playwright-update:
@@ -45,7 +45,7 @@ services:
       - ./:/work
       - npm_cache:/root/.npm
       - playwright_node_modules:/work/node_modules
-    command: bash -lc "apt-get update && apt-get install -y --no-install-recommends g++ make python3 && rm -rf /var/lib/apt/lists/* && npm ci --prefer-offline --no-audit --no-fund && npm run test:visual:update"
+    command: bash -lc "apt-get update && apt-get install -y --no-install-recommends g++ make python3 && rm -rf /var/lib/apt/lists/* && HUSKY=0 npm ci --prefer-offline --no-audit --no-fund && npm run test:visual:update"
 
   playwright-update-fast:
     platform: linux/amd64
@@ -57,7 +57,7 @@ services:
       - ./:/work
       - npm_cache:/root/.npm
       - playwright_node_modules:/work/node_modules
-    command: bash -lc "npm ci --prefer-offline --no-audit --no-fund && npm run test:visual:update"
+    command: bash -lc "HUSKY=0 npm ci --prefer-offline --no-audit --no-fund && npm run test:visual:update"
 
 volumes:
   npm_cache:
