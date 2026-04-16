@@ -52,6 +52,20 @@ The compose file pins the official Playwright image to the same major line as `@
 
 The compose services also install a small build toolchain (`make`, `g++`) as a fallback when a native module needs to compile from source during `npm ci`.
 
+### Faster local Docker runs (optional)
+
+The `playwright` services above install build deps via `apt-get` on every run for CI parity. If you run visuals frequently, use the `*-fast` services which bake build deps into a local image (`Dockerfile.playwright`).
+
+```bash
+# Fast Linux run (no apt-get on each run)
+docker compose run --rm playwright-fast
+
+# Fast Linux baseline update
+docker compose run --rm playwright-update-fast
+```
+
+**Baseline policy:** treat **Linux (Docker/CI)** as the source of truth for committed screenshots. macOS runs are useful for quick iteration but may show small pixel diffs due to font/rendering differences.
+
 ### CI behavior
 
 - GitHub Actions runs visual tests on every PR.
