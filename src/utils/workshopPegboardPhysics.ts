@@ -117,41 +117,6 @@ export function hardwareDims(hardware: PegboardHardware): {
   return hardwareDimsWithGrid(hardware, PEG_GRID);
 }
 
-/** Horizontal slack PegCard uses before shrink-to-fit scale on mobile stack. */
-const MOBILE_LAYOUT_CARD_GUTTER = 32;
-const MOBILE_GRID_CANDIDATES = [60, 54, 48, 42] as const;
-
-/** Pick a peg step so card pixel widths fit `innerW` without scaling when possible. */
-export function pickMobileGridLayout(
-  innerW: number,
-  items: { hardware: PegboardHardware }[]
-): { grid: number; innerWUsed: number; suppressMobileScale: boolean } {
-  if (innerW <= 0) {
-    return { grid: PEG_GRID, innerWUsed: 0, suppressMobileScale: true };
-  }
-  if (items.length === 0) {
-    const grid = PEG_GRID;
-    return {
-      grid,
-      innerWUsed: Math.max(grid, Math.floor(innerW / grid) * grid),
-      suppressMobileScale: true,
-    };
-  }
-  for (const grid of MOBILE_GRID_CANDIDATES) {
-    const innerWUsed = Math.floor(innerW / grid) * grid;
-    if (innerWUsed <= 0) continue;
-    const maxW = Math.max(
-      ...items.map(it => hardwareDimsWithGrid(it.hardware, grid).w)
-    );
-    if (maxW + MOBILE_LAYOUT_CARD_GUTTER <= innerW) {
-      return { grid, innerWUsed, suppressMobileScale: true };
-    }
-  }
-  const grid = 42;
-  const innerWUsed = Math.max(grid, Math.floor(innerW / grid) * grid);
-  return { grid, innerWUsed, suppressMobileScale: false };
-}
-
 export interface PackItem {
   id: string;
   hardware: PegboardHardware;
