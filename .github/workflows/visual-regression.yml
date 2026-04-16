@@ -11,7 +11,7 @@ jobs:
     # Use the official Playwright image so browsers/deps are preinstalled.
     # Baselines should be generated on Linux to match CI rendering.
     container:
-      image: mcr.microsoft.com/playwright:v1.55.0-jammy
+      image: mcr.microsoft.com/playwright:v1.59.1-jammy
     timeout-minutes: 20
     steps:
       - name: Checkout
@@ -38,14 +38,14 @@ jobs:
           name: playwright-report
           path: playwright-report
 
-      - name: Upload trace/video (on failure)
+      - name: Upload screenshot diffs (on failure)
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-artifacts
+          name: playwright-screenshot-diffs
           path: |
-            test-results
-            **/*.png
+            test-results/**/**-actual.png
+            test-results/**/**-diff.png
 
   # Optional: manual baseline regeneration in CI.
   # Usage:
@@ -55,7 +55,7 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.55.0-jammy
+      image: mcr.microsoft.com/playwright:v1.59.1-jammy
     timeout-minutes: 20
     steps:
       - name: Checkout
