@@ -24,22 +24,14 @@ export const getStaticPaths = (async ({ paginate }) => {
 
   return paginate(toPaginate, {
     pageSize: SITE.postPerPage,
-    props: {
-      workCount: work.length,
-      demoCount: demos.length,
-      linkCount: links.length,
-    },
   });
 }) satisfies GetStaticPaths;
 
 interface Props {
   page: Page<WorkshopPanel>;
-  workCount: number;
-  demoCount: number;
-  linkCount: number;
 }
 
-const { page, workCount, demoCount, linkCount } = Astro.props;
+const { page } = Astro.props;
 
 const pegboardPanels = serializeWorkshopPanelsForPegboard(page.data ?? []);
 
