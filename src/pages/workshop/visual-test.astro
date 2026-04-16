@@ -59,7 +59,7 @@ const pegboardPanels: PegboardPanelDTO[] = [
     pageDesc="Deterministic fixture for Playwright screenshot tests."
   >
     <div class="workshop-page-stack">
-      <WorkshopPegboard client:load panels={pegboardPanels} />
+      <WorkshopPegboard client:only="react" panels={pegboardPanels} />
     </div>
   </Main>
 </Layout>

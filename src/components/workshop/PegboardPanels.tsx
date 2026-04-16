@@ -51,7 +51,7 @@ function PegboardPanelMobile({
   layoutWidth?: number;
   mobileScalePresentation?: MobileScalePresentation;
 }) {
-  const w = layoutWidth ?? vw;
+  const w = Math.round(layoutWidth ?? vw);
   const slotContentW = mobileScalePresentation?.slotContentW ?? mobileInnerW(w);
   const itemsKey = useMemo(() => items.map(i => i.id).join("|"), [items]);
   const maxCardW = useMemo(
@@ -174,6 +174,7 @@ function PegboardPanelDesktop({
   layoutHeight,
   desktopPanelPadY,
   desktopPanelPadX,
+  desktopContentInnerW,
 }: {
   items: PegboardCardDTO[];
   vw: number;
@@ -182,10 +183,15 @@ function PegboardPanelDesktop({
   layoutHeight?: number;
   desktopPanelPadY?: number;
   desktopPanelPadX?: number;
+  /** Measured panel content width from DOM — preferred over portal−padding when set. */
+  desktopContentInnerW?: number | null;
 }) {
-  const w = layoutWidth ?? vw;
-  const h = layoutHeight ?? vh;
-  const innerW = desktopInnerW(w, desktopPanelPadX ?? 32);
+  const w = Math.round(layoutWidth ?? vw);
+  const h = Math.round(layoutHeight ?? vh);
+  const innerW =
+    desktopContentInnerW != null && desktopContentInnerW > 0
+      ? desktopContentInnerW
+      : desktopInnerW(w, desktopPanelPadX ?? 32);
   const viewportH = desktopPortalInnerH(h, desktopPanelPadY ?? 40);
 
   const itemsKey = useMemo(() => items.map(i => i.id).join("|"), [items]);
@@ -294,11 +300,16 @@ function PegboardPanelDesktop({
       }}
     >
       <div
-        className="pegboard-bg"
+        className="pegboard-bg pegboard-bg--desktop-cork"
+        data-peg-cols={Math.round(innerWFinal / grid)}
+        data-peg-rows={Math.round(innerH / grid)}
+        data-peg-grid-px={grid}
         style={{
           width: innerWFinal,
           height: innerH,
           ["--peg-grid-px" as never]: `${grid}px`,
+          ["--peg-cols" as never]: String(Math.round(innerWFinal / grid)),
+          ["--peg-rows" as never]: String(Math.round(innerH / grid)),
         }}
       >
         <span className="heavy-screw heavy-screw--tl" aria-hidden />
@@ -342,6 +353,7 @@ export default function PegboardPanelView({
   layoutHeight,
   desktopPanelPadY,
   desktopPanelPadX,
+  desktopContentInnerW,
   mobileScalePresentation,
 }: {
   items: PegboardCardDTO[];
@@ -352,6 +364,7 @@ export default function PegboardPanelView({
   layoutHeight?: number;
   desktopPanelPadY?: number;
   desktopPanelPadX?: number;
+  desktopContentInnerW?: number | null;
   mobileScalePresentation?: MobileScalePresentation;
 }) {
   if (isMobile) {
@@ -373,6 +386,7 @@ export default function PegboardPanelView({
       layoutHeight={layoutHeight}
       desktopPanelPadY={desktopPanelPadY}
       desktopPanelPadX={desktopPanelPadX}
+      desktopContentInnerW={desktopContentInnerW}
     />
   );
 }
