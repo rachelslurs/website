@@ -31,6 +31,8 @@ test.describe("Workshop pegboard alignment", () => {
           {
             // Capture screw edges; avoid accidental crop cuts.
             animations: "disabled",
+            // Docker runs can take longer to reach a stable layout (fonts, ResizeObserver, etc.).
+            timeout: 15_000,
           }
         );
       }
@@ -73,6 +75,7 @@ test.describe("Workshop pegboard alignment", () => {
       await expect(page).toHaveScreenshot(`slab-seam-and-frame--w${width}.png`, {
         clip,
         animations: "disabled",
+        timeout: 15_000,
       });
     });
   }
