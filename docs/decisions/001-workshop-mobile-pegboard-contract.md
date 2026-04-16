@@ -37,6 +37,8 @@ We treat the mobile pegboard as governed by an explicit **layout contract**: sha
 
 6. **Scroll vs drag** — The mobile scroll strip uses `touch-action: pan-y` so vertical scroll wins; peg drag must not break that without an explicit exception documented in code or a follow-up ADR.
 
+7. **Frame chrome vs inner scroll (see ADR-003)** — §6 applies to **gesture handling on the pegboard column**, not to hiding **workshop frame** controls. Bottom **slab navigation** (arrows) must remain **visible in the initial viewport** without scrolling the document; when the peg stack is taller than the middle region, **that region** scrolls. Normative detail: [ADR-003: Workshop frame chrome in the initial viewport](003-workshop-frame-chrome-initial-viewport.md).
+
 ## Alternatives Considered
 
 ### Per-slab independent `designContentW` and `scale`
@@ -57,3 +59,4 @@ We treat the mobile pegboard as governed by an explicit **layout contract**: sha
 - Refactors that move where `scale` is applied must preserve this contract or **supersede** it with a new ADR that references this number. **Do not delete** superseded ADRs; they keep historical context.
 - **Implementation touchpoints:** `WorkshopPegboard.tsx` (`mobileScalePresentation`, portal layout), `PegboardPanels.tsx` (`PegboardPanelMobile`, scale slot/surface), `pegboardDimensions.ts`, `pegboardTypes.ts`, `workshop-pegboard.css` (mobile scale classes).
 - **Types:** `MobileScalePresentation` references this ADR in JSDoc so the contract stays discoverable from the type definition.
+- **Frame chrome:** Vertical layout must also satisfy [ADR-003](003-workshop-frame-chrome-initial-viewport.md) (arrows visible without outer scroll); ADR-001 §7 cross-references it.
