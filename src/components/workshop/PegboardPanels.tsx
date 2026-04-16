@@ -12,7 +12,6 @@ import {
   initialPackPositions,
   initialPackPositionsWithGrid,
   PEG_GRID,
-  pickMobileGridLayout,
   resolveLayoutAfterResize,
   resolveLayoutAfterResizeWithGrid,
 } from "@utils/workshopPegboardPhysics";
@@ -20,35 +19,50 @@ import {
   desktopInnerW,
   desktopPortalInnerH,
   mobileInnerW,
+  PEGBOARD_BORDER_OUTSET,
 } from "./pegboardDimensions";
-import type { MobilePegLayout, PegboardCardSpec } from "./pegboardTypes";
+import type {
+  MobileScalePresentation,
+  PegboardCardSpec,
+} from "./pegboardTypes";
 import PegCard from "./PegCard";
-
-/** Matches `.pegboard-bg { border: 8px solid ... }` — outer box is cork + 2×8 when box-sizing is content-box. */
-const PEGBOARD_BORDER_OUTSET = 16;
 
 /** Minimum cork content height (grid rows) when the stack is nearly empty. */
 const MOBILE_PEGBOARD_MIN_GRID_ROWS = 3;
+
+function maxHardwareContentWidth(
+  items: PegboardCardDTO[],
+  grid: number
+): number {
+  if (items.length === 0) return grid * 4;
+  return Math.max(
+    ...items.map(it => hardwareDimsWithGrid(it.hardware, grid).w)
+  );
+}
 
 function PegboardPanelMobile({
   items,
   vw,
   layoutWidth,
-  mobilePegLayout,
+  mobileScalePresentation,
 }: {
   items: PegboardCardDTO[];
   vw: number;
   layoutWidth?: number;
-  /** When set (e.g. from `WorkshopPegboard`), all mobile slabs share this grid + width. */
-  mobilePegLayout?: MobilePegLayout;
+  mobileScalePresentation?: MobileScalePresentation;
 }) {
   const w = layoutWidth ?? vw;
-  const innerW = mobileInnerW(w);
+  const slotContentW = mobileScalePresentation?.slotContentW ?? mobileInnerW(w);
   const itemsKey = useMemo(() => items.map(i => i.id).join("|"), [items]);
-  const { grid, innerWUsed, suppressMobileScale } = useMemo(
-    () => mobilePegLayout ?? pickMobileGridLayout(innerW, items),
-    [mobilePegLayout, innerW, items]
+  const maxCardW = useMemo(
+    () => maxHardwareContentWidth(items, PEG_GRID),
+    [items, itemsKey]
   );
+  const designContentW = useMemo(() => {
+    if (mobileScalePresentation) return mobileScalePresentation.designContentW;
+    const raw = Math.max(slotContentW, maxCardW);
+    return Math.ceil(raw / PEG_GRID) * PEG_GRID;
+  }, [mobileScalePresentation, slotContentW, maxCardW]);
 
   const noopCommit = useCallback(() => {}, []);
   const emptySpecs = useMemo<PegboardCardSpec[]>(() => [], []);
@@ -62,9 +76,9 @@ function PegboardPanelMobile({
     const el = stackRef.current;
     if (!el) return;
 
-    const minH = MOBILE_PEGBOARD_MIN_GRID_ROWS * grid;
+    const minH = MOBILE_PEGBOARD_MIN_GRID_ROWS * PEG_GRID;
     const snapFromBorderHeight = (h: number) =>
-      Math.max(minH, Math.ceil(h / grid) * grid);
+      Math.max(minH, Math.ceil(h / PEG_GRID) * PEG_GRID);
 
     const apply = (entry?: ResizeObserverEntry) => {
       const h = entry
@@ -81,45 +95,72 @@ function PegboardPanelMobile({
     });
     ro.observe(el, { box: "border-box" });
     return () => ro.disconnect();
-  }, [itemsKey, innerWUsed, grid]);
+  }, [itemsKey, designContentW]);
+
+  const designOuterW = designContentW + PEGBOARD_BORDER_OUTSET;
+  const designOuterH = snappedContentH + PEGBOARD_BORDER_OUTSET;
+  const scale = useMemo(() => {
+    if (mobileScalePresentation) return mobileScalePresentation.scale;
+    return Math.min(1, slotContentW / designOuterW);
+  }, [mobileScalePresentation, slotContentW, designOuterW]);
+
+  const visW = designOuterW * scale;
+  const visH = designOuterH * scale;
 
   return (
     <div
-      className="pegboard-bg pegboard-bg--mobile-flow"
+      className="pegboard-mobile-scale-slot"
       style={{
-        width: innerWUsed,
-        height: snappedContentH,
-        ["--peg-grid-px" as never]: `${grid}px`,
+        width: visW,
+        height: visH,
       }}
     >
-      <span className="heavy-screw heavy-screw--tl" aria-hidden />
-      <span className="heavy-screw heavy-screw--tr" aria-hidden />
-      <span className="heavy-screw heavy-screw--bl" aria-hidden />
-      <span className="heavy-screw heavy-screw--br" aria-hidden />
-      <div ref={stackRef} className="pegboard-mobile-stack">
-        {items.map(it => {
-          const { w: cw, h } = hardwareDimsWithGrid(it.hardware, grid);
-          return (
-            <PegCard
-              key={it.id}
-              item={it}
-              x={0}
-              y={0}
-              w={cw}
-              h={h}
-              innerW={innerWUsed}
-              innerH={0}
-              gridPx={grid}
-              specs={emptySpecs}
-              positions={emptyPositions}
-              dragDisabled
-              availableWidth={innerWUsed}
-              mobileFlexStack
-              suppressMobileScale={suppressMobileScale}
-              onDragCommit={noopCommit}
-            />
-          );
-        })}
+      <div
+        className="pegboard-mobile-scale-surface"
+        style={{
+          width: designOuterW,
+          height: designOuterH,
+          transform: `scale(${scale})`,
+        }}
+      >
+        <div
+          className="pegboard-bg pegboard-bg--mobile-flow"
+          style={{
+            width: designContentW,
+            height: snappedContentH,
+            ["--peg-grid-px" as never]: `${PEG_GRID}px`,
+          }}
+        >
+          <span className="heavy-screw heavy-screw--tl" aria-hidden />
+          <span className="heavy-screw heavy-screw--tr" aria-hidden />
+          <span className="heavy-screw heavy-screw--bl" aria-hidden />
+          <span className="heavy-screw heavy-screw--br" aria-hidden />
+          <div ref={stackRef} className="pegboard-mobile-stack">
+            {items.map(it => {
+              const { w: cw, h } = hardwareDimsWithGrid(it.hardware, PEG_GRID);
+              return (
+                <PegCard
+                  key={it.id}
+                  item={it}
+                  x={0}
+                  y={0}
+                  w={cw}
+                  h={h}
+                  innerW={designContentW}
+                  innerH={0}
+                  gridPx={PEG_GRID}
+                  specs={emptySpecs}
+                  positions={emptyPositions}
+                  dragDisabled
+                  availableWidth={designContentW}
+                  mobileFlexStack
+                  suppressMobileScale
+                  onDragCommit={noopCommit}
+                />
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -301,7 +342,7 @@ export default function PegboardPanelView({
   layoutHeight,
   desktopPanelPadY,
   desktopPanelPadX,
-  mobilePegLayout,
+  mobileScalePresentation,
 }: {
   items: PegboardCardDTO[];
   isMobile: boolean;
@@ -311,7 +352,7 @@ export default function PegboardPanelView({
   layoutHeight?: number;
   desktopPanelPadY?: number;
   desktopPanelPadX?: number;
-  mobilePegLayout?: MobilePegLayout;
+  mobileScalePresentation?: MobileScalePresentation;
 }) {
   if (isMobile) {
     return (
@@ -319,7 +360,7 @@ export default function PegboardPanelView({
         items={items}
         vw={vw}
         layoutWidth={layoutWidth}
-        mobilePegLayout={mobilePegLayout}
+        mobileScalePresentation={mobileScalePresentation}
       />
     );
   }
