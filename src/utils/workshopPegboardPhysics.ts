@@ -2,8 +2,12 @@ export type PegboardHardware = "clipboard" | "lcd" | "blueprint";
 
 export const PEG_GRID = 60;
 
+export function snapToGridWithGrid(val: number, grid: number): number {
+  return Math.round(val / grid) * grid;
+}
+
 export function snapToGrid(val: number): number {
-  return Math.round(val / PEG_GRID) * PEG_GRID;
+  return snapToGridWithGrid(val, PEG_GRID);
 }
 
 export interface Rect {
@@ -23,6 +27,21 @@ export function rectsOverlap(a: Rect, b: Rect): boolean {
 }
 
 /** Collision hitbox: clipboard clip hangs above — body box starts lower. */
+export function hitBoxForCollisionWithGrid(
+  hardware: PegboardHardware,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  grid: number
+): Rect {
+  if (hardware === "clipboard") {
+    const clip = Math.round(grid * 0.75);
+    return { x, y: y + clip, w, h: Math.max(grid, h - clip) };
+  }
+  return { x, y, w, h };
+}
+
 export function hitBoxForCollision(
   hardware: PegboardHardware,
   x: number,
@@ -30,22 +49,26 @@ export function hitBoxForCollision(
   w: number,
   h: number
 ): Rect {
-  if (hardware === "clipboard") {
-    const clip = 45;
-    return { x, y: y + clip, w, h: Math.max(PEG_GRID, h - clip) };
-  }
-  return { x, y, w, h };
+  return hitBoxForCollisionWithGrid(hardware, x, y, w, h, PEG_GRID);
 }
 
-export function boardScrewRects(innerW: number, innerH: number): Rect[] {
+export function boardScrewRectsWithGrid(
+  innerW: number,
+  innerH: number,
+  grid: number
+): Rect[] {
   const s = 28;
-  const inset = 16;
+  const inset = Math.max(0, Math.round(grid / 2 - s / 2));
   return [
     { x: inset, y: inset, w: s, h: s },
     { x: innerW - inset - s, y: inset, w: s, h: s },
     { x: inset, y: innerH - inset - s, w: s, h: s },
     { x: innerW - inset - s, y: innerH - inset - s, w: s, h: s },
   ];
+}
+
+export function boardScrewRects(innerW: number, innerH: number): Rect[] {
+  return boardScrewRectsWithGrid(innerW, innerH, PEG_GRID);
 }
 
 export function cardInBoardBounds(
@@ -65,18 +88,68 @@ export function desktopPegboardSideGap(vw: number, innerW: number): number {
   return Math.max(0, (vw - panelPadX - innerW) / 2);
 }
 
+export function hardwareUnits(hardware: PegboardHardware): {
+  wu: number;
+  hu: number;
+} {
+  switch (hardware) {
+    case "clipboard":
+      return { wu: 5, hu: 8 };
+    case "lcd":
+      return { wu: 7, hu: 5 };
+    case "blueprint":
+      return { wu: 5, hu: 5 };
+  }
+}
+
+export function hardwareDimsWithGrid(
+  hardware: PegboardHardware,
+  grid: number
+): { w: number; h: number } {
+  const { wu, hu } = hardwareUnits(hardware);
+  return { w: wu * grid, h: hu * grid };
+}
+
 export function hardwareDims(hardware: PegboardHardware): {
   w: number;
   h: number;
 } {
-  switch (hardware) {
-    case "clipboard":
-      return { w: 300, h: 480 };
-    case "lcd":
-      return { w: 420, h: 300 };
-    case "blueprint":
-      return { w: 300, h: 300 };
+  return hardwareDimsWithGrid(hardware, PEG_GRID);
+}
+
+/** Horizontal slack PegCard uses before shrink-to-fit scale on mobile stack. */
+const MOBILE_LAYOUT_CARD_GUTTER = 32;
+const MOBILE_GRID_CANDIDATES = [60, 54, 48, 42] as const;
+
+/** Pick a peg step so card pixel widths fit `innerW` without scaling when possible. */
+export function pickMobileGridLayout(
+  innerW: number,
+  items: { hardware: PegboardHardware }[]
+): { grid: number; innerWUsed: number; suppressMobileScale: boolean } {
+  if (innerW <= 0) {
+    return { grid: PEG_GRID, innerWUsed: 0, suppressMobileScale: true };
   }
+  if (items.length === 0) {
+    const grid = PEG_GRID;
+    return {
+      grid,
+      innerWUsed: Math.max(grid, Math.floor(innerW / grid) * grid),
+      suppressMobileScale: true,
+    };
+  }
+  for (const grid of MOBILE_GRID_CANDIDATES) {
+    const innerWUsed = Math.floor(innerW / grid) * grid;
+    if (innerWUsed <= 0) continue;
+    const maxW = Math.max(
+      ...items.map(it => hardwareDimsWithGrid(it.hardware, grid).w)
+    );
+    if (maxW + MOBILE_LAYOUT_CARD_GUTTER <= innerW) {
+      return { grid, innerWUsed, suppressMobileScale: true };
+    }
+  }
+  const grid = 42;
+  const innerWUsed = Math.max(grid, Math.floor(innerW / grid) * grid);
+  return { grid, innerWUsed, suppressMobileScale: false };
 }
 
 export interface PackItem {
@@ -92,28 +165,39 @@ export function initialPackPositions(
   positions: Record<string, { x: number; y: number }>;
   contentHeight: number;
 } {
+  return initialPackPositionsWithGrid(items, innerW, PEG_GRID);
+}
+
+export function initialPackPositionsWithGrid(
+  items: PackItem[],
+  innerW: number,
+  grid: number
+): {
+  positions: Record<string, { x: number; y: number }>;
+  contentHeight: number;
+} {
   const positions: Record<string, { x: number; y: number }> = {};
-  let x = PEG_GRID;
-  let y = PEG_GRID;
+  let x = grid;
+  let y = grid;
   let rowH = 0;
-  let maxBottom = PEG_GRID;
+  let maxBottom = grid;
 
   for (const it of items) {
-    const { w, h } = hardwareDims(it.hardware);
-    if (x + w > innerW - PEG_GRID && x > PEG_GRID) {
-      x = PEG_GRID;
-      y += rowH + PEG_GRID;
+    const { w, h } = hardwareDimsWithGrid(it.hardware, grid);
+    if (x + w > innerW - grid && x > grid) {
+      x = grid;
+      y += rowH + grid;
       rowH = 0;
     }
     positions[it.id] = { x, y };
     rowH = Math.max(rowH, h);
     maxBottom = Math.max(maxBottom, y + h);
-    x += w + PEG_GRID;
+    x += w + grid;
   }
 
   const contentHeight = Math.max(
-    PEG_GRID * 8,
-    Math.ceil((maxBottom + PEG_GRID) / PEG_GRID) * PEG_GRID
+    grid * 4,
+    Math.ceil((maxBottom + grid) / grid) * grid
   );
   return { positions, contentHeight };
 }
@@ -147,6 +231,43 @@ function collides(
   return false;
 }
 
+function collidesWithGrid(
+  selfId: string,
+  x: number,
+  y: number,
+  spec: { id: string; hardware: PegboardHardware; w: number; h: number },
+  screws: Rect[],
+  others: { id: string; hardware: PegboardHardware; w: number; h: number }[],
+  positions: Record<string, { x: number; y: number }>,
+  innerW: number,
+  innerH: number,
+  grid: number
+): boolean {
+  const { w, h } = spec;
+  if (!cardInBoardBounds(x, y, w, h, innerW, innerH)) return true;
+
+  const hitSelf = hitBoxForCollisionWithGrid(spec.hardware, x, y, w, h, grid);
+  for (const s of screws) {
+    if (rectsOverlap(hitSelf, s)) return true;
+  }
+
+  for (const o of others) {
+    if (o.id === selfId) continue;
+    const p = positions[o.id];
+    if (!p) continue;
+    const hitO = hitBoxForCollisionWithGrid(
+      o.hardware,
+      p.x,
+      p.y,
+      o.w,
+      o.h,
+      grid
+    );
+    if (rectsOverlap(hitSelf, hitO)) return true;
+  }
+  return false;
+}
+
 /** True if placing `selfId` at (x,y) collides with bounds, corner screws, or other cards. */
 export function hasPlacementCollision(
   selfId: string,
@@ -169,6 +290,32 @@ export function hasPlacementCollision(
     positions,
     innerW,
     innerH
+  );
+}
+
+export function hasPlacementCollisionWithGrid(
+  selfId: string,
+  x: number,
+  y: number,
+  spec: { id: string; hardware: PegboardHardware; w: number; h: number },
+  allSpecs: { id: string; hardware: PegboardHardware; w: number; h: number }[],
+  positions: Record<string, { x: number; y: number }>,
+  innerW: number,
+  innerH: number,
+  grid: number
+): boolean {
+  const screws = boardScrewRectsWithGrid(innerW, innerH, grid);
+  return collidesWithGrid(
+    selfId,
+    x,
+    y,
+    spec,
+    screws,
+    allSpecs,
+    positions,
+    innerW,
+    innerH,
+    grid
   );
 }
 
@@ -216,6 +363,59 @@ export function resolveLayoutAfterResize(
   return next;
 }
 
+export function resolveLayoutAfterResizeWithGrid(
+  positions: Record<string, { x: number; y: number }>,
+  specs: { id: string; hardware: PegboardHardware; w: number; h: number }[],
+  innerW: number,
+  innerH: number,
+  grid: number
+): Record<string, { x: number; y: number }> {
+  const screws = boardScrewRectsWithGrid(innerW, innerH, grid);
+  const next = { ...positions };
+  const sorted = [...specs].sort((a, b) => {
+    const pa = next[a.id] ?? { x: 0, y: 0 };
+    const pb = next[b.id] ?? { x: 0, y: 0 };
+    if (pa.y !== pb.y) return pa.y - pb.y;
+    return pb.x - pa.x;
+  });
+
+  for (const spec of sorted) {
+    let x = snapToGridWithGrid(next[spec.id]?.x ?? grid, grid);
+    let y = snapToGridWithGrid(next[spec.id]?.y ?? grid, grid);
+    const { h } = spec;
+
+    let guard = 0;
+    while (
+      guard < 400 &&
+      collidesWithGrid(
+        spec.id,
+        x,
+        y,
+        spec,
+        screws,
+        specs,
+        next,
+        innerW,
+        innerH,
+        grid
+      )
+    ) {
+      guard += 1;
+      y += grid;
+      if (y + h > innerH - grid) {
+        y = grid;
+        x -= grid;
+      }
+      if (x < grid) {
+        x = grid;
+        y += grid;
+      }
+    }
+    next[spec.id] = { x, y };
+  }
+  return next;
+}
+
 export function proposedDragPosition(
   originX: number,
   originY: number,
@@ -228,6 +428,24 @@ export function proposedDragPosition(
 ): { x: number; y: number } {
   let x = snapToGrid(originX + offsetX);
   let y = snapToGrid(originY + offsetY);
+  x = Math.max(0, Math.min(x, innerW - w));
+  y = Math.max(0, Math.min(y, innerH - h));
+  return { x, y };
+}
+
+export function proposedDragPositionWithGrid(
+  originX: number,
+  originY: number,
+  offsetX: number,
+  offsetY: number,
+  w: number,
+  h: number,
+  innerW: number,
+  innerH: number,
+  grid: number
+): { x: number; y: number } {
+  let x = snapToGridWithGrid(originX + offsetX, grid);
+  let y = snapToGridWithGrid(originY + offsetY, grid);
   x = Math.max(0, Math.min(x, innerW - w));
   y = Math.max(0, Math.min(y, innerH - h));
   return { x, y };
