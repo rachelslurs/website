@@ -294,7 +294,7 @@ function PegboardPanelDesktop({
       style={{
         width: innerWFinal + PEGBOARD_BORDER_OUTSET,
         height: innerH + PEGBOARD_BORDER_OUTSET,
-        overflow: "hidden",
+        overflow: "visible",
         display: "flex",
         justifyContent: "center",
       }}
