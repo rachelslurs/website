@@ -495,15 +495,25 @@
 }
 
 /* Mobile column: flex stack (no absolute grid) inside cork frame */
+/* Match desktop grid gutters: first card at (grid, grid) from cork content origin so holes line up. */
 .pegboard-bg--mobile-flow .pegboard-mobile-stack {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 3rem;
-  padding: 2.5rem 0;
+  align-items: flex-start;
+  gap: var(--peg-grid-px);
+  padding: var(--peg-grid-px);
   position: relative;
   z-index: 2;
   box-sizing: border-box;
+}
+
+/* Narrow portal (<480px): centered stack + rem spacing so cards stay readable; per-slab grid from JS. */
+.workshop-pegboard-root[data-pegboard-layout="mobile"][data-workshop-narrow-mobile="true"]
+  .pegboard-bg--mobile-flow
+  .pegboard-mobile-stack {
+  align-items: center;
+  gap: 2.5rem;
+  padding: 2.5rem 0;
 }
 
 .workshop-pegboard-root .pegboard-bg--mobile-flow .peg-card.peg-card--mobile-stack {

@@ -3,11 +3,8 @@ import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PegboardCardDTO } from "@utils/serializeWorkshopPegboard";
 import {
-  hasPlacementCollision,
   hasPlacementCollisionWithGrid,
-  proposedDragPosition,
   proposedDragPositionWithGrid,
-  snapToGrid,
   snapToGridWithGrid,
 } from "@utils/workshopPegboardPhysics";
 import type { PegboardCardSpec } from "./pegboardTypes";
@@ -29,6 +26,7 @@ export default function PegCard({
   dragDisabled,
   availableWidth,
   mobileFlexStack,
+  suppressMobileScale,
   onDragCommit,
 }: {
   item: PegboardCardDTO;
@@ -46,6 +44,8 @@ export default function PegCard({
   availableWidth: number;
   /** Mobile column: flex stack without absolute grid. */
   mobileFlexStack?: boolean;
+  /** When true with `mobileFlexStack`, skip shrink-to-fit scale (grid already fits). */
+  suppressMobileScale?: boolean;
   onDragCommit: (id: string, nx: number, ny: number) => void;
 }) {
   const grid = gridPx ?? 60;
@@ -77,9 +77,11 @@ export default function PegCard({
 
   const padding = 32;
   const scaleFactor =
-    dragDisabled && availableWidth < w + padding
-      ? (availableWidth - padding) / w
-      : 1;
+    suppressMobileScale === true
+      ? 1
+      : dragDisabled && availableWidth < w + padding
+        ? (availableWidth - padding) / w
+        : 1;
 
   const whileDrag = isClipboard
     ? { scale: 1.01, zIndex: 50 }

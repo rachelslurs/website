@@ -6,3 +6,10 @@ export type PegboardCardSpec = {
   w: number;
   h: number;
 };
+
+/** Shared mobile cork step + width (all slabs use the same layout). */
+export type MobilePegLayout = {
+  grid: number;
+  innerWUsed: number;
+  suppressMobileScale: boolean;
+};
