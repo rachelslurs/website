@@ -4,6 +4,7 @@ import {
   initialPackPositionsColumnFirstWithGrid,
   initialPackPositionsWithGrid,
   layoutValidWithGrid,
+  orderPackItemsClipboardLast,
   packDesktopPanelAtGrid,
   resolveLayoutAfterResizeWithGrid,
 } from "./workshopPegboardPhysics";
@@ -49,6 +50,21 @@ describe("layoutValidWithGrid", () => {
       b: { x: 60, y: 60 },
     };
     expect(layoutValidWithGrid(positions, specs, 480, 360)).toBe(false);
+  });
+});
+
+describe("orderPackItemsClipboardLast", () => {
+  it("keeps non-clipboard order and moves clipboard(s) to the end", () => {
+    const items = [
+      { id: "w", hardware: "clipboard" as const },
+      { id: "l", hardware: "lcd" as const },
+      { id: "d", hardware: "blueprint" as const },
+    ];
+    expect(orderPackItemsClipboardLast(items).map(x => x.id)).toEqual([
+      "l",
+      "d",
+      "w",
+    ]);
   });
 });
 
