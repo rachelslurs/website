@@ -54,4 +54,5 @@ We adopt an explicit **frame chrome visibility** invariant for the workshop rout
 - **Regression tests:** `tests/visual/workshop-pegboard.spec.ts` — describe **Workshop frame chrome (ADR-003)** asserts `toBeInViewport` on `.workshop-panel-nav` and the first `.pegboard-bg` at standard widths, screenshots `.portal-frame`, and a **375×500** short-viewport smoke; describe **Workshop page with site chrome (viewport)** asserts main nav + `contentinfo` footer are in view and captures **`workshop-page-with-chrome--w*.png`** (full viewport: site chrome + workshop). Run `npm run test:visual`.
 - **Manual QA:** At **320, 375, 430, 768, 1024, 1280** (or the project’s standard set), confirm arrows visible **without** outer scroll on load.
 - **ADR-001** should be read together with this ADR for mobile: lattice rules (001) + chrome visibility (003).
+- **Desktop cork “fits”** (bounds, overlap, screws during resolve) is documented in [ADR-005](005-workshop-desktop-cork-layout-acceptance.md).
 - Supersede or amend this ADR if the workshop shell changes materially (e.g. arrows move to a different region).

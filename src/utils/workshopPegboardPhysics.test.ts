@@ -7,6 +7,7 @@ import {
   orderPackItemsClipboardLast,
   packDesktopPanelAtGrid,
   resolveLayoutAfterResizeWithGrid,
+  sortPackItemsByHeightDesc,
 } from "./workshopPegboardPhysics";
 
 function specsFor(
@@ -53,6 +54,21 @@ describe("layoutValidWithGrid", () => {
   });
 });
 
+describe("sortPackItemsByHeightDesc", () => {
+  it("orders tallest hardware first with input order among equal heights", () => {
+    const items = [
+      { id: "demo", hardware: "lcd" as const },
+      { id: "link", hardware: "lcd" as const },
+      { id: "work", hardware: "clipboard" as const },
+    ];
+    expect(sortPackItemsByHeightDesc(items, 60).map(x => x.id)).toEqual([
+      "work",
+      "demo",
+      "link",
+    ]);
+  });
+});
+
 describe("orderPackItemsClipboardLast", () => {
   it("keeps non-clipboard order and moves clipboard(s) to the end", () => {
     const items = [
@@ -85,6 +101,24 @@ describe("initialPackPositionsColumnFirstWithGrid", () => {
     );
     expect(positions.a!.x).toBe(positions.b!.x);
     expect(positions.b!.y).toBeGreaterThan(positions.a!.y);
+  });
+
+  it("places the second lcd flush under the first when innerH fits both (no vertical grid seam)", () => {
+    const items = [
+      { id: "a", hardware: "lcd" as const },
+      { id: "b", hardware: "lcd" as const },
+    ];
+    const grid = 60;
+    const { h } = hardwareDimsWithGrid("lcd", grid);
+    const ih = 660;
+    const { positions } = initialPackPositionsColumnFirstWithGrid(
+      items,
+      840,
+      ih,
+      grid
+    );
+    expect(positions.a).toEqual({ x: 60, y: 60 });
+    expect(positions.b).toEqual({ x: 60, y: 60 + h });
   });
 });
 
