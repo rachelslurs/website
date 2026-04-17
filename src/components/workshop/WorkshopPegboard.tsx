@@ -76,6 +76,8 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const [activePanelIndex, setActivePanelIndex] = useState(0);
+  /** `?workshopDebugCork=1` or `localStorage.workshopDebugCork = "1"` — outlines cork + console packing logs. */
+  const [debugWorkshopCork, setDebugWorkshopCork] = useState(false);
   const [portalLayout, setPortalLayout] = useState<{
     w: number;
     h: number;
@@ -95,6 +97,18 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   const [desktopPanelPadX, setDesktopPanelPadX] = useState(() =>
     workshopPanelRemPaddingPx()
   );
+
+  useEffect(() => {
+    try {
+      const q = new URLSearchParams(window.location.search).get(
+        "workshopDebugCork"
+      );
+      const ls = window.localStorage.getItem("workshopDebugCork");
+      setDebugWorkshopCork(q === "1" || ls === "1");
+    } catch {
+      setDebugWorkshopCork(false);
+    }
+  }, []);
 
   const layoutW = Math.round(portalLayout?.w ?? vw);
   const layoutH = Math.round(portalLayout?.h ?? vh);
@@ -416,6 +430,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
                     desktopPanelPadY={desktopPanelPadY}
                     desktopPanelPadX={desktopPanelPadX}
                     desktopContentInnerW={desktopPegboardContentInnerW}
+                    debugWorkshopCork={debugWorkshopCork}
                   />
                   {i < panels.length - 1 ? (
                     <>

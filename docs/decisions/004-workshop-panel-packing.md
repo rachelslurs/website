@@ -48,4 +48,4 @@ We encode panel construction in `src/utils/buildWorkshopPanels.ts` with the foll
 
 - **Implementation:** `buildWorkshopPanels` is the normative source; changes to packing rules should update this ADR or supersede it.
 - **Tests:** `src/utils/buildWorkshopPanels.test.ts` locks caps and representative ordering; extend it when behavior changes.
-- **Layout ADRs:** ADR-001 and ADR-003 remain authoritative for **how** panels render; this ADR is authoritative for **what** is grouped into a panel.
+- **Layout ADRs:** ADR-001 and ADR-003 remain authoritative for **how** panels render; [ADR-005](005-workshop-desktop-cork-layout-acceptance.md) documents **desktop cork acceptance** (bounds, resolve, overlap). This ADR is authoritative for **what** is grouped into a panel.

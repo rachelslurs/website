@@ -137,6 +137,26 @@ export function orderPackItemsClipboardLast(items: PackItem[]): PackItem[] {
   return [...non, ...clipboards];
 }
 
+/**
+ * Tallest card first, then stable tie-break by **original panel index** (input
+ * `items` order). Used for a column-first seed so the case study clipboard can
+ * anchor **column 1** instead of always being iterated last (which maps to the
+ * last column in column-first, or the right side in row-major with clip-last
+ * ordering).
+ */
+export function sortPackItemsByHeightDesc(
+  items: PackItem[],
+  grid: number
+): PackItem[] {
+  const idx = new Map(items.map((it, i) => [it.id, i]));
+  return [...items].sort((a, b) => {
+    const ha = hardwareDimsWithGrid(a.hardware, grid).h;
+    const hb = hardwareDimsWithGrid(b.hardware, grid).h;
+    if (hb !== ha) return hb - ha;
+    return (idx.get(a.id) ?? 0) - (idx.get(b.id) ?? 0);
+  });
+}
+
 /** Row-major pack with PEG_GRID gutters; returns positions and content height. */
 export function initialPackPositions(
   items: PackItem[],
@@ -186,6 +206,15 @@ export function initialPackPositionsWithGrid(
  * Column-first seed: stack items vertically (same column) before starting a new
  * column to the right. Lets desktop use vertical stacks at the current `grid`
  * when a single horizontal row would not fit — tried before shrinking `gridPx`.
+ *
+ * **Vertical seam:** There is **no extra `grid` gap between stacked cards** in a
+ * column — the next card starts at `y + h` (edges may touch; `rectsOverlap` treats
+ * flush as non-overlap). Top/left still start at `grid`; columns still advance by
+ * `colMaxW + grid`. Whether a placement clears corner screws is left to
+ * `resolveLayoutAfterResizeWithGrid`.
+ *
+ * **Wrap rule:** A new column starts when the current card would not fit with
+ * `y + h <= innerH` (same as `cardInBoardBounds`), not `innerH - grid`.
  */
 export function initialPackPositionsColumnFirstWithGrid(
   items: PackItem[],
@@ -204,7 +233,7 @@ export function initialPackPositionsColumnFirstWithGrid(
 
   for (const it of items) {
     const { w, h } = hardwareDimsWithGrid(it.hardware, grid);
-    if (y + h > innerH - grid && y > grid) {
+    if (y + h > innerH && y > grid) {
       x += colMaxW + grid;
       y = grid;
       colMaxW = 0;
@@ -212,7 +241,7 @@ export function initialPackPositionsColumnFirstWithGrid(
     positions[it.id] = { x, y };
     colMaxW = Math.max(colMaxW, w);
     maxBottom = Math.max(maxBottom, y + h);
-    y += h + grid;
+    y += h;
   }
 
   const contentHeight = Math.max(
@@ -230,24 +259,77 @@ export type PegboardPackedSpec = {
 };
 
 /**
- * Try several deterministic pack seeds at the same `grid`. **Column-first**
- * runs before row-major so pairs of shorter cards prefer a vertical stack when
- * both layouts fit at this `gridPx`. Then row-major (ADR panel order via
- * `ordered`), then a shortest-first row variant. Clipboard is always ordered
- * last before seeding so column stacks place shorter cards above the tall case
- * study clip.
+ * Try several deterministic pack seeds at the same `grid`. Order of seeds is
+ * the priority when multiple layouts validate.
+ *
+ * 1. **`columnFirstHeightDesc`** — column-first with **tallest first** (clipboard
+ *    often leads column 1 instead of the last column).
+ * 2. **`columnFirst`** — column-first with **clipboard last** so shorter cards can
+ *    stack above the case study in the same column when that fits.
+ * 3. **`rowMajorPanelOrder`** — row-major in **panel input order** (work / links /
+ *    demos from `buildWorkshopPanels`), so the work clipboard can sit **left**
+ *    instead of always **right** (clip-last row-major).
+ * 4. **`rowMajor`** — row-major with clipboard last (wider horizontal run for LCDs).
+ * 5. **`rowHeightAsc`** — row-major with shortest-first row fill.
+ *
  * `innerW` / `innerH` should already be snapped to multiples of `grid`.
  */
+export type PackDesktopPanelAtGridOptions = {
+  /** When true, logs each grid attempt and per-seed outcome to the console. */
+  debug?: boolean;
+  /** Shown in log lines (e.g. panel item key). */
+  debugLabel?: string;
+};
+
+function firstOverlappingPairIds(
+  positions: Record<string, { x: number; y: number }>,
+  specs: { id: string; w: number; h: number }[]
+): { a: string; b: string } | undefined {
+  for (let i = 0; i < specs.length; i += 1) {
+    for (let j = i + 1; j < specs.length; j += 1) {
+      const sa = specs[i]!;
+      const sb = specs[j]!;
+      const pa = positions[sa.id];
+      const pb = positions[sb.id];
+      if (!pa || !pb) continue;
+      const ra: Rect = { x: pa.x, y: pa.y, w: sa.w, h: sa.h };
+      const rb: Rect = { x: pb.x, y: pb.y, w: sb.w, h: sb.h };
+      if (rectsOverlap(ra, rb)) return { a: sa.id, b: sb.id };
+    }
+  }
+  return undefined;
+}
+
+function firstOutOfBoundsDetail(
+  resolved: Record<string, { x: number; y: number }>,
+  specs: { id: string; w: number; h: number }[],
+  innerW: number,
+  innerH: number
+): string | undefined {
+  for (const s of specs) {
+    const p = resolved[s.id];
+    if (!p) return `${s.id}:missing position`;
+    if (p.x < 0 || p.y < 0 || p.x + s.w > innerW || p.y + s.h > innerH) {
+      return `${s.id} rect (${p.x},${p.y}) ${s.w}×${s.h} exceeds cork ${innerW}×${innerH}`;
+    }
+  }
+  return undefined;
+}
+
 export function packDesktopPanelAtGrid(
   items: PackItem[],
   innerW: number,
   innerH: number,
-  grid: number
+  grid: number,
+  options?: PackDesktopPanelAtGridOptions
 ): {
   positions: Record<string, { x: number; y: number }>;
   specs: PegboardPackedSpec[];
 } | null {
   if (innerW <= 0 || innerH <= 0) return null;
+
+  const dbg = options?.debug === true;
+  const tag = options?.debugLabel ?? "workshop";
 
   const specs: PegboardPackedSpec[] = items.map(it => {
     const { w, h } = hardwareDimsWithGrid(it.hardware, grid);
@@ -255,23 +337,75 @@ export function packDesktopPanelAtGrid(
   });
 
   const ordered = orderPackItemsClipboardLast(items);
+  const heightDesc = sortPackItemsByHeightDesc(items, grid);
 
-  const seeds: Record<string, { x: number; y: number }>[] = [
-    initialPackPositionsColumnFirstWithGrid(ordered, innerW, innerH, grid)
-      .positions,
-    initialPackPositionsWithGrid(ordered, innerW, grid).positions,
-    initialPackPositionsWithGrid(
-      [...ordered].sort((a, b) => {
-        const ha = hardwareDimsWithGrid(a.hardware, grid).h;
-        const hb = hardwareDimsWithGrid(b.hardware, grid).h;
-        return ha - hb;
-      }),
-      innerW,
-      grid
-    ).positions,
+  const seeds: {
+    name: string;
+    positions: Record<string, { x: number; y: number }>;
+  }[] = [
+    {
+      name: "columnFirstHeightDesc",
+      positions: initialPackPositionsColumnFirstWithGrid(
+        heightDesc,
+        innerW,
+        innerH,
+        grid
+      ).positions,
+    },
+    {
+      name: "columnFirst",
+      positions: initialPackPositionsColumnFirstWithGrid(
+        ordered,
+        innerW,
+        innerH,
+        grid
+      ).positions,
+    },
+    {
+      name: "rowMajorPanelOrder",
+      positions: initialPackPositionsWithGrid(items, innerW, grid).positions,
+    },
+    {
+      name: "rowMajor",
+      positions: initialPackPositionsWithGrid(ordered, innerW, grid).positions,
+    },
+    {
+      name: "rowHeightAsc",
+      positions: initialPackPositionsWithGrid(
+        [...ordered].sort((a, b) => {
+          const ha = hardwareDimsWithGrid(a.hardware, grid).h;
+          const hb = hardwareDimsWithGrid(b.hardware, grid).h;
+          return ha - hb;
+        }),
+        innerW,
+        grid
+      ).positions,
+    },
   ];
 
-  for (const packed of seeds) {
+  if (dbg) {
+    const heights = specs.map(s => ({ id: s.id, h: s.h }));
+    const sumH = specs.reduce((acc, s) => acc + s.h, 0);
+    const maxH = specs.length ? Math.max(...specs.map(s => s.h)) : 0;
+    // eslint-disable-next-line no-console -- intentional debug aid (opt-in via URL/localStorage)
+    console.log(`[workshop-pack:${tag}] try grid`, grid, {
+      innerW,
+      innerH,
+      cols: Math.round(innerW / grid),
+      rows: Math.round(innerH / grid),
+      verticalBudgetHint: {
+        perCardH: heights,
+        maxH,
+        sumH,
+        innerH,
+        necessaryMaxH: maxH <= innerH,
+        /** Necessary only if every card shares one x-column (stacked); not sufficient for acceptance. */
+        necessarySumHIfSingleColumn: sumH <= innerH,
+      },
+    });
+  }
+
+  for (const { name: seedName, positions: packed } of seeds) {
     const resolved = resolveLayoutAfterResizeWithGrid(
       packed,
       specs,
@@ -285,9 +419,47 @@ export function packDesktopPanelAtGrid(
         p && p.x >= 0 && p.y >= 0 && p.x + s.w <= innerW && p.y + s.h <= innerH
       );
     });
-    if (allFit && layoutValidWithGrid(resolved, specs, innerW, innerH)) {
+    const layoutValid = layoutValidWithGrid(resolved, specs, innerW, innerH);
+    if (dbg) {
+      const oob = allFit
+        ? undefined
+        : firstOutOfBoundsDetail(resolved, specs, innerW, innerH);
+      const overlapPair =
+        allFit && !layoutValid
+          ? firstOverlappingPairIds(resolved, specs)
+          : undefined;
+      // eslint-disable-next-line no-console -- intentional debug aid
+      console.log(`[workshop-pack:${tag}] seed ${seedName}`, {
+        allFit,
+        layoutValid,
+        ...(oob ? { outOfBounds: oob } : {}),
+        ...(overlapPair ? { overlappingPair: overlapPair } : {}),
+        ...(!allFit || !layoutValid
+          ? {
+              note: !allFit
+                ? "At least one card’s full rect exceeds the cork after resolve (often screw-avoidance nudges in collidesWithGrid)."
+                : "Two or more cards overlap on full w×h rects (layoutValidWithGrid); see ADR-005.",
+            }
+          : {}),
+      });
+    }
+    if (allFit && layoutValid) {
+      if (dbg) {
+        // eslint-disable-next-line no-console -- intentional debug aid
+        console.log(`[workshop-pack:${tag}] accepted`, {
+          grid,
+          seed: seedName,
+        });
+      }
       return { positions: resolved, specs };
     }
+  }
+  if (dbg) {
+    // eslint-disable-next-line no-console -- intentional debug aid
+    console.log(`[workshop-pack:${tag}] rejected grid`, grid, {
+      innerW,
+      innerH,
+    });
   }
   return null;
 }
@@ -508,7 +680,16 @@ export function resolveLayoutAfterResizeWithGrid(
   return next;
 }
 
-/** True if every card is in bounds and no two cards overlap (full `w×h` rects). */
+/**
+ * True if every card’s full pegboard rectangle lies inside the cork and no two
+ * cards’ rectangles intersect.
+ *
+ * Does **not** evaluate corner screws — those are enforced during
+ * `resolveLayoutAfterResizeWithGrid` via `collidesWithGrid` (screw hit boxes +
+ * card-card overlap). Screw pressure usually surfaces as failed **`allFit`**
+ * (card pushed past the edge), not as `layoutValidWithGrid === false`. See
+ * ADR-005.
+ */
 export function layoutValidWithGrid(
   positions: Record<string, { x: number; y: number }>,
   specs: { id: string; hardware: PegboardHardware; w: number; h: number }[],
