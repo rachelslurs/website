@@ -26,7 +26,11 @@ export function rectsOverlap(a: Rect, b: Rect): boolean {
   );
 }
 
-/** Collision hitbox: clipboard clip hangs above — body box starts lower. */
+/**
+ * Hitbox for **corner screws** (clipboard clip sits above the body — ignore that
+ * band so we do not false-positive screw hits). **Card vs card** overlap uses full
+ * `w×h` bounds in `collides` / `collidesWithGrid`.
+ */
 export function hitBoxForCollisionWithGrid(
   hardware: PegboardHardware,
   x: number,
@@ -181,17 +185,18 @@ function collides(
   const { w, h } = spec;
   if (!cardInBoardBounds(x, y, w, h, innerW, innerH)) return true;
 
-  const hitSelf = hitBoxForCollision(spec.hardware, x, y, w, h);
+  const hitSelfForScrews = hitBoxForCollision(spec.hardware, x, y, w, h);
   for (const s of screws) {
-    if (rectsOverlap(hitSelf, s)) return true;
+    if (rectsOverlap(hitSelfForScrews, s)) return true;
   }
 
+  const fullSelf: Rect = { x, y, w, h };
   for (const o of others) {
     if (o.id === selfId) continue;
     const p = positions[o.id];
     if (!p) continue;
-    const hitO = hitBoxForCollision(o.hardware, p.x, p.y, o.w, o.h);
-    if (rectsOverlap(hitSelf, hitO)) return true;
+    const fullO: Rect = { x: p.x, y: p.y, w: o.w, h: o.h };
+    if (rectsOverlap(fullSelf, fullO)) return true;
   }
   return false;
 }
@@ -211,24 +216,25 @@ function collidesWithGrid(
   const { w, h } = spec;
   if (!cardInBoardBounds(x, y, w, h, innerW, innerH)) return true;
 
-  const hitSelf = hitBoxForCollisionWithGrid(spec.hardware, x, y, w, h, grid);
+  const hitSelfForScrews = hitBoxForCollisionWithGrid(
+    spec.hardware,
+    x,
+    y,
+    w,
+    h,
+    grid
+  );
   for (const s of screws) {
-    if (rectsOverlap(hitSelf, s)) return true;
+    if (rectsOverlap(hitSelfForScrews, s)) return true;
   }
 
+  const fullSelf: Rect = { x, y, w, h };
   for (const o of others) {
     if (o.id === selfId) continue;
     const p = positions[o.id];
     if (!p) continue;
-    const hitO = hitBoxForCollisionWithGrid(
-      o.hardware,
-      p.x,
-      p.y,
-      o.w,
-      o.h,
-      grid
-    );
-    if (rectsOverlap(hitSelf, hitO)) return true;
+    const fullO: Rect = { x: p.x, y: p.y, w: o.w, h: o.h };
+    if (rectsOverlap(fullSelf, fullO)) return true;
   }
   return false;
 }

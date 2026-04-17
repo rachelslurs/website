@@ -654,15 +654,17 @@
   cursor: grabbing;
 }
 
-.peg-card--drag.peg-card--clipboard,
-.peg-card--static.peg-card--clipboard {
+/*
+ * Static cards share `.peg-card` z-index so paint order follows DOM (matches
+ * ADR-004 panel order: work → links → demos). A high z-index on clipboard made
+ * demos/links look “under” the case study when packing hugged the clip chrome.
+ */
+.peg-card--drag.peg-card--clipboard {
   z-index: 20;
 }
 
 .peg-card--drag.peg-card--lcd,
-.peg-card--static.peg-card--lcd,
-.peg-card--drag.peg-card--blueprint,
-.peg-card--static.peg-card--blueprint {
+.peg-card--drag.peg-card--blueprint {
   z-index: 10;
 }
 
