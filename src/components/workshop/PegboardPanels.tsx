@@ -175,6 +175,7 @@ function PegboardPanelDesktop({
   desktopPanelPadY,
   desktopPanelPadX,
   desktopContentInnerW,
+  debugWorkshopCork,
 }: {
   items: PegboardCardDTO[];
   vw: number;
@@ -185,6 +186,8 @@ function PegboardPanelDesktop({
   desktopPanelPadX?: number;
   /** Measured panel content width from DOM — preferred over portal−padding when set. */
   desktopContentInnerW?: number | null;
+  /** When true, outlines the packed cork and logs grid/seed decisions (`?workshopDebugCork=1` or localStorage). */
+  debugWorkshopCork?: boolean;
 }) {
   const w = Math.round(layoutWidth ?? vw);
   const h = Math.round(layoutHeight ?? vh);
@@ -198,7 +201,19 @@ function PegboardPanelDesktop({
 
   const packedLayout = useMemo(() => {
     const grids = [60, 54, 48, 42, 36, 30];
+    const packOpts = {
+      debug: debugWorkshopCork === true,
+      debugLabel: itemsKey,
+    };
     const pick = () => {
+      if (packOpts.debug) {
+        // eslint-disable-next-line no-console -- intentional debug aid
+        console.log(`[workshop-pack:${itemsKey}] inputs`, {
+          layoutInnerW: innerW,
+          viewportH,
+          desktopContentInnerW: desktopContentInnerW ?? null,
+        });
+      }
       for (const grid of grids) {
         const iw = Math.floor(innerW / grid) * grid;
         const ih = Math.floor(viewportH / grid) * grid;
@@ -208,8 +223,22 @@ function PegboardPanelDesktop({
           id: i.id,
           hardware: i.hardware,
         }));
-        const packed = packDesktopPanelAtGrid(packItems, iw, ih, grid);
+        const packed = packDesktopPanelAtGrid(
+          packItems,
+          iw,
+          ih,
+          grid,
+          packOpts
+        );
         if (packed) {
+          if (packOpts.debug) {
+            // eslint-disable-next-line no-console -- intentional debug aid
+            console.log(`[workshop-pack:${itemsKey}] chosen grid`, grid, {
+              innerW: iw,
+              innerH: ih,
+              snappedFrom: { innerW, viewportH },
+            });
+          }
           return {
             grid,
             innerW: iw,
@@ -226,8 +255,19 @@ function PegboardPanelDesktop({
         id: i.id,
         hardware: i.hardware,
       }));
-      const last = packDesktopPanelAtGrid(packItems, iw, ih, grid);
+      const last = packDesktopPanelAtGrid(packItems, iw, ih, grid, packOpts);
       if (last) {
+        if (packOpts.debug) {
+          // eslint-disable-next-line no-console -- intentional debug aid
+          console.log(
+            `[workshop-pack:${itemsKey}] chosen grid (repeat 30)`,
+            grid,
+            {
+              innerW: iw,
+              innerH: ih,
+            }
+          );
+        }
         return {
           grid,
           innerW: iw,
@@ -235,6 +275,12 @@ function PegboardPanelDesktop({
           specs: last.specs,
           positions: last.positions,
         };
+      }
+      if (packOpts.debug) {
+        // eslint-disable-next-line no-console -- intentional debug aid
+        console.warn(
+          `[workshop-pack:${itemsKey}] fallback column-first resolve without strict pack (may overlap or sit out of bounds)`
+        );
       }
       const specs: PegboardCardSpec[] = items.map(it => {
         const { w, h } = hardwareDimsWithGrid(it.hardware, grid);
@@ -261,7 +307,14 @@ function PegboardPanelDesktop({
       };
     };
     return pick();
-  }, [itemsKey, items, innerW, viewportH]);
+  }, [
+    itemsKey,
+    items,
+    innerW,
+    viewportH,
+    debugWorkshopCork,
+    desktopContentInnerW,
+  ]);
 
   const [positions, setPositions] = useState(packedLayout.positions);
   const innerH = packedLayout.innerH;
@@ -305,7 +358,18 @@ function PegboardPanelDesktop({
           ["--peg-grid-px" as never]: `${grid}px`,
           ["--peg-cols" as never]: String(Math.round(innerWFinal / grid)),
           ["--peg-rows" as never]: String(Math.round(innerH / grid)),
+          ...(debugWorkshopCork
+            ? {
+                outline: "3px dashed rgb(192 38 211)",
+                outlineOffset: "-2px",
+              }
+            : {}),
         }}
+        title={
+          debugWorkshopCork
+            ? `Usable cork (packing): ${innerWFinal}×${innerH}px, grid ${grid}px`
+            : undefined
+        }
       >
         <span className="heavy-screw heavy-screw--tl" aria-hidden />
         <span className="heavy-screw heavy-screw--tr" aria-hidden />
@@ -350,6 +414,7 @@ export default function PegboardPanelView({
   desktopPanelPadX,
   desktopContentInnerW,
   mobileScalePresentation,
+  debugWorkshopCork,
 }: {
   items: PegboardCardDTO[];
   isMobile: boolean;
@@ -361,6 +426,7 @@ export default function PegboardPanelView({
   desktopPanelPadX?: number;
   desktopContentInnerW?: number | null;
   mobileScalePresentation?: MobileScalePresentation;
+  debugWorkshopCork?: boolean;
 }) {
   if (isMobile) {
     return (
@@ -382,6 +448,7 @@ export default function PegboardPanelView({
       desktopPanelPadY={desktopPanelPadY}
       desktopPanelPadX={desktopPanelPadX}
       desktopContentInnerW={desktopContentInnerW}
+      debugWorkshopCork={debugWorkshopCork}
     />
   );
 }
