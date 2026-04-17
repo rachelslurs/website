@@ -601,7 +601,9 @@
 /* Phase 2g: fixed 60px design board; JS sets slot size and scale on .pegboard-mobile-scale-surface */
 .pegboard-mobile-scale-slot {
   position: relative;
-  overflow: visible;
+  /* Unscaled `width`/`height` + `transform: scale()` on the surface still occupy the
+   * pre-transform layout box; `visible` lets that box paint over the next mobile slab. */
+  overflow: hidden;
   margin-left: auto;
   margin-right: auto;
   touch-action: pan-y;
