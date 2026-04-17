@@ -387,6 +387,33 @@ export function resolveLayoutAfterResizeWithGrid(
   return next;
 }
 
+/** True if every card is in bounds and no two cards overlap (full `w×h` rects). */
+export function layoutValidWithGrid(
+  positions: Record<string, { x: number; y: number }>,
+  specs: { id: string; hardware: PegboardHardware; w: number; h: number }[],
+  innerW: number,
+  innerH: number
+): boolean {
+  for (const s of specs) {
+    const p = positions[s.id];
+    if (!p) return false;
+    if (!cardInBoardBounds(p.x, p.y, s.w, s.h, innerW, innerH)) return false;
+  }
+  for (let i = 0; i < specs.length; i += 1) {
+    for (let j = i + 1; j < specs.length; j += 1) {
+      const a = specs[i]!;
+      const b = specs[j]!;
+      const pa = positions[a.id];
+      const pb = positions[b.id];
+      if (!pa || !pb) return false;
+      const ra: Rect = { x: pa.x, y: pa.y, w: a.w, h: a.h };
+      const rb: Rect = { x: pb.x, y: pb.y, w: b.w, h: b.h };
+      if (rectsOverlap(ra, rb)) return false;
+    }
+  }
+  return true;
+}
+
 export function proposedDragPosition(
   originX: number,
   originY: number,
