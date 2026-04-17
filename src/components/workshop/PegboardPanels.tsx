@@ -9,10 +9,9 @@ import {
 import type { PegboardCardDTO } from "@utils/serializeWorkshopPegboard";
 import {
   hardwareDimsWithGrid,
-  initialPackPositions,
   initialPackPositionsWithGrid,
+  layoutValidWithGrid,
   PEG_GRID,
-  resolveLayoutAfterResize,
   resolveLayoutAfterResizeWithGrid,
 } from "@utils/workshopPegboardPhysics";
 import {
@@ -197,7 +196,7 @@ function PegboardPanelDesktop({
   const itemsKey = useMemo(() => items.map(i => i.id).join("|"), [items]);
 
   const packedLayout = useMemo(() => {
-    const grids = [60, 54, 48, 42];
+    const grids = [60, 54, 48, 42, 36, 30];
     const pick = () => {
       for (const grid of grids) {
         const iw = Math.floor(innerW / grid) * grid;
@@ -228,10 +227,11 @@ function PegboardPanelDesktop({
             p && p.x >= 0 && p.y >= 0 && p.x + s.w <= iw && p.y + s.h <= ih
           );
         });
-        if (allFit)
+        if (allFit && layoutValidWithGrid(resolved, specs, iw, ih)) {
           return { grid, innerW: iw, innerH: ih, specs, positions: resolved };
+        }
       }
-      const grid = 42;
+      const grid = 30;
       const iw = Math.floor(innerW / grid) * grid;
       const ih = Math.floor(viewportH / grid) * grid;
       const specs: PegboardCardSpec[] = items.map(it => {
@@ -266,24 +266,16 @@ function PegboardPanelDesktop({
   const specs = packedLayout.specs;
   const innerWFinal = packedLayout.innerW;
 
+  /**
+   * Always take positions from `packedLayout` when it changes. Re-resolving from
+   * `prev` when item IDs were unchanged used stale (x,y) from a *previous* grid
+   * after `innerW` / `viewportH` / `grid` updated — that produced overlaps on
+   * desktop when portal or panel measurements settled (common on wide screens).
+   * User drags still win until the next packedLayout change (resize / data).
+   */
   useEffect(() => {
-    setPositions(prev => {
-      const nextIds = new Set(specs.map(s => s.id));
-      const prevKeys = Object.keys(prev);
-      const sameSet =
-        prevKeys.length === nextIds.size && prevKeys.every(k => nextIds.has(k));
-      if (!sameSet) {
-        return packedLayout.positions;
-      }
-      return resolveLayoutAfterResizeWithGrid(
-        prev,
-        specs,
-        innerWFinal,
-        packedLayout.innerH,
-        grid
-      );
-    });
-  }, [packedLayout, itemsKey, innerWFinal, viewportH, specs, items, grid]);
+    setPositions(packedLayout.positions);
+  }, [packedLayout]);
 
   const onDragCommit = useCallback((id: string, nx: number, ny: number) => {
     setPositions(p => ({ ...p, [id]: { x: nx, y: ny } }));
