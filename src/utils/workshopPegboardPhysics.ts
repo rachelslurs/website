@@ -171,6 +171,111 @@ export function initialPackPositionsWithGrid(
   return { positions, contentHeight };
 }
 
+/**
+ * Column-first seed: stack items vertically (same column) before starting a new
+ * column to the right. Lets desktop use vertical stacks at the current `grid`
+ * when a single horizontal row would not fit — tried before shrinking `gridPx`.
+ */
+export function initialPackPositionsColumnFirstWithGrid(
+  items: PackItem[],
+  innerW: number,
+  innerH: number,
+  grid: number
+): {
+  positions: Record<string, { x: number; y: number }>;
+  contentHeight: number;
+} {
+  const positions: Record<string, { x: number; y: number }> = {};
+  let x = grid;
+  let y = grid;
+  let colMaxW = 0;
+  let maxBottom = grid;
+
+  for (const it of items) {
+    const { w, h } = hardwareDimsWithGrid(it.hardware, grid);
+    if (y + h > innerH - grid && y > grid) {
+      x += colMaxW + grid;
+      y = grid;
+      colMaxW = 0;
+    }
+    positions[it.id] = { x, y };
+    colMaxW = Math.max(colMaxW, w);
+    maxBottom = Math.max(maxBottom, y + h);
+    y += h + grid;
+  }
+
+  const contentHeight = Math.max(
+    grid * 4,
+    Math.ceil((maxBottom + grid) / grid) * grid
+  );
+  return { positions, contentHeight };
+}
+
+export type PegboardPackedSpec = {
+  id: string;
+  hardware: PegboardHardware;
+  w: number;
+  h: number;
+};
+
+/**
+ * Try several deterministic pack seeds at the same `grid` (row-major,
+ * column-stack, row with tallest-first order). Returns the first layout that
+ * fits `innerW`×`innerH` with no overlaps, or `null` if none work at this grid.
+ * `innerW` / `innerH` should already be snapped to multiples of `grid`.
+ */
+export function packDesktopPanelAtGrid(
+  items: PackItem[],
+  innerW: number,
+  innerH: number,
+  grid: number
+): {
+  positions: Record<string, { x: number; y: number }>;
+  specs: PegboardPackedSpec[];
+} | null {
+  if (innerW <= 0 || innerH <= 0) return null;
+
+  const specs: PegboardPackedSpec[] = items.map(it => {
+    const { w, h } = hardwareDimsWithGrid(it.hardware, grid);
+    return { id: it.id, hardware: it.hardware, w, h };
+  });
+
+  const seeds: Record<string, { x: number; y: number }>[] = [
+    initialPackPositionsWithGrid(items, innerW, grid).positions,
+    initialPackPositionsColumnFirstWithGrid(items, innerW, innerH, grid)
+      .positions,
+    initialPackPositionsWithGrid(
+      [...items].sort((a, b) => {
+        const ha = hardwareDimsWithGrid(a.hardware, grid).h;
+        const hb = hardwareDimsWithGrid(b.hardware, grid).h;
+        return hb - ha;
+      }),
+      innerW,
+      grid
+    ).positions,
+  ];
+
+  for (const packed of seeds) {
+    const resolved = resolveLayoutAfterResizeWithGrid(
+      packed,
+      specs,
+      innerW,
+      innerH,
+      grid
+    );
+    const allFit = specs.every(s => {
+      const p = resolved[s.id];
+      return (
+        p && p.x >= 0 && p.y >= 0 && p.x + s.w <= innerW && p.y + s.h <= innerH
+      );
+    });
+    if (allFit && layoutValidWithGrid(resolved, specs, innerW, innerH)) {
+      return { positions: resolved, specs };
+    }
+  }
+  return null;
+}
+
 function collides(
   selfId: string,
   x: number,

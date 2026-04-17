@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   hardwareDimsWithGrid,
+  initialPackPositionsColumnFirstWithGrid,
   initialPackPositionsWithGrid,
   layoutValidWithGrid,
+  packDesktopPanelAtGrid,
   resolveLayoutAfterResizeWithGrid,
 } from "./workshopPegboardPhysics";
 
@@ -50,36 +52,37 @@ describe("layoutValidWithGrid", () => {
   });
 });
 
-describe("workshop trio packing (sanity)", () => {
-  it("finds a non-overlapping layout for clipboard + lcd + blueprint on a wide cork", () => {
+describe("initialPackPositionsColumnFirstWithGrid", () => {
+  it("stacks items vertically in one column before advancing x", () => {
+    const items = [
+      { id: "a", hardware: "blueprint" as const },
+      { id: "b", hardware: "blueprint" as const },
+    ];
+    const grid = 60;
+    const iw = 360;
+    const ih = 900;
+    const { positions } = initialPackPositionsColumnFirstWithGrid(
+      items,
+      iw,
+      ih,
+      grid
+    );
+    expect(positions.a!.x).toBe(positions.b!.x);
+    expect(positions.b!.y).toBeGreaterThan(positions.a!.y);
+  });
+});
+
+describe("packDesktopPanelAtGrid", () => {
+  it("packs workshop trio on a large cork at 60px grid", () => {
     const items = [
       { id: "work", hardware: "clipboard" as const },
       { id: "link", hardware: "lcd" as const },
       { id: "demo", hardware: "blueprint" as const },
     ];
-    const innerW = 1200;
-    const innerH = 1000;
-    for (const grid of [60, 54, 48, 42, 36, 30]) {
-      const iw = Math.floor(innerW / grid) * grid;
-      const ih = Math.floor(innerH / grid) * grid;
-      const specs = specsFor(items, grid);
-      const packed = initialPackPositionsWithGrid(items, iw, grid).positions;
-      const resolved = resolveLayoutAfterResizeWithGrid(
-        packed,
-        specs,
-        iw,
-        ih,
-        grid
-      );
-      const allFit = specs.every(s => {
-        const p = resolved[s.id];
-        return p && p.x >= 0 && p.y >= 0 && p.x + s.w <= iw && p.y + s.h <= ih;
-      });
-      if (allFit && layoutValidWithGrid(resolved, specs, iw, ih)) {
-        expect(true).toBe(true);
-        return;
-      }
-    }
-    throw new Error("no grid produced a valid layout");
+    const iw = 1200;
+    const ih = 1000;
+    const r = packDesktopPanelAtGrid(items, iw, ih, 60);
+    expect(r).not.toBeNull();
+    expect(layoutValidWithGrid(r!.positions, r!.specs, iw, ih)).toBe(true);
   });
 });
