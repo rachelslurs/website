@@ -75,7 +75,7 @@ docker compose run --rm playwright-update-fast
 
 ## Architecture decisions
 
-Design rationale for larger choices lives in **Architecture Decision Records** under [`docs/decisions/`](docs/decisions/) (for example [ADR-001: Workshop mobile pegboard layout contract](docs/decisions/001-workshop-mobile-pegboard-contract.md), [ADR-002: Visual regression CI favors speed over native build toolchain](docs/decisions/002-visual-regression-ci-speed-vs-native-builds.md), and [ADR-003: Workshop frame chrome in the initial viewport](docs/decisions/003-workshop-frame-chrome-initial-viewport.md)).
+Design rationale for larger choices lives in **Architecture Decision Records** under [`docs/decisions/`](docs/decisions/) (for example [ADR-001: Workshop mobile pegboard layout contract](docs/decisions/001-workshop-mobile-pegboard-contract.md), [ADR-002: Visual regression CI favors speed over native build toolchain](docs/decisions/002-visual-regression-ci-speed-vs-native-builds.md), [ADR-003: Workshop frame chrome in the initial viewport](docs/decisions/003-workshop-frame-chrome-initial-viewport.md), and [ADR-004: Workshop panel packing](docs/decisions/004-workshop-panel-packing.md)).
 
 Projects
 
