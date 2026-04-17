@@ -12,12 +12,18 @@ Accepted
 
 Desktop panels pick a **snapped cork** size (`innerW` × `innerH`, multiples of `gridPx`) and run deterministic pack seeds, then a **resolver** that nudges cards so they do not intersect **corner screw hit regions** or each other’s **full card rectangles**. When debugging (`?workshopDebugCork=1`), engineers see messages about **bounds**, **overlap**, and **“full card rect”**; without a written contract it is easy to assume `layoutValidWithGrid` also checks screws, or to treat **Σ card heights** as a sufficient vertical budget (it is not, except in a **single-column** layout).
 
+The workshop can show **several horizontal panels** in one strip. A **product** goal is that those panels must **not all read as the same template** (e.g. case study / clipboard always in the **rightmost** column because a single greedy seed always won first). Layout choice is therefore not only “first seed that fits” but includes **cross-panel diversity** and **left bias for the clipboard** when multiple layouts are physically valid at the same `gridPx`.
+
 ## Decision
 
 1. **Pipeline (normative)** — For a candidate `(gridPx, innerW, innerH)`:
-   - Seed **grid-snapped** `(x, y)` via several deterministic orderings in `packDesktopPanelAtGrid` (see JSDoc there): notably **`columnFirstHeightDesc`** (tallest first, so a work **clipboard** can anchor column 1 instead of always being iterated last), **`columnFirst`** with clipboard last (shorts stacked above the case study when that column fits), **`rowMajorPanelOrder`** (panel input order so work can sit **left**), then clip-last row-major and row-height variants. The **`columnFirst`** seed stacks the next card at **`y + h`** of the previous (no extra vertical `grid` seam between cards in the same column); a new column starts when **`y + h > innerH`** for the next placement. Row-major seeds still use horizontal/row gutters as before.
-   - Run **`resolveLayoutAfterResizeWithGrid`**, which repeatedly shifts a card while `collidesWithGrid` is true. That predicate is true if the placement is **out of cork bounds**, overlaps a **corner screw hit box** (`hitBoxForCollisionWithGrid` vs `boardScrewRectsWithGrid`), or overlaps another card’s **full `w×h` rectangle**.
-   - Accept the seed only if **`allFit`** (every resolved position keeps the card’s full rect inside the cork) **and** **`layoutValidWithGrid`** (see below).
+   - Build several **seed** layouts (column-first with clipboard last in two non-clipboard orders — `panelIndex` swaps try order; column-first tallest-first; row-major variants with `panelIndex` rotating fallback order). Column-first seeds stack within a column at **`y + h`** (no extra vertical `grid` seam); a new column starts when **`y + h > innerH`**. Row-major seeds use horizontal/row gutters as implemented in `initialPackPositionsWithGrid`.
+   - For **each** seed, run **`resolveLayoutAfterResizeWithGrid`**, then require **`allFit`** and **`layoutValidWithGrid`** (see below). **Every** seed that passes is a **candidate** layout.
+   - **Choose one candidate** (do not stop at the first passing seed):
+     - Compute the **minimum `x`** of all **clipboard** cards (left edge on the cork) for each candidate.
+     - Prefer candidates with **globally smallest** clipboard `x` so the case study can appear in the **left column** whenever *any* valid seed places it further left than a clipboard-last column that only fit by opening new columns to the right.
+     - Among candidates tied on that minimum `x`, pick using a **deterministic hash** of **`desktopPanelIndex`**, cork dimensions, `gridPx`, and item ids so **adjacent panels are not forced to look identical** when several layouts are equally “leftmost.”
+   - **Why clipboard was stuck on the right** (prior behavior): **Clipboard-last column-first** walks non-clipboard cards first, then the case study. When each card needs its **own column** (tight `innerH`), the clipboard is **iterated last** → **rightmost column**. **Clipboard-last row-major** walks left-to-right → **rightmost horizontal slot**. Without considering **other** passing seeds, the layout looked the same on every panel. **Selection among all valid seeds** fixes that when a seed exists with a smaller clipboard `x`.
 
 2. **`layoutValidWithGrid` scope** — It asserts only:
    - Each card’s **full pegboard rectangle** lies inside `innerW` × `innerH`.
@@ -46,9 +52,15 @@ Desktop panels pick a **snapped cork** size (`innerW` × `innerH`, multiples of 
 - **Cons:** False positives (side-by-side cards use width, not sum of heights) and false negatives (column stack can fail for screw nudges even when Σh barely fits).
 - **Rejected** as the acceptance rule; kept only as **debug intuition** (see `workshopDebugCork` logs).
 
+### “First valid seed wins” only
+
+- **Pros:** Slightly less CPU; trivial to read.
+- **Cons:** Clipboard and shorts **always** follow one template whenever that seed validates first (e.g. clipboard **always** right column / right slot across the strip).
+- **Rejected** in favor of **evaluating all seeds** and **preferring smaller clipboard `x`** plus hashed tie-breaks for strip diversity.
+
 ## Consequences
 
-- **Implementation:** `src/utils/workshopPegboardPhysics.ts` — `resolveLayoutAfterResizeWithGrid`, `collidesWithGrid`, `packDesktopPanelAtGrid`, `layoutValidWithGrid`.
+- **Implementation:** `src/utils/workshopPegboardPhysics.ts` — `resolveLayoutAfterResizeWithGrid`, `collidesWithGrid`, `packDesktopPanelAtGrid` (multi-seed + **clipboard-`x` preference** + hashed tie-break), `layoutValidWithGrid`. **`desktopPanelIndex`** is passed from `WorkshopPegboard` → `PegboardPanelView` for the hash.
 - **Cork size / height budget:** Still governed by [ADR-003](003-workshop-frame-chrome-initial-viewport.md) (viewport + portal padding); this ADR documents **what “fits” means** once `innerH` is chosen.
 - **Debug:** Opt-in logs (`?workshopDebugCork=1` or `localStorage.workshopDebugCork = "1"`) may include `verticalBudgetHint` (max/sum of `h`, `innerH`) and `overlappingPair` when overlap is the failure mode.
 - **Tests:** Extend `workshopPegboardPhysics.test.ts` when changing acceptance or resolver semantics.
