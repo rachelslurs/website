@@ -146,15 +146,26 @@ export default function PegCard({
         className={[rootClass, stack ? "peg-card--mobile-stack" : ""]
           .filter(Boolean)
           .join(" ")}
-        style={{
-          width: w,
-          height: h,
-          transform: stack
-            ? `scale(${scaleFactor})`
-            : `translate(${x}px, ${y}px) scale(${scaleFactor})`,
-          transformOrigin: "top center",
-          marginBottom: `${-h * (1 - scaleFactor)}px`,
-        }}
+        style={
+          stack
+            ? {
+                position: "relative",
+                left: "auto",
+                top: "auto",
+                width: w,
+                height: h,
+                transform: `scale(${scaleFactor})`,
+                transformOrigin: "top center",
+                marginBottom: `${-h * (1 - scaleFactor)}px`,
+              }
+            : {
+                width: w,
+                height: h,
+                transform: `translate(${x}px, ${y}px) scale(${scaleFactor})`,
+                transformOrigin: "top center",
+                marginBottom: `${-h * (1 - scaleFactor)}px`,
+              }
+        }
       >
         {cardInner}
       </div>
