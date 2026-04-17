@@ -10,6 +10,7 @@ import type { PegboardCardDTO } from "@utils/serializeWorkshopPegboard";
 import {
   hardwareDimsWithGrid,
   initialPackPositionsColumnFirstWithGrid,
+  orderPackItemsClipboardLast,
   packDesktopPanelAtGrid,
   PEG_GRID,
   resolveLayoutAfterResizeWithGrid,
@@ -240,7 +241,7 @@ function PegboardPanelDesktop({
         return { id: it.id, hardware: it.hardware, w, h };
       });
       const col = initialPackPositionsColumnFirstWithGrid(
-        packItems,
+        orderPackItemsClipboardLast(packItems),
         iw,
         ih,
         grid

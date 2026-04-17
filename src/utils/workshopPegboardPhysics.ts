@@ -126,6 +126,17 @@ export interface PackItem {
   hardware: PegboardHardware;
 }
 
+/**
+ * Stable pack order: keep relative order among non-clipboard cards, then append
+ * every clipboard (tallest hardware) last so column-first stacks shorter cards
+ * above the case study clip.
+ */
+export function orderPackItemsClipboardLast(items: PackItem[]): PackItem[] {
+  const non = items.filter(it => it.hardware !== "clipboard");
+  const clipboards = items.filter(it => it.hardware === "clipboard");
+  return [...non, ...clipboards];
+}
+
 /** Row-major pack with PEG_GRID gutters; returns positions and content height. */
 export function initialPackPositions(
   items: PackItem[],
@@ -220,8 +231,10 @@ export type PegboardPackedSpec = {
 
 /**
  * Try several deterministic pack seeds at the same `grid` (row-major,
- * column-stack, row with tallest-first order). Returns the first layout that
- * fits `innerW`×`innerH` with no overlaps, or `null` if none work at this grid.
+ * column-stack, row with shortest-first order). Clipboard is always ordered
+ * last before seeding so column stacks place shorter cards above the tall case
+ * study clip. Returns the first layout that fits `innerW`×`innerH` with no
+ * overlaps, or `null` if none work at this grid.
  * `innerW` / `innerH` should already be snapped to multiples of `grid`.
  */
 export function packDesktopPanelAtGrid(
@@ -240,15 +253,17 @@ export function packDesktopPanelAtGrid(
     return { id: it.id, hardware: it.hardware, w, h };
   });
 
+  const ordered = orderPackItemsClipboardLast(items);
+
   const seeds: Record<string, { x: number; y: number }>[] = [
-    initialPackPositionsWithGrid(items, innerW, grid).positions,
-    initialPackPositionsColumnFirstWithGrid(items, innerW, innerH, grid)
+    initialPackPositionsWithGrid(ordered, innerW, grid).positions,
+    initialPackPositionsColumnFirstWithGrid(ordered, innerW, innerH, grid)
       .positions,
     initialPackPositionsWithGrid(
-      [...items].sort((a, b) => {
+      [...ordered].sort((a, b) => {
         const ha = hardwareDimsWithGrid(a.hardware, grid).h;
         const hb = hardwareDimsWithGrid(b.hardware, grid).h;
-        return hb - ha;
+        return ha - hb;
       }),
       innerW,
       grid
