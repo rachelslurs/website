@@ -138,6 +138,20 @@ export function orderPackItemsClipboardLast(items: PackItem[]): PackItem[] {
 }
 
 /**
+ * Clipboard(s) still last for column-first “stack above,” but **non-clipboard**
+ * cards are iterated in **reverse panel order** so two shorts swap who sits
+ * closer to the clip — varies layout across panels when paired with
+ * `panelIndex` without row-major “clipboard on the right.”
+ */
+export function orderPackItemsClipboardLastReverseNonClipboard(
+  items: PackItem[]
+): PackItem[] {
+  const non = items.filter(it => it.hardware !== "clipboard");
+  const clipboards = items.filter(it => it.hardware === "clipboard");
+  return [...non].reverse().concat(clipboards);
+}
+
+/**
  * Tallest card first, then stable tie-break by **original panel index** (input
  * `items` order). Used for a column-first seed so the case study clipboard can
  * anchor **column 1** instead of always being iterated last (which maps to the
@@ -262,15 +276,12 @@ export type PegboardPackedSpec = {
  * Try several deterministic pack seeds at the same `grid`. Order of seeds is
  * the priority when multiple layouts validate.
  *
- * 1. **`columnFirstHeightDesc`** — column-first with **tallest first** (clipboard
- *    often leads column 1 instead of the last column).
- * 2. **`columnFirst`** — column-first with **clipboard last** so shorter cards can
- *    stack above the case study in the same column when that fits.
- * 3. **`rowMajorPanelOrder`** — row-major in **panel input order** (work / links /
- *    demos from `buildWorkshopPanels`), so the work clipboard can sit **left**
- *    instead of always **right** (clip-last row-major).
- * 4. **`rowMajor`** — row-major with clipboard last (wider horizontal run for LCDs).
- * 5. **`rowHeightAsc`** — row-major with shortest-first row fill.
+ * Seeds (column-first pair + height-desc + row variants; see ADR-005) are each
+ * resolved and validated. **Among every layout that passes**, the chosen layout
+ * is the one with **smallest clipboard left edge `x`** (so the case study can sit
+ * in the **left column** whenever any valid seed places it there). Ties use a
+ * deterministic hash of **`panelIndex`**, cork size, and `grid` so adjacent panels
+ * are not forced to pick the same seed when several ties on `x`.
  *
  * `innerW` / `innerH` should already be snapped to multiples of `grid`.
  */
@@ -279,7 +290,54 @@ export type PackDesktopPanelAtGridOptions = {
   debug?: boolean;
   /** Shown in log lines (e.g. panel item key). */
   debugLabel?: string;
+  /** Desktop strip index — varies seed try-order so layouts differ per panel. */
+  panelIndex?: number;
 };
+
+function samePackItemOrder(a: PackItem[], b: PackItem[]): boolean {
+  if (a.length !== b.length) return false;
+  return a.every((it, i) => it.id === b[i]!.id);
+}
+
+function rotateSeeds<T>(arr: T[], offset: number): T[] {
+  const n = arr.length;
+  if (n === 0) return arr;
+  const k = ((offset % n) + n) % n;
+  return arr.slice(k).concat(arr.slice(0, k));
+}
+
+/** Deterministic tie-break for picking among several valid pack layouts. */
+function packLayoutPickHash(
+  panelIndex: number,
+  itemsKey: string,
+  innerW: number,
+  innerH: number,
+  grid: number,
+  salt: number
+): number {
+  let h = 2166136261;
+  for (const part of [panelIndex, itemsKey, innerW, innerH, grid, salt]) {
+    const s = String(part);
+    for (let i = 0; i < s.length; i += 1) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+  }
+  return Math.abs(h);
+}
+
+/** Minimum `x` among clipboard cards (left edge); `0` if there is no clipboard. */
+function clipboardMinXForPack(
+  positions: Record<string, { x: number; y: number }>,
+  items: PackItem[]
+): number {
+  const xs = items
+    .filter(it => it.hardware === "clipboard")
+    .map(it => positions[it.id]?.x)
+    .filter((x): x is number => typeof x === "number");
+  if (xs.length === 0) return 0;
+  return Math.min(...xs);
+}
 
 function firstOverlappingPairIds(
   positions: Record<string, { x: number; y: number }>,
@@ -330,6 +388,7 @@ export function packDesktopPanelAtGrid(
 
   const dbg = options?.debug === true;
   const tag = options?.debugLabel ?? "workshop";
+  const panelIndex = options?.panelIndex ?? 0;
 
   const specs: PegboardPackedSpec[] = items.map(it => {
     const { w, h } = hardwareDimsWithGrid(it.hardware, grid);
@@ -337,9 +396,68 @@ export function packDesktopPanelAtGrid(
   });
 
   const ordered = orderPackItemsClipboardLast(items);
+  const orderedNonClipRev =
+    orderPackItemsClipboardLastReverseNonClipboard(items);
   const heightDesc = sortPackItemsByHeightDesc(items, grid);
 
-  const seeds: {
+  const columnFirstPair: {
+    name: string;
+    positions: Record<string, { x: number; y: number }>;
+  }[] = samePackItemOrder(ordered, orderedNonClipRev)
+    ? [
+        {
+          name: "columnFirst",
+          positions: initialPackPositionsColumnFirstWithGrid(
+            ordered,
+            innerW,
+            innerH,
+            grid
+          ).positions,
+        },
+      ]
+    : panelIndex % 2 === 0
+      ? [
+          {
+            name: "columnFirst",
+            positions: initialPackPositionsColumnFirstWithGrid(
+              ordered,
+              innerW,
+              innerH,
+              grid
+            ).positions,
+          },
+          {
+            name: "columnFirstNonClipboardReversed",
+            positions: initialPackPositionsColumnFirstWithGrid(
+              orderedNonClipRev,
+              innerW,
+              innerH,
+              grid
+            ).positions,
+          },
+        ]
+      : [
+          {
+            name: "columnFirstNonClipboardReversed",
+            positions: initialPackPositionsColumnFirstWithGrid(
+              orderedNonClipRev,
+              innerW,
+              innerH,
+              grid
+            ).positions,
+          },
+          {
+            name: "columnFirst",
+            positions: initialPackPositionsColumnFirstWithGrid(
+              ordered,
+              innerW,
+              innerH,
+              grid
+            ).positions,
+          },
+        ];
+
+  const rowSeeds: {
     name: string;
     positions: Record<string, { x: number; y: number }>;
   }[] = [
@@ -347,15 +465,6 @@ export function packDesktopPanelAtGrid(
       name: "columnFirstHeightDesc",
       positions: initialPackPositionsColumnFirstWithGrid(
         heightDesc,
-        innerW,
-        innerH,
-        grid
-      ).positions,
-    },
-    {
-      name: "columnFirst",
-      positions: initialPackPositionsColumnFirstWithGrid(
-        ordered,
         innerW,
         innerH,
         grid
@@ -383,12 +492,17 @@ export function packDesktopPanelAtGrid(
     },
   ];
 
+  const seeds = columnFirstPair.concat(
+    rotateSeeds(rowSeeds, Math.floor(panelIndex / 2))
+  );
+
   if (dbg) {
     const heights = specs.map(s => ({ id: s.id, h: s.h }));
     const sumH = specs.reduce((acc, s) => acc + s.h, 0);
     const maxH = specs.length ? Math.max(...specs.map(s => s.h)) : 0;
     // eslint-disable-next-line no-console -- intentional debug aid (opt-in via URL/localStorage)
     console.log(`[workshop-pack:${tag}] try grid`, grid, {
+      panelIndex,
       innerW,
       innerH,
       cols: Math.round(innerW / grid),
@@ -404,6 +518,12 @@ export function packDesktopPanelAtGrid(
       },
     });
   }
+
+  const itemsKeyForPick = items.map(it => it.id).join("|");
+  const winners: {
+    name: string;
+    positions: Record<string, { x: number; y: number }>;
+  }[] = [];
 
   for (const { name: seedName, positions: packed } of seeds) {
     const resolved = resolveLayoutAfterResizeWithGrid(
@@ -444,16 +564,40 @@ export function packDesktopPanelAtGrid(
       });
     }
     if (allFit && layoutValid) {
-      if (dbg) {
-        // eslint-disable-next-line no-console -- intentional debug aid
-        console.log(`[workshop-pack:${tag}] accepted`, {
-          grid,
-          seed: seedName,
-        });
-      }
-      return { positions: resolved, specs };
+      winners.push({ name: seedName, positions: resolved });
     }
   }
+
+  if (winners.length > 0) {
+    const clipXs = winners.map(w => clipboardMinXForPack(w.positions, items));
+    const minClipX = Math.min(...clipXs);
+    const shortlist = winners.filter(
+      w => clipboardMinXForPack(w.positions, items) === minClipX
+    );
+    const pick =
+      shortlist[
+        packLayoutPickHash(
+          panelIndex,
+          itemsKeyForPick,
+          innerW,
+          innerH,
+          grid,
+          minClipX
+        ) % shortlist.length
+      ]!;
+    if (dbg) {
+      // eslint-disable-next-line no-console -- intentional debug aid
+      console.log(`[workshop-pack:${tag}] chose among valid`, {
+        grid,
+        winnerCount: winners.length,
+        shortlistCount: shortlist.length,
+        minClipboardX: minClipX,
+        seed: pick.name,
+      });
+    }
+    return { positions: pick.positions, specs };
+  }
+
   if (dbg) {
     // eslint-disable-next-line no-console -- intentional debug aid
     console.log(`[workshop-pack:${tag}] rejected grid`, grid, {

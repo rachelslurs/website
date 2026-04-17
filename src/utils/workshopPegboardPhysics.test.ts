@@ -5,6 +5,7 @@ import {
   initialPackPositionsWithGrid,
   layoutValidWithGrid,
   orderPackItemsClipboardLast,
+  orderPackItemsClipboardLastReverseNonClipboard,
   packDesktopPanelAtGrid,
   resolveLayoutAfterResizeWithGrid,
   sortPackItemsByHeightDesc,
@@ -66,6 +67,19 @@ describe("sortPackItemsByHeightDesc", () => {
       "demo",
       "link",
     ]);
+  });
+});
+
+describe("orderPackItemsClipboardLastReverseNonClipboard", () => {
+  it("reverses non-clipboard sequence and keeps clipboards last", () => {
+    const items = [
+      { id: "link", hardware: "lcd" as const },
+      { id: "demo", hardware: "lcd" as const },
+      { id: "work", hardware: "clipboard" as const },
+    ];
+    expect(
+      orderPackItemsClipboardLastReverseNonClipboard(items).map(x => x.id)
+    ).toEqual(["demo", "link", "work"]);
   });
 });
 

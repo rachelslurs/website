@@ -431,6 +431,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
                     desktopPanelPadX={desktopPanelPadX}
                     desktopContentInnerW={desktopPegboardContentInnerW}
                     debugWorkshopCork={debugWorkshopCork}
+                    desktopPanelIndex={i}
                   />
                   {i < panels.length - 1 ? (
                     <>

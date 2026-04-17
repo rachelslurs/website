@@ -176,6 +176,7 @@ function PegboardPanelDesktop({
   desktopPanelPadX,
   desktopContentInnerW,
   debugWorkshopCork,
+  desktopPanelIndex,
 }: {
   items: PegboardCardDTO[];
   vw: number;
@@ -188,6 +189,8 @@ function PegboardPanelDesktop({
   desktopContentInnerW?: number | null;
   /** When true, outlines the packed cork and logs grid/seed decisions (`?workshopDebugCork=1` or localStorage). */
   debugWorkshopCork?: boolean;
+  /** Index on the desktop strip — varies pack seed try-order so panels look less uniform. */
+  desktopPanelIndex?: number;
 }) {
   const w = Math.round(layoutWidth ?? vw);
   const h = Math.round(layoutHeight ?? vh);
@@ -204,6 +207,7 @@ function PegboardPanelDesktop({
     const packOpts = {
       debug: debugWorkshopCork === true,
       debugLabel: itemsKey,
+      panelIndex: desktopPanelIndex ?? 0,
     };
     const pick = () => {
       if (packOpts.debug) {
@@ -314,6 +318,7 @@ function PegboardPanelDesktop({
     viewportH,
     debugWorkshopCork,
     desktopContentInnerW,
+    desktopPanelIndex,
   ]);
 
   const [positions, setPositions] = useState(packedLayout.positions);
@@ -415,6 +420,7 @@ export default function PegboardPanelView({
   desktopContentInnerW,
   mobileScalePresentation,
   debugWorkshopCork,
+  desktopPanelIndex,
 }: {
   items: PegboardCardDTO[];
   isMobile: boolean;
@@ -427,6 +433,7 @@ export default function PegboardPanelView({
   desktopContentInnerW?: number | null;
   mobileScalePresentation?: MobileScalePresentation;
   debugWorkshopCork?: boolean;
+  desktopPanelIndex?: number;
 }) {
   if (isMobile) {
     return (
@@ -449,6 +456,7 @@ export default function PegboardPanelView({
       desktopPanelPadX={desktopPanelPadX}
       desktopContentInnerW={desktopContentInnerW}
       debugWorkshopCork={debugWorkshopCork}
+      desktopPanelIndex={desktopPanelIndex}
     />
   );
 }
