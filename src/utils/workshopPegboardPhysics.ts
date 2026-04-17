@@ -230,11 +230,12 @@ export type PegboardPackedSpec = {
 };
 
 /**
- * Try several deterministic pack seeds at the same `grid` (row-major,
- * column-stack, row with shortest-first order). Clipboard is always ordered
+ * Try several deterministic pack seeds at the same `grid`. **Column-first**
+ * runs before row-major so pairs of shorter cards prefer a vertical stack when
+ * both layouts fit at this `gridPx`. Then row-major (ADR panel order via
+ * `ordered`), then a shortest-first row variant. Clipboard is always ordered
  * last before seeding so column stacks place shorter cards above the tall case
- * study clip. Returns the first layout that fits `innerW`×`innerH` with no
- * overlaps, or `null` if none work at this grid.
+ * study clip.
  * `innerW` / `innerH` should already be snapped to multiples of `grid`.
  */
 export function packDesktopPanelAtGrid(
@@ -256,9 +257,9 @@ export function packDesktopPanelAtGrid(
   const ordered = orderPackItemsClipboardLast(items);
 
   const seeds: Record<string, { x: number; y: number }>[] = [
-    initialPackPositionsWithGrid(ordered, innerW, grid).positions,
     initialPackPositionsColumnFirstWithGrid(ordered, innerW, innerH, grid)
       .positions,
+    initialPackPositionsWithGrid(ordered, innerW, grid).positions,
     initialPackPositionsWithGrid(
       [...ordered].sort((a, b) => {
         const ha = hardwareDimsWithGrid(a.hardware, grid).h;
