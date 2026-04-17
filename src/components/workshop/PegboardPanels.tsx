@@ -9,8 +9,8 @@ import {
 import type { PegboardCardDTO } from "@utils/serializeWorkshopPegboard";
 import {
   hardwareDimsWithGrid,
-  initialPackPositionsWithGrid,
-  layoutValidWithGrid,
+  initialPackPositionsColumnFirstWithGrid,
+  packDesktopPanelAtGrid,
   PEG_GRID,
   resolveLayoutAfterResizeWithGrid,
 } from "@utils/workshopPegboardPhysics";
@@ -203,44 +203,46 @@ function PegboardPanelDesktop({
         const ih = Math.floor(viewportH / grid) * grid;
         if (iw <= 0 || ih <= 0) continue;
 
-        const specs: PegboardCardSpec[] = items.map(it => {
-          const { w, h } = hardwareDimsWithGrid(it.hardware, grid);
-          return { id: it.id, hardware: it.hardware, w, h };
-        });
-
-        const { positions: packed } = initialPackPositionsWithGrid(
-          items.map(i => ({ id: i.id, hardware: i.hardware })),
-          iw,
-          grid
-        );
-        const resolved = resolveLayoutAfterResizeWithGrid(
-          packed,
-          specs,
-          iw,
-          ih,
-          grid
-        );
-
-        const allFit = specs.every(s => {
-          const p = resolved[s.id];
-          return (
-            p && p.x >= 0 && p.y >= 0 && p.x + s.w <= iw && p.y + s.h <= ih
-          );
-        });
-        if (allFit && layoutValidWithGrid(resolved, specs, iw, ih)) {
-          return { grid, innerW: iw, innerH: ih, specs, positions: resolved };
+        const packItems = items.map(i => ({
+          id: i.id,
+          hardware: i.hardware,
+        }));
+        const packed = packDesktopPanelAtGrid(packItems, iw, ih, grid);
+        if (packed) {
+          return {
+            grid,
+            innerW: iw,
+            innerH: ih,
+            specs: packed.specs,
+            positions: packed.positions,
+          };
         }
       }
       const grid = 30;
       const iw = Math.floor(innerW / grid) * grid;
       const ih = Math.floor(viewportH / grid) * grid;
+      const packItems = items.map(i => ({
+        id: i.id,
+        hardware: i.hardware,
+      }));
+      const last = packDesktopPanelAtGrid(packItems, iw, ih, grid);
+      if (last) {
+        return {
+          grid,
+          innerW: iw,
+          innerH: ih,
+          specs: last.specs,
+          positions: last.positions,
+        };
+      }
       const specs: PegboardCardSpec[] = items.map(it => {
         const { w, h } = hardwareDimsWithGrid(it.hardware, grid);
         return { id: it.id, hardware: it.hardware, w, h };
       });
-      const { positions: packed } = initialPackPositionsWithGrid(
-        items.map(i => ({ id: i.id, hardware: i.hardware })),
+      const col = initialPackPositionsColumnFirstWithGrid(
+        packItems,
         iw,
+        ih,
         grid
       );
       return {
@@ -249,7 +251,7 @@ function PegboardPanelDesktop({
         innerH: ih,
         specs,
         positions: resolveLayoutAfterResizeWithGrid(
-          packed,
+          col.positions,
           specs,
           iw,
           ih,
