@@ -118,7 +118,7 @@ todos:
     status: completed
   - id: phase7-typography-layouts
     content: "Phase 7c: Wire PostDetails/WorkDetails/SimplePage (+ posts index if needed) to prose + variant + modifiers; reduce duplicate global CSS"
-    status: pending
+    status: completed
   - id: phase7-typography-responsive-density
     content: "Phase 7d: Responsive reading density (max-sm:prose-sm or custom compact variant) aligned with shell + html md font-size; manual long-form + code post"
     status: pending

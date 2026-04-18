@@ -164,10 +164,7 @@
     @apply w-full max-w-none;
   }
 
-  /* Work / demo MDX: Tailwind Typography defaults + comfortable measure */
-  .entry-body {
-    @apply prose min-w-0 max-w-prose prose-img:rounded prose-img:bg-skin-fill;
-  }
+
 
   /*
    * Hide remark-toc output inside the article so it never duplicates the sidebar TOC.
