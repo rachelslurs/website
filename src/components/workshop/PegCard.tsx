@@ -109,7 +109,12 @@ export default function PegCard({
     ) : item.hardware === "lcd" ? (
       <div
         className="peg-card__inner peg-card__inner--lcd"
-        style={{ width: w, height: h, position: "relative" }}
+        style={{
+          width: w,
+          height: h,
+          position: "relative",
+          ["--peg-grid-px" as string]: `${grid}px`,
+        }}
       >
         <LinkLcdCard
           item={item}
@@ -120,7 +125,12 @@ export default function PegCard({
     ) : (
       <div
         className="peg-card__inner peg-card__inner--blueprint"
-        style={{ width: w, height: h, position: "relative" }}
+        style={{
+          width: w,
+          height: h,
+          position: "relative",
+          ["--peg-grid-px" as string]: `${grid}px`,
+        }}
       >
         <DemoBlueprintCard
           item={item}
