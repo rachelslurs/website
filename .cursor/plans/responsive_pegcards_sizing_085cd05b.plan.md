@@ -1,6 +1,6 @@
 ---
 name: Workshop pegboard responsive
-overview: "Single plan: desktop scaled grid + repack (Phase 1 done). Phase 2 mobile ≤768 — frame/seam/cork snap, scroll-primary + uniform presentation + physics cleanup + visual regression + ADR-001 (done). Phase 3 blueprint-sheet-mask (done). Phase 4 — workshop frame chrome in initial viewport (ADR-003): layout + Playwright ADR-003 describe (viewport + portal-frame screenshots) done. Phase 5 — workshop panel packing (ADR-004): caps + kind-priority backfill + non-progress partial panels; Vitest `npm test`; plan item 8 + Checkpoint A4 reconciled to ADR-004 (done). Phase 6 — **6a done:** `tests/visual/site-pages.spec.ts` + Docker baselines + `npm run test:visual:site-pages:*:docker`. **6b–6c pending:** tighter RisoBoardShell + nav + footer; full `test:visual:docker` after shell change."
+overview: "Single plan: desktop scaled grid + repack (Phase 1 done). Phase 2 mobile ≤768 — frame/seam/cork snap, scroll-primary + uniform presentation + physics cleanup + visual regression + ADR-001 (done). Phase 3 blueprint-sheet-mask (done). Phase 4 — workshop frame chrome in initial viewport (ADR-003): layout + Playwright ADR-003 describe (viewport + portal-frame screenshots) done. Phase 5 — workshop panel packing (ADR-004): caps + kind-priority backfill + non-progress partial panels; Vitest `npm test`; plan item 8 + Checkpoint A4 reconciled to ADR-004 (done). Phase 6 — **6a done:** `tests/visual/site-pages.spec.ts` + Docker baselines + `npm run test:visual:site-pages:*:docker`. **6b done:** site chrome uses **one spacing system** — `var(--spacing)` multiples via `tailwind.config.cjs` shell tokens + modest vertical tighten at `max-lg` / `max-sm`. **6c pending:** `npm run check` (done) + full `test:visual:docker` / `update:docker` for site-chrome, workshop-pegboard, site-pages. (Standalone `shell_spacing_token_unify_*.plan.md` merged here — do not maintain separately.)"
 todos:
   - id: css-content-box
     content: "Phase 1: Set `.pegboard-bg` to `box-sizing: content-box` (keep 8px border) in workshop-pegboard.css"
@@ -105,8 +105,8 @@ todos:
     content: "Phase 6a: Pin slugs to src/content (blog/work/demos); comment if rename"
     status: completed
   - id: phase6-shell-tighten
-    content: "Phase 6b: Tighter RisoBoardShell.astro + RisoNav.tsx + Footer.astro (responsive-first); optional ADR-003 Consequences note for shell padding lever"
-    status: pending
+    content: "Phase 6b: (1) Add semantic shell spacing keys to tailwind (calc(var(--spacing)*N)); wire RisoBoardShell + RisoNav + Footer only. (2) Tighter multiples max-sm/max-lg for ADR-003 vertical budget. Optional ADR-003 Consequences line. See Phase 6 spacing discipline + frontend-ui-engineering cross-link."
+    status: completed
   - id: phase6-verify
     content: "Phase 6c: npm run check + test:visual:docker / update:docker — site-chrome, workshop-pegboard, site-pages"
     status: pending
@@ -133,7 +133,7 @@ This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task
 3. **Phase 3 — Blueprint sheet mask (done):** **`blueprint-sheet-mask`** — CSS variables + `--blueprint-mask-image` with container-query variants (e.g. 260px / 220px); visual regression green (`docker compose run --rm playwright-fast`).
 4. **Phase 4 — Frame chrome in initial viewport (done):** **ADR-003** + **ADR-001 §7**. **`fillViewportSlot`** / **`h-svh`** / **no `prose` on workshop `main`** + pegboard-root column flex. **4c:** Playwright **Workshop frame chrome (ADR-003)** — `toBeInViewport` on `.workshop-panel-nav` + first `.pegboard-bg`; **`portal-frame--w*.png`** screenshots; short **375×500** smoke.
 5. **Phase 5 — Workshop panel packing (done):** **[ADR-004](../../docs/decisions/004-workshop-panel-packing.md)** — which CMS entries share a horizontal panel is decided in **`buildWorkshopPanels`** (not viewport CSS): max **3** items; **≤1 work** and **≤1 links** per panel; **demos** fill remaining slots; backfill sorts **work → links → demos**, then **newest first** within a kind; **non-progress** leaves a **partial panel** when the pool cannot add without breaking caps. **Verify:** `npm test` (Vitest), `npm run check`.
-6. **Phase 6 — Site shell vertical budget:** **6a (done)** — [`tests/visual/site-pages.spec.ts`](../../tests/visual/site-pages.spec.ts) viewport shell screenshots + `npm run test:visual:site-pages:*:docker`. **6b–6c (pending):** shrink global chrome ([`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro), [`RisoNav.tsx`](../../src/components/RisoNav.tsx), [`Footer.astro`](../../src/components/Footer.astro)); then full Docker visual run per [`visual-regression-docker.mdc`](../rules/visual-regression-docker.mdc).
+6. **Phase 6 — Site shell vertical budget:** **6a (done)** — [`tests/visual/site-pages.spec.ts`](../../tests/visual/site-pages.spec.ts) viewport shell screenshots + `npm run test:visual:site-pages:*:docker`. **6b (done)** — shell tokens in [`tailwind.config.cjs`](../../tailwind.config.cjs) + [`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro) / [`RisoNav.tsx`](../../src/components/RisoNav.tsx) / [`Footer.astro`](../../src/components/Footer.astro); vertical rhythm slightly tighter at `max-lg` / `max-sm`. **6c (pending):** full Docker visual run per [`visual-regression-docker.mdc`](../rules/visual-regression-docker.mdc).
 
 ## Phase 4: Workshop frame chrome (initial viewport)
 
@@ -707,6 +707,7 @@ flowchart TB
 
 - YAML **`mobile-pegb-unify-grid-scale`** — cancelled; replaced by **2f–2h**.
 - Standalone file `pegboard_scale_rethink_5944158c.plan.md` (historical Cursor plan) — **do not execute separately**; narrative merged here only.
+- Standalone file `shell_spacing_token_unify_6e67f27c.plan.md` (Cursor `CreatePlan` artifact) — **superseded**; shell spacing methodology lives **only** under Phase 6 below (same canonical file as pegboard roadmap).
 
 ## Phase 6: Site shell vertical budget (global)
 
@@ -714,15 +715,32 @@ flowchart TB
 
 **Goal:** Slightly smaller shell on **all** pages using `RisoBoardShell`, with workshop as the primary beneficiary. **Non-goals:** ADR-001 lattice, ADR-004 packing.
 
-**Implementation (sketch):**
+### Site chrome spacing discipline (agreement with design tokens)
+
+**Why:** Numeric Tailwind alone (`p-4`, `gap-8`) sits on the same 4px rhythm as [`--spacing: 0.25rem`](../../src/styles/base.css) but is **not declared** as multiples of the project token; tightening then invites ad-hoc values. **Discipline:** treat `--spacing` as the base unit; express **board shell** layout as **integer multiples** of it, same spirit as [`.app-layout` `padding-inline: calc(var(--spacing) * 4)`](../../src/styles/base.css) and [`frontend-ui-engineering` spacing scale](../skills/frontend-ui-engineering/SKILL.md) (“don’t invent values”).
+
+**Tailwind:** [`tailwind.config.cjs`](../../tailwind.config.cjs) already extends `spacing.spacing` → `var(--spacing)`. **Add** a small set of **semantic shell keys** (6–10), each `calc(var(--spacing) * N)` — e.g. `board-outer`, `board-column-gap`, `board-inner-x`, `nav-block-y`, `nav-link-gap`, `footer-block-y`, `footer-link-gap` — then use **only** those utilities in [`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro), [`RisoNav.tsx`](../../src/components/RisoNav.tsx), [`Footer.astro`](../../src/components/Footer.astro) for chrome `p-*` / `gap-*` / `py-*` / `pt-*`.
+
+**Non-goals for shell chrome:** raw `px` or fractional `rem` for layout rhythm; repo-wide replacement of every `gap-*` outside the shell trio.
+
+**Out of scope here:** workshop pegboard **inner** layout (ADR-001 / ADR-004) — still workshop CSS/components; this phase is **global board column** only.
+
+**Nav one-offs:** purely decorative offsets (e.g. dust tooltip) may stay arbitrary with a one-line comment **or** re-express as `calc(var(--spacing)*N)` if an integer N reads cleanly.
+
+**Vertical budget (Phase 6b after tokenize):** reduce **N** in token definitions or add `max-sm:` / `max-lg:` overrides — **not** new magic classes like `p-3.5`. Keep `fillViewportChain` / `h-svh` unchanged.
+
+**Visuals:** Expect a **`test:visual:update:docker`** pass after **tokenization** (computed layout can shift slightly even before intentional tightening); review diffs, then run **`test:visual:docker`** green.
+
+**ADR:** Optional one-line under ADR-003 **Consequences** — global shell vertical budget may be adjusted via **shared spacing tokens** (allowed lever; avoids per-page one-offs).
+
+**Implementation (files):**
 
 | Area | Files | Direction |
 |------|-------|-------------|
-| Shell wrapper | [`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro) | Reduce `gap-*`, `p-*`, `py-*` on `sm`/`md` first; keep `fillViewportChain` / `h-svh` behavior |
-| Nav | [`RisoNav.tsx`](../../src/components/RisoNav.tsx) | Tighter `py-*` / `gap-*`; optional `max-sm:` so large viewports stay airy |
-| Footer | [`Footer.astro`](../../src/components/Footer.astro) | Slightly smaller `pt` / `gap`; manual tap-target check on `.dymo` links |
-
-**ADR:** Optional one-line addition under ADR-003 **Consequences** — “global shell padding is an allowed vertical-budget lever.”
+| Shell wrapper | [`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro) | Map outer/inner `p-*`, column `gap-*` to shell tokens; responsive variants on the **same scale**; keep `fillViewportChain` / `h-svh` |
+| Nav | [`RisoNav.tsx`](../../src/components/RisoNav.tsx) | `py-*` / `gap-*` from shell tokens; optional `max-sm:` so large viewports stay airy |
+| Footer | [`Footer.astro`](../../src/components/Footer.astro) | `pt` / `gap` from shell tokens; manual tap-target check on `.dymo` links |
+| Theme | [`tailwind.config.cjs`](../../tailwind.config.cjs) | Define semantic `calc(var(--spacing)*N)` spacing keys used above |
 
 ### Phase 6a — Playwright: non-workshop page visuals
 
@@ -745,7 +763,7 @@ flowchart TB
 
 ### Phase 6b–6c — Implement shell + verify
 
-- Land CSS/class changes in shell components.
+- **6b —** Add shell spacing keys → wire the three components → tighten multiples for vertical budget (order matters).
 - **`npm run check`**; **`npm run test:visual:update:docker`** then **`npm run test:visual:docker`** for `site-chrome`, `workshop-pegboard`, and **`site-pages`**.
 
 ### Checkpoint: After Phase 6
