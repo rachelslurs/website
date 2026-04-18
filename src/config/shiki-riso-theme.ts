@@ -3,7 +3,7 @@ import { createCssVariablesTheme } from "shiki/core";
 
 /**
  * “Faded ink” Shiki palette — CSS variables + fallbacks; background is transparent so
- * `.analog-prose pre` greenbar stripes show through.
+ * `prose prose-analog pre` greenbar stripes show through.
  * @see https://shiki.style/guide/theme-colors#css-variables-theme
  */
 const risoAnalogTheme = createCssVariablesTheme({
@@ -45,7 +45,7 @@ const risoAnalogTheme = createCssVariablesTheme({
   },
 });
 
-/** css-variables theme is mostly foreground-only; match prior .analog-prose accents */
+/** css-variables theme is mostly foreground-only; match prior prose-analog accents */
 export const risoAnalogSyntaxTransformer: ShikiTransformer = {
   span(node) {
     const style = node.properties?.style;

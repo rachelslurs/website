@@ -213,7 +213,7 @@ nav .group:hover .dust-note {
   font-weight: 400;
 }
 
-/* Editorial “looseleaf” post layout: stamped title (outside `.analog-prose`). */
+/* Editorial “looseleaf” post layout: stamped title (outside `prose prose-analog`). */
 .analog-post-title {
   @apply font-display;
   @apply mt-4 text-2xl sm:text-3xl md:text-4xl break-words leading-tight md:leading-[1.15];
@@ -1014,218 +1014,9 @@ a.skip-to-content-board:focus {
   }
 }
 
-.analog-prose {
-  max-width: min(65ch, 100%);
-  margin: 0 auto;
-  @apply font-body;
-  font-size: 1rem;
-  line-height: var(--baseline);
-  color: var(--analog-body);
-}
-
-/* Vertical rhythm only — do not set horizontal margin; Tailwind `-mx-*` on
-   components like BlogDemo must win for breakout from the 65ch column. */
-.analog-prose .not-prose {
-  margin-top: calc(var(--baseline) * 2);
-  margin-bottom: calc(var(--baseline) * 2);
-  max-width: none;
-}
-
-.analog-prose p {
-  margin: 0 0 var(--baseline) 0;
-  color: var(--analog-body);
-}
-
-/* Blog demos: prevent `.analog-prose p` vertical rhythm from affecting UI copy */
-.analog-prose .blog-demo p {
-  margin: 0;
-  color: inherit;
-  font: inherit;
-  line-height: inherit;
-}
-
-.analog-prose h2 {
-  @apply font-heading;
-  font-weight: 600;
-  font-size: var(--riso-type-h2);
-  line-height: var(--baseline);
-  margin: 1.75em 0 0.375rem 0;
-  color: var(--analog-ink);
-}
-
-.analog-prose h3 {
-  @apply font-heading;
-  font-weight: 600;
-  font-size: var(--riso-type-h3);
-  line-height: var(--baseline);
-  margin: 1.75em 0 0.375rem 0;
-  color: var(--analog-ink);
-}
-
-@screen sm {
-  .analog-prose h2,
-  .analog-prose h3 {
-    margin-top: 2.5em;
-  }
-}
-
-.analog-prose h4 {
-  @apply font-heading;
-  font-weight: 400;
-  font-size: var(--riso-type-h4);
-  line-height: var(--baseline);
-  margin: var(--baseline) 0 calc(var(--baseline) / 2) 0;
-  color: var(--analog-ink);
-}
-
-/* Beat Tailwind Typography’s `.prose a { text-decoration: underline }` — only one underline */
-.prose.analog-prose a {
-  color: var(--blue);
-  text-decoration: none !important;
-  text-decoration-line: none !important;
-  /* Lower stops = underline sits farther below the text (more clear space above the band) */
-  background-image: linear-gradient(
-    transparent 88%,
-    rgba(0, 120, 191, 0.4) 88%,
-    rgba(0, 120, 191, 0.4) 97%,
-    transparent 97%
-  );
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-  transition: background-image 0.2s, color 0.2s;
-}
-
-.prose.analog-prose a:hover {
-  background-image: linear-gradient(
-    transparent 88%,
-    var(--red) 88%,
-    var(--red) 97%,
-    transparent 97%
-  );
-  color: var(--red);
-}
-
-.prose.analog-prose h2 a.heading-link,
-.prose.analog-prose h3 a.heading-link,
-.prose.analog-prose h4 a.heading-link {
-  color: inherit;
-  font-weight: 400;
-  background-image: none;
-  font-size: 0.85em;
-  margin-left: 0.25rem;
-}
-
-.prose.analog-prose h2 a.heading-link:hover,
-.prose.analog-prose h3 a.heading-link:hover,
-.prose.analog-prose h4 a.heading-link:hover {
-  color: var(--blue);
-}
-
-.analog-prose code:not(pre code) {
-  @apply font-mono;
-  background-color: rgba(255, 181, 17, 0.35);
-  padding: 2px 4px;
-  border-radius: 2px;
-  color: var(--analog-ink);
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-}
-
-/* Ruled “code paper”: white + pale green lines — reads separately from cream looseleaf body */
-.analog-prose pre {
-  @apply -mx-4 sm:-mx-8 md:-mx-16;
-  @apply px-4 sm:px-8 md:px-16;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
-  box-sizing: border-box;
-  background-color: rgb(var(--color-fill));
-  background-image: repeating-linear-gradient(
-    180deg,
-    #f3f9f5 0,
-    #f3f9f5 var(--baseline),
-    rgb(var(--color-fill)) var(--baseline),
-    rgb(var(--color-fill)) calc(var(--baseline) * 2)
-  );
-  border-top: 1px dashed #ccc;
-  border-bottom: 1px dashed #ccc;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  position: relative;
-}
-
-.analog-prose pre::before,
-.analog-prose pre::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 14px;
-  background-image: radial-gradient(
-    circle at 7px calc(var(--baseline) / 2),
-    var(--cream) 4px,
-    transparent 4.5px
-  );
-  background-size: 14px var(--baseline);
-  z-index: 2;
-}
-
-.analog-prose pre::before {
-  left: 0;
-  border-right: 1px solid #ddd;
-  background-color: rgb(var(--color-fill));
-}
-
-.analog-prose pre::after {
-  right: 0;
-  border-left: 1px solid #ddd;
-  background-color: rgb(var(--color-fill));
-}
-
-.analog-prose pre code {
-  @apply font-mono;
-  font-size: var(--riso-type-lg);
-  line-height: var(--baseline);
-  display: block;
-  white-space: pre-wrap;
-  word-break: break-word;
-  background: transparent;
-  padding: 0;
-  /* Token colors come from Shiki (src/config/shiki-riso-theme.ts) */
-}
-
-.analog-prose div:has(> pre) {
-  position: relative;
-  overflow: visible;
-}
-
-.analog-prose .copy-code {
-  z-index: 5;
-}
-
-.analog-prose ul,
-.analog-prose ol {
-  margin: 0 0 var(--baseline) 0;
-  padding-left: 1.5rem;
-}
-
-.analog-prose li {
-  margin: 0 0 calc(var(--baseline) / 2) 0;
-}
-
-.analog-prose blockquote {
-  margin: 0 0 var(--baseline) 0;
-  padding-left: 1.5rem;
-  border-left: 3px solid var(--red);
-  font-style: italic;
-  color: var(--ink-muted);
-}
-
 /* Work case study: technical annotations + opt-in pullquotes (see WorkDetails work-case-study) */
-.post-detail.work-case-study .analog-prose figure figcaption,
-.post-detail.work-case-study .analog-prose .work-tech-label {
+.post-detail.work-case-study .prose.prose-analog figure figcaption,
+.post-detail.work-case-study .prose.prose-analog .work-tech-label {
   @apply font-mono;
   font-size: var(--riso-type-md);
   line-height: var(--riso-leading-relaxed);
@@ -1233,7 +1024,7 @@ a.skip-to-content-board:focus {
   color: rgb(var(--color-placeholder));
 }
 
-.post-detail.work-case-study .analog-prose blockquote.work-pullquote {
+.post-detail.work-case-study .prose.prose-analog blockquote.work-pullquote {
   margin: 2.5rem 0;
   padding: 0 1rem;
   width: 100%;
@@ -1248,7 +1039,7 @@ a.skip-to-content-board:focus {
   color: var(--analog-ink);
 }
 
-.post-detail.work-case-study .analog-prose blockquote.work-pullquote p {
+.post-detail.work-case-study .prose.prose-analog blockquote.work-pullquote p {
   @apply font-heading;
   font-style: italic;
   font-weight: 600;
@@ -1259,7 +1050,7 @@ a.skip-to-content-board:focus {
 }
 
 @screen sm {
-  .post-detail.work-case-study .analog-prose blockquote.work-pullquote {
+  .post-detail.work-case-study .prose.prose-analog blockquote.work-pullquote {
     width: calc(100% + 2rem);
     margin-left: -1rem;
     margin-right: -1rem;
@@ -1269,96 +1060,13 @@ a.skip-to-content-board:focus {
 }
 
 @screen md {
-  .post-detail.work-case-study .analog-prose blockquote.work-pullquote {
+  .post-detail.work-case-study .prose.prose-analog blockquote.work-pullquote {
     width: calc(100% + 4rem);
     margin-left: -2rem;
     margin-right: -2rem;
     padding-left: 2rem;
     padding-right: 2rem;
   }
-}
-
-.analog-prose hr {
-  margin: var(--baseline) 0;
-  border: none;
-  border-top: 1px dashed rgba(26, 26, 46, 0.35);
-}
-
-/* Polaroids: explicit figure, or a lone image in a paragraph */
-.analog-prose figure.polaroid {
-  background: #fff;
-  padding: 12px 12px 40px 12px;
-  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
-  margin: var(--baseline) auto calc(var(--baseline) * 2) auto;
-  max-width: 80%;
-  position: relative;
-}
-
-.analog-prose figure.polaroid::before {
-  content: "";
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 15px;
-  background: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-radius: 2px;
-  z-index: 2;
-}
-
-.analog-prose .polaroid-img {
-  width: 100%;
-  height: auto;
-  display: block;
-  filter: grayscale(100%) contrast(120%) sepia(100%) hue-rotate(170deg);
-  mix-blend-mode: multiply;
-}
-
-.analog-prose .polaroid-caption {
-  position: absolute;
-  bottom: 12px;
-  left: 0;
-  width: 100%;
-  text-align: center;
-  @apply font-mono;
-  font-size: var(--riso-type-md);
-  line-height: var(--baseline);
-  color: var(--blue);
-}
-
-.analog-prose p:has(> img:only-child) {
-  position: relative;
-  box-sizing: border-box;
-  background: #fff;
-  padding: 12px 12px 40px 12px;
-  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
-  margin: var(--baseline) auto calc(var(--baseline) * 2) auto;
-  max-width: 80%;
-}
-
-.analog-prose p:has(> img:only-child)::before {
-  content: "";
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 15px;
-  background: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-radius: 2px;
-  z-index: 2;
-}
-
-.analog-prose p:has(> img:only-child) img {
-  width: 100%;
-  height: auto;
-  display: block;
-  margin: 0;
-  filter: grayscale(100%) contrast(120%) sepia(100%) hue-rotate(170deg);
-  mix-blend-mode: multiply;
 }
 
 /* Tag row: stamp label + linked Dymo labels (riso hover on .dymo.is-interactive) */
