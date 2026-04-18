@@ -47,6 +47,19 @@ async function expectShellInViewport(page: Page) {
 
 test.describe("Site pages — viewport shell chrome (Phase 6a)", () => {
   for (const width of WIDTHS) {
+    test(`homepage / @ ${width}px`, async ({ page }) => {
+      await page.setViewportSize(typicalViewport(width));
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await gotoReadyForScreenshot(page, "/");
+      await expectShellInViewport(page);
+      await expect(page.getByRole("contentinfo")).toBeAttached();
+
+      await expect(page).toHaveScreenshot(`homepage--w${width}.png`, {
+        animations: "disabled",
+        timeout: 15_000,
+      });
+    });
+
     test(`posts index @ ${width}px`, async ({ page }) => {
       await page.setViewportSize(typicalViewport(width));
       await page.emulateMedia({ reducedMotion: "reduce" });

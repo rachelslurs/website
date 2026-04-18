@@ -598,7 +598,7 @@ nav .group:hover .dust-note {
   display: inline-flex;
   align-items: center;
   background-image: linear-gradient(180deg, #333 0%, #1a1a1a 40%, #000 100%);
-  padding: 5px 10px 4px;
+  padding: 7px 10px 5px;
   border-radius: 2px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
   text-decoration: none;
