@@ -1,9 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
+import {
+  MOBILE_PORTAL_WIDTHS,
+  typicalViewport,
+  VISUAL_TEST_WIDTHS,
+} from "./viewportPresets";
 
-const WIDTHS = [320, 375, 430, 768, 1024, 1280] as const;
-
-/** Viewports where portal uses mobile slab stack (matches `data-pegboard-layout="mobile"`). */
-const MOBILE_PORTAL_WIDTHS = [320, 375, 430, 768] as const;
+const WIDTHS = VISUAL_TEST_WIDTHS;
 
 function nameFor(width: number, slabIndex1: number) {
   return `pegboard-bg--slab${slabIndex1}--w${width}.png`;
@@ -29,7 +31,7 @@ async function gotoWorkshopVisualFixture(page: Page) {
 test.describe("Workshop pegboard alignment", () => {
   for (const width of WIDTHS) {
     test(`pegboard-bg slabs @ ${width}px`, async ({ page }) => {
-      await page.setViewportSize({ width, height: 900 });
+      await page.setViewportSize(typicalViewport(width));
       await page.emulateMedia({ reducedMotion: "reduce" });
 
       await gotoWorkshopVisualFixture(page);
@@ -54,7 +56,7 @@ test.describe("Workshop pegboard alignment", () => {
 
   for (const width of [375, 768] as const) {
     test(`slab seam + frame @ ${width}px`, async ({ page }) => {
-      await page.setViewportSize({ width, height: 900 });
+      await page.setViewportSize(typicalViewport(width));
       await page.emulateMedia({ reducedMotion: "reduce" });
 
       await gotoWorkshopVisualFixture(page);
@@ -98,7 +100,7 @@ test.describe("Workshop frame chrome (ADR-003)", () => {
     test(`slab nav + first pegboard in viewport @ ${width}px`, async ({
       page,
     }) => {
-      await page.setViewportSize({ width, height: 900 });
+      await page.setViewportSize(typicalViewport(width));
       await page.emulateMedia({ reducedMotion: "reduce" });
       await gotoWorkshopVisualFixture(page);
 
@@ -114,7 +116,7 @@ test.describe("Workshop frame chrome (ADR-003)", () => {
 
   for (const width of [...MOBILE_PORTAL_WIDTHS, 1024, 1280] as const) {
     test(`portal-frame screenshot @ ${width}px`, async ({ page }) => {
-      await page.setViewportSize({ width, height: 900 });
+      await page.setViewportSize(typicalViewport(width));
       await page.emulateMedia({ reducedMotion: "reduce" });
       await gotoWorkshopVisualFixture(page);
 
@@ -128,6 +130,7 @@ test.describe("Workshop frame chrome (ADR-003)", () => {
     });
   }
 
+  /** Deliberately short height (not in `typicalViewport`) — ADR-003 stress case. */
   test("short viewport: nav + pegboard still in view @ 375×500", async ({
     page,
   }) => {
@@ -156,7 +159,7 @@ test.describe("Workshop frame chrome (ADR-003)", () => {
 test.describe("Workshop portal-inner (mobile vignette + inner chrome)", () => {
   for (const width of MOBILE_PORTAL_WIDTHS) {
     test(`portal-inner @ ${width}px`, async ({ page }) => {
-      await page.setViewportSize({ width, height: 900 });
+      await page.setViewportSize(typicalViewport(width));
       await page.emulateMedia({ reducedMotion: "reduce" });
       await gotoWorkshopVisualFixture(page);
 
@@ -174,7 +177,7 @@ test.describe("Workshop portal-inner (mobile vignette + inner chrome)", () => {
 
 test.describe("Workshop portal-inner (desktop)", () => {
   test("portal-inner @ 1280px", async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.setViewportSize(typicalViewport(1280));
     await page.emulateMedia({ reducedMotion: "reduce" });
     await gotoWorkshopVisualFixture(page);
 
@@ -194,7 +197,7 @@ test.describe("Workshop portal-inner (desktop)", () => {
  */
 test.describe("Workshop mobile LCD slab (layout)", () => {
   test("LCD pegboard slab @ 375px", async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 900 });
+    await page.setViewportSize(typicalViewport(375));
     await page.emulateMedia({ reducedMotion: "reduce" });
     await gotoWorkshopVisualFixture(page);
 
@@ -218,7 +221,7 @@ test.describe("Workshop mobile LCD slab (layout)", () => {
 test.describe("Workshop page with site chrome (viewport)", () => {
   for (const width of WIDTHS) {
     test(`viewport screenshot @ ${width}px`, async ({ page }) => {
-      await page.setViewportSize({ width, height: 900 });
+      await page.setViewportSize(typicalViewport(width));
       await page.emulateMedia({ reducedMotion: "reduce" });
       await gotoWorkshopVisualFixture(page);
 

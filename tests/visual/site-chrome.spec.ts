@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
+import { typicalViewport, VISUAL_TEST_WIDTHS } from "./viewportPresets";
 
-const WIDTHS = [320, 375, 430, 768, 1024, 1280] as const;
+const WIDTHS = VISUAL_TEST_WIDTHS;
 
 async function gotoWorkshopVisualFixture(page: Page) {
   await page.goto("/workshop/visual-test", { waitUntil: "networkidle" });
@@ -14,7 +15,7 @@ async function gotoWorkshopVisualFixture(page: Page) {
 test.describe("Site header (main navigation)", () => {
   for (const width of WIDTHS) {
     test(`screenshot @ ${width}px`, async ({ page }) => {
-      await page.setViewportSize({ width, height: 900 });
+      await page.setViewportSize(typicalViewport(width));
       await page.emulateMedia({ reducedMotion: "reduce" });
 
       await gotoWorkshopVisualFixture(page);
@@ -33,7 +34,7 @@ test.describe("Site header (main navigation)", () => {
 test.describe("Site footer", () => {
   for (const width of WIDTHS) {
     test(`screenshot @ ${width}px`, async ({ page }) => {
-      await page.setViewportSize({ width, height: 900 });
+      await page.setViewportSize(typicalViewport(width));
       await page.emulateMedia({ reducedMotion: "reduce" });
 
       await gotoWorkshopVisualFixture(page);
