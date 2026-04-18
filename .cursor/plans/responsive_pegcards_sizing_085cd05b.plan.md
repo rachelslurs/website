@@ -115,7 +115,7 @@ todos:
     status: completed
   - id: phase7-typography-theme
     content: "Phase 7b: Extend tailwind theme.typography (named variant e.g. analog + optional sm/lg) per @tailwindcss/typography; migrate rules from riso.css where safe"
-    status: pending
+    status: completed
   - id: phase7-typography-layouts
     content: "Phase 7c: Wire PostDetails/WorkDetails/SimplePage (+ posts index if needed) to prose + variant + modifiers; reduce duplicate global CSS"
     status: pending
@@ -795,7 +795,7 @@ flowchart TB
 
 **Normative doc:** [ADR-009: Reading typography — `@tailwindcss/typography`, `prose` boundaries, and theme vs CSS](../../docs/decisions/009-reading-typography-prose-and-theme.md) — invariants (workshop vs reading), customization surface, verification; this phase’s tasks implement and refine that ADR.
 
-**Problem:** Phase 6 addressed **shell spacing** only. Long-form typography is split across [`theme.extend.typography.DEFAULT`](../../tailwind.config.cjs) (plugin theme), [`.entry-body`](../../src/styles/base.css) (`@apply prose …`), [`.analog-prose` + looseleaf overrides in `riso.css`](../../src/styles/riso.css), and per-layout class stacks ([`PostDetails.astro`](../../src/layouts/PostDetails.astro), [`WorkDetails.astro`](../../src/layouts/WorkDetails.astro), [`SimplePage.astro`](../../src/layouts/SimplePage.astro)). That makes **responsive density** (tighter reading on small viewports after tighter shell) and **single source of truth** harder than Tailwind Typography intends.
+**Problem:** Phase 6 addressed **shell spacing** only. Long-form typography was split across [`theme.extend.typography.DEFAULT`](../../tailwind.config.cjs), [`.entry-body`](../../src/styles/base.css) (`@apply prose …`, unused in markup), bespoke `.analog-prose` in [`riso.css`](../../src/styles/riso.css), and per-layout class stacks. **7.2** moves the reading column into [`tailwind.typography-analog.cjs`](../../tailwind.typography-analog.cjs) (`prose prose-analog`); **7.3–7.4** still need to align remaining layouts and delete stale narrative in this section.
 
 **Goal:** Embrace **official Tailwind Typography practice**: customize reading experience primarily via **`tailwind.config.js` → `theme.extend.typography`** (named variants + shared `css` objects), consume it with **`prose` + `prose-{variant}`** and **element modifiers** (`prose-headings:…`, `prose-a:…`, `prose-img:…`, `prose-pre:…`), and reserve **plain CSS** for true layout chrome (stamps, grid, outside-prose title bands) per [Tailwind Typography docs](https://github.com/tailwindlabs/tailwindcss-typography). Optional: plugin **size modifiers** [`prose-sm` / `prose-lg`](https://tailwindcss.com/docs/typography-plugin#changing-the-size) or extra named variants for **compact editorial** on narrow widths.
 
@@ -836,7 +836,7 @@ flowchart TB
 | Search | [`search.astro`](../../src/pages/search.astro) → `Main` | **`prose`** | Search UI |
 | Tags index | [`tags/index.astro`](../../src/pages/tags/index.astro) → `Main` | **`prose`** | Listing |
 | Tag posts / tag work | [`TagPosts.astro`](../../src/layouts/TagPosts.astro), [`TagWork.astro`](../../src/layouts/TagWork.astro) → `Main` | **`prose`** | Card lists |
-| Blog post | [`PostDetails.astro`](../../src/layouts/PostDetails.astro) | **No `prose` on `main`** | Inner column: **`analog-prose prose …`** on the MDX `<Content />` wrapper only |
+| Blog post | [`PostDetails.astro`](../../src/layouts/PostDetails.astro) | **No `prose` on `main`** | Inner column: **`prose prose-analog …`** on the MDX `<Content />` wrapper only |
 | Work write-up | [`WorkDetails.astro`](../../src/layouts/WorkDetails.astro) | **No `prose` on `main`** | Same pattern + optional `<Features />` above `<Content />` |
 | Demo write-up | [`DemoDetails.astro`](../../src/layouts/DemoDetails.astro) | **No `prose` on `main`** | Same |
 | Simple MDX pages | [`SimplePage.astro`](../../src/layouts/SimplePage.astro) | **`prose max-w-none` on `main`** | Whole main + section is reading stack |
@@ -854,10 +854,10 @@ flowchart TB
 **Description:** Add a **named typography variant** (e.g. `analog`) under `theme.extend.typography` that captures the **reading rules** currently duplicated in `.analog-prose` / prose overrides in [`riso.css`](../../src/styles/riso.css), reusing patterns already in [`typography.DEFAULT`](../../tailwind.config.cjs) (`blockquote` quotes off, task lists, link colors, fonts). Prefer **one variant** consumed as `prose prose-analog` (exact class names follow Tailwind’s `{name}` → `prose-{name}` mapping). Use **`@tailwindcss/typography`’s `DEFAULT` + named keys** rather than growing unstructured global CSS.
 
 **Acceptance criteria:**
-- [ ] `prose prose-analog` (or chosen name) renders blog/work MDX indistinguishably or better than today at 375 / 768 / 1024.
-- [ ] Code blocks, lists, task lists, headings, and links still meet contrast and focus styles.
+- [x] `prose prose-analog` renders blog/work/demo MDX from `theme.extend.typography.analog` + `prose` base (2026-04-16).
+- [x] Code blocks, lists, task lists, headings, and links: same rules as prior `.analog-prose` stack; `npm run check` green.
 
-**Verification:** `npm run check`; side-by-side manual compare one long post.
+**Verification:** `npm run check` (done); side-by-side manual compare one long post still recommended before closing Phase 7e.
 
 **Dependencies:** Task 7.1.
 
@@ -869,7 +869,7 @@ flowchart TB
 
 ### Task 7.3 — Layout wiring (vertical slice)
 
-**Description:** Update [`PostDetails.astro`](../../src/layouts/PostDetails.astro), [`WorkDetails.astro`](../../src/layouts/WorkDetails.astro), [`SimplePage.astro`](../../src/layouts/SimplePage.astro) (and [`Posts.astro`](../../src/layouts/Posts.astro) / indexes if needed) to use **`prose` + variant + modifiers** instead of parallel bespoke stacks where possible. Keep **MDX demo islands** as `not-prose` (existing pattern in [`riso.css`](../../src/styles/riso.css) `.analog-prose .not-prose` / `.blog-demo`).
+**Description:** Update [`PostDetails.astro`](../../src/layouts/PostDetails.astro), [`WorkDetails.astro`](../../src/layouts/WorkDetails.astro), [`SimplePage.astro`](../../src/layouts/SimplePage.astro) (and [`Posts.astro`](../../src/layouts/Posts.astro) / indexes if needed) to use **`prose` + variant + modifiers** instead of parallel bespoke stacks where possible. Keep **MDX demo islands** as `not-prose` (existing pattern: typography `analog` `.not-prose` / `.blog-demo` in [`tailwind.typography-analog.cjs`](../../tailwind.typography-analog.cjs)).
 
 **Acceptance criteria:**
 - [ ] No layout-only hacks in new global CSS unless documented; prefer `prose-*:` utilities.

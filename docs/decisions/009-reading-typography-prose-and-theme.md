@@ -10,7 +10,7 @@ Accepted
 
 ## Context
 
-Long-form pages (blog, work write-ups, demos, simple marketing copy) use **Tailwind Typography** (`prose`) with customization in [`tailwind.config.cjs`](../../tailwind.config.cjs) (`theme.extend.typography.DEFAULT`) and additional editorial styling in [`src/styles/riso.css`](../../src/styles/riso.css) (e.g. `.analog-prose`, looseleaf metaphors). **Phase 6** of the [responsive workshop roadmap](../../.cursor/plans/responsive_pegcards_sizing_085cd05b.plan.md) tightened **shell spacing only**; it did not unify typography.
+Long-form pages (blog, work write-ups, demos, simple marketing copy) use **Tailwind Typography** (`prose`) with customization in [`tailwind.config.cjs`](../../tailwind.config.cjs) (`theme.extend.typography.DEFAULT` plus named **`analog`** in [`tailwind.typography-analog.cjs`](../../tailwind.typography-analog.cjs), consumed as **`prose prose-analog`**). Work-case-study pullquote/label rules remain in [`src/styles/riso.css`](../../src/styles/riso.css); looseleaf chrome stays there too. **Phase 6** of the [responsive workshop roadmap](../../.cursor/plans/responsive_pegcards_sizing_085cd05b.plan.md) tightened **shell spacing only**; it did not unify typography.
 
 Without a written contract, agents may:
 
