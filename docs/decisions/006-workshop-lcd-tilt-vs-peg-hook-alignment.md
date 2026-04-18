@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed
+Accepted
 
 ## Date
 
@@ -53,4 +53,4 @@ A **single** `rotateX` on the entire card subtree would project **hooks** in 3D 
 - **Visual regression:** Playwright captures under `tests/visual/workshop-pegboard.spec.ts` may show bezel vs hole phase offset when tilt is on; **assert hooks and layout**, not pixel-perfect orthographic overlap of the slate border with cork dots.
 - **Cross-links:** [ADR-005](005-workshop-desktop-cork-layout-acceptance.md) (shared `gridPx`, packing); [ADR-001](001-workshop-mobile-pegboard-contract.md) (mobile scale and lattice).
 
-When this ADR is accepted, set **Status** to `Accepted` and implement or restore CSS accordingly (pending author review).
+**Implementation:** `src/styles/workshop-pegboard.css` — `.lcd-hardware__tilt` and `.lcd-shadow-base` use the same `perspective` / `rotateX` on all layouts; mount hooks remain siblings of `.lcd-hardware__tilt` in `PegboardHardwareCards.tsx`.
