@@ -103,6 +103,7 @@ export default function PegCard({
           item={item}
           dragVisual={clipboardDragVisual}
           blockParentDragHandlers={blockParentDragHandlers}
+          gridPx={grid}
         />
       </div>
     ) : item.hardware === "lcd" ? (

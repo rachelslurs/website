@@ -1,12 +1,18 @@
 import { describe, expect, it } from "vitest";
 import {
+  CLIPBOARD_HOOK_RING_CENTER_Y_FRAC_OF_CARD_H,
+  CLIPBOARD_MASONITE_TOP_FRAC_OF_CARD_H,
+  CLIPBOARD_PAPERS_TOP_FRAC_OF_CARD_H,
+  DESKTOP_PACK_GRIDS,
   hardwareDimsWithGrid,
+  hitBoxForCollisionWithGrid,
   initialPackPositionsColumnFirstWithGrid,
   initialPackPositionsWithGrid,
   layoutValidWithGrid,
   orderPackItemsClipboardLast,
   orderPackItemsClipboardLastReverseNonClipboard,
   packDesktopPanelAtGrid,
+  pickSharedDesktopPackGrid,
   resolveLayoutAfterResizeWithGrid,
   sortPackItemsByHeightDesc,
 } from "./workshopPegboardPhysics";
@@ -136,6 +142,34 @@ describe("initialPackPositionsColumnFirstWithGrid", () => {
   });
 });
 
+describe("pickSharedDesktopPackGrid", () => {
+  it("returns the same coarsest grid for every panel when all fit at that grid", () => {
+    const trio = [
+      { id: "work", hardware: "clipboard" as const },
+      { id: "link", hardware: "lcd" as const },
+      { id: "demo", hardware: "blueprint" as const },
+    ];
+    const panels = [{ items: trio }, { items: trio }];
+    const r = pickSharedDesktopPackGrid(panels, 1200, 1000);
+    expect(r.grid).toBe(60);
+    expect(r.innerW).toBe(Math.floor(1200 / 60) * 60);
+    expect(r.innerH).toBe(Math.floor(1000 / 60) * 60);
+  });
+
+  it("uses a smaller shared grid when one panel cannot pack at 60", () => {
+    const trio = [
+      { id: "work", hardware: "clipboard" as const },
+      { id: "link", hardware: "lcd" as const },
+      { id: "demo", hardware: "blueprint" as const },
+    ];
+    const easy = [{ items: trio }];
+    const tight = [{ items: trio }, { items: trio }];
+    const easyGrid = pickSharedDesktopPackGrid(easy, 1200, 1000).grid;
+    const sharedTight = pickSharedDesktopPackGrid(tight, 520, 520).grid;
+    expect(easyGrid).toBeGreaterThanOrEqual(sharedTight);
+  });
+});
+
 describe("packDesktopPanelAtGrid", () => {
   it("packs workshop trio on a large cork at 60px grid", () => {
     const items = [
@@ -148,5 +182,27 @@ describe("packDesktopPanelAtGrid", () => {
     const r = packDesktopPanelAtGrid(items, iw, ih, 60);
     expect(r).not.toBeNull();
     expect(layoutValidWithGrid(r!.positions, r!.specs, iw, ih)).toBe(true);
+  });
+});
+
+describe("clipboard hardware vs peg lattice", () => {
+  it("keeps hook ring centre and masonite top on-grid (CSS + hitBox must stay aligned)", () => {
+    for (const grid of DESKTOP_PACK_GRIDS) {
+      const { w, h } = hardwareDimsWithGrid("clipboard", grid);
+      expect(CLIPBOARD_HOOK_RING_CENTER_Y_FRAC_OF_CARD_H * h).toBeCloseTo(
+        0.5 * grid,
+        10
+      );
+      expect(CLIPBOARD_MASONITE_TOP_FRAC_OF_CARD_H * h).toBeCloseTo(
+        0.75 * grid,
+        10
+      );
+      const box = hitBoxForCollisionWithGrid("clipboard", 0, 0, w, h, grid);
+      expect(box.y).toBeCloseTo(0.75 * grid, 10);
+    }
+  });
+
+  it("documents papers band offset at the reference grid (change CSS together)", () => {
+    expect(CLIPBOARD_PAPERS_TOP_FRAC_OF_CARD_H).toBeCloseTo(85 / 480, 12);
   });
 });

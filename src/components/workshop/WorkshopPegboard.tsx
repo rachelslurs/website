@@ -8,6 +8,7 @@ import {
 import {
   desktopPegboardSideGap,
   hardwareDimsWithGrid,
+  pickSharedDesktopPackGrid,
   PEG_GRID,
 } from "@utils/workshopPegboardPhysics";
 import {
@@ -23,7 +24,9 @@ import type { PegboardPanelDTO } from "@utils/serializeWorkshopPegboard";
 import PegboardPanelView from "./PegboardPanels";
 import {
   desktopInnerW,
+  desktopPortalInnerH,
   mobileInnerW,
+  MOBILE_PEGBOARD_STACK_PADDING_X,
   PEGBOARD_BORDER_OUTSET,
 } from "./pegboardDimensions";
 import type { MobileScalePresentation } from "./pegboardTypes";
@@ -137,11 +140,44 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
             ...flat.map(it => hardwareDimsWithGrid(it.hardware, PEG_GRID).w)
           );
     const designContentW =
-      Math.ceil(Math.max(slotContentW, maxCardW) / PEG_GRID) * PEG_GRID;
+      Math.ceil(
+        Math.max(slotContentW, maxCardW + MOBILE_PEGBOARD_STACK_PADDING_X) /
+          PEG_GRID
+      ) * PEG_GRID;
     const designOuterW = designContentW + PEGBOARD_BORDER_OUTSET;
     const scale = Math.min(1, slotContentW / designOuterW);
     return { slotContentW, designContentW, scale };
   }, [isMobile, layoutW, panels]);
+
+  const panelsPackKey = useMemo(
+    () =>
+      panels
+        .map(p => p.items.map(it => `${it.id}:${it.hardware}`).join(","))
+        .join("|"),
+    [panels]
+  );
+
+  const desktopSharedPack = useMemo(() => {
+    if (isMobile || !isLayoutReady) return undefined;
+    const layoutInnerW =
+      desktopPegboardContentInnerW != null && desktopPegboardContentInnerW > 0
+        ? desktopPegboardContentInnerW
+        : desktopInnerW(layoutW, desktopPanelPadX);
+    const viewportH = desktopPortalInnerH(layoutH, desktopPanelPadY);
+    const panelPayload = panels.map(p => ({
+      items: p.items.map(i => ({ id: i.id, hardware: i.hardware })),
+    }));
+    return pickSharedDesktopPackGrid(panelPayload, layoutInnerW, viewportH);
+  }, [
+    isMobile,
+    isLayoutReady,
+    panelsPackKey,
+    layoutW,
+    layoutH,
+    desktopPegboardContentInnerW,
+    desktopPanelPadX,
+    desktopPanelPadY,
+  ]);
 
   useIsoLayoutEffect(() => {
     if (isMobile) {
@@ -432,6 +468,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
                     desktopContentInnerW={desktopPegboardContentInnerW}
                     debugWorkshopCork={debugWorkshopCork}
                     desktopPanelIndex={i}
+                    desktopSharedPack={desktopSharedPack}
                   />
                   {i < panels.length - 1 ? (
                     <>
