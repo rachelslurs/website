@@ -112,7 +112,7 @@ todos:
     status: completed
   - id: phase7-typography-inventory
     content: "Phase 7a: Inventory prose/analog-prose/not-prose + entry-body usage across layouts; confirm ADR-003 workshop boundary (no prose on workshop main)"
-    status: pending
+    status: completed
   - id: phase7-typography-theme
     content: "Phase 7b: Extend tailwind theme.typography (named variant e.g. analog + optional sm/lg) per @tailwindcss/typography; migrate rules from riso.css where safe"
     status: pending
@@ -810,8 +810,8 @@ flowchart TB
 **Description:** List every layout and wrapper that applies `prose`, `analog-prose`, `not-prose`, or MDX body classes; note which use `.entry-body` vs full-width `prose`. Confirm no accidental `prose` on workshop `main`.
 
 **Acceptance criteria:**
-- [ ] Written map (in this plan subsection or as an amendment to **[ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)**) of routes → layout → typography classes.
-- [ ] **[ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)** and ADR-003 workshop exception explicitly referenced so future edits do not regress flex.
+- [x] Written map (this subsection — amend **[ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)** only if you want the same table duplicated there).
+- [x] **[ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)** and ADR-003 workshop exception explicitly referenced so future edits do not regress flex.
 
 **Verification:** Grep `prose` / `analog-prose` in `src/layouts` + `src/pages`; manual open `/workshop/visual-test` and confirm `main` has no `prose`.
 
@@ -820,6 +820,32 @@ flowchart TB
 **Files likely touched:** Plan or `docs/decisions/` only.
 
 **Estimated scope:** Small.
+
+#### Phase 7a inventory (2026-04-16)
+
+**ADR-003 / ADR-009 — workshop `#main-content`:** [`Main.astro`](../../src/layouts/Main.astro) adds `prose` to `#main-content` only when **`fillViewportSlot` is false** (default). Workshop routes pass **`fillViewportSlot`** so `main` gets `workshop-viewport-slot …` and **no `prose`**. [`WorkshopPegboard.tsx`](../../src/components/workshop/WorkshopPegboard.tsx) uses **`not-prose`** on `.workshop-pegboard-root`. No regression found.
+
+| Area | Entry | `#main-content` | Reading typography wrapper |
+|------|--------|-----------------|-----------------------------|
+| Workshop (any slug) | [`workshop/[...page].astro`](../../src/pages/workshop/[...page].astro) → `Main` **`fillViewportSlot`** | No `prose` | Pegboard `not-prose` |
+| Workshop visual fixture | [`workshop/visual-test.astro`](../../src/pages/workshop/visual-test.astro) → `Main` **`fillViewportSlot`** | No `prose` | Same |
+| Posts index | [`Posts.astro`](../../src/layouts/Posts.astro) → `Main` | **`prose`** (Main default) | [`PostsIndexBoard.tsx`](../../src/components/riso/PostsIndexBoard.tsx) root **`not-prose`** (board UI, not article body) |
+| Work index | [`Work.astro`](../../src/layouts/Work.astro) → `Main` | **`prose`** | Index chrome / cards |
+| Demos index | [`Demos.astro`](../../src/layouts/Demos.astro) → `Main` | **`prose`** | Index chrome |
+| Tech hub | [`tech/index.astro`](../../src/pages/tech/index.astro) → `Main` | **`prose`** | Listing |
+| Search | [`search.astro`](../../src/pages/search.astro) → `Main` | **`prose`** | Search UI |
+| Tags index | [`tags/index.astro`](../../src/pages/tags/index.astro) → `Main` | **`prose`** | Listing |
+| Tag posts / tag work | [`TagPosts.astro`](../../src/layouts/TagPosts.astro), [`TagWork.astro`](../../src/layouts/TagWork.astro) → `Main` | **`prose`** | Card lists |
+| Blog post | [`PostDetails.astro`](../../src/layouts/PostDetails.astro) | **No `prose` on `main`** | Inner column: **`analog-prose prose …`** on the MDX `<Content />` wrapper only |
+| Work write-up | [`WorkDetails.astro`](../../src/layouts/WorkDetails.astro) | **No `prose` on `main`** | Same pattern + optional `<Features />` above `<Content />` |
+| Demo write-up | [`DemoDetails.astro`](../../src/layouts/DemoDetails.astro) | **No `prose` on `main`** | Same |
+| Simple MDX pages | [`SimplePage.astro`](../../src/layouts/SimplePage.astro) | **`prose max-w-none` on `main`** | Whole main + section is reading stack |
+| Homepage | [`index.astro`](../../src/pages/index.astro) | **No `prose`** | [`PortfolioBoard`](../../src/components/PortfolioBoard.tsx) (board UI) |
+| 404 | [`404.astro`](../../src/pages/404.astro) | **No `prose`** | Local page styles |
+
+**`.entry-body`:** [`base.css`](../../src/styles/base.css) defines `.entry-body` with `@apply prose …`. **No** `class="entry-body"` in `src/` today — utility is **unused** in markup (candidates for removal or reuse in Phase 7.3–7.4).
+
+**Other `prose` / `not-prose` touchpoints:** [`BackToTop.astro`](../../src/components/BackToTop.astro) (`prose` for link styling); [`BlogDemo.tsx`](../../src/components/BlogDemo.tsx) **`not-prose`** breakout; [`DemoLayout.tsx`](../../src/components/DemoLayout.tsx) **`not-prose`** wrapper; [`src/content/demos/modal.mdx`](../../src/content/demos/modal.mdx) uses `className='prose'` on a `ul` (content-level, review in 7.3).
 
 ---
 
