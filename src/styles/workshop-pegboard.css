@@ -729,11 +729,11 @@
 /* Blueprint top hooks — reference mock (single capsule + ::after highlight) */
 .blueprint-hook-anchor .straight-hook {
   position: absolute;
-  bottom: 6px;
-  left: 5px;
-  width: 6px;
-  height: 18px;
-  border-radius: 3px;
+  bottom: calc(var(--peg-grid-px) * 6 / 60);
+  left: calc(var(--peg-grid-px) * 5 / 60);
+  width: calc(var(--peg-grid-px) * 6 / 60);
+  height: calc(var(--peg-grid-px) * 18 / 60);
+  border-radius: calc(var(--peg-grid-px) * 3 / 60);
   background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 40%, #4b5563 100%);
   box-shadow:
     3px 4px 5px rgba(0, 0, 0, 0.4),
@@ -746,8 +746,8 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
+  height: calc(var(--peg-grid-px) * 3 / 60);
+  border-radius: calc(var(--peg-grid-px) * 3 / 60) calc(var(--peg-grid-px) * 3 / 60) 0 0;
   background: rgba(255, 255, 255, 0.4);
 }
 
@@ -1334,7 +1334,7 @@
 
 .lcd-mount-hook {
   position: absolute;
-  bottom: 26px;
+  bottom: calc(var(--peg-grid-px) * 26 / 60);
   z-index: 40;
   pointer-events: none;
 }
@@ -1344,9 +1344,9 @@
   position: relative;
   z-index: 10;
   display: block;
-  width: 6px;
-  height: 23px;
-  border-radius: 3px;
+  width: calc(var(--peg-grid-px) * 6 / 60);
+  height: calc(var(--peg-grid-px) * 23 / 60);
+  border-radius: calc(var(--peg-grid-px) * 3 / 60);
   background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 40%, #4b5563 100%);
   box-shadow:
     3px 4px 5px rgba(0, 0, 0, 0.4),
@@ -1366,12 +1366,12 @@
 }
 
 .lcd-mount-hook--l {
-  left: 30px;
+  left: calc(var(--peg-grid-px) * 30 / 60);
   transform: translateX(-50%);
 }
 
 .lcd-mount-hook--r {
-  right: 30px;
+  right: calc(var(--peg-grid-px) * 30 / 60);
   transform: translateX(50%);
 }
 
@@ -1415,6 +1415,8 @@
   height: 100%;
   border-radius: 4px;
   box-sizing: border-box;
+  /* Cork lattice pitch — hole discs + hooks use this so blueprint chrome tracks `gridPx`. */
+  --blueprint-hole-diameter-px: calc(var(--peg-grid-px) * 16 / 60);
 }
 
 .blueprint-bg::before {
@@ -1429,12 +1431,11 @@
    * Blueprint “paper” + punched holes: tuning knobs.
    *
    * Strategy:
-   * - Keep geometry in CSS variables (offset/diameter) so hooks + depth discs stay coherent.
-   * - Keep the die-cut shape as a small set of discrete SVG masks, selected via container queries.
-   *   (We can't parameterize an SVG data URL with CSS vars in a portable way.)
+   * - Hole **centres** use % of the card (5×5 grid units): first cork hole is mid-cell
+   *   = (0.5/5) = 10% from top/left — matches any `gridPx` (see ADR-005 / workshop lattice).
+   * - Diameter + hooks use `--peg-grid-px` on `.blueprint-bg`.
+   * - Die-cut mask variants via container queries (can't parameterize SVG data URLs with vars).
    */
-  --blueprint-hole-offset-px: 30px;
-  --blueprint-hole-diameter-px: 16px;
   --blueprint-paper-opacity: 1;
   --blueprint-grid-cells: 16;
   --blueprint-grid-line: 1.25px;
@@ -1486,14 +1487,14 @@
 }
 
 .blueprint-hole-depth--tl {
-  top: var(--blueprint-hole-offset-px, 30px);
-  left: var(--blueprint-hole-offset-px, 30px);
+  top: 10%;
+  left: 10%;
   transform: translate(-50%, -50%);
 }
 
 .blueprint-hole-depth--tr {
-  top: var(--blueprint-hole-offset-px, 30px);
-  right: var(--blueprint-hole-offset-px, 30px);
+  top: 10%;
+  right: 10%;
   transform: translate(50%, -50%);
 }
 
@@ -1513,14 +1514,14 @@
 }
 
 .blueprint-hook-anchor--tl {
-  top: var(--blueprint-hole-offset-px, 30px);
-  left: var(--blueprint-hole-offset-px, 30px);
+  top: 10%;
+  left: 10%;
   transform: translate(-50%, -50%);
 }
 
 .blueprint-hook-anchor--tr {
-  top: var(--blueprint-hole-offset-px, 30px);
-  right: var(--blueprint-hole-offset-px, 30px);
+  top: 10%;
+  right: 10%;
   transform: translate(50%, -50%);
 }
 
@@ -1613,20 +1614,24 @@
     padding: 9px 10px;
   }
 
+  .peg-card__inner--blueprint .blueprint-bg {
+    /* Variant A: slightly smaller die-cut holes for narrow cards. */
+    --blueprint-hole-diameter-px: calc(var(--peg-grid-px) * 14 / 60);
+  }
+
   .peg-card__inner--blueprint .blueprint-bg::before {
     --blueprint-grid-line: 1px;
-    /* Variant A: slightly smaller die-cut holes for narrow cards. */
-    --blueprint-hole-diameter-px: 14px;
-    --blueprint-hole-offset-px: 28px;
     --blueprint-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Crect x='0' y='0' width='300' height='300' rx='4' ry='4' fill='white'/%3E%3Ccircle cx='30' cy='30' r='7' fill='black'/%3E%3Ccircle cx='270' cy='30' r='7' fill='black'/%3E%3C/svg%3E");
   }
 }
 
 @container (max-width: 220px) {
-  .peg-card__inner--blueprint .blueprint-bg::before {
+  .peg-card__inner--blueprint .blueprint-bg {
     /* Variant B: smallest readable holes for very narrow cards. */
-    --blueprint-hole-diameter-px: 12px;
-    --blueprint-hole-offset-px: 26px;
+    --blueprint-hole-diameter-px: calc(var(--peg-grid-px) * 12 / 60);
+  }
+
+  .peg-card__inner--blueprint .blueprint-bg::before {
     --blueprint-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Crect x='0' y='0' width='300' height='300' rx='4' ry='4' fill='white'/%3E%3Ccircle cx='30' cy='30' r='6' fill='black'/%3E%3Ccircle cx='270' cy='30' r='6' fill='black'/%3E%3C/svg%3E");
   }
 }
