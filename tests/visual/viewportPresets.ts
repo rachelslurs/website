@@ -1,5 +1,6 @@
 /**
- * Playwright viewports for `/workshop/visual-test` (pegboard + site chrome).
+ * Playwright viewports for visual tests (`/workshop/visual-test`, site chrome,
+ * `site-pages.spec.ts`, etc.).
  *
  * **Run / update screenshots:** always use Docker — `npm run test:visual:docker` /
  * `npm run test:visual:update:docker` (see `.cursor/rules/visual-regression-docker.mdc`).
