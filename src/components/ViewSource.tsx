@@ -14,7 +14,7 @@ export default function ViewSource({
       href={githubUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center gap-2 text-sm text-skin-base opacity-70 hover:opacity-100 hover:text-skin-accent transition-colors group ${className}`}
+      className={`inline-flex items-center gap-2 text-sm opacity-70 hover:opacity-100 hover:text-skin-accent transition-colors group ${className}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
