@@ -1389,23 +1389,7 @@
   transform: translateX(50%);
 }
 
-/*
- * Desktop cork: LCD module uses `rotateX` on mobile for depth; on desktop that skew
- * breaks orthographic alignment vs peg holes. Keep tilt on mobile stack only.
- */
-.workshop-pegboard-root[data-pegboard-layout="desktop"] .lcd-hardware__tilt {
-  transform: none;
-}
-
-.workshop-pegboard-root[data-pegboard-layout="desktop"] .lcd-shadow-base {
-  transform: translate(var(--lcd-cast-offset-x), var(--lcd-cast-offset-y));
-}
-
-.workshop-pegboard-root[data-pegboard-layout="desktop"]
-  .lcd-hardware--dragging
-  .lcd-shadow-base {
-  transform: translate(var(--lcd-cast-offset-x-drag), var(--lcd-cast-offset-y-drag));
-}
+/* LCD tilt: see docs/decisions/006-workshop-lcd-tilt-vs-peg-hook-alignment.md — hooks stay outside `.lcd-hardware__tilt`. */
 
 /* Blueprint demo cards — shadow system (physical layers):
    1) Main card: soft Z-axis drop shadow (rest ↔ drag).

@@ -256,6 +256,7 @@ export function LinkLcdCard({
           </div>
         </div>
       </div>
+      {/* Peg-lattice hardware: keep outside `.lcd-hardware__tilt` (ADR-006). */}
       <span className="lcd-mount-hook lcd-mount-hook--l" aria-hidden>
         <span className="lcd-hook" />
       </span>
