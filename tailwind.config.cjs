@@ -7,6 +7,8 @@ function withOpacity(variableName) {
   };
 }
 
+const typographyAnalog = require("./tailwind.typography-analog.cjs");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{astro,html,js,jsx,md,mdx,ts,tsx}"],
@@ -374,6 +376,7 @@ module.exports = {
       },
           },
         },
+        analog: typographyAnalog,
       },
     },
   },
