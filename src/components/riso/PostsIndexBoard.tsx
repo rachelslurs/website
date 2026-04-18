@@ -618,7 +618,7 @@ export default function PostsIndexBoard({
           >
             <article className="card flex flex-col">
               <h2
-                className="post-title m-0 mb-1 font-semibold"
+                className="post-title m-0 mb-1 font-display font-medium"
                 style={{ viewTransitionName: post.slug }}
               >
                 <a
@@ -636,7 +636,7 @@ export default function PostsIndexBoard({
                 {post.dateLabel}
               </time>
               {post.desc ? (
-                <p className="post-excerpt m-0 font-body leading-relaxed">
+                <p className="post-excerpt m-0 font-['Lora',_Georgia,_serif] leading-relaxed">
                   {post.desc}
                 </p>
               ) : null}

@@ -407,7 +407,7 @@ export default function PortfolioBoard({
                     {post.dateLabel}
                   </time>
                   <h3
-                    className={`post-title ${i === 0 ? "post-title-lg" : ""}`}
+                    className={`post-title font-display font-medium ${i === 0 ? "post-title-lg" : ""}`}
                     style={{ viewTransitionName: post.slug }}
                   >
                     <a
@@ -418,7 +418,9 @@ export default function PortfolioBoard({
                     </a>
                   </h3>
                   {post.desc ? (
-                    <p className="post-excerpt">{post.desc}</p>
+                    <p className="post-excerpt font-['Lora',_Georgia,_serif] leading-relaxed">
+                      {post.desc}
+                    </p>
                   ) : null}
                   <div className="mt-auto flex items-end justify-between pt-4">
                     <DymoLabel
