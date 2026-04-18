@@ -5,6 +5,9 @@
  */
 module.exports = {
   css: {
+    "--baseline": "var(--analog-baseline)",
+    "--analog-ink": "var(--black, #1a1a2e)",
+    "--analog-body": "var(--ink-secondary, #292524)",
     maxWidth: "min(65ch, 100%)",
     marginLeft: "auto",
     marginRight: "auto",
