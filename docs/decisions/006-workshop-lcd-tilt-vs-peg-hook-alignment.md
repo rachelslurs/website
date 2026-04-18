@@ -26,7 +26,7 @@ A **single** `rotateX` on the entire card subtree would project **hooks** in 3D 
 
 4. **Variable `gridPx`** — Insets and chrome that must track the cork pitch (including everything **inside** the tilt layer except purely decorative blur) use **`--peg-grid-px`** so the module scales with [ADR-005](005-workshop-desktop-cork-layout-acceptance.md) / [ADR-001](001-workshop-mobile-pegboard-contract.md) when the strip picks a coarser grid.
 
-5. **Tilt box vs bottom J-hooks (vertical)** — `.lcd-hardware__tilt` and `.lcd-shadow-base` use a **`bottom` inset** that reserves at least **half a peg cell** for the flat mount hooks **plus** an extra **`8/60 * --peg-grid-px`** lift so the tipped module (especially the **screen**) reads **above** the hook foot, not flush on it. Hooks stay on the lattice; only the tilted subtree’s bottom edge moves up.
+5. **Tilt box vs bottom J-hooks (vertical)** — `.lcd-hardware__tilt` and `.lcd-shadow-base` use a **`bottom` inset** that reserves at least **half a peg cell** for the flat mount hooks **plus** an extra **`4/60 * --peg-grid-px`** lift so the tipped module (especially the **screen**) sits **slightly above** the hook foot — between flush and a larger gap (was `8/60`; tuned down for a subtler read). Hooks stay on the lattice; only the tilted subtree’s bottom edge moves up.
 
 ## Alternatives Considered
 
@@ -51,7 +51,7 @@ A **single** `rotateX` on the entire card subtree would project **hooks** in 3D 
 ## Consequences
 
 - **DOM contract:** `src/components/workshop/PegboardHardwareCards.tsx` — `LinkLcdCard` keeps **`.lcd-mount-hook`** elements **after** `.lcd-hardware__tilt`, not inside it. Changing that structure requires revisiting this ADR.
-- **Styles:** `src/styles/workshop-pegboard.css` — tilt and transition live on **`.lcd-hardware__tilt`** (and paired **`.lcd-shadow-base`**); hook rules do not apply `rotateX`. Shared **`bottom`** on tilt + shadow: `calc(0.5 * var(--peg-grid-px) + var(--peg-grid-px) * 8 / 60)` (§5).
+- **Styles:** `src/styles/workshop-pegboard.css` — tilt and transition live on **`.lcd-hardware__tilt`** (and paired **`.lcd-shadow-base`**); hook rules do not apply `rotateX`. Shared **`bottom`** on tilt + shadow: `calc(0.5 * var(--peg-grid-px) + var(--peg-grid-px) * 4 / 60)` (§5).
 - **Visual regression:** Playwright captures under `tests/visual/workshop-pegboard.spec.ts` may show bezel vs hole phase offset when tilt is on; **assert hooks and layout**, not pixel-perfect orthographic overlap of the slate border with cork dots.
 - **Cross-links:** [ADR-005](005-workshop-desktop-cork-layout-acceptance.md) (shared `gridPx`, packing); [ADR-001](001-workshop-mobile-pegboard-contract.md) (mobile scale and lattice).
 - **See also:** [ADR-007](007-workshop-peg-card-drag-scale-transform-origin.md) — drag-time `whileDrag` **scale** uses `transform-origin: top center` so hooks stay visually peg-aligned to the cork lattice while dragging (orthogonal to this ADR’s tilt vs hook **split**, which applies at rest).
