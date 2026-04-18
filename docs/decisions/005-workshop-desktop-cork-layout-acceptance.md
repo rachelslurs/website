@@ -42,6 +42,8 @@ The workshop can show **several horizontal panels** in one strip. A **product** 
    - A **single vertical column** (no side-by-side cards) additionally needs **`Σᵢ hᵢ ≤ innerH`** (stacked heights must fit). This matches the **`columnFirst`** seed when it succeeds without horizontal packing.
    - **Row-major** or mixed layouts need **2D** feasibility: widths must fit per row as well (`innerW` budget). There is no single scalar like Σh that proves a row+column arrangement fits; the code’s truth is the seed + resolve + `allFit` + `layoutValidWithGrid` checks above.
 
+5. **Case study clipboard clamp vs `gridPx`** — The strip may pick a **coarser** `gridPx` than 60px, so clipboard **card** width/height shrink. The metal **clamp** (spec SVG), masonite plate, and peg-hook mock must **scale down by the same amount as the clipboard body**—no legacy fixed-size artboard (for example 240×100px) that stays large while the card shrinks. Normative approach: SVG uses a fixed `viewBox` only and a **constant fraction of card width** (currently **80%**—the original 240px art on a 300px-wide `5×60` card), with `height: auto`; vertical offsets and hook size use **`calc(... * var(--peg-grid-px))`** so chrome stays on the **same lattice** as cork holes. **`CLIPBOARD_HOOK_RING_CENTER_Y_FRAC_OF_CARD_H`**, **`CLIPBOARD_MASONITE_TOP_FRAC_OF_CARD_H`**, and related layout in `workshopPegboardPhysics.ts` stay in sync with `hitBoxForCollisionWithGrid`; Vitest in `workshopPegboardPhysics.test.ts` guards drift. **Mobile** inherits the same product rule via design-space dimensions plus uniform surface scale ([ADR-001](001-workshop-mobile-pegboard-contract.md) §8).
+
 ## Alternatives Considered
 
 ### Fold screw checks into `layoutValidWithGrid`
@@ -67,4 +69,4 @@ The workshop can show **several horizontal panels** in one strip. A **product** 
 - **Implementation:** `src/utils/workshopPegboardPhysics.ts` — `resolveLayoutAfterResizeWithGrid`, `collidesWithGrid`, `packDesktopPanelAtGrid` (multi-seed + **clipboard-`x` preference** + hashed tie-break), `layoutValidWithGrid`. **`desktopPanelIndex`** is passed from `WorkshopPegboard` → `PegboardPanelView` for the hash.
 - **Cork size / height budget:** Still governed by [ADR-003](003-workshop-frame-chrome-initial-viewport.md) (viewport + portal padding); this ADR documents **what “fits” means** once `innerH` is chosen.
 - **Debug:** Opt-in logs (`?workshopDebugCork=1` or `localStorage.workshopDebugCork = "1"`) may include `verticalBudgetHint` (max/sum of `h`, `innerH`) and `overlappingPair` when overlap is the failure mode.
-- **Tests:** Extend `workshopPegboardPhysics.test.ts` when changing acceptance or resolver semantics.
+- **Tests:** Extend `workshopPegboardPhysics.test.ts` when changing acceptance or resolver semantics (includes **clipboard hardware vs peg lattice** tests for §5).
