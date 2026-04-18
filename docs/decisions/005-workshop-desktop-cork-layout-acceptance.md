@@ -14,9 +14,13 @@ Desktop panels pick a **snapped cork** size (`innerW` × `innerH`, multiples of 
 
 The workshop can show **several horizontal panels** in one strip. A **product** goal is that those panels must **not all read as the same template** (e.g. case study / clipboard always in the **rightmost** column because a single greedy seed always won first). Layout choice is therefore not only “first seed that fits” but includes **cross-panel diversity** and **left bias for the clipboard** when multiple layouts are physically valid at the same `gridPx`.
 
+**Peg spacing:** The **distance between peg holes** (`--peg-grid-px` / `gridPx`) must **not change from one desktop board to the next** in the same strip — one **shared** `gridPx` (and matching snapped cork size) is chosen from all panels’ packing feasibility so every `.pegboard-bg--desktop-cork` uses the same lattice.
+
 ## Decision
 
-1. **Pipeline (normative)** — For a candidate `(gridPx, innerW, innerH)`:
+1. **Pipeline (normative)** — For desktop, **`gridPx` and snapped `innerW` × `innerH` are chosen once per strip** (`pickSharedDesktopPackGrid`): the **coarsest** candidate in `DESKTOP_PACK_GRIDS` for which **every** panel passes strict `packDesktopPanelAtGrid`; otherwise fall back to **`30`** for all. Each panel then runs seed selection / clipboard-`x` preference **only at that shared triple** (see JSDoc on `packDesktopPanelAtGrid`). **Mobile** keeps a fixed `PEG_GRID` lattice (ADR-001); this shared rule is **desktop strip** only.
+
+   For a candidate `(gridPx, innerW, innerH)` **per panel** at that shared triple:
    - Build several **seed** layouts (column-first with clipboard last in two non-clipboard orders — `panelIndex` swaps try order; column-first tallest-first; row-major variants with `panelIndex` rotating fallback order). Column-first seeds stack within a column at **`y + h`** (no extra vertical `grid` seam); a new column starts when **`y + h > innerH`**. Row-major seeds use horizontal/row gutters as implemented in `initialPackPositionsWithGrid`.
    - For **each** seed, run **`resolveLayoutAfterResizeWithGrid`**, then require **`allFit`** and **`layoutValidWithGrid`** (see below). **Every** seed that passes is a **candidate** layout.
    - **Choose one candidate** (do not stop at the first passing seed):

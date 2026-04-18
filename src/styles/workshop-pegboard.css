@@ -247,6 +247,31 @@
   }
 }
 
+/*
+ * Mobile vertical scroll: vignette lighter than desktop default (0.8 / 0.9) so
+ * peg slabs stay readable while panning. Narrower viewports get a touch more
+ * depth than tablet-width mobile, still well below the full TV shadowbox.
+ */
+.workshop-pegboard-root[data-pegboard-layout="mobile"] .shadowbox-portal {
+  box-shadow:
+    inset 46px 0 68px -22px rgba(0, 0, 0, 0.4),
+    inset -46px 0 68px -22px rgba(0, 0, 0, 0.4),
+    inset 0 46px 68px -22px rgba(0, 0, 0, 0.44),
+    inset 0 -46px 68px -22px rgba(0, 0, 0, 0.44),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 480px) {
+  .workshop-pegboard-root[data-pegboard-layout="mobile"] .shadowbox-portal {
+    box-shadow:
+      inset 56px 0 88px -26px rgba(0, 0, 0, 0.52),
+      inset -56px 0 88px -26px rgba(0, 0, 0, 0.52),
+      inset 0 56px 88px -26px rgba(0, 0, 0, 0.56),
+      inset 0 -56px 88px -26px rgba(0, 0, 0, 0.56),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+}
+
 .workshop-pegboard-root .portal-inner {
   position: relative;
   flex: 1 1 auto;
@@ -618,11 +643,11 @@
 }
 
 /* Mobile column: flex stack (no absolute grid) inside cork frame */
-/* Match desktop grid gutters: first card at (grid, grid) from cork content origin so holes line up. */
+/* Padding matches desktop grid gutter; cards are centered when narrower than the cork. */
 .pegboard-bg--mobile-flow .pegboard-mobile-stack {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--peg-grid-px);
   padding: var(--peg-grid-px);
   position: relative;
@@ -637,6 +662,14 @@
   top: auto;
   touch-action: pan-y;
   user-select: text;
+}
+
+/* LCD 3D tilt + shadow extend past the design box; clip on mobile so nothing reads past the cork. */
+.workshop-pegboard-root[data-pegboard-layout="mobile"]
+  .pegboard-bg--mobile-flow
+  .peg-card--mobile-stack.peg-card--lcd {
+  max-width: 100%;
+  overflow: hidden;
 }
 
 /* Hardware cards */
@@ -735,12 +768,13 @@
 /* Masonite board only below clip (cork shows through top band) */
 .masonite-plate {
   position: absolute;
-  top: 45px;
+  /* Same inset as `hitBoxForCollisionWithGrid` clipboard clip (`0.75 * grid`). */
+  top: calc(0.75 * var(--peg-grid-px));
   right: 0;
   bottom: 0;
   left: 0;
   z-index: 0;
-  border-radius: 16px;
+  border-radius: calc(var(--peg-grid-px) * 16 / 60);
   border: 1px solid #7d653f;
   background-image:
     repeating-linear-gradient(
@@ -771,6 +805,9 @@
   top: 0;
   left: 50%;
   z-index: 30;
+  display: block;
+  width: 100%;
+  height: auto;
   transform: translateX(-50%);
   pointer-events: none;
   filter: var(--pegboard-spec-svg-drop);
@@ -778,11 +815,12 @@
 
 .peg-clipboard-mount {
   position: absolute;
-  top: 30px;
+  /* Hook ring centre at `0.5 * grid` — lines up with first peg hole row when card y is grid-snapped. */
+  top: calc(0.5 * var(--peg-grid-px));
   left: 50%;
   z-index: 50;
-  width: 16px;
-  height: 16px;
+  width: calc(var(--peg-grid-px) * 16 / 60);
+  height: calc(var(--peg-grid-px) * 16 / 60);
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
@@ -795,11 +833,11 @@
 
 .peg-clipboard-hook-mock__shaft {
   position: absolute;
-  bottom: 6px;
-  left: 5px;
-  width: 6px;
-  height: 20px;
-  border-radius: 3px;
+  bottom: calc(var(--peg-grid-px) * 6 / 60);
+  left: calc(var(--peg-grid-px) * 5 / 60);
+  width: calc(var(--peg-grid-px) * 6 / 60);
+  height: calc(var(--peg-grid-px) * 20 / 60);
+  border-radius: calc(var(--peg-grid-px) * 3 / 60);
   background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 40%, #4b5563 100%);
   box-shadow:
     3px 4px 5px rgba(0, 0, 0, 0.4),
@@ -819,10 +857,11 @@
 .peg-clipboard__papers {
   position: absolute;
   z-index: 10;
-  top: 85px;
-  right: 16px;
-  bottom: 16px;
-  left: 16px;
+  /* Legacy 85px at 8×5 @ 60px grid — keep proportional to card height when grid changes. */
+  top: calc(100% * 85 / 480);
+  right: calc(var(--peg-grid-px) * 16 / 60);
+  bottom: calc(var(--peg-grid-px) * 16 / 60);
+  left: calc(var(--peg-grid-px) * 16 / 60);
   pointer-events: auto;
 }
 
