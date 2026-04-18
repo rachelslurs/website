@@ -642,6 +642,7 @@ nav .group:hover .dust-note {
 .dymo-text {
   @apply font-mono;
   font-size: var(--riso-type-sm);
+  line-height: 1;
   font-weight: 700;
   text-transform: uppercase;
   color: #fff;
