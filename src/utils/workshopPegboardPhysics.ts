@@ -40,7 +40,7 @@ export function hitBoxForCollisionWithGrid(
   grid: number
 ): Rect {
   if (hardware === "clipboard") {
-    const clip = Math.round(grid * 0.75);
+    const clip = grid * 0.75;
     return { x, y: y + clip, w, h: Math.max(grid, h - clip) };
   }
   return { x, y, w, h };
@@ -113,6 +113,23 @@ export function hardwareDimsWithGrid(
   const { wu, hu } = hardwareUnits(hardware);
   return { w: wu * grid, h: hu * grid };
 }
+
+/**
+ * Clipboard is **8 grid units tall**. The metal hook ring centre must sit **0.5 grid**
+ * below the card’s top edge so, when the card’s top is grid-snapped on the cork, it
+ * lines up with the first row of peg holes (`y = grid/2` in cork space for a card at
+ * `y = 0`). Keep `workshop-pegboard.css` (`.peg-clipboard-mount`) in sync.
+ */
+export const CLIPBOARD_HOOK_RING_CENTER_Y_FRAC_OF_CARD_H = 0.5 / 8;
+
+/**
+ * Masonite starts where the clip band ends — same ratio as `hitBoxForCollisionWithGrid`
+ * top inset (`0.75 * grid`). Keep `.masonite-plate` in sync.
+ */
+export const CLIPBOARD_MASONITE_TOP_FRAC_OF_CARD_H = 0.75 / 8;
+
+/** Papers band (legacy mock); fraction of card height at the 60px-grid design point. */
+export const CLIPBOARD_PAPERS_TOP_FRAC_OF_CARD_H = 85 / 480;
 
 export function hardwareDims(hardware: PegboardHardware): {
   w: number;
@@ -606,6 +623,49 @@ export function packDesktopPanelAtGrid(
     });
   }
   return null;
+}
+
+/** Candidate `gridPx` for desktop cork packing (largest peg spacing first). */
+export const DESKTOP_PACK_GRIDS: readonly number[] = [60, 54, 48, 42, 36, 30];
+
+/**
+ * One snapped cork size and **`gridPx` for every desktop panel** on the strip,
+ * so `--peg-grid-px` (peg hole spacing) matches across boards. Chooses the
+ * **coarsest** `grid` in `DESKTOP_PACK_GRIDS` for which `packDesktopPanelAtGrid`
+ * succeeds for **all** panels; if none pass, falls back to **`30`** (panels may
+ * use their local fallback resolve when strict pack still fails).
+ */
+export function pickSharedDesktopPackGrid(
+  panels: { items: PackItem[] }[],
+  layoutInnerW: number,
+  viewportH: number,
+  options?: PackDesktopPanelAtGridOptions
+): { grid: number; innerW: number; innerH: number } {
+  const silentOpts: PackDesktopPanelAtGridOptions | undefined = options?.debug
+    ? { ...options, debug: false }
+    : options;
+
+  for (const grid of DESKTOP_PACK_GRIDS) {
+    const innerW = Math.floor(layoutInnerW / grid) * grid;
+    const innerH = Math.floor(viewportH / grid) * grid;
+    if (innerW <= 0 || innerH <= 0) continue;
+    let allPass = true;
+    for (const p of panels) {
+      if (!packDesktopPanelAtGrid(p.items, innerW, innerH, grid, silentOpts)) {
+        allPass = false;
+        break;
+      }
+    }
+    if (allPass) {
+      return { grid, innerW, innerH };
+    }
+  }
+  const grid = 30;
+  return {
+    grid,
+    innerW: Math.floor(layoutInnerW / grid) * grid,
+    innerH: Math.floor(viewportH / grid) * grid,
+  };
 }
 
 function collides(

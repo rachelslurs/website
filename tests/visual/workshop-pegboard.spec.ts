@@ -148,6 +148,73 @@ test.describe("Workshop frame chrome (ADR-003)", () => {
  * `h-svh` board shell. Default `page` screenshot is viewport-sized (not `fullPage`),
  * so this matches what users see without scrolling the document.
  */
+/**
+ * `portal-inner` holds the scroll region + absolutely positioned `.shadowbox-portal`
+ * vignette. Separate from `.portal-frame` screenshots so mobile shadow strength and
+ * peg stack stay guarded when the outer wood chrome is unchanged.
+ */
+test.describe("Workshop portal-inner (mobile vignette + inner chrome)", () => {
+  for (const width of MOBILE_PORTAL_WIDTHS) {
+    test(`portal-inner @ ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await gotoWorkshopVisualFixture(page);
+
+      const root = page.locator(".workshop-pegboard-root");
+      await expect(root).toHaveAttribute("data-pegboard-layout", "mobile");
+
+      const inner = root.locator(".portal-inner").first();
+      await expect(inner).toHaveScreenshot(`portal-inner--mobile--w${width}.png`, {
+        animations: "disabled",
+        timeout: 15_000,
+      });
+    });
+  }
+});
+
+test.describe("Workshop portal-inner (desktop)", () => {
+  test("portal-inner @ 1280px", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await gotoWorkshopVisualFixture(page);
+
+    const root = page.locator(".workshop-pegboard-root");
+    await expect(root).toHaveAttribute("data-pegboard-layout", "desktop");
+
+    const inner = root.locator(".portal-inner").first();
+    await expect(inner).toHaveScreenshot("portal-inner--desktop--w1280.png", {
+      animations: "disabled",
+      timeout: 15_000,
+    });
+  });
+});
+
+/**
+ * LCD-only slab: mobile stack padding + centering + clip (narrow width stress).
+ */
+test.describe("Workshop mobile LCD slab (layout)", () => {
+  test("LCD pegboard slab @ 375px", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await gotoWorkshopVisualFixture(page);
+
+    await expect(page.locator(".workshop-pegboard-root")).toHaveAttribute(
+      "data-pegboard-layout",
+      "mobile"
+    );
+
+    const boards = page.locator(".pegboard-bg");
+    await expect(boards).toHaveCount(3);
+    await expect(boards.nth(1)).toHaveScreenshot(
+      "pegboard-bg--slab2-lcd-mobile-layout--w375.png",
+      {
+        animations: "disabled",
+        timeout: 15_000,
+      }
+    );
+  });
+});
+
 test.describe("Workshop page with site chrome (viewport)", () => {
   for (const width of WIDTHS) {
     test(`viewport screenshot @ ${width}px`, async ({ page }) => {
