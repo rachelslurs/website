@@ -21,7 +21,7 @@ const { animateNav = false, fillViewportChain = false } = Astro.props;
 </a>
 <div
   class:list={[
-    "board-page-outer mx-auto w-full max-w-[1200px] p-4 max-sm:p-2",
+    "board-page-outer mx-auto w-full max-w-[1200px] p-board-outer max-sm:p-board-outer-sm",
     /* min-h-dvh alone leaves height indefinite for flex descendants on some engines;
      * h-svh fixes the workshop pegboard column (ADR-003). */
     fillViewportChain && "flex h-svh min-h-0 flex-col",
@@ -30,7 +30,7 @@ const { animateNav = false, fillViewportChain = false } = Astro.props;
   <!-- ADR-008: page-owned visuals (tape, edges, etc.) must stay inside this column. -->
   <div
     class:list={[
-      "board relative flex flex-col gap-8 px-10 max-lg:py-6 lg:pb-10 lg:pt-8 max-sm:gap-5 max-sm:p-4",
+      "board relative flex flex-col gap-board-slab-gap px-board-padding-x max-lg:py-board-padding-y-lg lg:pb-board-pb-lg lg:pt-board-pt-lg max-sm:gap-board-slab-gap-sm max-sm:p-board-padding-sm",
       fillViewportChain && "min-h-0 flex-1",
     ]}
   >
@@ -46,7 +46,9 @@ const { animateNav = false, fillViewportChain = false } = Astro.props;
       <div class="blob blob-4"></div>
     </div>
 
-    <div class="relative z-[110] flex min-h-0 flex-1 flex-col gap-8">
+    <div
+      class="relative z-[110] flex min-h-0 flex-1 flex-col gap-board-stack-gap max-lg:gap-board-stack-gap-lg max-sm:gap-board-stack-gap-sm"
+    >
       <RisoNav
         client:load
         activePath={Astro.url.pathname}
