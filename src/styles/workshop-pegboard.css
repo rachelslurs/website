@@ -1046,6 +1046,13 @@
   overflow: visible;
   border-radius: 0;
   background: transparent;
+  /* Scale faux-cast offsets with cork `gridPx` (defaults match 60px reference). */
+  --lcd-cast-offset-x: calc(var(--peg-grid-px) * 6 / 60);
+  --lcd-cast-offset-y: calc(var(--peg-grid-px) * 8 / 60);
+  --lcd-cast-offset-x-drag: calc(var(--peg-grid-px) * 10 / 60);
+  --lcd-cast-offset-y-drag: calc(var(--peg-grid-px) * 14 / 60);
+  --lcd-cast-blur: calc(var(--peg-grid-px) * 7 / 60);
+  --lcd-cast-blur-drag: calc(var(--peg-grid-px) * 11 / 60);
 }
 
 .lcd-hardware {
@@ -1057,10 +1064,11 @@
 
 .lcd-hardware__tilt {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  bottom: 30px;
-  left: 10px;
+  top: calc(var(--peg-grid-px) * 10 / 60);
+  right: calc(var(--peg-grid-px) * 10 / 60);
+  /* Reserve half a cell for bottom mount hooks — same ratio as 30px @ 60px grid. */
+  bottom: calc(0.5 * var(--peg-grid-px));
+  left: calc(var(--peg-grid-px) * 10 / 60);
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -1074,17 +1082,17 @@
 /* Same inset + 3D tilt as .lcd-hardware__tilt; cast vector = --pegboard-card-shadow * ~0.4 */
 .lcd-shadow-base {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  bottom: 30px;
-  left: 10px;
+  top: calc(var(--peg-grid-px) * 10 / 60);
+  right: calc(var(--peg-grid-px) * 10 / 60);
+  bottom: calc(0.5 * var(--peg-grid-px));
+  left: calc(var(--peg-grid-px) * 10 / 60);
   z-index: 0;
   border-radius: 4px;
   background: #050b14;
   opacity: var(--lcd-cast-opacity, 0.16);
   filter: blur(var(--lcd-cast-blur, 7px));
   transform: perspective(1000px) rotateX(4deg)
-    translate(var(--lcd-cast-offset-x, 6px), var(--lcd-cast-offset-y, 8px));
+    translate(var(--lcd-cast-offset-x), var(--lcd-cast-offset-y));
   transform-origin: top center;
   transition:
     filter 0.38s cubic-bezier(0.4, 0, 0.2, 1),
@@ -1094,9 +1102,9 @@
 
 .lcd-hardware--dragging .lcd-shadow-base {
   opacity: var(--lcd-cast-opacity-drag, 0.22);
-  filter: blur(var(--lcd-cast-blur-drag, 11px));
+  filter: blur(var(--lcd-cast-blur-drag));
   transform: perspective(1000px) rotateX(4deg)
-    translate(var(--lcd-cast-offset-x-drag, 10px), var(--lcd-cast-offset-y-drag, 14px));
+    translate(var(--lcd-cast-offset-x-drag), var(--lcd-cast-offset-y-drag));
 }
 
 .lcd-pcb {
@@ -1120,28 +1128,32 @@
   pointer-events: none;
   -webkit-mask-image:
     radial-gradient(
-      circle at 20px calc(100% - 28px),
-      transparent 10px,
-      black 10.5px
+      circle at calc(var(--peg-grid-px) * 20 / 60)
+        calc(100% - var(--peg-grid-px) * 28 / 60),
+      transparent calc(var(--peg-grid-px) * 10 / 60),
+      black calc(var(--peg-grid-px) * 10.5 / 60)
     ),
     radial-gradient(
-      circle at calc(100% - 20px) calc(100% - 28px),
-      transparent 10px,
-      black 10.5px
+      circle at calc(100% - var(--peg-grid-px) * 20 / 60)
+        calc(100% - var(--peg-grid-px) * 28 / 60),
+      transparent calc(var(--peg-grid-px) * 10 / 60),
+      black calc(var(--peg-grid-px) * 10.5 / 60)
     );
   -webkit-mask-size: 51% 100%, 51% 100%;
   -webkit-mask-position: left bottom, right bottom;
   -webkit-mask-repeat: no-repeat;
   mask-image:
     radial-gradient(
-      circle at 20px calc(100% - 28px),
-      transparent 10px,
-      black 10.5px
+      circle at calc(var(--peg-grid-px) * 20 / 60)
+        calc(100% - var(--peg-grid-px) * 28 / 60),
+      transparent calc(var(--peg-grid-px) * 10 / 60),
+      black calc(var(--peg-grid-px) * 10.5 / 60)
     ),
     radial-gradient(
-      circle at calc(100% - 20px) calc(100% - 28px),
-      transparent 10px,
-      black 10.5px
+      circle at calc(100% - var(--peg-grid-px) * 20 / 60)
+        calc(100% - var(--peg-grid-px) * 28 / 60),
+      transparent calc(var(--peg-grid-px) * 10 / 60),
+      black calc(var(--peg-grid-px) * 10.5 / 60)
     );
   mask-size: 51% 100%, 51% 100%;
   mask-position: left bottom, right bottom;
@@ -1153,11 +1165,11 @@
   bottom: 0;
   left: 50%;
   display: flex;
-  width: 8rem;
-  height: 10px;
+  width: min(8rem, calc(var(--peg-grid-px) * 128 / 60));
+  height: calc(var(--peg-grid-px) * 10 / 60);
   align-items: flex-end;
   justify-content: space-evenly;
-  padding: 0 4px 2px;
+  padding: 0 calc(var(--peg-grid-px) * 4 / 60) calc(var(--peg-grid-px) * 2 / 60);
   transform: translateX(-50%);
   border-radius: 0 0 2px 2px;
   background: #072a19;
@@ -1166,20 +1178,20 @@
 }
 
 .lcd-pcb__pin {
-  width: 3px;
-  height: 8px;
-  flex: 0 0 3px;
-  border-radius: 1px 1px 0 0;
+  width: calc(var(--peg-grid-px) * 3 / 60);
+  height: calc(var(--peg-grid-px) * 8 / 60);
+  flex: 0 0 calc(var(--peg-grid-px) * 3 / 60);
+  border-radius: calc(var(--peg-grid-px) * 1 / 60) calc(var(--peg-grid-px) * 1 / 60) 0 0;
   background: #f1c232;
 }
 
 .lcd-slate {
   position: absolute;
   z-index: 2;
-  top: 10px;
-  right: 10px;
-  bottom: 10px;
-  left: 10px;
+  top: calc(var(--peg-grid-px) * 10 / 60);
+  right: calc(var(--peg-grid-px) * 10 / 60);
+  bottom: calc(var(--peg-grid-px) * 10 / 60);
+  left: calc(var(--peg-grid-px) * 10 / 60);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1197,8 +1209,9 @@
   min-height: 0;
   flex: 1;
   flex-direction: column;
-  padding: 8px 8px 10px;
-  gap: 6px;
+  padding: calc(var(--peg-grid-px) * 8 / 60) calc(var(--peg-grid-px) * 8 / 60)
+    calc(var(--peg-grid-px) * 10 / 60);
+  gap: calc(var(--peg-grid-px) * 6 / 60);
 }
 
 .lcd-slate__top {
@@ -1206,8 +1219,8 @@
   flex-shrink: 0;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 8px;
-  padding: 0 4px;
+  gap: calc(var(--peg-grid-px) * 8 / 60);
+  padding: 0 calc(var(--peg-grid-px) * 4 / 60);
 }
 
 .lcd-chip-label {
@@ -1245,7 +1258,8 @@
   position: relative;
   display: flex;
   width: 100%;
-  max-width: 260px;
+  /* ~260px at 60px grid — scales so bezel tracks lattice when `gridPx` drops. */
+  max-width: calc(var(--peg-grid-px) * 260 / 60);
   flex: 1 1 0;
   min-height: 0;
   align-items: center;
@@ -1255,7 +1269,7 @@
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 4px;
-  border: 3px solid #020617;
+  border: calc(var(--peg-grid-px) * 3 / 60) solid #020617;
   background: linear-gradient(145deg, #0f172a 0%, #000 100%);
   box-shadow:
     inset 2px 5px 14px rgba(0, 0, 0, 0.62),
@@ -1296,11 +1310,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: calc(var(--peg-grid-px) * 4 / 60);
   width: 100%;
   height: 100%;
   margin: 0;
-  padding: 8px;
+  padding: calc(var(--peg-grid-px) * 8 / 60);
   border: none;
   cursor: pointer;
   background: transparent;
@@ -1329,7 +1343,7 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  padding: 0 4px;
+  padding: 0 calc(var(--peg-grid-px) * 4 / 60);
 }
 
 .lcd-mount-hook {
@@ -1359,8 +1373,8 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
+  height: calc(var(--peg-grid-px) * 3 / 60);
+  border-radius: calc(var(--peg-grid-px) * 3 / 60) calc(var(--peg-grid-px) * 3 / 60) 0 0;
   background: rgba(255, 255, 255, 0.4);
   pointer-events: none;
 }
@@ -1373,6 +1387,24 @@
 .lcd-mount-hook--r {
   right: calc(var(--peg-grid-px) * 30 / 60);
   transform: translateX(50%);
+}
+
+/*
+ * Desktop cork: LCD module uses `rotateX` on mobile for depth; on desktop that skew
+ * breaks orthographic alignment vs peg holes. Keep tilt on mobile stack only.
+ */
+.workshop-pegboard-root[data-pegboard-layout="desktop"] .lcd-hardware__tilt {
+  transform: none;
+}
+
+.workshop-pegboard-root[data-pegboard-layout="desktop"] .lcd-shadow-base {
+  transform: translate(var(--lcd-cast-offset-x), var(--lcd-cast-offset-y));
+}
+
+.workshop-pegboard-root[data-pegboard-layout="desktop"]
+  .lcd-hardware--dragging
+  .lcd-shadow-base {
+  transform: translate(var(--lcd-cast-offset-x-drag), var(--lcd-cast-offset-y-drag));
 }
 
 /* Blueprint demo cards — shadow system (physical layers):
@@ -1487,14 +1519,15 @@
 }
 
 .blueprint-hole-depth--tl {
-  top: 10%;
-  left: 10%;
+  /* Half a lattice step from card TL — matches cork hole phase (same as 10% on 5-wide card). */
+  top: calc(0.5 * var(--peg-grid-px));
+  left: calc(0.5 * var(--peg-grid-px));
   transform: translate(-50%, -50%);
 }
 
 .blueprint-hole-depth--tr {
-  top: 10%;
-  right: 10%;
+  top: calc(0.5 * var(--peg-grid-px));
+  right: calc(0.5 * var(--peg-grid-px));
   transform: translate(50%, -50%);
 }
 
@@ -1514,14 +1547,14 @@
 }
 
 .blueprint-hook-anchor--tl {
-  top: 10%;
-  left: 10%;
+  top: calc(0.5 * var(--peg-grid-px));
+  left: calc(0.5 * var(--peg-grid-px));
   transform: translate(-50%, -50%);
 }
 
 .blueprint-hook-anchor--tr {
-  top: 10%;
-  right: 10%;
+  top: calc(0.5 * var(--peg-grid-px));
+  right: calc(0.5 * var(--peg-grid-px));
   transform: translate(50%, -50%);
 }
 
