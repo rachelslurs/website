@@ -1,6 +1,6 @@
 ---
 name: Workshop pegboard responsive
-overview: "Single plan: desktop scaled grid + repack (Phase 1 done). Phase 2 mobile ≤768 — frame/seam/cork snap, scroll-primary + uniform presentation + physics cleanup + visual regression + ADR-001 (done). Phase 3 blueprint-sheet-mask (done). Phase 4 — workshop frame chrome in initial viewport (ADR-003): layout + Playwright ADR-003 describe (viewport + portal-frame screenshots) done. Phase 5 — workshop panel packing (ADR-004): caps + kind-priority backfill + non-progress partial panels; Vitest `npm test`; plan item 8 + Checkpoint A4 reconciled to ADR-004 (done). Phase 6 — **6a done:** `tests/visual/site-pages.spec.ts` + Docker baselines + `npm run test:visual:site-pages:*:docker`. **6b done:** site chrome uses **one spacing system** — `var(--spacing)` multiples via `tailwind.config.cjs` shell tokens + modest vertical tighten at `max-lg` / `max-sm`. **6c pending:** `npm run check` (done) + full `test:visual:docker` / `update:docker` for site-chrome, workshop-pegboard, site-pages. (Standalone `shell_spacing_token_unify_*.plan.md` merged here — do not maintain separately.)"
+overview: "Single plan: desktop scaled grid + repack (Phase 1 done). Phase 2 mobile ≤768 — frame/seam/cork snap, scroll-primary + uniform presentation + physics cleanup + visual regression + ADR-001 (done). Phase 3 blueprint-sheet-mask (done). Phase 4 — workshop frame chrome in initial viewport (ADR-003): layout + Playwright ADR-003 describe (viewport + portal-frame screenshots) done. Phase 5 — workshop panel packing (ADR-004): caps + kind-priority backfill + non-progress partial panels; Vitest `npm test`; plan item 8 + Checkpoint A4 reconciled to ADR-004 (done). Phase 6 — **complete:** **6a** site-pages spec + Docker; **6b** shell spacing tokens + tighter chrome; **6c** `npm run check` + `test:visual:update:docker` then `test:visual:docker` green (site-chrome, workshop-pegboard, site-pages) with committed Linux baselines. (Standalone `shell_spacing_token_unify_*.plan.md` merged here — do not maintain separately.)"
 todos:
   - id: css-content-box
     content: "Phase 1: Set `.pegboard-bg` to `box-sizing: content-box` (keep 8px border) in workshop-pegboard.css"
@@ -109,7 +109,7 @@ todos:
     status: completed
   - id: phase6-verify
     content: "Phase 6c: npm run check + test:visual:docker / update:docker — site-chrome, workshop-pegboard, site-pages"
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -133,7 +133,7 @@ This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task
 3. **Phase 3 — Blueprint sheet mask (done):** **`blueprint-sheet-mask`** — CSS variables + `--blueprint-mask-image` with container-query variants (e.g. 260px / 220px); visual regression green (`docker compose run --rm playwright-fast`).
 4. **Phase 4 — Frame chrome in initial viewport (done):** **ADR-003** + **ADR-001 §7**. **`fillViewportSlot`** / **`h-svh`** / **no `prose` on workshop `main`** + pegboard-root column flex. **4c:** Playwright **Workshop frame chrome (ADR-003)** — `toBeInViewport` on `.workshop-panel-nav` + first `.pegboard-bg`; **`portal-frame--w*.png`** screenshots; short **375×500** smoke.
 5. **Phase 5 — Workshop panel packing (done):** **[ADR-004](../../docs/decisions/004-workshop-panel-packing.md)** — which CMS entries share a horizontal panel is decided in **`buildWorkshopPanels`** (not viewport CSS): max **3** items; **≤1 work** and **≤1 links** per panel; **demos** fill remaining slots; backfill sorts **work → links → demos**, then **newest first** within a kind; **non-progress** leaves a **partial panel** when the pool cannot add without breaking caps. **Verify:** `npm test` (Vitest), `npm run check`.
-6. **Phase 6 — Site shell vertical budget:** **6a (done)** — [`tests/visual/site-pages.spec.ts`](../../tests/visual/site-pages.spec.ts) viewport shell screenshots + `npm run test:visual:site-pages:*:docker`. **6b (done)** — shell tokens in [`tailwind.config.cjs`](../../tailwind.config.cjs) + [`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro) / [`RisoNav.tsx`](../../src/components/RisoNav.tsx) / [`Footer.astro`](../../src/components/Footer.astro); vertical rhythm slightly tighter at `max-lg` / `max-sm`. **6c (pending):** full Docker visual run per [`visual-regression-docker.mdc`](../rules/visual-regression-docker.mdc).
+6. **Phase 6 — Site shell vertical budget (done):** **6a** — [`tests/visual/site-pages.spec.ts`](../../tests/visual/site-pages.spec.ts) + `npm run test:visual:site-pages:*:docker`. **6b** — shell tokens in [`tailwind.config.cjs`](../../tailwind.config.cjs) + [`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro) / [`RisoNav.tsx`](../../src/components/RisoNav.tsx) / [`Footer.astro`](../../src/components/Footer.astro). **6c** — `npm run check` + `test:visual:update:docker` + `test:visual:docker` per [`visual-regression-docker.mdc`](../rules/visual-regression-docker.mdc); baselines committed.
 
 ## Phase 4: Workshop frame chrome (initial viewport)
 
@@ -763,13 +763,13 @@ flowchart TB
 
 ### Phase 6b–6c — Implement shell + verify
 
-- **6b —** Add shell spacing keys → wire the three components → tighten multiples for vertical budget (order matters).
-- **`npm run check`**; **`npm run test:visual:update:docker`** then **`npm run test:visual:docker`** for `site-chrome`, `workshop-pegboard`, and **`site-pages`**.
+- **6b —** Add shell spacing keys → wire the three components → tighten multiples for vertical budget (order matters). **Done.**
+- **6c —** **`npm run check`**; **`npm run test:visual:update:docker`** then **`npm run test:visual:docker`** for `site-chrome`, `workshop-pegboard`, and **`site-pages`**. **Done** (Linux Docker baselines refreshed and green).
 
 ### Checkpoint: After Phase 6
 
-- [ ] Workshop: nav arrows + first pegboard still `toBeInViewport` at standard widths (existing ADR-003 tests).
-- [x] New `site-pages` suite green in Docker (`npm run test:visual:site-pages:docker`).
+- [x] Workshop: nav arrows + first pegboard still `toBeInViewport` at standard widths (ADR-003 tests in `workshop-pegboard.spec.ts`; Phase 6c Docker run green).
+- [x] New `site-pages` suite green in Docker (`npm run test:visual:site-pages:docker` / full `test:visual:docker`).
 - [ ] Manual: one homepage or index + one demo — chrome does not feel cramped or inaccessible.
 
 ## Recent baseline changes (already done)
