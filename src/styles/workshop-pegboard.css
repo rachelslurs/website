@@ -1078,7 +1078,7 @@
   top: calc(var(--peg-grid-px) * 10 / 60);
   right: calc(var(--peg-grid-px) * 10 / 60);
   /* Bottom inset: half-cell for J hooks + lift — ADR-006 §5 */
-  bottom: calc(0.5 * var(--peg-grid-px) + var(--peg-grid-px) * 8 / 60);
+  bottom: calc(0.5 * var(--peg-grid-px) + var(--peg-grid-px) * 4 / 60);
   left: calc(var(--peg-grid-px) * 10 / 60);
   z-index: 10;
   display: flex;
@@ -1095,7 +1095,7 @@
   position: absolute;
   top: calc(var(--peg-grid-px) * 10 / 60);
   right: calc(var(--peg-grid-px) * 10 / 60);
-  bottom: calc(0.5 * var(--peg-grid-px) + var(--peg-grid-px) * 8 / 60);
+  bottom: calc(0.5 * var(--peg-grid-px) + var(--peg-grid-px) * 4 / 60);
   left: calc(var(--peg-grid-px) * 10 / 60);
   z-index: 0;
   border-radius: 4px;
