@@ -206,3 +206,12 @@ describe("clipboard hardware vs peg lattice", () => {
     expect(CLIPBOARD_PAPERS_TOP_FRAC_OF_CARD_H).toBeCloseTo(85 / 480, 12);
   });
 });
+
+describe("blueprint hardware vs peg lattice", () => {
+  it("places top-corner hole centres at half a grid from card edges (5×5 card)", () => {
+    for (const grid of DESKTOP_PACK_GRIDS) {
+      const { w } = hardwareDimsWithGrid("blueprint", grid);
+      expect(0.1 * w).toBeCloseTo(0.5 * grid, 10);
+    }
+  });
+});
