@@ -685,6 +685,8 @@
 .peg-card--drag {
   z-index: 10;
   cursor: grabbing;
+  /* whileDrag scale (Framer): grow from top so hooks stay visually peg-aligned — ADR-007 */
+  transform-origin: top center;
 }
 
 /*
@@ -726,14 +728,22 @@
   text-underline-offset: 2px;
 }
 
-/* Blueprint top hooks — reference mock (single capsule + ::after highlight) */
+/*
+ * Blueprint top hooks — shaft is laid out in **anchor** space (same box as hole diameter),
+ * not clipboard mount px, so metal tracks the die-cut + cork phase at every `gridPx`.
+ * Bottom of the shaft sits at the hole’s vertical midpoint (D/2 from anchor top) so the metal
+ * overlaps roughly the upper half of the cutout; shadow reads on the cork inside the hole.
+ */
 .blueprint-hook-anchor .straight-hook {
   position: absolute;
-  bottom: calc(var(--peg-grid-px) * 6 / 60);
-  left: calc(var(--peg-grid-px) * 5 / 60);
-  width: calc(var(--peg-grid-px) * 6 / 60);
-  height: calc(var(--peg-grid-px) * 18 / 60);
-  border-radius: calc(var(--peg-grid-px) * 3 / 60);
+  /* bottom of shaft = hole center → ~half the circular void sits “under” the hardware */
+  bottom: calc(100% - var(--blueprint-hole-diameter-px) / 2);
+  left: 50%;
+  /* 6×18 in a 16px reference mount → scale with punched hole diameter */
+  width: calc(var(--blueprint-hole-diameter-px) * 6 / 16);
+  height: calc(var(--blueprint-hole-diameter-px) * 18 / 16);
+  transform: translateX(-50%);
+  border-radius: calc(var(--blueprint-hole-diameter-px) * 3 / 16);
   background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 40%, #4b5563 100%);
   box-shadow:
     3px 4px 5px rgba(0, 0, 0, 0.4),
@@ -746,8 +756,9 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: calc(var(--peg-grid-px) * 3 / 60);
-  border-radius: calc(var(--peg-grid-px) * 3 / 60) calc(var(--peg-grid-px) * 3 / 60) 0 0;
+  height: calc(var(--blueprint-hole-diameter-px) * 3 / 16);
+  border-radius: calc(var(--blueprint-hole-diameter-px) * 3 / 16)
+    calc(var(--blueprint-hole-diameter-px) * 3 / 16) 0 0;
   background: rgba(255, 255, 255, 0.4);
 }
 
@@ -1066,8 +1077,8 @@
   position: absolute;
   top: calc(var(--peg-grid-px) * 10 / 60);
   right: calc(var(--peg-grid-px) * 10 / 60);
-  /* Reserve half a cell for bottom mount hooks — same ratio as 30px @ 60px grid. */
-  bottom: calc(0.5 * var(--peg-grid-px));
+  /* Bottom inset: half-cell for J hooks + lift — ADR-006 §5 */
+  bottom: calc(0.5 * var(--peg-grid-px) + var(--peg-grid-px) * 8 / 60);
   left: calc(var(--peg-grid-px) * 10 / 60);
   z-index: 10;
   display: flex;
@@ -1079,12 +1090,12 @@
   transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Same inset + 3D tilt as .lcd-hardware__tilt; cast vector = --pegboard-card-shadow * ~0.4 */
+/* Same inset + 3D tilt as .lcd-hardware__tilt (ADR-006 §5); cast vector = --pegboard-card-shadow * ~0.4 */
 .lcd-shadow-base {
   position: absolute;
   top: calc(var(--peg-grid-px) * 10 / 60);
   right: calc(var(--peg-grid-px) * 10 / 60);
-  bottom: calc(0.5 * var(--peg-grid-px));
+  bottom: calc(0.5 * var(--peg-grid-px) + var(--peg-grid-px) * 8 / 60);
   left: calc(var(--peg-grid-px) * 10 / 60);
   z-index: 0;
   border-radius: 4px;
