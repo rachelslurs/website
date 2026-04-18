@@ -39,6 +39,8 @@ We treat the mobile pegboard as governed by an explicit **layout contract**: sha
 
 7. **Frame chrome vs inner scroll (see ADR-003)** — §6 applies to **gesture handling on the pegboard column**, not to hiding **workshop frame** controls. Bottom **slab navigation** (arrows) must remain **visible in the initial viewport** without scrolling the document; when the peg stack is taller than the middle region, **that region** scrolls. Normative detail: [ADR-003: Workshop frame chrome in the initial viewport](003-workshop-frame-chrome-initial-viewport.md).
 
+8. **Case study clipboard metal clamp** — The case-study card’s **metal clamp** (spec SVG), masonite band, and peg-hook mock are part of the **same design-space card** as the papers (`5×PEG_GRID` × `8×PEG_GRID` before any mobile `scale`). The clamp must **never** use a fixed pixel width/height that outruns the card body: lateral scale tracks the card (historically **80%** of card width for the spec art—240px on a 300px-wide clipboard at 60px grid—so the clamp stays subordinate to the board, not edge-to-edge). Vertical chrome stays tied to `--peg-grid-px`. When §3 applies `transform: scale(...)` on the mobile surface, the whole card—including the clamp—scales together. Desktop uses a variable strip `gridPx`; the same “clamp tracks card + lattice” rule is normative there too ([ADR-005](005-workshop-desktop-cork-layout-acceptance.md) §5).
+
 ## Alternatives Considered
 
 ### Per-slab independent `designContentW` and `scale`
@@ -57,6 +59,6 @@ We treat the mobile pegboard as governed by an explicit **layout contract**: sha
 
 - Visual regression and manual QA should cover mobile at and below the portal breakpoint, including narrow slots where `scale < 1`.
 - Refactors that move where `scale` is applied must preserve this contract or **supersede** it with a new ADR that references this number. **Do not delete** superseded ADRs; they keep historical context.
-- **Implementation touchpoints:** `WorkshopPegboard.tsx` (`mobileScalePresentation`, portal layout), `PegboardPanels.tsx` (`PegboardPanelMobile`, scale slot/surface), `pegboardDimensions.ts`, `pegboardTypes.ts`, `workshop-pegboard.css` (mobile scale classes).
+- **Implementation touchpoints:** `WorkshopPegboard.tsx` (`mobileScalePresentation`, portal layout), `PegboardPanels.tsx` (`PegboardPanelMobile`, scale slot/surface), `pegboardDimensions.ts`, `pegboardTypes.ts`, `workshop-pegboard.css` (mobile scale + clipboard clamp §8), `PegboardHardwareCards.tsx`.
 - **Types:** `MobileScalePresentation` references this ADR in JSDoc so the contract stays discoverable from the type definition.
 - **Frame chrome:** Vertical layout must also satisfy [ADR-003](003-workshop-frame-chrome-initial-viewport.md) (arrows visible without outer scroll); ADR-001 §7 cross-references it.
