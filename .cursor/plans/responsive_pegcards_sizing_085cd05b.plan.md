@@ -1,6 +1,6 @@
 ---
 name: Workshop pegboard responsive
-overview: "Single plan: desktop scaled grid + repack (Phase 1 done). Phase 2 mobile ≤768 — frame/seam/cork snap, scroll-primary + uniform presentation + physics cleanup + visual regression + ADR-001 (done). Phase 3 blueprint-sheet-mask (done). Phase 4 — workshop frame chrome in initial viewport (ADR-003): layout + Playwright ADR-003 describe (viewport + portal-frame screenshots) done. Phase 5 — workshop panel packing (ADR-004): caps + kind-priority backfill + non-progress partial panels; Vitest `npm test`; plan item 8 + Checkpoint A4 reconciled to ADR-004 (done). Phase 6 — **complete:** **6a** site-pages spec + Docker; **6b** shell spacing tokens + tighter chrome; **6c** `npm run check` + `test:visual:update:docker` then `test:visual:docker` green (site-chrome, workshop-pegboard, site-pages) with committed Linux baselines. (Standalone `shell_spacing_token_unify_*.plan.md` merged here — do not maintain separately.)"
+overview: "Single plan: desktop scaled grid + repack (Phase 1 done). Phase 2 mobile ≤768 — frame/seam/cork snap, scroll-primary + uniform presentation + physics cleanup + visual regression + ADR-001 (done). Phase 3 blueprint-sheet-mask (done). Phase 4 — workshop frame chrome in initial viewport (ADR-003): layout + Playwright ADR-003 describe (viewport + portal-frame screenshots) done. Phase 5 — workshop panel packing (ADR-004): caps + kind-priority backfill + non-progress partial panels; Vitest `npm test`; plan item 8 + Checkpoint A4 reconciled to ADR-004 (done). Phase 6 — **complete:** **6a** site-pages spec + Docker; **6b** shell spacing tokens + tighter chrome; **6c** `npm run check` + `test:visual:update:docker` then `test:visual:docker` green (site-chrome, workshop-pegboard, site-pages) with committed Linux baselines. Phase 7 — **pending:** reading typography — **[ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)** + `@tailwindcss/typography` theme variants + layout wiring + responsive density + site-pages VR (see Phase 7 below). (Standalone `shell_spacing_token_unify_*.plan.md` merged here — do not maintain separately.)"
 todos:
   - id: css-content-box
     content: "Phase 1: Set `.pegboard-bg` to `box-sizing: content-box` (keep 8px border) in workshop-pegboard.css"
@@ -110,6 +110,24 @@ todos:
   - id: phase6-verify
     content: "Phase 6c: npm run check + test:visual:docker / update:docker — site-chrome, workshop-pegboard, site-pages"
     status: completed
+  - id: phase7-typography-inventory
+    content: "Phase 7a: Inventory prose/analog-prose/not-prose + entry-body usage across layouts; confirm ADR-003 workshop boundary (no prose on workshop main)"
+    status: pending
+  - id: phase7-typography-theme
+    content: "Phase 7b: Extend tailwind theme.typography (named variant e.g. analog + optional sm/lg) per @tailwindcss/typography; migrate rules from riso.css where safe"
+    status: pending
+  - id: phase7-typography-layouts
+    content: "Phase 7c: Wire PostDetails/WorkDetails/SimplePage (+ posts index if needed) to prose + variant + modifiers; reduce duplicate global CSS"
+    status: pending
+  - id: phase7-typography-responsive-density
+    content: "Phase 7d: Responsive reading density (max-sm:prose-sm or custom compact variant) aligned with shell + html md font-size; manual long-form + code post"
+    status: pending
+  - id: phase7-typography-verify
+    content: "Phase 7e: npm run check + test:visual:docker / update:docker for site-pages (+ site-chrome if nav chrome shifts)"
+    status: pending
+  - id: phase7-typography-adr
+    content: "ADR-009 — reading typography + prose boundaries + theme vs riso; amend after Phase 7 implementation if split changes"
+    status: completed
 isProject: false
 ---
 
@@ -119,7 +137,7 @@ isProject: false
 
 ## Planning discipline (task breakdown)
 
-This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task-breakdown/SKILL.md): **dependency order** (frame → interaction model → single presentation transform → physics cleanup → verify), **vertical slices** (each slice leaves the UI shippable), **checkpoints** after each phase, and **`npm run check` + named viewports**. **Merged:** the separate “pegboard scale rethink” narrative (design-resolution + uniform `scale` vs multi-`gridPx` reflow on mobile) now lives **only in this file** under **Phase 2 revision** below. Multi-step delivery within a phase follows [`incremental-implementation`](../skills/incremental-implementation/SKILL.md): implement → **`npm test` / `npm run check`** → verify → next slice.
+This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task-breakdown/SKILL.md): **dependency order** (frame → interaction model → single presentation transform → physics cleanup → verify), **vertical slices** (each slice leaves the UI shippable), **checkpoints** after each phase, and **`npm run check` + named viewports**. **Merged:** the separate “pegboard scale rethink” narrative (design-resolution + uniform `scale` vs multi-`gridPx` reflow on mobile) now lives **only in this file** under **Phase 2 revision** below. Multi-step delivery within a phase follows [`incremental-implementation`](../skills/incremental-implementation/SKILL.md): implement → **`npm test` / `npm run check`** → verify → next slice. **Phase 7** tasks use the skill’s task shape (**Description / Acceptance criteria / Verification / Dependencies / Files**) inside the Phase 7 heading.
 
 ## Execution order (single program)
 
@@ -134,6 +152,7 @@ This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task
 4. **Phase 4 — Frame chrome in initial viewport (done):** **ADR-003** + **ADR-001 §7**. **`fillViewportSlot`** / **`h-svh`** / **no `prose` on workshop `main`** + pegboard-root column flex. **4c:** Playwright **Workshop frame chrome (ADR-003)** — `toBeInViewport` on `.workshop-panel-nav` + first `.pegboard-bg`; **`portal-frame--w*.png`** screenshots; short **375×500** smoke.
 5. **Phase 5 — Workshop panel packing (done):** **[ADR-004](../../docs/decisions/004-workshop-panel-packing.md)** — which CMS entries share a horizontal panel is decided in **`buildWorkshopPanels`** (not viewport CSS): max **3** items; **≤1 work** and **≤1 links** per panel; **demos** fill remaining slots; backfill sorts **work → links → demos**, then **newest first** within a kind; **non-progress** leaves a **partial panel** when the pool cannot add without breaking caps. **Verify:** `npm test` (Vitest), `npm run check`.
 6. **Phase 6 — Site shell vertical budget (done):** **6a** — [`tests/visual/site-pages.spec.ts`](../../tests/visual/site-pages.spec.ts) + `npm run test:visual:site-pages:*:docker`. **6b** — shell tokens in [`tailwind.config.cjs`](../../tailwind.config.cjs) + [`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro) / [`RisoNav.tsx`](../../src/components/RisoNav.tsx) / [`Footer.astro`](../../src/components/Footer.astro). **6c** — `npm run check` + `test:visual:update:docker` + `test:visual:docker` per [`visual-regression-docker.mdc`](../rules/visual-regression-docker.mdc); baselines committed.
+7. **Phase 7 — Reading typography (pending):** `@tailwindcss/typography` as the **customization surface** (named `typography` variants + `prose-*` modifiers), layouts wired consistently, optional compact density at narrow widths, Docker **site-pages** (± site-chrome) verification. **Does not** relax ADR-003 (**no `prose` on workshop `#main-content`** — workshop stays `not-prose` / peg-local styles).
 
 ## Phase 4: Workshop frame chrome (initial viewport)
 
@@ -771,6 +790,134 @@ flowchart TB
 - [x] Workshop: nav arrows + first pegboard still `toBeInViewport` at standard widths (ADR-003 tests in `workshop-pegboard.spec.ts`; Phase 6c Docker run green).
 - [x] New `site-pages` suite green in Docker (`npm run test:visual:site-pages:docker` / full `test:visual:docker`).
 - [ ] Manual: one homepage or index + one demo — chrome does not feel cramped or inaccessible.
+
+## Phase 7: Reading typography (`@tailwindcss/typography`)
+
+**Normative doc:** [ADR-009: Reading typography — `@tailwindcss/typography`, `prose` boundaries, and theme vs CSS](../../docs/decisions/009-reading-typography-prose-and-theme.md) — invariants (workshop vs reading), customization surface, verification; this phase’s tasks implement and refine that ADR.
+
+**Problem:** Phase 6 addressed **shell spacing** only. Long-form typography is split across [`theme.extend.typography.DEFAULT`](../../tailwind.config.cjs) (plugin theme), [`.entry-body`](../../src/styles/base.css) (`@apply prose …`), [`.analog-prose` + looseleaf overrides in `riso.css`](../../src/styles/riso.css), and per-layout class stacks ([`PostDetails.astro`](../../src/layouts/PostDetails.astro), [`WorkDetails.astro`](../../src/layouts/WorkDetails.astro), [`SimplePage.astro`](../../src/layouts/SimplePage.astro)). That makes **responsive density** (tighter reading on small viewports after tighter shell) and **single source of truth** harder than Tailwind Typography intends.
+
+**Goal:** Embrace **official Tailwind Typography practice**: customize reading experience primarily via **`tailwind.config.js` → `theme.extend.typography`** (named variants + shared `css` objects), consume it with **`prose` + `prose-{variant}`** and **element modifiers** (`prose-headings:…`, `prose-a:…`, `prose-img:…`, `prose-pre:…`), and reserve **plain CSS** for true layout chrome (stamps, grid, outside-prose title bands) per [Tailwind Typography docs](https://github.com/tailwindlabs/tailwindcss-typography). Optional: plugin **size modifiers** [`prose-sm` / `prose-lg`](https://tailwindcss.com/docs/typography-plugin#changing-the-size) or extra named variants for **compact editorial** on narrow widths.
+
+**Hard boundary (ADR-003, restated in ADR-009):** Workshop routes keep **`prose` off `#main-content`** so typography utilities do not fight the `fillViewportSlot` flex chain; [`WorkshopPegboard.tsx`](../../src/components/workshop/WorkshopPegboard.tsx) stays **`not-prose`**. Phase 7 is **posts / work / demos / simple pages** only.
+
+**Non-goals:** Peg card / hardware label typography inside the workshop (keep existing workshop CSS); changing [`html` font-size at `md`](../../src/styles/base.css) without reviewing `rem`-driven prose + shell spacing together.
+
+---
+
+### Task 7.1 — Inventory & boundary doc
+
+**Description:** List every layout and wrapper that applies `prose`, `analog-prose`, `not-prose`, or MDX body classes; note which use `.entry-body` vs full-width `prose`. Confirm no accidental `prose` on workshop `main`.
+
+**Acceptance criteria:**
+- [ ] Written map (in this plan subsection or as an amendment to **[ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)**) of routes → layout → typography classes.
+- [ ] **[ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)** and ADR-003 workshop exception explicitly referenced so future edits do not regress flex.
+
+**Verification:** Grep `prose` / `analog-prose` in `src/layouts` + `src/pages`; manual open `/workshop/visual-test` and confirm `main` has no `prose`.
+
+**Dependencies:** None (Phase 6 complete).
+
+**Files likely touched:** Plan or `docs/decisions/` only.
+
+**Estimated scope:** Small.
+
+---
+
+### Task 7.2 — `theme.extend.typography` variants (Tailwind-first)
+
+**Description:** Add a **named typography variant** (e.g. `analog`) under `theme.extend.typography` that captures the **reading rules** currently duplicated in `.analog-prose` / prose overrides in [`riso.css`](../../src/styles/riso.css), reusing patterns already in [`typography.DEFAULT`](../../tailwind.config.cjs) (`blockquote` quotes off, task lists, link colors, fonts). Prefer **one variant** consumed as `prose prose-analog` (exact class names follow Tailwind’s `{name}` → `prose-{name}` mapping). Use **`@tailwindcss/typography`’s `DEFAULT` + named keys** rather than growing unstructured global CSS.
+
+**Acceptance criteria:**
+- [ ] `prose prose-analog` (or chosen name) renders blog/work MDX indistinguishably or better than today at 375 / 768 / 1024.
+- [ ] Code blocks, lists, task lists, headings, and links still meet contrast and focus styles.
+
+**Verification:** `npm run check`; side-by-side manual compare one long post.
+
+**Dependencies:** Task 7.1.
+
+**Files likely touched:** [`tailwind.config.cjs`](../../tailwind.config.cjs); optionally trim [`riso.css`](../../src/styles/riso.css) after parity.
+
+**Estimated scope:** Medium.
+
+---
+
+### Task 7.3 — Layout wiring (vertical slice)
+
+**Description:** Update [`PostDetails.astro`](../../src/layouts/PostDetails.astro), [`WorkDetails.astro`](../../src/layouts/WorkDetails.astro), [`SimplePage.astro`](../../src/layouts/SimplePage.astro) (and [`Posts.astro`](../../src/layouts/Posts.astro) / indexes if needed) to use **`prose` + variant + modifiers** instead of parallel bespoke stacks where possible. Keep **MDX demo islands** as `not-prose` (existing pattern in [`riso.css`](../../src/styles/riso.css) `.analog-prose .not-prose` / `.blog-demo`).
+
+**Acceptance criteria:**
+- [ ] No layout-only hacks in new global CSS unless documented; prefer `prose-*:` utilities.
+- [ ] `entry-body` / article measure (`max-w-prose` etc.) unchanged or improved.
+
+**Verification:** `npm run check`; smoke `/posts/*`, `/work/*`, `/demos/*`, `/about`.
+
+**Dependencies:** Task 7.2.
+
+**Files likely touched:** Layout Astro files above; small edits to [`base.css`](../../src/styles/base.css) if `.entry-body` simplifies.
+
+**Estimated scope:** Medium.
+
+---
+
+### Task 7.4 — De-duplicate `riso.css` vs theme
+
+**Description:** After 7.2–7.3 land, **delete or shrink** `.analog-prose` rules that now live in `theme.typography`; keep in `riso.css` only what **cannot** be expressed as typography theme (e.g. stamped title outside prose column, cork/looseleaf chrome). Resolve or update the **TODO** in [`riso.css`](../../src/styles/riso.css) about folding sizes into Tailwind tokens.
+
+**Acceptance criteria:**
+- [ ] No double-competing rules for the same selectors (theme vs global CSS).
+- [ ] Comments document the split: **theme = reading rhythm**, **riso = editorial chrome**.
+
+**Verification:** Visual pass + grep for stale `.analog-prose` duplicates.
+
+**Dependencies:** Task 7.3.
+
+**Files likely touched:** [`riso.css`](../../src/styles/riso.css), [`tailwind.config.cjs`](../../tailwind.config.cjs).
+
+**Estimated scope:** Small–medium.
+
+---
+
+### Task 7.5 — Responsive reading density
+
+**Description:** Align reading **size and vertical rhythm** with Phase 6 shell (tighter chrome): e.g. `max-sm:prose-sm` on article bodies, or a **custom** `typography.compact` variant if `prose-sm` is too generic. Account for **`md:` `html` font-size 125%** — prose uses `rem`; confirm body text does not become oversized on tablet.
+
+**Acceptance criteria:**
+- [ ] Narrow viewports feel intentional (not “default prose squeezed by shell”).
+- [ ] No workshop route changes.
+
+**Verification:** Manual 320 / 375 / 768; optional container-query pass later (out of scope unless needed).
+
+**Dependencies:** Task 7.3 (can parallelize with 7.4 after 7.3 if two agents; else sequential).
+
+**Files likely touched:** Layouts, [`tailwind.config.cjs`](../../tailwind.config.cjs).
+
+**Estimated scope:** Small.
+
+---
+
+### Task 7.6 — Verify + ADR maintenance
+
+**Description:** Run **`npm run check`** and Docker visuals per [`visual-regression-docker.mdc`](../rules/visual-regression-docker.mdc) — at minimum [`site-pages.spec.ts`](../../tests/visual/site-pages.spec.ts); refresh **`site-chrome`** if nav/footer chrome pixels shift. **Amend [ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)** if the theme vs `riso.css` split or verification story changes materially after implementation.
+
+**Acceptance criteria:**
+- [ ] `test:visual:docker` green with committed Linux PNGs.
+- [ ] **[ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)** remains accurate or is amended; README Architecture lists ADR-009.
+
+**Verification:** `npm run test:visual:update:docker` → review diffs → `npm run test:visual:docker`.
+
+**Dependencies:** Tasks 7.4 and 7.5 (or declare “good enough” after 7.3 if scoping down).
+
+**Files likely touched:** `tests/visual/__screenshots__/`, `docs/decisions/`, [`README.md`](../../README.md).
+
+**Estimated scope:** Small–medium.
+
+---
+
+### Checkpoint: After Phase 7
+
+- [ ] One long blog post + one code-heavy post: hierarchy, links, and code blocks read clearly at 375 and 1024.
+- [ ] `site-pages` (and any touched chrome) visual suite green in Docker.
+- [ ] Workshop ADR-003 behavior unchanged (nav + first pegboard in viewport; no `prose` on workshop `main`); **[ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)** still matches implementation (or is amended).
 
 ## Recent baseline changes (already done)
 - Blueprint + LCD cards were increased by **+1 grid unit** in both dimensions (with `PEG_GRID = 60`).
