@@ -70,3 +70,4 @@ The workshop can show **several horizontal panels** in one strip. A **product** 
 - **Cork size / height budget:** Still governed by [ADR-003](003-workshop-frame-chrome-initial-viewport.md) (viewport + portal padding); this ADR documents **what “fits” means** once `innerH` is chosen.
 - **Debug:** Opt-in logs (`?workshopDebugCork=1` or `localStorage.workshopDebugCork = "1"`) may include `verticalBudgetHint` (max/sum of `h`, `innerH`) and `overlappingPair` when overlap is the failure mode.
 - **Tests:** Extend `workshopPegboardPhysics.test.ts` when changing acceptance or resolver semantics (includes **clipboard hardware vs peg lattice** tests for §5).
+- **LCD 3D tilt vs peg hooks:** The faux LCD module may use `rotateX` while mount hooks stay outside the tilt subtree for lattice alignment — see [ADR-006: Workshop LCD — tilt vs peg-hook alignment](006-workshop-lcd-tilt-vs-peg-hook-alignment.md) (Proposed until reviewed).
