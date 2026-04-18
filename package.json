@@ -19,6 +19,8 @@
     "perf:baseline": "npm run build && npm run perf:report",
     "test:visual": "playwright test",
     "test:visual:update": "playwright test --update-snapshots",
+    "test:visual:docker": "docker compose run --rm playwright-fast",
+    "test:visual:update:docker": "docker compose run --rm playwright-update-fast",
     "test": "vitest run",
     "test:watch": "vitest"
   },

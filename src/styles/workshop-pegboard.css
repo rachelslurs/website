@@ -806,7 +806,8 @@
   left: 50%;
   z-index: 30;
   display: block;
-  width: 100%;
+  /* 240 / (5×60) — spec art width vs clipboard width at reference grid. */
+  width: calc(100% * 240 / 300);
   height: auto;
   transform: translateX(-50%);
   pointer-events: none;

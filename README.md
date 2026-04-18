@@ -13,35 +13,24 @@ npm run dev
 
 The workshop pegboard has alignment invariants (peg holes ↔ screws ↔ border/content-box ↔ scaling) that are easy to regress with small CSS/JS changes. We use Playwright screenshots to catch drift.
 
+**Baseline policy:** treat **Linux (Docker/CI)** as the source of truth for committed screenshots. Prefer Docker for every run and baseline update so local results match CI.
+
 ### Fixture page
 
 Use the deterministic fixture at:
 
 - `/workshop/visual-test`
 
-### Run locally (macOS)
+### Run in Docker (default; matches CI)
 
-One-time browser install:
-
-```bash
-npx playwright install chromium
-```
-
-Run tests:
+Wrappers (same as `docker compose run --rm playwright-fast` / `playwright-update-fast`):
 
 ```bash
-npm run test:visual
+npm run test:visual:docker
+npm run test:visual:update:docker
 ```
 
-Update baselines (writes to `tests/visual/__screenshots__/`):
-
-```bash
-npm run test:visual:update
-```
-
-### Run locally in Linux (recommended; matches CI baselines)
-
-Baselines in CI are rendered on Linux (Playwright container), so generating/updating baselines via Docker avoids macOS ↔ Linux pixel diffs.
+Lower-level compose (official image; runs `apt-get` for a native build toolchain on each invocation — slower but closer to a cold CI machine):
 
 ```bash
 docker compose run --rm playwright
@@ -50,21 +39,29 @@ docker compose run --rm playwright-update
 
 The compose file pins the official Playwright image to the same major line as `@playwright/test` so the preinstalled browser build matches what the test runner expects.
 
-The compose services also install a small build toolchain (`make`, `g++`) as a fallback when a native module needs to compile from source during `npm ci`.
+### Faster Docker runs (optional)
 
-### Faster local Docker runs (optional)
-
-The `playwright` services above install build deps via `apt-get` on every run for CI parity. If you run visuals frequently, use the `*-fast` services which bake build deps into a local image (`Dockerfile.playwright`).
+The `playwright` services above install build deps via `apt-get` on every run. For day-to-day work, the default npm scripts use `*-fast` services, which bake build deps into a local image (`Dockerfile.playwright`).
 
 ```bash
-# Fast Linux run (no apt-get on each run)
 docker compose run --rm playwright-fast
-
-# Fast Linux baseline update
 docker compose run --rm playwright-update-fast
 ```
 
-**Baseline policy:** treat **Linux (Docker/CI)** as the source of truth for committed screenshots. macOS runs are useful for quick iteration but may show small pixel diffs due to font/rendering differences.
+### Run on the host (macOS / quick iteration only)
+
+Host runs can diverge from Linux baselines (fonts, subpixel rasterization). Use only for quick debugging, not for updating committed PNGs.
+
+One-time browser install:
+
+```bash
+npx playwright install chromium
+```
+
+```bash
+npm run test:visual
+npm run test:visual:update
+```
 
 ### CI behavior
 
