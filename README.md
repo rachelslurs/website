@@ -30,6 +30,13 @@ npm run test:visual:docker
 npm run test:visual:update:docker
 ```
 
+Site pages shell screenshots only (`tests/visual/site-pages.spec.ts`):
+
+```bash
+npm run test:visual:site-pages:docker
+npm run test:visual:site-pages:update:docker
+```
+
 Lower-level compose (official image; runs `apt-get` for a native build toolchain on each invocation — slower but closer to a cold CI machine):
 
 ```bash

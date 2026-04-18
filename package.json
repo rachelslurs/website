@@ -21,6 +21,8 @@
     "test:visual:update": "playwright test --update-snapshots",
     "test:visual:docker": "docker compose run --rm playwright-fast",
     "test:visual:update:docker": "docker compose run --rm playwright-update-fast",
+    "test:visual:site-pages:docker": "docker compose run --rm playwright-fast bash -lc 'npm ci --prefer-offline --no-audit --no-fund && npx playwright test tests/visual/site-pages.spec.ts'",
+    "test:visual:site-pages:update:docker": "docker compose run --rm playwright-update-fast bash -lc 'npm ci --prefer-offline --no-audit --no-fund && npx playwright test tests/visual/site-pages.spec.ts --update-snapshots'",
     "test": "vitest run",
     "test:watch": "vitest"
   },

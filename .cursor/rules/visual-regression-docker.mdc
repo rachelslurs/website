@@ -5,23 +5,24 @@ alwaysApply: true
 
 # Visual regression tests — always Docker
 
-Committed screenshot baselines match **Linux** (GitHub Actions + `mcr.microsoft.com/playwright`).
+**Default is Docker only.** Committed screenshot baselines match **Linux** (GitHub Actions + `mcr.microsoft.com/playwright`). Host macOS/Windows Playwright output is **not** acceptable for committing or “fixing” golden PNGs.
 
-**Agents and automation:** **always** run and update visual tests **inside Docker**. Do **not** use `npm run test:visual`, `npm run test:visual:update`, or bare `npx playwright test` on the host for verification or snapshot updates unless the **user explicitly** asks for a quick local host run.
+**Agents and automation:** **never** use `npm run test:visual`, `npm run test:visual:update`, or bare `npx playwright test … --update-snapshots` on the host for verification or baseline updates. **Always** use the Docker npm scripts below (including scoped specs). The only exception is a **human** doing deliberate quick local debugging — agents should not.
 
 **Commands**
 
 - Run full suite: `npm run test:visual:docker`
-- Update snapshots: `npm run test:visual:update:docker`
+- Update snapshots (full suite): `npm run test:visual:update:docker`
+- Site pages only: `npm run test:visual:site-pages:docker` / `npm run test:visual:site-pages:update:docker`
 
 Those wrap `docker compose run --rm playwright-fast` and `playwright-update-fast` (see `README.md` and `docker-compose.yml`).
 
-**Scoped runs** (one spec, `--grep`, etc.): still use Docker — override the service command so `npm ci` runs in the container, then Playwright:
+**Scoped runs** (one spec, `--grep`, etc.): still use Docker — either the dedicated `*:site-pages:*:docker` scripts in `package.json`, or override the service command so `npm ci` runs in the container, then Playwright:
 
 ```bash
 docker compose run --rm playwright-fast bash -lc "npm ci --prefer-offline --no-audit --no-fund && npx playwright test tests/visual/workshop-pegboard.spec.ts"
 ```
 
-Append `--update-snapshots` when refreshing baselines. Use `playwright` / `playwright-update` (non-`*-fast`) only if you need the full `apt-get` toolchain path from `docker-compose.yml`.
+Append `--update-snapshots` when refreshing baselines (or use `npm run test:visual:update:docker` for the whole suite). Use `playwright` / `playwright-update` (non-`*-fast`) only if you need the full `apt-get` toolchain path from `docker-compose.yml`.
 
 Shell runs need Docker available (`all` / full permissions if the sandbox blocks Docker).
