@@ -13,7 +13,7 @@ npm run dev
 
 The workshop pegboard has alignment invariants (peg holes ↔ screws ↔ border/content-box ↔ scaling) that are easy to regress with small CSS/JS changes. We use Playwright screenshots to catch drift.
 
-**Baseline policy:** treat **Linux (Docker/CI)** as the source of truth for committed screenshots. Prefer Docker for every run and baseline update so local results match CI.
+**Baseline policy:** treat **Linux (Docker/CI)** as the source of truth for committed screenshots. **Always** use the Docker npm scripts below to run or update visual tests (including scoped specs); host Playwright can diverge (fonts, subpixel). Cursor agents follow `.cursor/rules/visual-regression-docker.mdc`.
 
 ### Fixture page
 
