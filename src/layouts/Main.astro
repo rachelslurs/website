@@ -41,7 +41,8 @@ const fillViewportSlot = props.fillViewportSlot === true;
     id="main-content"
     class:list={[
       "board-slot app-layout max-w-none",
-      !fillViewportSlot && "prose",
+      !fillViewportSlot &&
+        "prose prose-analog prose-img:rounded prose-img:bg-skin-fill",
       fillViewportSlot && "workshop-viewport-slot flex min-h-0 flex-1 flex-col",
     ]}
   >
