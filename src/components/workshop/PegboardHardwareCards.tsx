@@ -4,6 +4,7 @@ import {
   TvIcon,
 } from "@heroicons/react/24/outline";
 import type { PegboardCardDTO } from "@utils/serializeWorkshopPegboard";
+import { PEG_GRID } from "@utils/workshopPegboardPhysics";
 import { useEffect, useId, useState } from "react";
 import type { MouseEvent } from "react";
 import { externalLinkProps, stopDragChain } from "./pegboardCardUtils";
@@ -12,10 +13,13 @@ export function CaseStudyClipboard({
   item,
   dragVisual,
   blockParentDragHandlers = true,
+  gridPx = PEG_GRID,
 }: {
   item: PegboardCardDTO;
   dragVisual: boolean;
   blockParentDragHandlers?: boolean;
+  /** Cork lattice pitch — drives clip + hook scale so hardware matches holes at any `gridPx`. */
+  gridPx?: number;
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const metalId = `clipMetal-${uid}`;
@@ -27,17 +31,19 @@ export function CaseStudyClipboard({
   const stopIfNeeded = blockParentDragHandlers ? stopDragChain : undefined;
 
   return (
-    <div className="peg-clipboard-root">
+    <div
+      className="peg-clipboard-root"
+      style={{ ["--peg-grid-px" as string]: `${gridPx}px` }}
+    >
       <div
         className={`masonite-plate ${dragVisual ? "masonite-plate--dragging" : ""}`}
         aria-hidden
       />
       <svg
-        width={240}
-        height={100}
         viewBox="0 0 240 100"
         fill="none"
         className="peg-clipboard-spec-svg"
+        preserveAspectRatio="xMidYMin meet"
         aria-hidden
       >
         <defs>
@@ -250,6 +256,7 @@ export function LinkLcdCard({
           </div>
         </div>
       </div>
+      {/* Peg-lattice hardware: keep outside `.lcd-hardware__tilt` (ADR-006). */}
       <span className="lcd-mount-hook lcd-mount-hook--l" aria-hidden>
         <span className="lcd-hook" />
       </span>

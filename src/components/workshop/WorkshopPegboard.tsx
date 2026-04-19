@@ -8,6 +8,7 @@ import {
 import {
   desktopPegboardSideGap,
   hardwareDimsWithGrid,
+  pickSharedDesktopPackGrid,
   PEG_GRID,
 } from "@utils/workshopPegboardPhysics";
 import {
@@ -23,7 +24,9 @@ import type { PegboardPanelDTO } from "@utils/serializeWorkshopPegboard";
 import PegboardPanelView from "./PegboardPanels";
 import {
   desktopInnerW,
+  desktopPortalInnerH,
   mobileInnerW,
+  MOBILE_PEGBOARD_STACK_PADDING_X,
   PEGBOARD_BORDER_OUTSET,
 } from "./pegboardDimensions";
 import type { MobileScalePresentation } from "./pegboardTypes";
@@ -76,6 +79,8 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const [activePanelIndex, setActivePanelIndex] = useState(0);
+  /** `?workshopDebugCork=1` or `localStorage.workshopDebugCork = "1"` — outlines cork + console packing logs. */
+  const [debugWorkshopCork, setDebugWorkshopCork] = useState(false);
   const [portalLayout, setPortalLayout] = useState<{
     w: number;
     h: number;
@@ -95,6 +100,18 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   const [desktopPanelPadX, setDesktopPanelPadX] = useState(() =>
     workshopPanelRemPaddingPx()
   );
+
+  useEffect(() => {
+    try {
+      const q = new URLSearchParams(window.location.search).get(
+        "workshopDebugCork"
+      );
+      const ls = window.localStorage.getItem("workshopDebugCork");
+      setDebugWorkshopCork(q === "1" || ls === "1");
+    } catch {
+      setDebugWorkshopCork(false);
+    }
+  }, []);
 
   const layoutW = Math.round(portalLayout?.w ?? vw);
   const layoutH = Math.round(portalLayout?.h ?? vh);
@@ -123,11 +140,44 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
             ...flat.map(it => hardwareDimsWithGrid(it.hardware, PEG_GRID).w)
           );
     const designContentW =
-      Math.ceil(Math.max(slotContentW, maxCardW) / PEG_GRID) * PEG_GRID;
+      Math.ceil(
+        Math.max(slotContentW, maxCardW + MOBILE_PEGBOARD_STACK_PADDING_X) /
+          PEG_GRID
+      ) * PEG_GRID;
     const designOuterW = designContentW + PEGBOARD_BORDER_OUTSET;
     const scale = Math.min(1, slotContentW / designOuterW);
     return { slotContentW, designContentW, scale };
   }, [isMobile, layoutW, panels]);
+
+  const panelsPackKey = useMemo(
+    () =>
+      panels
+        .map(p => p.items.map(it => `${it.id}:${it.hardware}`).join(","))
+        .join("|"),
+    [panels]
+  );
+
+  const desktopSharedPack = useMemo(() => {
+    if (isMobile || !isLayoutReady) return undefined;
+    const layoutInnerW =
+      desktopPegboardContentInnerW != null && desktopPegboardContentInnerW > 0
+        ? desktopPegboardContentInnerW
+        : desktopInnerW(layoutW, desktopPanelPadX);
+    const viewportH = desktopPortalInnerH(layoutH, desktopPanelPadY);
+    const panelPayload = panels.map(p => ({
+      items: p.items.map(i => ({ id: i.id, hardware: i.hardware })),
+    }));
+    return pickSharedDesktopPackGrid(panelPayload, layoutInnerW, viewportH);
+  }, [
+    isMobile,
+    isLayoutReady,
+    panelsPackKey,
+    layoutW,
+    layoutH,
+    desktopPegboardContentInnerW,
+    desktopPanelPadX,
+    desktopPanelPadY,
+  ]);
 
   useIsoLayoutEffect(() => {
     if (isMobile) {
@@ -232,22 +282,23 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   useIsoLayoutEffect(() => {
     const el = portalInnerRef.current;
     if (!el) return;
-    const apply = (width: number, height: number) => {
-      // ResizeObserver contentRect can be sub-pixel; peg math uses floor(inner/grid)*grid.
-      // Rounding avoids TR/BR screw vs hole drift when a 1px budget flips (e.g. 1023 vs 1024).
-      const w = Math.round(width);
-      const h = Math.round(height);
+    const apply = (target: HTMLElement) => {
+      // Use border-box pixel size from layout (not contentRect), so flex-constrained
+      // portal-inner height matches what the user sees after ADR-003 height chain.
+      const w = Math.round(target.clientWidth);
+      const h = Math.round(target.clientHeight);
+      // Do not bail on 0×0: first paint can be before flex insets size the portal; we
+      // still need portalLayout set so `visibility` clears and ResizeObserver can settle.
       setPortalLayout({
         w,
         h,
         isMobile: w <= 768,
       });
     };
-    apply(el.clientWidth, el.clientHeight);
+    apply(el);
     const ro = new ResizeObserver(entries => {
       for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        apply(width, height);
+        if (entry.target instanceof HTMLElement) apply(entry.target);
       }
     });
     ro.observe(el);
@@ -415,6 +466,9 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
                     desktopPanelPadY={desktopPanelPadY}
                     desktopPanelPadX={desktopPanelPadX}
                     desktopContentInnerW={desktopPegboardContentInnerW}
+                    debugWorkshopCork={debugWorkshopCork}
+                    desktopPanelIndex={i}
+                    desktopSharedPack={desktopSharedPack}
                   />
                   {i < panels.length - 1 ? (
                     <>

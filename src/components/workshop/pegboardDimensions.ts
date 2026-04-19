@@ -3,6 +3,13 @@ import { PEG_GRID } from "@utils/workshopPegboardPhysics";
 /** Matches `.pegboard-bg { border: 8px solid … }` — 2× border width for content-box outer size. */
 export const PEGBOARD_BORDER_OUTSET = 16;
 
+/**
+ * Horizontal space reserved inside `.pegboard-mobile-stack` (`padding` left + right,
+ * each `PEG_GRID`). Cork **content** width must include this so a 7-wide LCD is not
+ * wider than the padded inner.
+ */
+export const MOBILE_PEGBOARD_STACK_PADDING_X = PEG_GRID * 2;
+
 /** Usable cork width for desktop (panel padding from caller). */
 export function desktopInnerW(vw: number, desktopPanelPadX: number): number {
   return Math.max(0, vw - desktopPanelPadX * 2);

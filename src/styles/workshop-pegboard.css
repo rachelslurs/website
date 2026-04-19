@@ -7,6 +7,15 @@
   min-height: 0;
 }
 
+/*
+ * ADR-003: `workshop-viewport-slot` (Main fillViewportSlot) — stack fills main so
+ * pegboard + portal-bezel stay in view; only .workshop-scroll--* scrolls.
+ */
+#main-content.workshop-viewport-slot .workshop-page-stack {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .workshop-page-stack > .workshop-pegboard-root {
   flex: 1 1 auto;
   min-height: 0;
@@ -17,6 +26,10 @@
 }
 
 .workshop-pegboard-root {
+  /* Column flex so `.portal-frame` flex/min-height-0 participate (ADR-003); block parent lets content expand page height after hydration. */
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   /* Mirrors tailwind.config fontFamily — use theme() so stacks stay single-sourced */
   --font-display: theme("fontFamily.display");
   --font-body: theme("fontFamily.body");
@@ -234,6 +247,31 @@
   }
 }
 
+/*
+ * Mobile vertical scroll: vignette lighter than desktop default (0.8 / 0.9) so
+ * peg slabs stay readable while panning. Narrower viewports get a touch more
+ * depth than tablet-width mobile, still well below the full TV shadowbox.
+ */
+.workshop-pegboard-root[data-pegboard-layout="mobile"] .shadowbox-portal {
+  box-shadow:
+    inset 46px 0 68px -22px rgba(0, 0, 0, 0.4),
+    inset -46px 0 68px -22px rgba(0, 0, 0, 0.4),
+    inset 0 46px 68px -22px rgba(0, 0, 0, 0.44),
+    inset 0 -46px 68px -22px rgba(0, 0, 0, 0.44),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 480px) {
+  .workshop-pegboard-root[data-pegboard-layout="mobile"] .shadowbox-portal {
+    box-shadow:
+      inset 56px 0 88px -26px rgba(0, 0, 0, 0.52),
+      inset -56px 0 88px -26px rgba(0, 0, 0, 0.52),
+      inset 0 56px 88px -26px rgba(0, 0, 0, 0.56),
+      inset 0 -56px 88px -26px rgba(0, 0, 0, 0.56),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+}
+
 .workshop-pegboard-root .portal-inner {
   position: relative;
   flex: 1 1 auto;
@@ -275,9 +313,50 @@
   pointer-events: none;
 }
 
+/*
+ * Mobile: if anything above still lets the document grow, keep slab nav in the
+ * viewport (ADR-003). Wood fill matches .portal-frame so scrolling content does
+ * not show through the bezel band.
+ */
+.workshop-pegboard-root[data-pegboard-layout="mobile"] .portal-bezel {
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
+  align-self: stretch;
+  box-sizing: border-box;
+  /* Do not use margin-top: auto here — it absorbs flex free space and collapses
+   * `.portal-inner` (flex 1 1 0) to zero height in the column. */
+  background-color: #4a3018;
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.03) 0%,
+      transparent 10%,
+      rgba(255, 255, 255, 0.02) 20%,
+      transparent 30%,
+      rgba(0, 0, 0, 0.04) 50%,
+      transparent 60%,
+      rgba(255, 255, 255, 0.01) 80%,
+      transparent 100%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.05) 3px,
+      rgba(0, 0, 0, 0.05) 4px
+    );
+  box-shadow:
+    0 -10px 24px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
 @media (max-height: 720px) {
   .workshop-pegboard-root .portal-bezel {
     height: 56px;
+  }
+
+  .workshop-pegboard-root:not([data-pegboard-layout="mobile"]) .portal-bezel {
     margin-top: 10px;
   }
 
@@ -292,6 +371,9 @@
     height: 76px;
     justify-content: space-between;
     padding: 0 0.5rem;
+  }
+
+  .workshop-pegboard-root:not([data-pegboard-layout="mobile"]) .portal-bezel {
     margin-top: 16px;
   }
 }
@@ -544,7 +626,9 @@
 /* Phase 2g: fixed 60px design board; JS sets slot size and scale on .pegboard-mobile-scale-surface */
 .pegboard-mobile-scale-slot {
   position: relative;
-  overflow: visible;
+  /* Unscaled `width`/`height` + `transform: scale()` on the surface still occupy the
+   * pre-transform layout box; `visible` lets that box paint over the next mobile slab. */
+  overflow: hidden;
   margin-left: auto;
   margin-right: auto;
   touch-action: pan-y;
@@ -559,11 +643,11 @@
 }
 
 /* Mobile column: flex stack (no absolute grid) inside cork frame */
-/* Match desktop grid gutters: first card at (grid, grid) from cork content origin so holes line up. */
+/* Padding matches desktop grid gutter; cards are centered when narrower than the cork. */
 .pegboard-bg--mobile-flow .pegboard-mobile-stack {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--peg-grid-px);
   padding: var(--peg-grid-px);
   position: relative;
@@ -580,6 +664,14 @@
   user-select: text;
 }
 
+/* LCD 3D tilt + shadow extend past the design box; clip on mobile so nothing reads past the cork. */
+.workshop-pegboard-root[data-pegboard-layout="mobile"]
+  .pegboard-bg--mobile-flow
+  .peg-card--mobile-stack.peg-card--lcd {
+  max-width: 100%;
+  overflow: hidden;
+}
+
 /* Hardware cards */
 .peg-card {
   position: absolute;
@@ -593,17 +685,21 @@
 .peg-card--drag {
   z-index: 10;
   cursor: grabbing;
+  /* whileDrag scale (Framer): grow from top so hooks stay visually peg-aligned — ADR-007 */
+  transform-origin: top center;
 }
 
-.peg-card--drag.peg-card--clipboard,
-.peg-card--static.peg-card--clipboard {
+/*
+ * Static cards share `.peg-card` z-index so paint order follows DOM (matches
+ * ADR-004 panel order: work → links → demos). A high z-index on clipboard made
+ * demos/links look “under” the case study when packing hugged the clip chrome.
+ */
+.peg-card--drag.peg-card--clipboard {
   z-index: 20;
 }
 
 .peg-card--drag.peg-card--lcd,
-.peg-card--static.peg-card--lcd,
-.peg-card--drag.peg-card--blueprint,
-.peg-card--static.peg-card--blueprint {
+.peg-card--drag.peg-card--blueprint {
   z-index: 10;
 }
 
@@ -632,14 +728,22 @@
   text-underline-offset: 2px;
 }
 
-/* Blueprint top hooks — reference mock (single capsule + ::after highlight) */
+/*
+ * Blueprint top hooks — shaft is laid out in **anchor** space (same box as hole diameter),
+ * not clipboard mount px, so metal tracks the die-cut + cork phase at every `gridPx`.
+ * Bottom of the shaft sits at the hole’s vertical midpoint (D/2 from anchor top) so the metal
+ * overlaps roughly the upper half of the cutout; shadow reads on the cork inside the hole.
+ */
 .blueprint-hook-anchor .straight-hook {
   position: absolute;
-  bottom: 6px;
-  left: 5px;
-  width: 6px;
-  height: 18px;
-  border-radius: 3px;
+  /* bottom of shaft = hole center → ~half the circular void sits “under” the hardware */
+  bottom: calc(100% - var(--blueprint-hole-diameter-px) / 2);
+  left: 50%;
+  /* 6×18 in a 16px reference mount → scale with punched hole diameter */
+  width: calc(var(--blueprint-hole-diameter-px) * 6 / 16);
+  height: calc(var(--blueprint-hole-diameter-px) * 18 / 16);
+  transform: translateX(-50%);
+  border-radius: calc(var(--blueprint-hole-diameter-px) * 3 / 16);
   background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 40%, #4b5563 100%);
   box-shadow:
     3px 4px 5px rgba(0, 0, 0, 0.4),
@@ -652,8 +756,9 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
+  height: calc(var(--blueprint-hole-diameter-px) * 3 / 16);
+  border-radius: calc(var(--blueprint-hole-diameter-px) * 3 / 16)
+    calc(var(--blueprint-hole-diameter-px) * 3 / 16) 0 0;
   background: rgba(255, 255, 255, 0.4);
 }
 
@@ -674,12 +779,13 @@
 /* Masonite board only below clip (cork shows through top band) */
 .masonite-plate {
   position: absolute;
-  top: 45px;
+  /* Same inset as `hitBoxForCollisionWithGrid` clipboard clip (`0.75 * grid`). */
+  top: calc(0.75 * var(--peg-grid-px));
   right: 0;
   bottom: 0;
   left: 0;
   z-index: 0;
-  border-radius: 16px;
+  border-radius: calc(var(--peg-grid-px) * 16 / 60);
   border: 1px solid #7d653f;
   background-image:
     repeating-linear-gradient(
@@ -710,6 +816,10 @@
   top: 0;
   left: 50%;
   z-index: 30;
+  display: block;
+  /* 240 / (5×60) — spec art width vs clipboard width at reference grid. */
+  width: calc(100% * 240 / 300);
+  height: auto;
   transform: translateX(-50%);
   pointer-events: none;
   filter: var(--pegboard-spec-svg-drop);
@@ -717,11 +827,12 @@
 
 .peg-clipboard-mount {
   position: absolute;
-  top: 30px;
+  /* Hook ring centre at `0.5 * grid` — lines up with first peg hole row when card y is grid-snapped. */
+  top: calc(0.5 * var(--peg-grid-px));
   left: 50%;
   z-index: 50;
-  width: 16px;
-  height: 16px;
+  width: calc(var(--peg-grid-px) * 16 / 60);
+  height: calc(var(--peg-grid-px) * 16 / 60);
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
@@ -734,11 +845,11 @@
 
 .peg-clipboard-hook-mock__shaft {
   position: absolute;
-  bottom: 6px;
-  left: 5px;
-  width: 6px;
-  height: 20px;
-  border-radius: 3px;
+  bottom: calc(var(--peg-grid-px) * 6 / 60);
+  left: calc(var(--peg-grid-px) * 5 / 60);
+  width: calc(var(--peg-grid-px) * 6 / 60);
+  height: calc(var(--peg-grid-px) * 20 / 60);
+  border-radius: calc(var(--peg-grid-px) * 3 / 60);
   background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 40%, #4b5563 100%);
   box-shadow:
     3px 4px 5px rgba(0, 0, 0, 0.4),
@@ -758,10 +869,11 @@
 .peg-clipboard__papers {
   position: absolute;
   z-index: 10;
-  top: 85px;
-  right: 16px;
-  bottom: 16px;
-  left: 16px;
+  /* Legacy 85px at 8×5 @ 60px grid — keep proportional to card height when grid changes. */
+  top: calc(100% * 85 / 480);
+  right: calc(var(--peg-grid-px) * 16 / 60);
+  bottom: calc(var(--peg-grid-px) * 16 / 60);
+  left: calc(var(--peg-grid-px) * 16 / 60);
   pointer-events: auto;
 }
 
@@ -945,6 +1057,13 @@
   overflow: visible;
   border-radius: 0;
   background: transparent;
+  /* Scale faux-cast offsets with cork `gridPx` (defaults match 60px reference). */
+  --lcd-cast-offset-x: calc(var(--peg-grid-px) * 6 / 60);
+  --lcd-cast-offset-y: calc(var(--peg-grid-px) * 8 / 60);
+  --lcd-cast-offset-x-drag: calc(var(--peg-grid-px) * 10 / 60);
+  --lcd-cast-offset-y-drag: calc(var(--peg-grid-px) * 14 / 60);
+  --lcd-cast-blur: calc(var(--peg-grid-px) * 7 / 60);
+  --lcd-cast-blur-drag: calc(var(--peg-grid-px) * 11 / 60);
 }
 
 .lcd-hardware {
@@ -956,10 +1075,11 @@
 
 .lcd-hardware__tilt {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  bottom: 30px;
-  left: 10px;
+  top: calc(var(--peg-grid-px) * 10 / 60);
+  right: calc(var(--peg-grid-px) * 10 / 60);
+  /* Bottom inset: half-cell for J hooks + lift — ADR-006 §5 */
+  bottom: calc(0.5 * var(--peg-grid-px) + var(--peg-grid-px) * 4 / 60);
+  left: calc(var(--peg-grid-px) * 10 / 60);
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -970,20 +1090,20 @@
   transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Same inset + 3D tilt as .lcd-hardware__tilt; cast vector = --pegboard-card-shadow * ~0.4 */
+/* Same inset + 3D tilt as .lcd-hardware__tilt (ADR-006 §5); cast vector = --pegboard-card-shadow * ~0.4 */
 .lcd-shadow-base {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  bottom: 30px;
-  left: 10px;
+  top: calc(var(--peg-grid-px) * 10 / 60);
+  right: calc(var(--peg-grid-px) * 10 / 60);
+  bottom: calc(0.5 * var(--peg-grid-px) + var(--peg-grid-px) * 4 / 60);
+  left: calc(var(--peg-grid-px) * 10 / 60);
   z-index: 0;
   border-radius: 4px;
   background: #050b14;
   opacity: var(--lcd-cast-opacity, 0.16);
   filter: blur(var(--lcd-cast-blur, 7px));
   transform: perspective(1000px) rotateX(4deg)
-    translate(var(--lcd-cast-offset-x, 6px), var(--lcd-cast-offset-y, 8px));
+    translate(var(--lcd-cast-offset-x), var(--lcd-cast-offset-y));
   transform-origin: top center;
   transition:
     filter 0.38s cubic-bezier(0.4, 0, 0.2, 1),
@@ -993,9 +1113,9 @@
 
 .lcd-hardware--dragging .lcd-shadow-base {
   opacity: var(--lcd-cast-opacity-drag, 0.22);
-  filter: blur(var(--lcd-cast-blur-drag, 11px));
+  filter: blur(var(--lcd-cast-blur-drag));
   transform: perspective(1000px) rotateX(4deg)
-    translate(var(--lcd-cast-offset-x-drag, 10px), var(--lcd-cast-offset-y-drag, 14px));
+    translate(var(--lcd-cast-offset-x-drag), var(--lcd-cast-offset-y-drag));
 }
 
 .lcd-pcb {
@@ -1019,28 +1139,32 @@
   pointer-events: none;
   -webkit-mask-image:
     radial-gradient(
-      circle at 20px calc(100% - 28px),
-      transparent 10px,
-      black 10.5px
+      circle at calc(var(--peg-grid-px) * 20 / 60)
+        calc(100% - var(--peg-grid-px) * 28 / 60),
+      transparent calc(var(--peg-grid-px) * 10 / 60),
+      black calc(var(--peg-grid-px) * 10.5 / 60)
     ),
     radial-gradient(
-      circle at calc(100% - 20px) calc(100% - 28px),
-      transparent 10px,
-      black 10.5px
+      circle at calc(100% - var(--peg-grid-px) * 20 / 60)
+        calc(100% - var(--peg-grid-px) * 28 / 60),
+      transparent calc(var(--peg-grid-px) * 10 / 60),
+      black calc(var(--peg-grid-px) * 10.5 / 60)
     );
   -webkit-mask-size: 51% 100%, 51% 100%;
   -webkit-mask-position: left bottom, right bottom;
   -webkit-mask-repeat: no-repeat;
   mask-image:
     radial-gradient(
-      circle at 20px calc(100% - 28px),
-      transparent 10px,
-      black 10.5px
+      circle at calc(var(--peg-grid-px) * 20 / 60)
+        calc(100% - var(--peg-grid-px) * 28 / 60),
+      transparent calc(var(--peg-grid-px) * 10 / 60),
+      black calc(var(--peg-grid-px) * 10.5 / 60)
     ),
     radial-gradient(
-      circle at calc(100% - 20px) calc(100% - 28px),
-      transparent 10px,
-      black 10.5px
+      circle at calc(100% - var(--peg-grid-px) * 20 / 60)
+        calc(100% - var(--peg-grid-px) * 28 / 60),
+      transparent calc(var(--peg-grid-px) * 10 / 60),
+      black calc(var(--peg-grid-px) * 10.5 / 60)
     );
   mask-size: 51% 100%, 51% 100%;
   mask-position: left bottom, right bottom;
@@ -1052,11 +1176,11 @@
   bottom: 0;
   left: 50%;
   display: flex;
-  width: 8rem;
-  height: 10px;
+  width: min(8rem, calc(var(--peg-grid-px) * 128 / 60));
+  height: calc(var(--peg-grid-px) * 10 / 60);
   align-items: flex-end;
   justify-content: space-evenly;
-  padding: 0 4px 2px;
+  padding: 0 calc(var(--peg-grid-px) * 4 / 60) calc(var(--peg-grid-px) * 2 / 60);
   transform: translateX(-50%);
   border-radius: 0 0 2px 2px;
   background: #072a19;
@@ -1065,20 +1189,20 @@
 }
 
 .lcd-pcb__pin {
-  width: 3px;
-  height: 8px;
-  flex: 0 0 3px;
-  border-radius: 1px 1px 0 0;
+  width: calc(var(--peg-grid-px) * 3 / 60);
+  height: calc(var(--peg-grid-px) * 8 / 60);
+  flex: 0 0 calc(var(--peg-grid-px) * 3 / 60);
+  border-radius: calc(var(--peg-grid-px) * 1 / 60) calc(var(--peg-grid-px) * 1 / 60) 0 0;
   background: #f1c232;
 }
 
 .lcd-slate {
   position: absolute;
   z-index: 2;
-  top: 10px;
-  right: 10px;
-  bottom: 10px;
-  left: 10px;
+  top: calc(var(--peg-grid-px) * 10 / 60);
+  right: calc(var(--peg-grid-px) * 10 / 60);
+  bottom: calc(var(--peg-grid-px) * 10 / 60);
+  left: calc(var(--peg-grid-px) * 10 / 60);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1096,8 +1220,9 @@
   min-height: 0;
   flex: 1;
   flex-direction: column;
-  padding: 8px 8px 10px;
-  gap: 6px;
+  padding: calc(var(--peg-grid-px) * 8 / 60) calc(var(--peg-grid-px) * 8 / 60)
+    calc(var(--peg-grid-px) * 10 / 60);
+  gap: calc(var(--peg-grid-px) * 6 / 60);
 }
 
 .lcd-slate__top {
@@ -1105,8 +1230,8 @@
   flex-shrink: 0;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 8px;
-  padding: 0 4px;
+  gap: calc(var(--peg-grid-px) * 8 / 60);
+  padding: 0 calc(var(--peg-grid-px) * 4 / 60);
 }
 
 .lcd-chip-label {
@@ -1144,7 +1269,8 @@
   position: relative;
   display: flex;
   width: 100%;
-  max-width: 260px;
+  /* ~260px at 60px grid — scales so bezel tracks lattice when `gridPx` drops. */
+  max-width: calc(var(--peg-grid-px) * 260 / 60);
   flex: 1 1 0;
   min-height: 0;
   align-items: center;
@@ -1154,7 +1280,7 @@
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 4px;
-  border: 3px solid #020617;
+  border: calc(var(--peg-grid-px) * 3 / 60) solid #020617;
   background: linear-gradient(145deg, #0f172a 0%, #000 100%);
   box-shadow:
     inset 2px 5px 14px rgba(0, 0, 0, 0.62),
@@ -1195,11 +1321,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: calc(var(--peg-grid-px) * 4 / 60);
   width: 100%;
   height: 100%;
   margin: 0;
-  padding: 8px;
+  padding: calc(var(--peg-grid-px) * 8 / 60);
   border: none;
   cursor: pointer;
   background: transparent;
@@ -1228,12 +1354,12 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  padding: 0 4px;
+  padding: 0 calc(var(--peg-grid-px) * 4 / 60);
 }
 
 .lcd-mount-hook {
   position: absolute;
-  bottom: 26px;
+  bottom: calc(var(--peg-grid-px) * 26 / 60);
   z-index: 40;
   pointer-events: none;
 }
@@ -1243,9 +1369,9 @@
   position: relative;
   z-index: 10;
   display: block;
-  width: 6px;
-  height: 23px;
-  border-radius: 3px;
+  width: calc(var(--peg-grid-px) * 6 / 60);
+  height: calc(var(--peg-grid-px) * 23 / 60);
+  border-radius: calc(var(--peg-grid-px) * 3 / 60);
   background: linear-gradient(135deg, #f3f4f6 0%, #9ca3af 40%, #4b5563 100%);
   box-shadow:
     3px 4px 5px rgba(0, 0, 0, 0.4),
@@ -1258,21 +1384,23 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
+  height: calc(var(--peg-grid-px) * 3 / 60);
+  border-radius: calc(var(--peg-grid-px) * 3 / 60) calc(var(--peg-grid-px) * 3 / 60) 0 0;
   background: rgba(255, 255, 255, 0.4);
   pointer-events: none;
 }
 
 .lcd-mount-hook--l {
-  left: 30px;
+  left: calc(var(--peg-grid-px) * 30 / 60);
   transform: translateX(-50%);
 }
 
 .lcd-mount-hook--r {
-  right: 30px;
+  right: calc(var(--peg-grid-px) * 30 / 60);
   transform: translateX(50%);
 }
+
+/* LCD tilt: see docs/decisions/006-workshop-lcd-tilt-vs-peg-hook-alignment.md — hooks stay outside `.lcd-hardware__tilt`. */
 
 /* Blueprint demo cards — shadow system (physical layers):
    1) Main card: soft Z-axis drop shadow (rest ↔ drag).
@@ -1314,6 +1442,8 @@
   height: 100%;
   border-radius: 4px;
   box-sizing: border-box;
+  /* Cork lattice pitch — hole discs + hooks use this so blueprint chrome tracks `gridPx`. */
+  --blueprint-hole-diameter-px: calc(var(--peg-grid-px) * 16 / 60);
 }
 
 .blueprint-bg::before {
@@ -1324,9 +1454,23 @@
   border-radius: 4px;
   box-sizing: border-box;
   pointer-events: none;
-  background-color: var(--cream);
+  /*
+   * Blueprint “paper” + punched holes: tuning knobs.
+   *
+   * Strategy:
+   * - Hole **centres** use % of the card (5×5 grid units): first cork hole is mid-cell
+   *   = (0.5/5) = 10% from top/left — matches any `gridPx` (see ADR-005 / workshop lattice).
+   * - Diameter + hooks use `--peg-grid-px` on `.blueprint-bg`.
+   * - Die-cut mask variants via container queries (can't parameterize SVG data URLs with vars).
+   */
+  --blueprint-paper-opacity: 1;
   --blueprint-grid-cells: 16;
   --blueprint-grid-line: 1.25px;
+  --blueprint-grid-alpha: 0.05;
+  --blueprint-border-alpha: 0.15;
+  --blueprint-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Crect x='0' y='0' width='300' height='300' rx='4' ry='4' fill='white'/%3E%3Ccircle cx='30' cy='30' r='8' fill='black'/%3E%3Ccircle cx='270' cy='30' r='8' fill='black'/%3E%3C/svg%3E");
+
+  background-color: var(--cream);
   background-image:
     linear-gradient(
       rgba(0, 120, 191, 0.05) var(--blueprint-grid-line),
@@ -1347,8 +1491,8 @@
    * Die-cut holes via SVG mask (scales with element size).
    * ViewBox is 300×300; holes are centered at (30,30) and (270,30) with r=8 (16px dia).
    */
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Crect x='0' y='0' width='300' height='300' rx='4' ry='4' fill='white'/%3E%3Ccircle cx='30' cy='30' r='8' fill='black'/%3E%3Ccircle cx='270' cy='30' r='8' fill='black'/%3E%3C/svg%3E");
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Crect x='0' y='0' width='300' height='300' rx='4' ry='4' fill='white'/%3E%3Ccircle cx='30' cy='30' r='8' fill='black'/%3E%3Ccircle cx='270' cy='30' r='8' fill='black'/%3E%3C/svg%3E");
+  -webkit-mask-image: var(--blueprint-mask-image);
+  mask-image: var(--blueprint-mask-image);
   -webkit-mask-mode: luminance;
   mask-mode: luminance;
   -webkit-mask-repeat: no-repeat;
@@ -1361,8 +1505,8 @@
 .blueprint-hole-depth {
   position: absolute;
   z-index: 8;
-  width: 16px;
-  height: 16px;
+  width: var(--blueprint-hole-diameter-px, 16px);
+  height: var(--blueprint-hole-diameter-px, 16px);
   border-radius: 50%;
   pointer-events: none;
   /* Inset only — outer 1px highlight read as a rim/border at the paper hole */
@@ -1370,14 +1514,15 @@
 }
 
 .blueprint-hole-depth--tl {
-  top: 30px;
-  left: 30px;
+  /* Half a lattice step from card TL — matches cork hole phase (same as 10% on 5-wide card). */
+  top: calc(0.5 * var(--peg-grid-px));
+  left: calc(0.5 * var(--peg-grid-px));
   transform: translate(-50%, -50%);
 }
 
 .blueprint-hole-depth--tr {
-  top: 30px;
-  right: 30px;
+  top: calc(0.5 * var(--peg-grid-px));
+  right: calc(0.5 * var(--peg-grid-px));
   transform: translate(50%, -50%);
 }
 
@@ -1391,20 +1536,20 @@
 .blueprint-hook-anchor {
   position: absolute;
   z-index: 20;
-  width: 16px;
-  height: 16px;
+  width: var(--blueprint-hole-diameter-px, 16px);
+  height: var(--blueprint-hole-diameter-px, 16px);
   pointer-events: none;
 }
 
 .blueprint-hook-anchor--tl {
-  top: 30px;
-  left: 30px;
+  top: calc(0.5 * var(--peg-grid-px));
+  left: calc(0.5 * var(--peg-grid-px));
   transform: translate(-50%, -50%);
 }
 
 .blueprint-hook-anchor--tr {
-  top: 30px;
-  right: 30px;
+  top: calc(0.5 * var(--peg-grid-px));
+  right: calc(0.5 * var(--peg-grid-px));
   transform: translate(50%, -50%);
 }
 
@@ -1497,8 +1642,25 @@
     padding: 9px 10px;
   }
 
+  .peg-card__inner--blueprint .blueprint-bg {
+    /* Variant A: slightly smaller die-cut holes for narrow cards. */
+    --blueprint-hole-diameter-px: calc(var(--peg-grid-px) * 14 / 60);
+  }
+
   .peg-card__inner--blueprint .blueprint-bg::before {
     --blueprint-grid-line: 1px;
+    --blueprint-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Crect x='0' y='0' width='300' height='300' rx='4' ry='4' fill='white'/%3E%3Ccircle cx='30' cy='30' r='7' fill='black'/%3E%3Ccircle cx='270' cy='30' r='7' fill='black'/%3E%3C/svg%3E");
+  }
+}
+
+@container (max-width: 220px) {
+  .peg-card__inner--blueprint .blueprint-bg {
+    /* Variant B: smallest readable holes for very narrow cards. */
+    --blueprint-hole-diameter-px: calc(var(--peg-grid-px) * 12 / 60);
+  }
+
+  .peg-card__inner--blueprint .blueprint-bg::before {
+    --blueprint-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300'%3E%3Crect x='0' y='0' width='300' height='300' rx='4' ry='4' fill='white'/%3E%3Ccircle cx='30' cy='30' r='6' fill='black'/%3E%3Ccircle cx='270' cy='30' r='6' fill='black'/%3E%3C/svg%3E");
   }
 }
 

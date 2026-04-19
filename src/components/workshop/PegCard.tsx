@@ -103,12 +103,18 @@ export default function PegCard({
           item={item}
           dragVisual={clipboardDragVisual}
           blockParentDragHandlers={blockParentDragHandlers}
+          gridPx={grid}
         />
       </div>
     ) : item.hardware === "lcd" ? (
       <div
         className="peg-card__inner peg-card__inner--lcd"
-        style={{ width: w, height: h, position: "relative" }}
+        style={{
+          width: w,
+          height: h,
+          position: "relative",
+          ["--peg-grid-px" as string]: `${grid}px`,
+        }}
       >
         <LinkLcdCard
           item={item}
@@ -119,7 +125,12 @@ export default function PegCard({
     ) : (
       <div
         className="peg-card__inner peg-card__inner--blueprint"
-        style={{ width: w, height: h, position: "relative" }}
+        style={{
+          width: w,
+          height: h,
+          position: "relative",
+          ["--peg-grid-px" as string]: `${grid}px`,
+        }}
       >
         <DemoBlueprintCard
           item={item}
@@ -146,15 +157,26 @@ export default function PegCard({
         className={[rootClass, stack ? "peg-card--mobile-stack" : ""]
           .filter(Boolean)
           .join(" ")}
-        style={{
-          width: w,
-          height: h,
-          transform: stack
-            ? `scale(${scaleFactor})`
-            : `translate(${x}px, ${y}px) scale(${scaleFactor})`,
-          transformOrigin: "top center",
-          marginBottom: `${-h * (1 - scaleFactor)}px`,
-        }}
+        style={
+          stack
+            ? {
+                position: "relative",
+                left: "auto",
+                top: "auto",
+                width: w,
+                height: h,
+                transform: `scale(${scaleFactor})`,
+                transformOrigin: "top center",
+                marginBottom: `${-h * (1 - scaleFactor)}px`,
+              }
+            : {
+                width: w,
+                height: h,
+                transform: `translate(${x}px, ${y}px) scale(${scaleFactor})`,
+                transformOrigin: "top center",
+                marginBottom: `${-h * (1 - scaleFactor)}px`,
+              }
+        }
       >
         {cardInner}
       </div>

@@ -43,16 +43,53 @@ function sortAllQueues(
   sortDemoQueue(demoQ);
 }
 
+const MAX_ITEMS_PER_PANEL = 3;
+
+function countKind(
+  panel: WorkshopPanelItem[],
+  kind: WorkshopPanelItem["kind"]
+): number {
+  return panel.filter(item => item.kind === kind).length;
+}
+
+function canAddToPanel(
+  panel: WorkshopPanelItem[],
+  kind: Tagged["kind"]
+): boolean {
+  if (panel.length >= MAX_ITEMS_PER_PANEL) return false;
+  if (kind === "work" && countKind(panel, "work") >= 1) return false;
+  if (kind === "links" && countKind(panel, "links") >= 1) return false;
+  return true;
+}
+
+/** Lower sorts earlier in the pool (picked first). */
+function kindPriority(kind: Tagged["kind"]): number {
+  if (kind === "work") return 0;
+  if (kind === "links") return 1;
+  return 2;
+}
+
+function sortPoolByKindThenDate(pool: Tagged[]) {
+  pool.sort((a, b) => {
+    const byKind = kindPriority(a.kind) - kindPriority(b.kind);
+    if (byKind !== 0) return byKind;
+    return entryTime(b.entry) - entryTime(a.entry);
+  });
+}
+
 /**
  * Group work, links, and demos into panels of at most 3 items.
- * Per panel: next work → next link → up to 1 demo → global date backfill.
+ * Per panel: next work → next link → up to 1 demo → backfill with priority
+ * work → links → demos (newest first within each kind). At most one work and
+ * one links entry per panel; demos may fill remaining slots.
+ *
+ * @see `docs/decisions/004-workshop-panel-packing.md` (ADR-004) — normative rules and consequences.
  */
 export default function buildWorkshopPanels(
   work: CollectionEntry<"work">[],
   demos: CollectionEntry<"demos">[],
   links: CollectionEntry<"links">[]
 ): WorkshopPanel[] {
-  const MAX_ITEMS_PER_PANEL = 3;
   const workQ = [...work];
   const linkQ = [...links];
   const demoQ = [...demos];
@@ -81,13 +118,16 @@ export default function buildWorkshopPanels(
         ...linkQ.map(entry => ({ kind: "links" as const, entry })),
         ...demoQ.map(entry => ({ kind: "demos" as const, entry })),
       ];
-      pool.sort((a, b) => entryTime(b.entry) - entryTime(a.entry));
+      sortPoolByKindThenDate(pool);
       workQ.length = 0;
       linkQ.length = 0;
       demoQ.length = 0;
 
       while (panel.length < MAX_ITEMS_PER_PANEL && pool.length) {
-        panel.push(pool.shift()!);
+        const idx = pool.findIndex(item => canAddToPanel(panel, item.kind));
+        if (idx === -1) break;
+        const [picked] = pool.splice(idx, 1);
+        panel.push(picked);
       }
 
       for (const w of pool) {

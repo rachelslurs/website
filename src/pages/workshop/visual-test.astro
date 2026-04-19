@@ -4,6 +4,11 @@ import Layout from "@layouts/Layout.astro";
 import Main from "@layouts/Main.astro";
 import type { PegboardPanelDTO } from "@utils/serializeWorkshopPegboard";
 
+/**
+ * Three panels × **one card each** (clipboard, LCD, blueprint) so Playwright can
+ * snapshot each hardware in isolation. Multi-card packing is covered in Vitest
+ * (`workshopPegboardPhysics.test.ts`); add items here if we need multi-card *visual* baselines.
+ */
 const pegboardPanels: PegboardPanelDTO[] = [
   {
     items: [
@@ -55,6 +60,7 @@ const pegboardPanels: PegboardPanelDTO[] = [
   <Main
     showPageHeader={false}
     showBreadcrumbs={false}
+    fillViewportSlot
     pageTitle="Workshop Visual Test"
     pageDesc="Deterministic fixture for Playwright screenshot tests."
   >
