@@ -186,20 +186,27 @@ nav .group:hover .dust-note {
 
 /* ── POST TYPOGRAPHY ── */
 .post-date {
-  @apply font-mono;
-  font-size: var(--riso-type-sm);
-  line-height: var(--analog-baseline);
+  @apply font-mono mb-2;
+  font-size: var(--riso-type-2xs);
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--ink-muted);
-  margin-bottom: 0.4rem;
   font-weight: 700;
 }
 .post-title {
   @apply font-display;
-  @apply mt-4 text-xl sm:text-2xl md:text-3xl break-words leading-tight md:leading-[1.15];
+
+  @apply mt-2 mb-4 text-xl sm:text-2xl md:text-3xl break-words leading-tight md:leading-[1.15];
   color: var(--black);
   font-weight: 400;
+  a {
+    color: var(--black);
+    background-image: none;
+    &:hover {
+      color: var(--red);
+      @apply transition-colors focus-visible:outline-none;
+    }
+  }
 }
 .post-title-lg {
   @apply text-2xl sm:text-3xl md:text-4xl;
@@ -218,17 +225,13 @@ nav .group:hover .dust-note {
   @apply font-display;
   @apply mt-4 text-2xl sm:text-3xl md:text-4xl break-words leading-tight md:leading-[1.15];
   color: var(--black);
+  margin-top: calc(var(--baseline) / 2);
+  margin-bottom: var(--baseline);
   font-weight: 400;
 }
 /* Body copy sizing matches `.analog-prose` on PostDetails; use `--analog-baseline`
    (not `--baseline`) so cards work outside `.analog-post`. */
 .post-excerpt {
-  @apply font-body;
-  font-size: 1rem;
-  line-height: var(--analog-baseline);
-  color: var(--ink-secondary);
-  margin-top: 0.5rem;
-  flex: 1;
 }
 
 /* Posts index (/posts): title → date → snippet rhythm; homepage cards keep base .post-* */
@@ -340,13 +343,11 @@ nav .group:hover .dust-note {
 .card-link {
   @apply font-mono;
   font-size: var(--riso-type-md);
-  margin-top: 0;
   color: var(--blue);
   font-weight: bold;
   text-decoration: none;
   display: inline-block;
   padding-bottom: 2px;
-  border-bottom: 1px solid currentColor;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition:
@@ -598,7 +599,7 @@ nav .group:hover .dust-note {
   display: inline-flex;
   align-items: center;
   background-image: linear-gradient(180deg, #333 0%, #1a1a1a 40%, #000 100%);
-  padding: 7px 10px 5px;
+  padding: 4px 10px;
   border-radius: 2px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
   text-decoration: none;
@@ -642,7 +643,6 @@ nav .group:hover .dust-note {
 .dymo-text {
   @apply font-mono;
   font-size: var(--riso-type-sm);
-  line-height: 1;
   font-weight: 700;
   text-transform: uppercase;
   color: #fff;
@@ -930,7 +930,7 @@ a.skip-to-content-board:focus {
 }
 
 .analog-post .post-header {
-  margin-bottom: calc(var(--baseline) * 2);
+  margin-bottom: var(--baseline);
 }
 
 .analog-post .post-footer {
@@ -943,7 +943,7 @@ a.skip-to-content-board:focus {
   width: 100%;
   height: 3px;
   background: var(--analog-ink);
-  margin-bottom: calc(var(--baseline) - 3px);
+  margin-bottom: calc(var(--baseline)/2);
 }
 
 .analog-post .post-header::after {
@@ -952,7 +952,7 @@ a.skip-to-content-board:focus {
   width: 100%;
   height: 1px;
   background: var(--analog-ink);
-  margin-top: calc(var(--baseline) - 1px);
+  margin-top: calc(var(--baseline)/2);
 }
 
 .analog-post .post-footer::before {
@@ -961,7 +961,7 @@ a.skip-to-content-board:focus {
   width: 100%;
   height: 1px;
   background: var(--analog-ink);
-  margin-bottom: calc(var(--baseline) - 1px);
+  margin-bottom: calc(var(--baseline)/2);
 }
 
 .analog-post .post-footer::after {
@@ -970,7 +970,7 @@ a.skip-to-content-board:focus {
   width: 100%;
   height: 3px;
   background: var(--analog-ink);
-  margin-top: calc(var(--baseline) - 3px);
+  margin-top: calc(var(--baseline)/2);
 }
 
 /* Archival stamp: date line + “Tags:” label (locked to baseline grid) */
@@ -991,7 +991,7 @@ a.skip-to-content-board:focus {
 }
 
 .analog-post .post-meta {
-  margin-bottom: 1rem;
+  margin-bottom: calc(var(--baseline)/2);
 }
 
 .analog-post .post-tags-heading {

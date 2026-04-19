@@ -639,9 +639,9 @@ export default function PostsIndexBoard({
             stagger={stagger}
             tapeClass={tapeClass}
           >
-            <article className="card flex flex-col">
+            <article className="card flex flex-col prose prose-analog max-w-none min-w-0 prose-h2:mt-0 prose-h2:mb-1">
               <h2
-                className="post-title m-0 mb-1 font-display font-medium"
+                className="post-title m-0 mb-1"
                 style={{ viewTransitionName: post.slug }}
               >
                 <a
@@ -655,11 +655,7 @@ export default function PostsIndexBoard({
               <time className="post-date" dateTime={post.dateTime}>
                 {post.dateLabel}
               </time>
-              {post.desc ? (
-                <p className="post-excerpt m-0 font-['Lora',_Georgia,_serif] leading-relaxed">
-                  {post.desc}
-                </p>
-              ) : null}
+              {post.desc ? <p className="post-excerpt">{post.desc}</p> : null}
 
               <div className="mt-auto flex items-center justify-between pt-4">
                 <DymoLabel
