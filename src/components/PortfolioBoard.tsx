@@ -402,27 +402,22 @@ export default function PortfolioBoard({
                 wrapperClassName={i === 0 ? "col-span-2 max-sm:col-span-1" : ""}
                 stagger={i}
               >
-                <article className="card h-full flex flex-col">
+                <article className="card h-full flex flex-col prose prose-analog max-w-none min-w-0 prose-h3:mt-0 prose-h3:mb-1">
                   <time className="post-date" dateTime={post.dateTime}>
                     {post.dateLabel}
                   </time>
                   <h3
-                    className={`post-title font-display font-medium ${i === 0 ? "post-title-lg" : ""}`}
+                    className={`post-title ${i === 0 ? "post-title-lg" : ""}`}
                     style={{ viewTransitionName: post.slug }}
                   >
-                    <a
-                      href={post.href}
-                      className="hover:text-[var(--red)] transition-colors focus-visible:outline-none"
-                    >
+                    <a href={post.href} className="">
                       {post.title}
                     </a>
                   </h3>
                   {post.desc ? (
-                    <p className="post-excerpt font-['Lora',_Georgia,_serif] leading-relaxed">
-                      {post.desc}
-                    </p>
+                    <p className="post-excerpt">{post.desc}</p>
                   ) : null}
-                  <div className="mt-auto flex items-end justify-between pt-4">
+                  <div className="mt-auto flex items-center justify-between">
                     <DymoLabel
                       text={post.tag}
                       size="section"
@@ -466,10 +461,10 @@ export default function PortfolioBoard({
                 }
                 stagger={i}
               >
-                <article className="card h-full flex flex-col">
+                <article className="card h-full flex flex-col prose prose-analog max-w-none min-w-0 prose-h3:mt-0">
                   <div className="flex flex-1 flex-col mb-4">
                     <div className="work-label">{w.label}</div>
-                    <h3 className="work-name m-0">
+                    <h3 className="work-name">
                       <a
                         href={w.href}
                         className="hover:text-[var(--red)] transition-colors focus-visible:outline-none"
@@ -477,7 +472,7 @@ export default function PortfolioBoard({
                         {w.name}
                       </a>
                     </h3>
-                    <p className="work-desc !flex-none mt-1.5 mb-0 leading-relaxed">
+                    <p className="work-desc !flex-none mt-1.5 mb-[var(--baseline)]">
                       {w.desc}
                     </p>
                   </div>
@@ -514,9 +509,9 @@ export default function PortfolioBoard({
                 className="demo-item"
                 stagger={i}
               >
-                <article className="card h-full card-demo flex min-h-[130px] flex-col items-center text-center">
+                <article className="card h-full card-demo flex min-h-[130px] flex-col items-center text-center prose prose-analog max-w-none min-w-0 prose-h3:mt-0">
                   <div className="flex flex-1 w-full flex-col items-center pt-0 pb-3">
-                    <h3 className="demo-title m-0">
+                    <h3 className="demo-title">
                       <a
                         href={d.href}
                         className="hover:text-[var(--yellow)] transition-colors focus-visible:outline-none"
@@ -524,7 +519,7 @@ export default function PortfolioBoard({
                         {d.title}
                       </a>
                     </h3>
-                    <p className="demo-sub mt-auto pt-3 mb-0 leading-tight">
+                    <p className="demo-sub mt-auto pt-3 mb-[var(--baseline)]">
                       {d.sub}
                     </p>
                   </div>

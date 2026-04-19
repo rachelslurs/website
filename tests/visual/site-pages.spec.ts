@@ -54,7 +54,30 @@ test.describe("Site pages — viewport shell chrome (Phase 6a)", () => {
       await expectShellInViewport(page);
       await expect(page.getByRole("contentinfo")).toBeAttached();
 
-      await expect(page).toHaveScreenshot(`homepage--w${width}.png`, {
+      const mask = [
+        page.locator('h1, h2, h3, p, time, .work-label, .demo-sub, .skill-tag')
+      ];
+
+      await expect(page.locator('.zone-hero')).toHaveScreenshot(`homepage-hero--w${width}.png`, {
+        mask,
+        animations: "disabled",
+        timeout: 15_000,
+      });
+
+      await expect(page.locator('#posts + section')).toHaveScreenshot(`homepage-posts--w${width}.png`, {
+        mask,
+        animations: "disabled",
+        timeout: 15_000,
+      });
+
+      await expect(page.locator('#work + section')).toHaveScreenshot(`homepage-work--w${width}.png`, {
+        mask,
+        animations: "disabled",
+        timeout: 15_000,
+      });
+
+      await expect(page.locator('#demos + section')).toHaveScreenshot(`homepage-demos--w${width}.png`, {
+        mask,
         animations: "disabled",
         timeout: 15_000,
       });

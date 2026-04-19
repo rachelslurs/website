@@ -36,8 +36,6 @@ module.exports = {
       fontWeight: "600",
       fontSize: "var(--riso-type-h2)",
       lineHeight: "var(--baseline)",
-      marginTop: "1.75em",
-      marginBottom: "0.375rem",
       color: "var(--analog-ink)",
     },
     h3: {
@@ -45,8 +43,6 @@ module.exports = {
       fontWeight: "600",
       fontSize: "var(--riso-type-h3)",
       lineHeight: "var(--baseline)",
-      marginTop: "1.75em",
-      marginBottom: "0.375rem",
       color: "var(--analog-ink)",
     },
     h4: {
