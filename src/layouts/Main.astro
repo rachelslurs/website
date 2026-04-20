@@ -35,14 +35,17 @@ const showPageHeader = props.showPageHeader !== false;
 const fillViewportSlot = props.fillViewportSlot === true;
 ---
 
-<RisoBoardShell fillViewportChain={fillViewportSlot}>
+<RisoBoardShell
+  fillViewportChain={fillViewportSlot}
+  immersivePegStage={fillViewportSlot}
+>
   {showBreadcrumbs && <Breadcrumbs />}
   <main
     id="main-content"
     class:list={[
       "board-slot app-layout max-w-none",
       !fillViewportSlot &&
-        "prose prose-analog prose-img:rounded prose-img:bg-skin-fill",
+        "prose prose-analog max-sm:prose-sm prose-img:rounded prose-img:bg-skin-fill",
       fillViewportSlot && "workshop-viewport-slot flex min-h-0 flex-1 flex-col",
     ]}
   >

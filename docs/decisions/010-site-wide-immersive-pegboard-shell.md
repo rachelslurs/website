@@ -122,5 +122,5 @@ Engineering and design work should align to the following **normative** rules:
 ## Follow-ups
 
 - [x] Team review: **Accepted** (2026-04-20).
-- [ ] Write **ADR-011** (or amend ADR-008) — peg field vs reading column vs decorative bounds.
+- [x] Write **ADR-011** (or amend ADR-008) — peg field vs reading column vs decorative bounds ([ADR-011](011-immersive-shell-dom-contract.md), workshop URL scene: [ADR-012](012-workshop-url-scene-pagination.md)).
 - [x] Linked from [responsive plan Phase 8](../../.cursor/plans/responsive_pegcards_sizing_085cd05b.plan.md#phase-8-site-wide-immersive-pegboard-adr-010) (shell / routing work).
