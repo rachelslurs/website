@@ -137,6 +137,9 @@ todos:
   - id: phase8-pilot-viewport-shell
     content: "Phase 8: Vertical slice — viewport-wide peg stage + item-layer transition on one pilot route; preserve ADR-003 where framed"
     status: pending
+  - id: phase8-visual-regression-redo
+    content: "Phase 8: Visual regression baseline redo — expect broad refresh of site-pages + site-chrome + workshop-pegboard PNGs after shell stabilizes (intentional update + human diff review per visual-regression-docker.mdc)"
+    status: pending
 isProject: false
 ---
 
@@ -162,7 +165,7 @@ This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task
 5. **Phase 5 — Workshop panel packing (done):** **[ADR-004](../../docs/decisions/004-workshop-panel-packing.md)** — which CMS entries share a horizontal panel is decided in **`buildWorkshopPanels`** (not viewport CSS): max **3** items; **≤1 work** and **≤1 links** per panel; **demos** fill remaining slots; backfill sorts **work → links → demos**, then **newest first** within a kind; **non-progress** leaves a **partial panel** when the pool cannot add without breaking caps. **Verify:** `npm test` (Vitest), `npm run check`.
 6. **Phase 6 — Site shell vertical budget (done):** **6a** — [`tests/visual/site-pages.spec.ts`](../../tests/visual/site-pages.spec.ts) + `npm run test:visual:site-pages:*:docker`. **6b** — shell tokens in [`tailwind.config.cjs`](../../tailwind.config.cjs) + [`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro) / [`RisoNav.tsx`](../../src/components/RisoNav.tsx) / [`Footer.astro`](../../src/components/Footer.astro). **6c** — `npm run check` + `test:visual:update:docker` + `test:visual:docker` per [`visual-regression-docker.mdc`](../rules/visual-regression-docker.mdc); baselines committed.
 7. **Phase 7 — Reading typography ([ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)) — ON HOLD:** **7a–7c complete** (inventory, theme variant, core layout wiring). **7d–7e deferred** (responsive density + Docker verify) until **Phase 8** immersive shell and container contract stabilize — avoids redoing typography and `site-pages` VR when `RisoBoardShell` / reading columns may still move. **Does not** relax ADR-003 (**no `prose` on workshop `#main-content`**). See Phase 7 heading.
-8. **Phase 8 — Site-wide immersive pegboard ([ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)):** **Active track** ahead of Phase 7 resumption. Normative: persistent viewport-wide **peg stage**, **URL→durable scene**, **item-layer** route transitions, **reading measure** inside full width per ADR-009. **Depends on:** ADR-011 (or ADR-008 amendment) for bounds that supersede the old “everything inside inner `board` only” story where it conflicts; optional split into a dedicated plan if Phase 8 scope grows. **Resume Phase 7d–7e after** a vertical slice of Phase 8 (or ADR-011) lands so prose density aligns to final containers.
+8. **Phase 8 — Site-wide immersive pegboard ([ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)):** **Active track** ahead of Phase 7 resumption. Normative: persistent viewport-wide **peg stage**, **URL→durable scene**, **item-layer** route transitions, **reading measure** inside full width per ADR-009. **Depends on:** ADR-011 (or ADR-008 amendment) for bounds that supersede the old “everything inside inner `board` only” story where it conflicts; optional split into a dedicated plan if Phase 8 scope grows. **Resume Phase 7d–7e after** a vertical slice of Phase 8 (or ADR-011) lands so prose density aligns to final containers. **Visual regression:** plan for a **broad baseline redo** (`site-pages`, `site-chrome`, `workshop-pegboard`) when the shell stabilizes — see Phase 8 **Order of operations** step 4 below and todo **`phase8-visual-regression-redo`**.
 
 ## Phase 4: Workshop frame chrome (initial viewport)
 
@@ -972,7 +975,7 @@ flowchart TB
 1. **ADR-011** (or amend **ADR-008**) — single written DOM contract for peg field, reading column, tape/grain (ADR-010 Consequences).
 2. **URL → scene** doc or ADR — stable paths/queries, defaults, redirects, SSR + client hydration agreement.
 3. **Vertical slice** — one pilot route: remove outer max-width constraint for the peg field, persistent stage chrome, one item-layer transition pattern; **ADR-003** still applies anywhere the TV frame exists.
-4. **VR + manual** — `site-pages`, `workshop-pegboard`, `site-chrome` per [visual-regression-docker.mdc](../rules/visual-regression-docker.mdc).
+4. **VR + manual** — `site-pages`, `workshop-pegboard`, `site-chrome` per [visual-regression-docker.mdc](../rules/visual-regression-docker.mdc). **Expect a baseline redo:** Phase 8 changes outer layout and chrome enough that most or all committed screenshots in those suites will need an **intentional refresh** (Docker update workflow + **review every diff**). Do not treat VR as small pixel nudges—plan time for a full pass after the immersive shell lands (see YAML todo **`phase8-visual-regression-redo`**).
 
 **Remove this plan?** **No.** It remains the **canonical history and checklist** for workshop responsive work. Phase 8 **extends** it. If Phase 8 grows large (many routes, new layout package), you may **extract** a second plan file and leave a one-paragraph pointer here — optional, not required yet.
 
