@@ -79,9 +79,9 @@ npm run test:visual:update
 
 ## Architecture decisions
 
-Design rationale for larger choices lives in **Architecture Decision Records** under [`docs/decisions/`](docs/decisions/) (for example [ADR-001: Workshop mobile pegboard layout contract](docs/decisions/001-workshop-mobile-pegboard-contract.md), [ADR-002: Visual regression CI favors speed over native build toolchain](docs/decisions/002-visual-regression-ci-speed-vs-native-builds.md), [ADR-003: Workshop frame chrome in the initial viewport](docs/decisions/003-workshop-frame-chrome-initial-viewport.md), [ADR-004: Workshop panel packing](docs/decisions/004-workshop-panel-packing.md), and [ADR-009: Reading typography, prose boundaries, and theme vs CSS](docs/decisions/009-reading-typography-prose-and-theme.md)).
+Design rationale for larger choices lives in **Architecture Decision Records** under [`docs/decisions/`](docs/decisions/) (for example [ADR-001: Workshop mobile pegboard layout contract](docs/decisions/001-workshop-mobile-pegboard-contract.md), [ADR-002: Visual regression CI favors speed over native build toolchain](docs/decisions/002-visual-regression-ci-speed-vs-native-builds.md), [ADR-003: Workshop frame chrome in the initial viewport](docs/decisions/003-workshop-frame-chrome-initial-viewport.md), [ADR-004: Workshop panel packing](docs/decisions/004-workshop-panel-packing.md), [ADR-009: Reading typography, prose boundaries, and theme vs CSS](docs/decisions/009-reading-typography-prose-and-theme.md), and [ADR-010: Site-wide immersive pegboard shell](docs/decisions/010-site-wide-immersive-pegboard-shell.md)).
 
-**Workshop roadmap (phases + YAML todos):** [`.cursor/plans/responsive_pegcards_sizing_085cd05b.plan.md`](.cursor/plans/responsive_pegcards_sizing_085cd05b.plan.md) — pegboard responsive work, ADR-003/004 alignment, Phase 6 site shell / `site-pages` visuals, and Phase 7 reading typography (see ADR-009).
+**Workshop roadmap (phases + YAML todos):** [`.cursor/plans/responsive_pegcards_sizing_085cd05b.plan.md`](.cursor/plans/responsive_pegcards_sizing_085cd05b.plan.md) — pegboard responsive work, ADR-003/004 alignment, Phase 6 site shell / `site-pages` visuals; **Phase 7** reading typography (ADR-009) **on hold** after 7a–7c (defer 7d–7e until shell stabilizes); **Phase 8** site-wide immersive shell (ADR-010) **active** ahead of resuming Phase 7.
 
 Projects
 
