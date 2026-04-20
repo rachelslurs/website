@@ -977,6 +977,191 @@ flowchart TB
 3. **Vertical slice** — one pilot route: remove outer max-width constraint for the peg field, persistent stage chrome, one item-layer transition pattern; **ADR-003** still applies anywhere the TV frame exists.
 4. **VR + manual** — `site-pages`, `workshop-pegboard`, `site-chrome` per [visual-regression-docker.mdc](../rules/visual-regression-docker.mdc). **Expect a baseline redo:** Phase 8 changes outer layout and chrome enough that most or all committed screenshots in those suites will need an **intentional refresh** (Docker update workflow + **review every diff**). Do not treat VR as small pixel nudges—plan time for a full pass after the immersive shell lands (see YAML todo **`phase8-visual-regression-redo`**).
 
+### Phase 8 — Task breakdown ([`planning-and-task-breakdown`](../skills/planning-and-task-breakdown/SKILL.md))
+
+**Overview:** Ship **[ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)** in **vertical slices**: written contracts first → **one pilot surface** proves viewport-wide peg stage + URL→scene + item-layer motion without breaking **ADR-003** / **ADR-001** → **baseline redo** → then widen route coverage in later waves (not all in the first PR).
+
+**Dependency graph (implementation order):**
+
+```text
+ADR-011 (DOM bounds: peg field / reading / tape-grain)
+        │
+        ├── URL→scene spec (workshop + pilot defaults)
+        │
+        ├── RisoBoardShell / Main — new wrapper split (peg-stage vs content slot)
+        │         │
+        │         └── Pilot route only (e.g. workshop OR home per MVP)
+        │                   │
+        │                   ├── URL read/write ↔ scene state (SSR + client)
+        │                   └── Item-layer transition (respect prefers-reduced-motion)
+        │
+        └── VR baseline redo (site-pages + site-chrome + workshop-pegboard)
+                  │
+                  └── Phase 7d–7e resume (typography density + verify)
+```
+
+**Pilot pick (choose one before 8.3):** [ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md) **MVP scope** suggests **workshop or home** — record the choice in Task 8.2 so URL work and shell props stay scoped.
+
+---
+
+#### Task 8.1 — ADR-011: Shell DOM contract (supersede / amend ADR-008)
+
+**Description:** Write **`docs/decisions/011-…md`** (number may shift if another ADR lands first) that defines **three boundaries** in implementable terms: (a) **peg field** extent (viewport-wide vs inset), (b) **reading measure** column / `prose` root placement vs ADR-009, (c) **tape / grain / blobs** — which nodes clip them and how that differs from today’s inner `board` rule in [ADR-008](../../docs/decisions/008-riso-board-inner-content-bounds.md). Include **nav + footer z-order** vs peg layer (ADR-010 open questions).
+
+**Acceptance criteria:**
+- [ ] ADR exists with **Status: Accepted** (or **Proposed** with explicit “implement against this draft” if you iterate).
+- [ ] **Supersedes or amends** ADR-008 in plain language (no silent conflict).
+- [ ] **ADR-003** and **ADR-001** referenced where workshop portal height / scroll still apply.
+
+**Verification:** Peer read + grep `ADR-008` / `board-page-outer` in repo; confirm new ADR linked from ADR-010 follow-ups.
+
+**Dependencies:** None (uses ADR-010 only).
+
+**Files likely touched:** `docs/decisions/011-*.md` (new), small cross-link edits to `008`, `010`.
+
+**Estimated scope:** Small.
+
+---
+
+#### Task 8.2 — URL → durable scene (spec or ADR)
+
+**Description:** Document **stable** URL shapes for the pilot: path segments and/or query keys, **default** when omitted, **redirect** policy for renamed slugs, and **SSR vs client** ownership (first paint must match hydration). Workshop stack/panel state is the likely first consumer per ADR-010 MVP.
+
+**Acceptance criteria:**
+- [ ] One markdown ADR or spec under `docs/decisions/` (or `docs/` if you prefer non-ADR) with examples (`/workshop/...`, query patterns).
+- [ ] Explicit **“out of scope for v1”** for ephemeral UI in the URL.
+- [ ] **Link rot** mitigation named (redirects or compatibility shims).
+
+**Verification:** Walk through 3 URLs on paper: cold load, refresh, share link — state story is unambiguous.
+
+**Dependencies:** Task **8.1** (DOM contract informs whether scene is global vs route-local).
+
+**Files likely touched:** `docs/decisions/*.md`, optionally `README.md` Architecture pointer.
+
+**Estimated scope:** Small–medium.
+
+---
+
+#### Task 8.3 — Shell implementation: peg stage + content slot (pilot only)
+
+**Description:** Implement ADR-011 in [`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro) / [`Main.astro`](../../src/layouts/Main.astro) (and related CSS in [`riso.css`](../../src/styles/riso.css) / Tailwind) for the **pilot route only** first: outer **`board-page-outer` max-width** removed or relocated per contract; **viewport-wide peg background** (or shared stage) lives in the new outer layer; **reading** stays on an inner measured column per **ADR-009**. Preserve **`fillViewportChain`** / **`h-svh` / `min-h-0`** semantics for workshop (**ADR-003**). Revisit [`transition:persist="riso-board-decoration"`](../../src/components/RisoBoardShell.astro) if full-site persistence conflicts with in-page navigation (existing inline comment).
+
+**Acceptance criteria:**
+- [ ] Pilot route: peg field reads **full-bleed** (or per ADR-011) at **1280px+** without shrinking the “wall” to 1200px.
+- [ ] Workshop (if in pilot): **bottom frame nav** still **ADR-003**-compliant at 320 / 375 / 768 / 1024 / 1280 (no document scroll to reach arrows on first paint).
+- [ ] Non-pilot routes: **unchanged** OR explicitly behind a flag (document the choice).
+
+**Verification:** `npm run check`; manual pilot breakpoints; if workshop in pilot: `npm run test:visual` for `workshop-pegboard` (may still fail until Task 8.6 — note expected state).
+
+**Dependencies:** Tasks **8.1**, **8.2** (contract + URL story stable enough to wire slots).
+
+**Files likely touched:** `RisoBoardShell.astro`, `Main.astro`, `tailwind.config.cjs`, `src/styles/riso.css`, pilot page/layout entry.
+
+**Estimated scope:** Medium (keep pilot-only; avoid “every layout” in one task).
+
+---
+
+#### Task 8.4 — Pilot: URL drives durable scene (SSR + client)
+
+**Description:** For the pilot surface, derive **scene state** from the URL on the server and rehydrate the same on the client; internal navigation updates URL and state together. No drift between refresh and client transition.
+
+**Acceptance criteria:**
+- [ ] Hard refresh and **copy-paste URL** reproduce the same visible scene for the pilot.
+- [ ] Invalid / legacy URLs resolve to a defined default or **301/302** per Task 8.2.
+
+**Verification:** `npm run check`; manual: refresh mid-scene; Playwright smoke optional (add if cheap).
+
+**Dependencies:** Tasks **8.2**, **8.3**.
+
+**Files likely touched:** [`workshop/[...page].astro`](../../src/pages/workshop/[...page].astro) and/or [`WorkshopPegboard.tsx`](../../src/components/workshop/WorkshopPegboard.tsx) (or home pilot components).
+
+**Estimated scope:** Medium.
+
+---
+
+#### Task 8.5 — Pilot: item-layer route transition
+
+**Description:** One transition pattern when the **durable scene** changes (View Transitions API, layout animation, or Framer Motion) on **item/content subtree** keyed by URL — peg stage chrome stays stable. **`prefers-reduced-motion`:** instant swap or minimal cross-fade per ADR-010 Consequences.
+
+**Acceptance criteria:**
+- [ ] Transition visible on pilot navigation between two scenes (record which pair in PR).
+- [ ] Reduced-motion path does not lock scroll or hide focus.
+
+**Verification:** Manual two URLs + system “reduce motion”; `npm run check`.
+
+**Dependencies:** Task **8.4**.
+
+**Files likely touched:** Pilot layout, optional global CSS, small Astro `ViewTransitions` config if used.
+
+**Estimated scope:** Small–medium.
+
+---
+
+#### Task 8.6 — Visual regression baseline redo + ADR-003 guards
+
+**Description:** After shell + pilot stabilize, run **Docker** visual update per [visual-regression-docker.mdc](../rules/visual-regression-docker.mdc); **commit** new PNGs for **`site-pages`**, **`site-chrome`**, **`workshop-pegboard`**. Review **every** diff. Confirm ADR-003 Playwright assertions still pass.
+
+**Acceptance criteria:**
+- [ ] `npm run test:visual:docker` (or project-standard equivalent) **green** with committed baselines.
+- [ ] ADR-003 **viewport** checks still pass where workshop is in scope.
+- [ ] YAML todo **`phase8-visual-regression-redo`** marked **completed**.
+
+**Verification:** CI / local Docker per rule; screenshot diff review logged in PR.
+
+**Dependencies:** Tasks **8.3**–**8.5** (or **8.3** alone if 8.4–8.5 deferred — then partial baseline; prefer one batch).
+
+**Files likely touched:** `tests/visual/__screenshots__/**/*.png`, possible `*.spec.ts` expectation tweaks.
+
+**Estimated scope:** Medium (time-heavy, few source files).
+
+---
+
+#### Task 8.7 — Rollout wave 2+ (deferred sub-plan)
+
+**Description:** Apply the pilot shell + URL + transition pattern to **remaining routes**; split by **layout family** (indexes, details, 404, legal) so each PR stays reviewable. Update ADR-011 **Consequences** if new edge cases appear.
+
+**Acceptance criteria:** Per-wave checklist (define when starting wave 2); do not fold entire site into Task 8.3.
+
+**Verification:** Per-wave `npm run check` + targeted VR.
+
+**Dependencies:** Tasks **8.1**–**8.6** complete for pilot.
+
+**Files likely touched:** Many layouts under `src/layouts`, `src/pages`.
+
+**Estimated scope:** **Large** — must be **split into multiple PRs** (this task is the umbrella only).
+
+---
+
+### Checkpoint: After Tasks 8.1–8.2 (docs only)
+
+- [ ] ADR-011 + URL/scene doc are readable by someone who did not write them.
+- [ ] No open contradiction with ADR-009 / ADR-003 / ADR-001.
+
+### Checkpoint: After Task 8.3 (pilot shell)
+
+- [ ] Pilot full-bleed reads correct; workshop ADR-003 still holds if workshop is pilot.
+- [ ] `npm run check` clean.
+
+### Checkpoint: After Tasks 8.4–8.6 (pilot complete)
+
+- [ ] URL ↔ scene verified; transition OK + reduced-motion OK.
+- [ ] Visual suites green; baselines refreshed intentionally.
+
+### Risks and mitigations (Phase 8)
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| ADR-011 vague → implementation thrash | High | Lock three boundaries + z-index; review before code. |
+| `transition:persist` + new shell fights navigation | Med | Re-test every major route class; document in ADR-011 if persist scope changes. |
+| VR noise hides real regressions | High | Review diffs in small batches; keep ADR-003 locator tests strict. |
+| Phase 7 typography run mid-shell | Med | Keep Phase 7 on hold until Checkpoint “8.4–8.6” done (existing plan note). |
+
+### Parallelization
+
+- **Sequential:** 8.1 → 8.2 → 8.3 (strong order).
+- **After 8.4 lands:** 8.5 can pair with prep for 8.6 (different files) with care — same pilot route, coordinate.
+- **Parallel safe:** Draft ADR-011 sections while prototyping DOM in a spike branch **if** spikes are throwaway or merged behind pilot flag.
+
 **Remove this plan?** **No.** It remains the **canonical history and checklist** for workshop responsive work. Phase 8 **extends** it. If Phase 8 grows large (many routes, new layout package), you may **extract** a second plan file and leave a one-paragraph pointer here — optional, not required yet.
 
 ## Recent baseline changes (already done)
