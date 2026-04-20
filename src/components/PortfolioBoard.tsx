@@ -402,7 +402,7 @@ export default function PortfolioBoard({
                 wrapperClassName={i === 0 ? "col-span-2 max-sm:col-span-1" : ""}
                 stagger={i}
               >
-                <article className="card h-full flex flex-col prose prose-analog max-w-none min-w-0 prose-h3:mt-0 prose-h3:mb-1">
+                <article className="card h-full flex flex-col prose">
                   <time className="post-date" dateTime={post.dateTime}>
                     {post.dateLabel}
                   </time>
@@ -461,7 +461,7 @@ export default function PortfolioBoard({
                 }
                 stagger={i}
               >
-                <article className="card h-full flex flex-col prose prose-analog max-w-none min-w-0 prose-h3:mt-0">
+                <article className="card h-full flex flex-col prose">
                   <div className="flex flex-1 flex-col mb-4">
                     <div className="work-label">{w.label}</div>
                     <h3 className="work-name">
@@ -509,7 +509,7 @@ export default function PortfolioBoard({
                 className="demo-item"
                 stagger={i}
               >
-                <article className="card h-full card-demo flex min-h-[130px] flex-col items-center text-center prose prose-analog max-w-none min-w-0 prose-h3:mt-0">
+                <article className="card h-full card-demo flex min-h-[130px] flex-col items-center text-center prose">
                   <div className="flex flex-1 w-full flex-col items-center pt-0 pb-3">
                     <h3 className="demo-title">
                       <a

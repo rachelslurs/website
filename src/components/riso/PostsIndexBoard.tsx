@@ -616,16 +616,12 @@ export default function PostsIndexBoard({
             stagger={stagger}
             tapeClass={tapeClass}
           >
-            <article className="card flex flex-col prose prose-analog max-w-none min-w-0 prose-h2:mt-0 prose-h2:mb-1">
+            <article className="card flex flex-col prose">
               <h2
                 className="post-title m-0 mb-1"
                 style={{ viewTransitionName: post.slug }}
               >
-                <a
-                  href={post.href}
-                  title={post.title}
-                  className="hover:text-[var(--red)] transition-colors focus-visible:outline-none"
-                >
+                <a href={post.href} title={post.title}>
                   {post.title}
                 </a>
               </h2>
