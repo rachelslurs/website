@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Accepted (amended by [ADR-011](011-immersive-shell-dom-contract.md) for **outer** shell width on immersive pilot routes only)
 
 ## Date
 

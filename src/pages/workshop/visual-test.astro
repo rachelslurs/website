@@ -64,7 +64,7 @@ const pegboardPanels: PegboardPanelDTO[] = [
     pageTitle="Workshop Visual Test"
     pageDesc="Deterministic fixture for Playwright screenshot tests."
   >
-    <div class="workshop-page-stack">
+    <div transition:name="workshop-pegboard-stage" class="workshop-page-stack">
       <WorkshopPegboard client:only="react" panels={pegboardPanels} />
     </div>
   </Main>
