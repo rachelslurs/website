@@ -48,6 +48,10 @@ The **normative layout box** is the inner column that already wraps `RisoNav`, t
 - **New decoration:** Prefer children of that column (or its existing `overflow-hidden` overlay) so bounds stay obvious in the tree.
 - **Visual regression:** Site-level captures that include this shell (for example `tests/visual/site-pages.spec.ts` **work-design-pro** viewports) should remain consistent with **no tape or sheet edge chrome** crossing outside that padded board frame.
 
+## See also
+
+- [ADR-010: Site-wide immersive pegboard shell](010-site-wide-immersive-pegboard-shell.md) (**Accepted**) — Expect **ADR-011** (or an amendment here) that redefines where the **peg field**, **reading column**, and **tape/grain** may extend (viewport-wide peg vs inner `board` only). Until that lands, this ADR’s inner-column bound remains normative for implementation.
+
 ## Follow-ups (TODO)
 
 Current baselines still show **tape bleeding past the inner board frame** at narrow widths. After the layout/CSS fix lands, refresh Linux baselines with the repo’s Docker Playwright scripts (see `.cursor/rules/visual-regression-docker.mdc`).

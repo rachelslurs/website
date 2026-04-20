@@ -57,8 +57,8 @@ Without a written contract, agents may:
 
 ## Consequences
 
-- **Phase 7** tasks in the responsive plan should reference this ADR when updating README or closing YAML items.
-- **New typography ADRs** are unnecessary unless this decision is superseded; amend ADR-009 or add ADR-010 if the split between theme and `riso.css` changes materially.
+- **Phase 7** tasks in the responsive plan should reference this ADR when updating README or closing YAML items. **Execution status (2026-04-20):** Phase 7 is **on hold** after **7a–7c**; **7d–7e** (responsive density + Docker verify) are **deferred** until **[ADR-010](010-site-wide-immersive-pegboard-shell.md) Phase 8** shell/container work stabilizes, so typography tuning is not invalidated by moving reading containers — see the plan’s Phase 7 callout.
+- **New typography ADRs** are unnecessary unless this decision is superseded; amend ADR-009 or add a **new numbered ADR** if the split between theme and `riso.css` changes materially. (Shell/layout direction lives in [ADR-010](010-site-wide-immersive-pegboard-shell.md); it does not replace this typography contract unless explicitly revised here.)
 - **README** Architecture section should link ADR-009 alongside ADR-003 for anyone touching `prose` or workshop layout.
 
 ## References
