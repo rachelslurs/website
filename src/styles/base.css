@@ -561,3 +561,11 @@
     @apply border-skin-accent font-semibold text-skin-accent;
   }
 }
+
+/* Phase 8.5: workshop pegboard item layer — named View Transition (Layout.astro enables ViewTransitions). */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(workshop-pegboard-stage),
+  ::view-transition-new(workshop-pegboard-stage) {
+    animation-duration: 0.001ms !important;
+  }
+}

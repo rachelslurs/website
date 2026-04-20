@@ -11,9 +11,18 @@ export interface Props {
    * pegboard regions scroll internally (ADR-003). Used by workshop via Main.
    */
   fillViewportChain?: boolean;
+  /**
+   * Pilot (ADR-011 / ADR-010): drop outer `max-w-[1200px]` so the peg field can use
+   * the full viewport width; inner `board` column + ADR-008 decoration bounds unchanged.
+   */
+  immersivePegStage?: boolean;
 }
 
-const { animateNav = false, fillViewportChain = false } = Astro.props;
+const {
+  animateNav = false,
+  fillViewportChain = false,
+  immersivePegStage = false,
+} = Astro.props;
 ---
 
 <a id="skip-to-content" href="#main-content" class="skip-to-content-board">
@@ -21,13 +30,14 @@ const { animateNav = false, fillViewportChain = false } = Astro.props;
 </a>
 <div
   class:list={[
-    "board-page-outer mx-auto w-full max-w-[1200px] p-board-outer max-sm:p-board-outer-sm",
+    "board-page-outer w-full p-board-outer max-sm:p-board-outer-sm",
+    immersivePegStage ? "max-w-none" : "mx-auto max-w-[1200px]",
     /* min-h-dvh alone leaves height indefinite for flex descendants on some engines;
      * h-svh fixes the workshop pegboard column (ADR-003). */
     fillViewportChain && "flex h-svh min-h-0 flex-col",
   ]}
 >
-  <!-- ADR-008: page-owned visuals (tape, edges, etc.) must stay inside this column. -->
+  <!-- ADR-008 (+ ADR-011): page-owned visuals (tape, edges, etc.) stay inside the inner `board` column. -->
   <div
     class:list={[
       "board relative flex flex-col gap-board-slab-gap px-board-padding-x max-lg:py-board-padding-y-lg lg:pb-board-pb-lg lg:pt-board-pt-lg max-sm:gap-board-slab-gap-sm max-sm:p-board-padding-sm",
