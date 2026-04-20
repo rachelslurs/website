@@ -128,17 +128,26 @@ todos:
   - id: phase7-typography-adr
     content: "ADR-009 — reading typography + prose boundaries + theme vs riso; amend after Phase 7 implementation if split changes"
     status: completed
-  - id: phase8-adr011-shell-contract
-    content: "Phase 8: ADR-011 (or amend ADR-008) — DOM contract: peg field vs reading measure vs tape/grain per ADR-010"
+  - id: phase8-81-adr011-dom-contract
+    content: "Phase 8.1: ADR-011 (or amend ADR-008) — DOM contract peg field vs reading measure vs tape/grain + nav/footer z-order (plan Task 8.1)"
     status: pending
-  - id: phase8-url-scene-spec
-    content: "Phase 8: Document URL→durable scene mapping + SSR/client agreement (ADR or spec under docs/decisions)"
+  - id: phase8-82-url-scene-spec
+    content: "Phase 8.2: URL→durable scene doc — stable paths/queries, defaults, redirects, SSR vs client (plan Task 8.2)"
     status: pending
-  - id: phase8-pilot-viewport-shell
-    content: "Phase 8: Vertical slice — viewport-wide peg stage + item-layer transition on one pilot route; preserve ADR-003 where framed"
+  - id: phase8-83-shell-pilot
+    content: "Phase 8.3: RisoBoardShell/Main — implement ADR-011 for pilot route only; full-bleed peg stage; ADR-003 if workshop (plan Task 8.3)"
     status: pending
-  - id: phase8-visual-regression-redo
-    content: "Phase 8: Visual regression baseline redo — expect broad refresh of site-pages + site-chrome + workshop-pegboard PNGs after shell stabilizes (intentional update + human diff review per visual-regression-docker.mdc)"
+  - id: phase8-84-url-state-pilot
+    content: "Phase 8.4: Pilot URL drives scene — refresh + share link match; invalid URLs → default/redirect (plan Task 8.4)"
+    status: pending
+  - id: phase8-85-item-layer-transition
+    content: "Phase 8.5: Pilot item-layer transition — keyed subtree motion; prefers-reduced-motion path (plan Task 8.5)"
+    status: pending
+  - id: phase8-86-visual-regression-redo
+    content: "Phase 8.6: VR baseline redo — site-pages + site-chrome + workshop-pegboard Docker update; review every diff; ADR-003 green (plan Task 8.6)"
+    status: pending
+  - id: phase8-87-rollout-wave-2
+    content: "Phase 8.7: Rollout wave 2+ — remaining routes in reviewable PRs (umbrella; split per layout family) (plan Task 8.7)"
     status: pending
 isProject: false
 ---
@@ -165,7 +174,7 @@ This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task
 5. **Phase 5 — Workshop panel packing (done):** **[ADR-004](../../docs/decisions/004-workshop-panel-packing.md)** — which CMS entries share a horizontal panel is decided in **`buildWorkshopPanels`** (not viewport CSS): max **3** items; **≤1 work** and **≤1 links** per panel; **demos** fill remaining slots; backfill sorts **work → links → demos**, then **newest first** within a kind; **non-progress** leaves a **partial panel** when the pool cannot add without breaking caps. **Verify:** `npm test` (Vitest), `npm run check`.
 6. **Phase 6 — Site shell vertical budget (done):** **6a** — [`tests/visual/site-pages.spec.ts`](../../tests/visual/site-pages.spec.ts) + `npm run test:visual:site-pages:*:docker`. **6b** — shell tokens in [`tailwind.config.cjs`](../../tailwind.config.cjs) + [`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro) / [`RisoNav.tsx`](../../src/components/RisoNav.tsx) / [`Footer.astro`](../../src/components/Footer.astro). **6c** — `npm run check` + `test:visual:update:docker` + `test:visual:docker` per [`visual-regression-docker.mdc`](../rules/visual-regression-docker.mdc); baselines committed.
 7. **Phase 7 — Reading typography ([ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)) — ON HOLD:** **7a–7c complete** (inventory, theme variant, core layout wiring). **7d–7e deferred** (responsive density + Docker verify) until **Phase 8** immersive shell and container contract stabilize — avoids redoing typography and `site-pages` VR when `RisoBoardShell` / reading columns may still move. **Does not** relax ADR-003 (**no `prose` on workshop `#main-content`**). See Phase 7 heading.
-8. **Phase 8 — Site-wide immersive pegboard ([ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)):** **Active track** ahead of Phase 7 resumption. Normative: persistent viewport-wide **peg stage**, **URL→durable scene**, **item-layer** route transitions, **reading measure** inside full width per ADR-009. **Depends on:** ADR-011 (or ADR-008 amendment) for bounds that supersede the old “everything inside inner `board` only” story where it conflicts; optional split into a dedicated plan if Phase 8 scope grows. **Resume Phase 7d–7e after** a vertical slice of Phase 8 (or ADR-011) lands so prose density aligns to final containers. **Visual regression:** plan for a **broad baseline redo** (`site-pages`, `site-chrome`, `workshop-pegboard`) when the shell stabilizes — see Phase 8 **Order of operations** step 4 below and todo **`phase8-visual-regression-redo`**.
+8. **Phase 8 — Site-wide immersive pegboard ([ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)):** **Active track** ahead of Phase 7 resumption. Normative: persistent viewport-wide **peg stage**, **URL→durable scene**, **item-layer** route transitions, **reading measure** inside full width per ADR-009. **Depends on:** ADR-011 (or ADR-008 amendment) for bounds that supersede the old “everything inside inner `board` only” story where it conflicts; optional split into a dedicated plan if Phase 8 scope grows. **Resume Phase 7d–7e after** a vertical slice of Phase 8 (or ADR-011) lands so prose density aligns to final containers. **Visual regression:** plan for a **broad baseline redo** (`site-pages`, `site-chrome`, `workshop-pegboard`) when the shell stabilizes — see Phase 8 **Order of operations** step 4 below and todo **`phase8-86-visual-regression-redo`**.
 
 ## Phase 4: Workshop frame chrome (initial viewport)
 
@@ -975,9 +984,11 @@ flowchart TB
 1. **ADR-011** (or amend **ADR-008**) — single written DOM contract for peg field, reading column, tape/grain (ADR-010 Consequences).
 2. **URL → scene** doc or ADR — stable paths/queries, defaults, redirects, SSR + client hydration agreement.
 3. **Vertical slice** — one pilot route: remove outer max-width constraint for the peg field, persistent stage chrome, one item-layer transition pattern; **ADR-003** still applies anywhere the TV frame exists.
-4. **VR + manual** — `site-pages`, `workshop-pegboard`, `site-chrome` per [visual-regression-docker.mdc](../rules/visual-regression-docker.mdc). **Expect a baseline redo:** Phase 8 changes outer layout and chrome enough that most or all committed screenshots in those suites will need an **intentional refresh** (Docker update workflow + **review every diff**). Do not treat VR as small pixel nudges—plan time for a full pass after the immersive shell lands (see YAML todo **`phase8-visual-regression-redo`**).
+4. **VR + manual** — `site-pages`, `workshop-pegboard`, `site-chrome` per [visual-regression-docker.mdc](../rules/visual-regression-docker.mdc). **Expect a baseline redo:** Phase 8 changes outer layout and chrome enough that most or all committed screenshots in those suites will need an **intentional refresh** (Docker update workflow + **review every diff**). Do not treat VR as small pixel nudges—plan time for a full pass after the immersive shell lands (see YAML todo **`phase8-86-visual-regression-redo`**).
 
 ### Phase 8 — Task breakdown ([`planning-and-task-breakdown`](../skills/planning-and-task-breakdown/SKILL.md))
+
+**Cursor plan todos:** Each task below maps 1:1 to a `todos[]` entry in this file’s YAML frontmatter — ids **`phase8-81-adr011-dom-contract`** through **`phase8-87-rollout-wave-2`**. Mark **completed** in the YAML as you ship so Cursor’s plan/todo UI stays in sync.
 
 **Overview:** Ship **[ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)** in **vertical slices**: written contracts first → **one pilot surface** proves viewport-wide peg stage + URL→scene + item-layer motion without breaking **ADR-003** / **ADR-001** → **baseline redo** → then widen route coverage in later waves (not all in the first PR).
 
@@ -1006,6 +1017,8 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 
 #### Task 8.1 — ADR-011: Shell DOM contract (supersede / amend ADR-008)
 
+**Cursor todo id:** `phase8-81-adr011-dom-contract`
+
 **Description:** Write **`docs/decisions/011-…md`** (number may shift if another ADR lands first) that defines **three boundaries** in implementable terms: (a) **peg field** extent (viewport-wide vs inset), (b) **reading measure** column / `prose` root placement vs ADR-009, (c) **tape / grain / blobs** — which nodes clip them and how that differs from today’s inner `board` rule in [ADR-008](../../docs/decisions/008-riso-board-inner-content-bounds.md). Include **nav + footer z-order** vs peg layer (ADR-010 open questions).
 
 **Acceptance criteria:**
@@ -1024,6 +1037,8 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 ---
 
 #### Task 8.2 — URL → durable scene (spec or ADR)
+
+**Cursor todo id:** `phase8-82-url-scene-spec`
 
 **Description:** Document **stable** URL shapes for the pilot: path segments and/or query keys, **default** when omitted, **redirect** policy for renamed slugs, and **SSR vs client** ownership (first paint must match hydration). Workshop stack/panel state is the likely first consumer per ADR-010 MVP.
 
@@ -1044,6 +1059,8 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 
 #### Task 8.3 — Shell implementation: peg stage + content slot (pilot only)
 
+**Cursor todo id:** `phase8-83-shell-pilot`
+
 **Description:** Implement ADR-011 in [`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro) / [`Main.astro`](../../src/layouts/Main.astro) (and related CSS in [`riso.css`](../../src/styles/riso.css) / Tailwind) for the **pilot route only** first: outer **`board-page-outer` max-width** removed or relocated per contract; **viewport-wide peg background** (or shared stage) lives in the new outer layer; **reading** stays on an inner measured column per **ADR-009**. Preserve **`fillViewportChain`** / **`h-svh` / `min-h-0`** semantics for workshop (**ADR-003**). Revisit [`transition:persist="riso-board-decoration"`](../../src/components/RisoBoardShell.astro) if full-site persistence conflicts with in-page navigation (existing inline comment).
 
 **Acceptance criteria:**
@@ -1063,6 +1080,8 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 
 #### Task 8.4 — Pilot: URL drives durable scene (SSR + client)
 
+**Cursor todo id:** `phase8-84-url-state-pilot`
+
 **Description:** For the pilot surface, derive **scene state** from the URL on the server and rehydrate the same on the client; internal navigation updates URL and state together. No drift between refresh and client transition.
 
 **Acceptance criteria:**
@@ -1080,6 +1099,8 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 ---
 
 #### Task 8.5 — Pilot: item-layer route transition
+
+**Cursor todo id:** `phase8-85-item-layer-transition`
 
 **Description:** One transition pattern when the **durable scene** changes (View Transitions API, layout animation, or Framer Motion) on **item/content subtree** keyed by URL — peg stage chrome stays stable. **`prefers-reduced-motion`:** instant swap or minimal cross-fade per ADR-010 Consequences.
 
@@ -1099,12 +1120,14 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 
 #### Task 8.6 — Visual regression baseline redo + ADR-003 guards
 
+**Cursor todo id:** `phase8-86-visual-regression-redo`
+
 **Description:** After shell + pilot stabilize, run **Docker** visual update per [visual-regression-docker.mdc](../rules/visual-regression-docker.mdc); **commit** new PNGs for **`site-pages`**, **`site-chrome`**, **`workshop-pegboard`**. Review **every** diff. Confirm ADR-003 Playwright assertions still pass.
 
 **Acceptance criteria:**
 - [ ] `npm run test:visual:docker` (or project-standard equivalent) **green** with committed baselines.
 - [ ] ADR-003 **viewport** checks still pass where workshop is in scope.
-- [ ] YAML todo **`phase8-visual-regression-redo`** marked **completed**.
+- [ ] YAML todo **`phase8-86-visual-regression-redo`** marked **completed**.
 
 **Verification:** CI / local Docker per rule; screenshot diff review logged in PR.
 
@@ -1117,6 +1140,8 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 ---
 
 #### Task 8.7 — Rollout wave 2+ (deferred sub-plan)
+
+**Cursor todo id:** `phase8-87-rollout-wave-2`
 
 **Description:** Apply the pilot shell + URL + transition pattern to **remaining routes**; split by **layout family** (indexes, details, 404, legal) so each PR stays reviewable. Update ADR-011 **Consequences** if new edge cases appear.
 
