@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed
+Accepted
 
 ## Date
 
@@ -34,7 +34,7 @@ None of the above yet states a **product-level** rule for: **viewport-wide peg f
 
 ## Decision
 
-If accepted, engineering and design work should align to the following **normative** rules:
+Engineering and design work should align to the following **normative** rules:
 
 1. **Persistent pegboard stage** — Users experience **one stable pegboard “wall”** (holes, lighting, depth grammar) across routes. **Background and peg field** may extend **to the viewport**; the site should not rely on **`max-w-[1200px]`** (or equivalent) on the **outermost board shell** as the primary way to create intentionality at wide widths.
 
@@ -100,7 +100,27 @@ If accepted, engineering and design work should align to the following **normati
 - Whether **non-framed** routes use the same **portal** metaphor or a **flatter** peg layer while sharing lighting/CSS tokens.
 - How **footer and global nav** sit in the z-stack relative to the peg field at full bleed (new ADR or extension of shell ADRs).
 
+## Related ADRs — alignment guide (per [documentation-and-adrs skill](../../.cursor/skills/documentation-and-adrs/SKILL.md))
+
+**Do not delete** prior ADRs; **amend**, **supersede with a new ADR**, or add **short cross-links** only.
+
+| ADR | Topic | Typical alignment |
+|-----|--------|-------------------|
+| [001](001-workshop-mobile-pegboard-contract.md) | Mobile lattice, portal width, scroll vs drag | **Keep.** “Portal truth” still applies wherever a **TV portal** exists; if the outer site becomes full-bleed peg, ensure **portal inner box** is still the layout authority for workshop cards (may be a **clarifying amendment** to §Context only). |
+| [003](003-workshop-frame-chrome-initial-viewport.md) | Frame chrome in viewport, flex/`min-height: 0` | **Keep.** ADR-010 explicitly inherits these invariants for framed experiences. |
+| [004](004-workshop-panel-packing.md) | Which cards share a panel | **Keep** (workshop data shape, not shell width). |
+| [005](005-workshop-desktop-cork-layout-acceptance.md) | Desktop cork packing | **Keep** (geometry inside cork). Wider viewport may change **available cork area**; packing rules unchanged unless physics contract changes. |
+| [006](006-workshop-lcd-tilt-vs-peg-hook-alignment.md), [007](007-workshop-peg-card-drag-scale-transform-origin.md) | Card tilt, drag transform-origin | **Keep** (component-level). |
+| [008](008-riso-board-inner-content-bounds.md) | Inner `board` column = max extent for page chrome | **Revise or supersede** — This is the **main tension**. Write **ADR-011** (or amend 008) with a new DOM contract: **peg field** (viewport?), **reading measure** (inner column / `prose` root), **decorative tape/grain** (which box clips them). **Next step:** schedule ADR-011 (see [responsive plan Phase 8](../../.cursor/plans/responsive_pegcards_sizing_085cd05b.plan.md#phase-8-site-wide-immersive-pegboard-adr-010)). |
+| [009](009-reading-typography-prose-and-theme.md) | `prose` on reading roots, not workshop shell | **Keep**; ADR-010 Decision §4 already defers here. Optional: add one **Consequences** bullet that immersive shell + reading islands remain the pattern. |
+
+**New ADRs worth writing next (names are suggestions):**
+
+- **Shell / DOM contract** — Successor to the “bounds” story of 008: z-index of global nav/footer vs peg layer; optional `prefers-reduced-motion` for route item transitions.
+- **URL → scene** — Stable path/query conventions, defaults, SSR + client agreement, redirect policy for renamed scenes.
+
 ## Follow-ups
 
-- [ ] Team review: **Accept**, **Amend**, or **Reject** this ADR; if **Accept**, schedule ADR-008 revision.
-- [ ] Link this ADR from any active roadmap item that touches `RisoBoardShell` or workshop shell layout.
+- [x] Team review: **Accepted** (2026-04-20).
+- [ ] Write **ADR-011** (or amend ADR-008) — peg field vs reading column vs decorative bounds.
+- [x] Linked from [responsive plan Phase 8](../../.cursor/plans/responsive_pegcards_sizing_085cd05b.plan.md#phase-8-site-wide-immersive-pegboard-adr-010) (shell / routing work).

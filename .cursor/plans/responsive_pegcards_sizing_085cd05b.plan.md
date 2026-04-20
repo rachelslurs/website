@@ -1,6 +1,6 @@
 ---
 name: Workshop pegboard responsive
-overview: "Single plan: desktop scaled grid + repack (Phase 1 done). Phase 2 mobile ≤768 — frame/seam/cork snap, scroll-primary + uniform presentation + physics cleanup + visual regression + ADR-001 (done). Phase 3 blueprint-sheet-mask (done). Phase 4 — workshop frame chrome in initial viewport (ADR-003): layout + Playwright ADR-003 describe (viewport + portal-frame screenshots) done. Phase 5 — workshop panel packing (ADR-004): caps + kind-priority backfill + non-progress partial panels; Vitest `npm test`; plan item 8 + Checkpoint A4 reconciled to ADR-004 (done). Phase 6 — **complete:** **6a** site-pages spec + Docker; **6b** shell spacing tokens + tighter chrome; **6c** `npm run check` + `test:visual:update:docker` then `test:visual:docker` green (site-chrome, workshop-pegboard, site-pages) with committed Linux baselines. Phase 7 — **pending:** reading typography — **[ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)** + `@tailwindcss/typography` theme variants + layout wiring + responsive density + site-pages VR (see Phase 7 below). (Standalone `shell_spacing_token_unify_*.plan.md` merged here — do not maintain separately.)"
+overview: "Single plan: desktop scaled grid + repack (Phase 1 done). Phase 2 mobile ≤768 — frame/seam/cork snap, scroll-primary + uniform presentation + physics cleanup + visual regression + ADR-001 (done). Phase 3 blueprint-sheet-mask (done). Phase 4 — workshop frame chrome in initial viewport (ADR-003): layout + Playwright ADR-003 describe (viewport + portal-frame screenshots) done. Phase 5 — workshop panel packing (ADR-004): caps + kind-priority backfill + non-progress partial panels; Vitest `npm test`; plan item 8 + Checkpoint A4 reconciled to ADR-004 (done). Phase 6 — **complete:** **6a** site-pages spec + Docker; **6b** shell spacing tokens + tighter chrome; **6c** `npm run check` + `test:visual:update:docker` then `test:visual:docker` green (site-chrome, workshop-pegboard, site-pages) with committed Linux baselines. Phase 7 — **on hold:** reading typography **[ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)** — 7a–7c done; **7d–7e deferred** until **[ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md) Phase 8** shell/container work stabilizes (avoid typography + container churn). Phase 8 — **active track:** ADR-010 site-wide immersive pegboard (viewport stage, URL→scene, item-layer transitions); see Phase 8 heading. (Standalone `shell_spacing_token_unify_*.plan.md` merged here — do not maintain separately.)"
 todos:
   - id: css-content-box
     content: "Phase 1: Set `.pegboard-bg` to `box-sizing: content-box` (keep 8px border) in workshop-pegboard.css"
@@ -120,14 +120,23 @@ todos:
     content: "Phase 7c: Wire PostDetails/WorkDetails/SimplePage (+ posts index if needed) to prose + variant + modifiers; reduce duplicate global CSS"
     status: completed
   - id: phase7-typography-responsive-density
-    content: "Phase 7d: Responsive reading density (max-sm:prose-sm or custom compact variant) aligned with shell + html md font-size; manual long-form + code post"
+    content: "ON HOLD — Phase 7d (resume after Phase 8 shell stable): Responsive reading density (max-sm:prose-sm or custom compact variant) aligned with shell + html md font-size; manual long-form + code post. Deferred: container changes would invalidate tuning."
     status: pending
   - id: phase7-typography-verify
-    content: "Phase 7e: npm run check + test:visual:docker / update:docker for site-pages (+ site-chrome if nav chrome shifts)"
+    content: "ON HOLD — Phase 7e (resume after Phase 8 shell stable): npm run check + test:visual:docker / update:docker for site-pages (+ site-chrome if nav chrome shifts). Deferred: batch VR with post–Phase 8 baselines."
     status: pending
   - id: phase7-typography-adr
     content: "ADR-009 — reading typography + prose boundaries + theme vs riso; amend after Phase 7 implementation if split changes"
     status: completed
+  - id: phase8-adr011-shell-contract
+    content: "Phase 8: ADR-011 (or amend ADR-008) — DOM contract: peg field vs reading measure vs tape/grain per ADR-010"
+    status: pending
+  - id: phase8-url-scene-spec
+    content: "Phase 8: Document URL→durable scene mapping + SSR/client agreement (ADR or spec under docs/decisions)"
+    status: pending
+  - id: phase8-pilot-viewport-shell
+    content: "Phase 8: Vertical slice — viewport-wide peg stage + item-layer transition on one pilot route; preserve ADR-003 where framed"
+    status: pending
 isProject: false
 ---
 
@@ -137,7 +146,7 @@ isProject: false
 
 ## Planning discipline (task breakdown)
 
-This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task-breakdown/SKILL.md): **dependency order** (frame → interaction model → single presentation transform → physics cleanup → verify), **vertical slices** (each slice leaves the UI shippable), **checkpoints** after each phase, and **`npm run check` + named viewports**. **Merged:** the separate “pegboard scale rethink” narrative (design-resolution + uniform `scale` vs multi-`gridPx` reflow on mobile) now lives **only in this file** under **Phase 2 revision** below. Multi-step delivery within a phase follows [`incremental-implementation`](../skills/incremental-implementation/SKILL.md): implement → **`npm test` / `npm run check`** → verify → next slice. **Phase 7** tasks use the skill’s task shape (**Description / Acceptance criteria / Verification / Dependencies / Files**) inside the Phase 7 heading.
+This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task-breakdown/SKILL.md): **dependency order** (frame → interaction model → single presentation transform → physics cleanup → verify), **vertical slices** (each slice leaves the UI shippable), **checkpoints** after each phase, and **`npm run check` + named viewports**. **Merged:** the separate “pegboard scale rethink” narrative (design-resolution + uniform `scale` vs multi-`gridPx` reflow on mobile) now lives **only in this file** under **Phase 2 revision** below. Multi-step delivery within a phase follows [`incremental-implementation`](../skills/incremental-implementation/SKILL.md): implement → **`npm test` / `npm run check`** → verify → next slice. **Phase 7** (reading typography, ADR-009) is **on hold** after **7a–7c** — **7d–7e** deferred until **Phase 8** shell/container direction stabilizes so typography density and VR baselines are not thrown away by `RisoBoardShell` changes. **Phase 8** tracks **[ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)** (site-wide shell); it shares `RisoBoardShell`, visuals, and VR suites with Phase 7.
 
 ## Execution order (single program)
 
@@ -152,7 +161,8 @@ This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task
 4. **Phase 4 — Frame chrome in initial viewport (done):** **ADR-003** + **ADR-001 §7**. **`fillViewportSlot`** / **`h-svh`** / **no `prose` on workshop `main`** + pegboard-root column flex. **4c:** Playwright **Workshop frame chrome (ADR-003)** — `toBeInViewport` on `.workshop-panel-nav` + first `.pegboard-bg`; **`portal-frame--w*.png`** screenshots; short **375×500** smoke.
 5. **Phase 5 — Workshop panel packing (done):** **[ADR-004](../../docs/decisions/004-workshop-panel-packing.md)** — which CMS entries share a horizontal panel is decided in **`buildWorkshopPanels`** (not viewport CSS): max **3** items; **≤1 work** and **≤1 links** per panel; **demos** fill remaining slots; backfill sorts **work → links → demos**, then **newest first** within a kind; **non-progress** leaves a **partial panel** when the pool cannot add without breaking caps. **Verify:** `npm test` (Vitest), `npm run check`.
 6. **Phase 6 — Site shell vertical budget (done):** **6a** — [`tests/visual/site-pages.spec.ts`](../../tests/visual/site-pages.spec.ts) + `npm run test:visual:site-pages:*:docker`. **6b** — shell tokens in [`tailwind.config.cjs`](../../tailwind.config.cjs) + [`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro) / [`RisoNav.tsx`](../../src/components/RisoNav.tsx) / [`Footer.astro`](../../src/components/Footer.astro). **6c** — `npm run check` + `test:visual:update:docker` + `test:visual:docker` per [`visual-regression-docker.mdc`](../rules/visual-regression-docker.mdc); baselines committed.
-7. **Phase 7 — Reading typography (pending):** `@tailwindcss/typography` as the **customization surface** (named `typography` variants + `prose-*` modifiers), layouts wired consistently, optional compact density at narrow widths, Docker **site-pages** (± site-chrome) verification. **Does not** relax ADR-003 (**no `prose` on workshop `#main-content`** — workshop stays `not-prose` / peg-local styles).
+7. **Phase 7 — Reading typography ([ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)) — ON HOLD:** **7a–7c complete** (inventory, theme variant, core layout wiring). **7d–7e deferred** (responsive density + Docker verify) until **Phase 8** immersive shell and container contract stabilize — avoids redoing typography and `site-pages` VR when `RisoBoardShell` / reading columns may still move. **Does not** relax ADR-003 (**no `prose` on workshop `#main-content`**). See Phase 7 heading.
+8. **Phase 8 — Site-wide immersive pegboard ([ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)):** **Active track** ahead of Phase 7 resumption. Normative: persistent viewport-wide **peg stage**, **URL→durable scene**, **item-layer** route transitions, **reading measure** inside full width per ADR-009. **Depends on:** ADR-011 (or ADR-008 amendment) for bounds that supersede the old “everything inside inner `board` only” story where it conflicts; optional split into a dedicated plan if Phase 8 scope grows. **Resume Phase 7d–7e after** a vertical slice of Phase 8 (or ADR-011) lands so prose density aligns to final containers.
 
 ## Phase 4: Workshop frame chrome (initial viewport)
 
@@ -793,6 +803,8 @@ flowchart TB
 
 ## Phase 7: Reading typography (`@tailwindcss/typography`)
 
+> **ON HOLD (2026-04-20):** **7a–7c** are done. **7d** (responsive reading density) and **7e** (Docker visual verification) are **deferred** until **[Phase 8](#phase-8-site-wide-immersive-pegboard-adr-010)** ([ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)) shell and container work stabilizes — full-bleed peg stage and revised `RisoBoardShell` bounds would otherwise force **duplicate** typography tuning and **duplicate** `site-pages` baseline refreshes.
+
 **Normative doc:** [ADR-009: Reading typography — `@tailwindcss/typography`, `prose` boundaries, and theme vs CSS](../../docs/decisions/009-reading-typography-prose-and-theme.md) — invariants (workshop vs reading), customization surface, verification; this phase’s tasks implement and refine that ADR.
 
 **Problem:** Phase 6 addressed **shell spacing** only. Long-form typography was split across [`theme.extend.typography.DEFAULT`](../../tailwind.config.cjs), [`.entry-body`](../../src/styles/base.css) (`@apply prose …`, unused in markup), bespoke `.analog-prose` in [`riso.css`](../../src/styles/riso.css), and per-layout class stacks. **7.2** moves the reading column into [`tailwind.typography-analog.cjs`](../../tailwind.typography-analog.cjs) (`prose prose-analog`); **7.3–7.4** still need to align remaining layouts and delete stale narrative in this section.
@@ -941,9 +953,28 @@ flowchart TB
 
 ### Checkpoint: After Phase 7
 
+*Deferred while Phase 7 is on hold — run when **7d–7e** resume after Phase 8 shell stabilizes.*
+
 - [ ] One long blog post + one code-heavy post: hierarchy, links, and code blocks read clearly at 375 and 1024.
 - [ ] `site-pages` (and any touched chrome) visual suite green in Docker.
 - [ ] Workshop ADR-003 behavior unchanged (nav + first pegboard in viewport; no `prose` on workshop `main`); **[ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)** still matches implementation (or is amended).
+
+## Phase 8: Site-wide immersive pegboard (ADR-010)
+
+**Normative:** [ADR-010: Site-wide immersive pegboard — persistent stage, URL-driven scenes, full-field board](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md) (**Accepted**).
+
+**Relationship to this plan:** Phases **1–6** are the historical **workshop responsive + frame** program (complete). **Phase 7** (reading typography, ADR-009) is **on hold** after **7a–7c**; **7d–7e** resume **after** Phase 8 shell/container direction is stable. **Phase 8** is the **site shell / routing / cross-route experience** program. **Do not delete** earlier phases or ADRs; ADR-010’s matrix calls out what to **keep** vs **supersede** (notably **ADR-008** → **ADR-011**).
+
+**What to tackle from the old plan as part of Phase 8:** Nothing **mandatory** from Phases 1–6 is reopened by ADR-010 alone. **Phase 7d–7e** intentionally **not** run in parallel with early Phase 8 refactors (see Phase 7 hold callout).
+
+**Order of operations (suggested):**
+
+1. **ADR-011** (or amend **ADR-008**) — single written DOM contract for peg field, reading column, tape/grain (ADR-010 Consequences).
+2. **URL → scene** doc or ADR — stable paths/queries, defaults, redirects, SSR + client hydration agreement.
+3. **Vertical slice** — one pilot route: remove outer max-width constraint for the peg field, persistent stage chrome, one item-layer transition pattern; **ADR-003** still applies anywhere the TV frame exists.
+4. **VR + manual** — `site-pages`, `workshop-pegboard`, `site-chrome` per [visual-regression-docker.mdc](../rules/visual-regression-docker.mdc).
+
+**Remove this plan?** **No.** It remains the **canonical history and checklist** for workshop responsive work. Phase 8 **extends** it. If Phase 8 grows large (many routes, new layout package), you may **extract** a second plan file and leave a one-paragraph pointer here — optional, not required yet.
 
 ## Recent baseline changes (already done)
 - Blueprint + LCD cards were increased by **+1 grid unit** in both dimensions (with `PEG_GRID = 60`).
