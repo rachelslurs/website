@@ -32,6 +32,22 @@ function workshopPanelRemPaddingPx(): number {
   return Math.round(2 * fontPx);
 }
 
+/** Content-box size for packing — `client*` includes padding; flex children lay out in the content box. */
+function workshopScrollContentClientSize(target: HTMLElement): {
+  w: number;
+  h: number;
+} {
+  const cs = getComputedStyle(target);
+  const pl = parseFloat(cs.paddingLeft || "0") || 0;
+  const pr = parseFloat(cs.paddingRight || "0") || 0;
+  const pt = parseFloat(cs.paddingTop || "0") || 0;
+  const pb = parseFloat(cs.paddingBottom || "0") || 0;
+  return {
+    w: Math.max(0, Math.round(target.clientWidth - pl - pr)),
+    h: Math.max(0, Math.round(target.clientHeight - pt - pb)),
+  };
+}
+
 export interface WorkshopPegboardProps {
   panels: PegboardPanelDTO[];
 }
@@ -266,12 +282,12 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     const el = isMobile ? mobileScrollRef.current : scrollRef.current;
     if (!el) return;
     const apply = (target: HTMLElement) => {
-      const w = Math.round(target.clientWidth);
-      const h = Math.round(target.clientHeight);
+      const { w, h } = workshopScrollContentClientSize(target);
       setPortalLayout({
         w,
         h,
-        isMobile: w <= 768,
+        /* Breakpoint uses full strip width so padding on the desktop strip does not flip mobile mode. */
+        isMobile: Math.round(target.clientWidth) <= 768,
       });
     };
     apply(el);

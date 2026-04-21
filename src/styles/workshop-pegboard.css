@@ -5,6 +5,14 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  /* Do not clip ink (pegboard / bracket shadows) — flex defaults are visible; keep explicit. */
+  overflow: visible;
+  /*
+   * Pegboard + metal bands cast downward; the pagination row is the next flex sibling and
+   * paints on top in DOM order, which reads as a hard “clip” at the seam. Reserve space so
+   * shadows fall in the gap instead of under the footer chrome.
+   */
+  row-gap: max(4.5rem, calc(30px + 60px + 24px));
 }
 
 /*
@@ -14,11 +22,13 @@
 #main-content.workshop-viewport-slot .workshop-page-stack {
   flex: 1 1 auto;
   min-height: 0;
+  overflow: visible;
 }
 
 .workshop-page-stack > .workshop-pegboard-root {
   flex: 1 1 auto;
   min-height: 0;
+  overflow: visible;
 }
 
 .workshop-page-stack__footer {
@@ -80,6 +90,14 @@
   align-self: stretch;
   min-height: 0;
   width: 100%;
+  box-sizing: border-box;
+  /*
+   * Room for `.pegboard-bg` outer drop (15px 30px 60px) + bracket shadows inside this scrollport.
+   * Packing uses the **content** box (`WorkshopPegboard` subtracts padding from clientHeight); without
+   * that, `overflow-y: hidden` clips a board that was sized to the full `clientHeight`.
+   */
+  padding-block: max(4.5rem, calc(30px + 60px + 24px));
+  padding-inline: max(1.25rem, calc(15px + 48px + 8px));
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
