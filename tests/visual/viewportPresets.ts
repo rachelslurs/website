@@ -11,7 +11,7 @@
  * layout budgets stay representative).
  *
  * Wide desktop pairs (`1024`, `1280`) use **taller** viewports than legacy
- * “768-wide laptop” tropes: `portal-inner` height is much smaller than
+ * “768-wide laptop” tropes: workshop peg scrollport height is much smaller than
  * `window.innerHeight` (site chrome + portal frame + bezel), so short `vh`
  * snapshots collapsed cork to ~5×30px — not representative of desktop use.
  *

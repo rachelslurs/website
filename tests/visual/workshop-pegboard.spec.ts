@@ -11,10 +11,6 @@ function nameFor(width: number, slabIndex1: number) {
   return `pegboard-bg--slab${slabIndex1}--w${width}.png`;
 }
 
-function namePortalFrame(width: number) {
-  return `portal-frame--w${width}.png`;
-}
-
 function namePageWithChrome(width: number) {
   return `workshop-page-with-chrome--w${width}.png`;
 }
@@ -92,21 +88,24 @@ test.describe("Workshop pegboard alignment", () => {
 });
 
 /**
- * ADR-003: slab nav + cork stay in the first viewport without document scroll;
- * `fillViewportSlot` / `h-svh` flex chain + `.portal-frame` bounds.
+ * ADR-003: peg scrollport + cork stay in the first viewport without document scroll;
+ * `fillViewportSlot` / `h-svh` flex chain + `.workshop-pegboard-root` (scroll only; no bottom bezel).
  */
-test.describe("Workshop frame chrome (ADR-003)", () => {
+test.describe("Workshop peg viewport (ADR-003)", () => {
   for (const width of WIDTHS) {
-    test(`slab nav + first pegboard in viewport @ ${width}px`, async ({
+    test(`peg scroll + first pegboard in viewport @ ${width}px`, async ({
       page,
     }) => {
       await page.setViewportSize(typicalViewport(width));
       await page.emulateMedia({ reducedMotion: "reduce" });
       await gotoWorkshopVisualFixture(page);
 
-      const nav = page.locator(".workshop-panel-nav");
-      await expect(nav).toBeVisible();
-      await expect(nav).toBeInViewport();
+      const root = page.locator(".workshop-pegboard-root");
+      const scroll = root.locator(
+        ".workshop-scroll--desktop-strip, .workshop-scroll--mobile"
+      );
+      await expect(scroll).toBeVisible();
+      await expect(scroll).toBeInViewport();
 
       const firstBoard = page.locator(".pegboard-bg").first();
       await expect(firstBoard).toBeVisible();
@@ -114,32 +113,19 @@ test.describe("Workshop frame chrome (ADR-003)", () => {
     });
   }
 
-  for (const width of [...MOBILE_PORTAL_WIDTHS, 1024, 1280] as const) {
-    test(`portal-frame screenshot @ ${width}px`, async ({ page }) => {
-      await page.setViewportSize(typicalViewport(width));
-      await page.emulateMedia({ reducedMotion: "reduce" });
-      await gotoWorkshopVisualFixture(page);
-
-      const frame = page.locator(".workshop-pegboard-root .portal-frame");
-      await expect(frame).toBeVisible();
-
-      await expect(frame).toHaveScreenshot(namePortalFrame(width), {
-        animations: "disabled",
-        timeout: 15_000,
-      });
-    });
-  }
-
   /** Deliberately short height (not in `typicalViewport`) — ADR-003 stress case. */
-  test("short viewport: nav + pegboard still in view @ 375×500", async ({
+  test("short viewport: peg scroll + pegboard still in view @ 375×500", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 375, height: 500 });
     await page.emulateMedia({ reducedMotion: "reduce" });
     await gotoWorkshopVisualFixture(page);
 
-    const nav = page.locator(".workshop-panel-nav");
-    await expect(nav).toBeInViewport();
+    const root = page.locator(".workshop-pegboard-root");
+    const scroll = root.locator(
+      ".workshop-scroll--desktop-strip, .workshop-scroll--mobile"
+    );
+    await expect(scroll).toBeInViewport();
     await expect(page.locator(".pegboard-bg").first()).toBeInViewport({
       ratio: 0.1,
     });
@@ -152,11 +138,10 @@ test.describe("Workshop frame chrome (ADR-003)", () => {
  * so this matches what users see without scrolling the document.
  */
 /**
- * `portal-inner` holds the scroll region + absolutely positioned `.shadowbox-portal`
- * vignette. Separate from `.portal-frame` screenshots so mobile shadow strength and
- * peg stack stay guarded when the outer wood chrome is unchanged.
+ * Peg scrollport: mobile vertical stack + desktop strip.
+ * Baseline names keep `portal-inner-*` for stable git history / diff review.
  */
-test.describe("Workshop portal-inner (mobile vignette + inner chrome)", () => {
+test.describe("Workshop peg scrollport (mobile)", () => {
   for (const width of MOBILE_PORTAL_WIDTHS) {
     test(`portal-inner @ ${width}px`, async ({ page }) => {
       await page.setViewportSize(typicalViewport(width));
@@ -166,8 +151,8 @@ test.describe("Workshop portal-inner (mobile vignette + inner chrome)", () => {
       const root = page.locator(".workshop-pegboard-root");
       await expect(root).toHaveAttribute("data-pegboard-layout", "mobile");
 
-      const inner = root.locator(".portal-inner").first();
-      await expect(inner).toHaveScreenshot(`portal-inner--mobile--w${width}.png`, {
+      const scroll = root.locator(".workshop-scroll--mobile").first();
+      await expect(scroll).toHaveScreenshot(`portal-inner--mobile--w${width}.png`, {
         animations: "disabled",
         timeout: 15_000,
       });
@@ -175,7 +160,7 @@ test.describe("Workshop portal-inner (mobile vignette + inner chrome)", () => {
   }
 });
 
-test.describe("Workshop portal-inner (desktop)", () => {
+test.describe("Workshop peg scrollport (desktop)", () => {
   test("portal-inner @ 1280px", async ({ page }) => {
     await page.setViewportSize(typicalViewport(1280));
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -184,8 +169,8 @@ test.describe("Workshop portal-inner (desktop)", () => {
     const root = page.locator(".workshop-pegboard-root");
     await expect(root).toHaveAttribute("data-pegboard-layout", "desktop");
 
-    const inner = root.locator(".portal-inner").first();
-    await expect(inner).toHaveScreenshot("portal-inner--desktop--w1280.png", {
+    const scroll = root.locator(".workshop-scroll--desktop-strip").first();
+    await expect(scroll).toHaveScreenshot("portal-inner--desktop--w1280.png", {
       animations: "disabled",
       timeout: 15_000,
     });

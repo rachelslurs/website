@@ -30,17 +30,25 @@ const {
 </a>
 <div
   class:list={[
-    "board-page-outer w-full p-board-outer max-sm:p-board-outer-sm",
+    "board-page-outer w-full",
+    immersivePegStage
+      ? "py-board-outer max-sm:py-board-outer-sm px-0"
+      : "p-board-outer max-sm:p-board-outer-sm",
+    immersivePegStage && "board-page-outer--immersive-peg-stage",
     immersivePegStage ? "max-w-none" : "mx-auto max-w-[1200px]",
     /* min-h-dvh alone leaves height indefinite for flex descendants on some engines;
      * h-svh fixes the workshop pegboard column (ADR-003). */
     fillViewportChain && "flex h-svh min-h-0 flex-col",
   ]}
 >
+  {immersivePegStage && <div class="peg-stage-underlay" aria-hidden="true" />}
   <!-- ADR-008 (+ ADR-011): page-owned visuals (tape, edges, etc.) stay inside the inner `board` column. -->
   <div
     class:list={[
-      "board relative flex flex-col gap-board-slab-gap px-board-padding-x max-lg:py-board-padding-y-lg lg:pb-board-pb-lg lg:pt-board-pt-lg max-sm:gap-board-slab-gap-sm max-sm:p-board-padding-sm",
+      "board relative flex flex-col gap-board-slab-gap max-lg:py-board-padding-y-lg lg:pb-board-pb-lg lg:pt-board-pt-lg max-sm:gap-board-slab-gap-sm",
+      immersivePegStage
+        ? "px-0 max-sm:px-0 max-sm:py-board-padding-sm"
+        : "px-board-padding-x max-sm:p-board-padding-sm",
       fillViewportChain && "min-h-0 flex-1",
     ]}
   >

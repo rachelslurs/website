@@ -1,24 +1,10 @@
-import DymoLabel from "@components/riso/DymoLabel";
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronUpIcon,
-} from "@heroicons/react/24/outline";
 import {
   desktopPegboardSideGap,
   hardwareDimsWithGrid,
   pickSharedDesktopPackGrid,
   PEG_GRID,
 } from "@utils/workshopPegboardPhysics";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import type { PegboardPanelDTO } from "@utils/serializeWorkshopPegboard";
 import PegboardPanelView from "./PegboardPanels";
@@ -75,10 +61,8 @@ function useViewportPegboard() {
 
 export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   const { vw, vh } = useViewportPegboard();
-  const portalInnerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
-  const [activePanelIndex, setActivePanelIndex] = useState(0);
   /** `?workshopDebugCork=1` or `localStorage.workshopDebugCork = "1"` — outlines cork + console packing logs. */
   const [debugWorkshopCork, setDebugWorkshopCork] = useState(false);
   const [portalLayout, setPortalLayout] = useState<{
@@ -86,8 +70,6 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     h: number;
     isMobile: boolean;
   } | null>(null);
-  /** Mobile column: panel index at ends, or -1 when mid-scroll (reference: both nav buttons stay enabled). */
-  const [mobilePanelIdx, setMobilePanelIdx] = useState(0);
   const [connectorBands, setConnectorBands] = useState<
     Record<number, { left: number; width: number; top: number; bottom: number }>
   >({});
@@ -279,16 +261,13 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     setConnectorBands(next);
   }, [isMobile, panels.length, layoutW, layoutH, desktopInner]);
 
+  /** Peg scrollport (`workshop-scroll--*`) — same box packing used to measure when it lived in `.portal-inner`. */
   useIsoLayoutEffect(() => {
-    const el = portalInnerRef.current;
+    const el = isMobile ? mobileScrollRef.current : scrollRef.current;
     if (!el) return;
     const apply = (target: HTMLElement) => {
-      // Use border-box pixel size from layout (not contentRect), so flex-constrained
-      // portal-inner height matches what the user sees after ADR-003 height chain.
       const w = Math.round(target.clientWidth);
       const h = Math.round(target.clientHeight);
-      // Do not bail on 0×0: first paint can be before flex insets size the portal; we
-      // still need portalLayout set so `visibility` clears and ResizeObserver can settle.
       setPortalLayout({
         w,
         h,
@@ -303,82 +282,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     });
     ro.observe(el);
     return () => ro.disconnect();
-  }, [panels.length]);
-
-  const syncScrollIndex = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const pageW = el.clientWidth || 1;
-    const idx = Math.round(el.scrollLeft / pageW);
-    setActivePanelIndex(
-      Math.min(Math.max(0, idx), Math.max(0, panels.length - 1))
-    );
-  }, [panels.length]);
-
-  const syncMobileScrollIndex = useCallback(() => {
-    const el = mobileScrollRef.current;
-    if (!el) return;
-    const { scrollTop, scrollHeight, clientHeight } = el;
-    const atTop = scrollTop <= 10;
-    const atBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight - 10;
-    const n = panels.length;
-    if (atTop && atBottom) {
-      setMobilePanelIdx(-1);
-    } else if (atTop) {
-      setMobilePanelIdx(0);
-    } else if (atBottom) {
-      setMobilePanelIdx(Math.max(0, n - 1));
-    } else {
-      setMobilePanelIdx(-1);
-    }
-  }, [panels.length]);
-
-  useEffect(() => {
-    syncScrollIndex();
-  }, [syncScrollIndex, panels.length, layoutW]);
-
-  useEffect(() => {
-    if (!isMobile) return;
-    syncMobileScrollIndex();
-  }, [isMobile, panels.length, syncMobileScrollIndex]);
-
-  const scrollPrev = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const pageW = el.clientWidth;
-    el.scrollBy({ left: -pageW, behavior: "smooth" });
-  }, []);
-
-  const scrollNext = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const pageW = el.clientWidth;
-    el.scrollBy({ left: pageW, behavior: "smooth" });
-  }, []);
-
-  const scrollMobilePrev = useCallback(() => {
-    const el = mobileScrollRef.current;
-    const ch =
-      el?.clientHeight ??
-      (typeof window !== "undefined" ? window.innerHeight : 600);
-    const delta = ch * 0.8;
-    el?.scrollBy({
-      top: -delta,
-      behavior: "smooth",
-    });
-  }, []);
-
-  const scrollMobileNext = useCallback(() => {
-    const el = mobileScrollRef.current;
-    const ch =
-      el?.clientHeight ??
-      (typeof window !== "undefined" ? window.innerHeight : 600);
-    const delta = ch * 0.8;
-    el?.scrollBy({
-      top: delta,
-      behavior: "smooth",
-    });
-  }, []);
+  }, [panels.length, isMobile]);
 
   if (panels.length === 0) {
     return (
@@ -386,12 +290,8 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
         className="workshop-pegboard-root workshop-wall not-prose font-body w-full min-w-0"
         data-pegboard-layout="desktop"
       >
-        <div className="portal-frame">
-          <div className="portal-inner flex min-h-[12rem] items-center justify-center">
-            <p className="text-sm text-slate-400">
-              Nothing on the pegboard yet.
-            </p>
-          </div>
+        <div className="flex min-h-[12rem] flex-1 flex-col items-center justify-center px-4">
+          <p className="text-sm text-slate-400">Nothing on the pegboard yet.</p>
         </div>
       </div>
     );
@@ -428,145 +328,74 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     );
   });
 
-  const atFirst = activePanelIndex <= 0;
-  const atLast = activePanelIndex >= panels.length - 1;
-  const navDisabledPrev = isMobile ? mobilePanelIdx === 0 : atFirst;
-  const navDisabledNext = isMobile
-    ? mobilePanelIdx === panels.length - 1
-    : atLast;
-
   return (
     <div
       className="workshop-pegboard-root workshop-wall not-prose font-body w-full min-w-0"
       data-pegboard-layout={isMobile ? "mobile" : "desktop"}
     >
-      <div className="portal-frame">
+      {!isMobile ? (
         <div
-          ref={portalInnerRef}
-          className="portal-inner"
+          ref={scrollRef}
+          className="workshop-scroll--desktop-strip hide-scrollbar"
           style={{ visibility: isLayoutReady ? "visible" : "hidden" }}
         >
-          <div className="shadowbox-portal" aria-hidden />
-          {!isMobile ? (
-            <div
-              ref={scrollRef}
-              onScroll={syncScrollIndex}
-              className="workshop-scroll--desktop-strip hide-scrollbar"
-            >
-              {panels.map((panel, i) => (
-                <div key={`panel-${i}`} className="workshop-panel--desktop">
-                  <PegboardPanelView
-                    key={panel.items.map(x => x.id).join("|")}
-                    items={panel.items}
-                    isMobile={false}
-                    vw={vw}
-                    vh={vh}
-                    layoutWidth={layoutW}
-                    layoutHeight={layoutH}
-                    desktopPanelPadY={desktopPanelPadY}
-                    desktopPanelPadX={desktopPanelPadX}
-                    desktopContentInnerW={desktopPegboardContentInnerW}
-                    debugWorkshopCork={debugWorkshopCork}
-                    desktopPanelIndex={i}
-                    desktopSharedPack={desktopSharedPack}
+          {panels.map((panel, i) => (
+            <div key={`panel-${i}`} className="workshop-panel--desktop">
+              <PegboardPanelView
+                key={panel.items.map(x => x.id).join("|")}
+                items={panel.items}
+                isMobile={false}
+                vw={vw}
+                vh={vh}
+                layoutWidth={layoutW}
+                layoutHeight={layoutH}
+                desktopPanelPadY={desktopPanelPadY}
+                desktopPanelPadX={desktopPanelPadX}
+                desktopContentInnerW={desktopPegboardContentInnerW}
+                debugWorkshopCork={debugWorkshopCork}
+                desktopPanelIndex={i}
+                desktopSharedPack={desktopSharedPack}
+              />
+              {i < panels.length - 1 ? (
+                <>
+                  {/*
+                   * Align connector bands to the pegboard corner screw centers.
+                   * Peg hole / screw spacing follows `--peg-grid-px` on `.pegboard-bg`.
+                   */}
+                  <div
+                    aria-hidden
+                    className="metal-bracket--band"
+                    style={{
+                      width: connectorBands[i]?.width ?? sideGap + 80,
+                      left: connectorBands[i]?.left,
+                      top: connectorBands[i]?.top ?? 70,
+                      transform: "translateY(-50%)",
+                    }}
                   />
-                  {i < panels.length - 1 ? (
-                    <>
-                      {/*
-                       * Align connector bands to the pegboard corner screw centers.
-                       * Peg hole / screw spacing follows `--peg-grid-px` on `.pegboard-bg`.
-                       */}
-                      <div
-                        aria-hidden
-                        className="metal-bracket--band"
-                        style={{
-                          width: connectorBands[i]?.width ?? sideGap + 80,
-                          left: connectorBands[i]?.left,
-                          top: connectorBands[i]?.top ?? 70,
-                          transform: "translateY(-50%)",
-                        }}
-                      />
-                      <div
-                        aria-hidden
-                        className="metal-bracket--band"
-                        style={{
-                          width: connectorBands[i]?.width ?? sideGap + 80,
-                          left: connectorBands[i]?.left,
-                          bottom: connectorBands[i]?.bottom ?? 70,
-                          transform: "translateY(50%)",
-                        }}
-                      />
-                    </>
-                  ) : null}
-                </div>
-              ))}
+                  <div
+                    aria-hidden
+                    className="metal-bracket--band"
+                    style={{
+                      width: connectorBands[i]?.width ?? sideGap + 80,
+                      left: connectorBands[i]?.left,
+                      bottom: connectorBands[i]?.bottom ?? 70,
+                      transform: "translateY(50%)",
+                    }}
+                  />
+                </>
+              ) : null}
             </div>
-          ) : (
-            <div
-              ref={mobileScrollRef}
-              onScroll={syncMobileScrollIndex}
-              className="workshop-scroll--mobile hide-scrollbar"
-            >
-              {mobileBlocks}
-            </div>
-          )}
+          ))}
         </div>
-
+      ) : (
         <div
-          className={
-            panels.length === 1
-              ? "portal-bezel portal-bezel--solo"
-              : "portal-bezel"
-          }
+          ref={mobileScrollRef}
+          className="workshop-scroll--mobile hide-scrollbar"
+          style={{ visibility: isLayoutReady ? "visible" : "hidden" }}
         >
-          <div
-            className="flex shrink-0 items-center justify-center gap-3 max-[380px]:gap-2"
-            aria-hidden="true"
-          >
-            <DymoLabel
-              text="Workshop"
-              size="large"
-              isInteractive={false}
-              grain="vertical"
-              title="Vertical grain (default)"
-            />
-          </div>
-          <span className="sr-only">
-            Workshop — two label textures shown for comparison: vertical and
-            horizontal tape grain.
-          </span>
-          {panels.length > 1 ? (
-            <nav className="workshop-panel-nav" aria-label="Workshop panels">
-              <button
-                type="button"
-                className="workshop-panel-nav__btn focus-outline"
-                disabled={navDisabledPrev}
-                aria-label={isMobile ? "Scroll up" : "Previous panel"}
-                onClick={isMobile ? scrollMobilePrev : scrollPrev}
-              >
-                {isMobile ? (
-                  <ChevronUpIcon className="h-5 w-5" aria-hidden />
-                ) : (
-                  <ChevronLeftIcon className="h-5 w-5" aria-hidden />
-                )}
-              </button>
-              <button
-                type="button"
-                className="workshop-panel-nav__btn focus-outline"
-                disabled={navDisabledNext}
-                aria-label={isMobile ? "Scroll down" : "Next panel"}
-                onClick={isMobile ? scrollMobileNext : scrollNext}
-              >
-                {isMobile ? (
-                  <ChevronDownIcon className="h-5 w-5" aria-hidden />
-                ) : (
-                  <ChevronRightIcon className="h-5 w-5" aria-hidden />
-                )}
-              </button>
-            </nav>
-          ) : null}
+          {mobileBlocks}
         </div>
-      </div>
+      )}
     </div>
   );
 }

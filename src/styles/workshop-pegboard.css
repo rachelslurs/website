@@ -9,7 +9,7 @@
 
 /*
  * ADR-003: `workshop-viewport-slot` (Main fillViewportSlot) — stack fills main so
- * pegboard + portal-bezel stay in view; only .workshop-scroll--* scrolls.
+ * the peg scrollport stays in view; only `.workshop-scroll--*` scrolls.
  */
 #main-content.workshop-viewport-slot .workshop-page-stack {
   flex: 1 1 auto;
@@ -26,7 +26,7 @@
 }
 
 .workshop-pegboard-root {
-  /* Column flex so `.portal-frame` flex/min-height-0 participate (ADR-003); block parent lets content expand page height after hydration. */
+  /* Column flex: peg scroll strip is flex-1 (ADR-003). */
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -56,9 +56,9 @@
 
 /* Cork “shop floor” behind the portal — matches site .board grain (reference mock). */
 .workshop-wall {
-  background-color: var(--cork);
+  /* background-color: var(--cork);
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
-  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.12);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.12); */
 }
 
 .hide-scrollbar {
@@ -174,275 +174,6 @@
 .metal-bracket--band::before,
 .metal-bracket--band::after {
   display: none;
-}
-
-/* Physical TV-style portal (wood frame + dark viewport + shadowbox vignette) */
-.workshop-pegboard-root .portal-frame {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  width: 100%;
-  min-height: 0;
-  box-sizing: border-box;
-  background-color: #4a3018;
-  background-image:
-    linear-gradient(
-      90deg,
-      rgba(0, 0, 0, 0.03) 0%,
-      transparent 10%,
-      rgba(255, 255, 255, 0.02) 20%,
-      transparent 30%,
-      rgba(0, 0, 0, 0.04) 50%,
-      transparent 60%,
-      rgba(255, 255, 255, 0.01) 80%,
-      transparent 100%
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent 0px,
-      transparent 2px,
-      rgba(0, 0, 0, 0.05) 3px,
-      rgba(0, 0, 0, 0.05) 4px
-    ),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.12'/%3E%3C/svg%3E");
-  border-top: 6px solid #6b4728;
-  border-left: 6px solid #57391f;
-  border-right: 6px solid #2d1d0f;
-  border-bottom: 6px solid #1a1008;
-  border-radius: 8px;
-  box-shadow:
-    0 20px 40px -10px rgba(0, 0, 0, 0.8),
-    0 8px 16px -4px rgba(0, 0, 0, 0.6);
-  padding: 16px;
-  gap: 0;
-}
-
-@media (min-width: 640px) {
-  .workshop-pegboard-root .portal-frame {
-    border-width: 8px;
-    border-radius: 12px;
-    padding: 24px;
-  }
-}
-
-/* Small screens: lighten portal chrome so content gets more space. */
-@media (max-width: 480px) {
-  .workshop-pegboard-root .portal-frame {
-    border-width: 4px;
-    border-radius: 8px;
-    padding: 12px;
-    box-shadow:
-      0 16px 28px -10px rgba(0, 0, 0, 0.7),
-      0 6px 12px -4px rgba(0, 0, 0, 0.5);
-  }
-
-  .workshop-pegboard-root .shadowbox-portal {
-    box-shadow:
-      inset 50px 0 90px -30px rgba(0, 0, 0, 0.6),
-      inset -50px 0 90px -30px rgba(0, 0, 0, 0.6),
-      inset 0 50px 90px -30px rgba(0, 0, 0, 0.68),
-      inset 0 -50px 90px -30px rgba(0, 0, 0, 0.68),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.035);
-  }
-}
-
-/*
- * Mobile vertical scroll: vignette lighter than desktop default (0.8 / 0.9) so
- * peg slabs stay readable while panning. Narrower viewports get a touch more
- * depth than tablet-width mobile, still well below the full TV shadowbox.
- */
-.workshop-pegboard-root[data-pegboard-layout="mobile"] .shadowbox-portal {
-  box-shadow:
-    inset 46px 0 68px -22px rgba(0, 0, 0, 0.4),
-    inset -46px 0 68px -22px rgba(0, 0, 0, 0.4),
-    inset 0 46px 68px -22px rgba(0, 0, 0, 0.44),
-    inset 0 -46px 68px -22px rgba(0, 0, 0, 0.44),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-}
-
-@media (max-width: 480px) {
-  .workshop-pegboard-root[data-pegboard-layout="mobile"] .shadowbox-portal {
-    box-shadow:
-      inset 56px 0 88px -26px rgba(0, 0, 0, 0.52),
-      inset -56px 0 88px -26px rgba(0, 0, 0, 0.52),
-      inset 0 56px 88px -26px rgba(0, 0, 0, 0.56),
-      inset 0 -56px 88px -26px rgba(0, 0, 0, 0.56),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-  }
-}
-
-.workshop-pegboard-root .portal-inner {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  background-color: var(--black);
-  border-radius: 4px;
-  box-shadow:
-    inset 0 0 0 2px rgba(0, 0, 0, 1),
-    inset 0 0 0 3px rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-}
-
-.workshop-pegboard-root .shadowbox-portal {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 60;
-  box-shadow:
-    inset 80px 0 120px -30px rgba(0, 0, 0, 0.8),
-    inset -80px 0 120px -30px rgba(0, 0, 0, 0.8),
-    inset 0 80px 120px -30px rgba(0, 0, 0, 0.9),
-    inset 0 -80px 120px -30px rgba(0, 0, 0, 0.9),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-}
-
-.workshop-pegboard-root .portal-bezel {
-  position: relative;
-  z-index: 80;
-  flex: 0 0 auto;
-  display: flex;
-  height: 64px;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  padding: 0 0.25rem;
-  margin-top: 12px;
-  pointer-events: none;
-}
-
-/*
- * Mobile: if anything above still lets the document grow, keep slab nav in the
- * viewport (ADR-003). Wood fill matches .portal-frame so scrolling content does
- * not show through the bezel band.
- */
-.workshop-pegboard-root[data-pegboard-layout="mobile"] .portal-bezel {
-  position: sticky;
-  bottom: 0;
-  z-index: 100;
-  align-self: stretch;
-  box-sizing: border-box;
-  /* Do not use margin-top: auto here — it absorbs flex free space and collapses
-   * `.portal-inner` (flex 1 1 0) to zero height in the column. */
-  background-color: #4a3018;
-  background-image:
-    linear-gradient(
-      90deg,
-      rgba(0, 0, 0, 0.03) 0%,
-      transparent 10%,
-      rgba(255, 255, 255, 0.02) 20%,
-      transparent 30%,
-      rgba(0, 0, 0, 0.04) 50%,
-      transparent 60%,
-      rgba(255, 255, 255, 0.01) 80%,
-      transparent 100%
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent 0px,
-      transparent 2px,
-      rgba(0, 0, 0, 0.05) 3px,
-      rgba(0, 0, 0, 0.05) 4px
-    );
-  box-shadow:
-    0 -10px 24px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-@media (max-height: 720px) {
-  .workshop-pegboard-root .portal-bezel {
-    height: 56px;
-  }
-
-  .workshop-pegboard-root:not([data-pegboard-layout="mobile"]) .portal-bezel {
-    margin-top: 10px;
-  }
-
-  .workshop-pegboard-root .workshop-panel-nav__btn {
-    width: 2.25rem;
-    height: 2.25rem;
-  }
-}
-
-@media (min-width: 640px) {
-  .workshop-pegboard-root .portal-bezel {
-    height: 76px;
-    justify-content: space-between;
-    padding: 0 0.5rem;
-  }
-
-  .workshop-pegboard-root:not([data-pegboard-layout="mobile"]) .portal-bezel {
-    margin-top: 16px;
-  }
-}
-
-.workshop-pegboard-root .portal-bezel > * {
-  pointer-events: auto;
-}
-
-.workshop-pegboard-root .portal-bezel--solo {
-  justify-content: center;
-}
-
-.workshop-pegboard-root .portal-bezel .workshop-panel-nav {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.workshop-pegboard-root .workshop-panel-nav {
-  margin: 0;
-  padding: 0;
-}
-
-.workshop-pegboard-root .workshop-panel-nav__btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  padding: 0;
-  border-radius: 999px;
-  border: 3px solid #0f172a;
-  background-color: var(--black);
-  color: #fff;
-  cursor: pointer;
-  box-shadow:
-    inset 2px 2px 5px rgba(255, 255, 255, 0.2),
-    4px 6px 10px rgba(0, 0, 0, 0.6),
-    4px 4px 0 rgba(0, 0, 0, 0.9);
-  transition:
-    transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.15s ease;
-}
-
-@media (min-width: 640px) {
-  .workshop-pegboard-root .workshop-panel-nav__btn {
-    width: 3rem;
-    height: 3rem;
-  }
-}
-
-.workshop-pegboard-root .workshop-panel-nav__btn:hover:not(:disabled) {
-  transform: scale(1.05);
-}
-
-.workshop-pegboard-root .workshop-panel-nav__btn:active:not(:disabled) {
-  transform: translateY(4px) translateX(4px);
-  box-shadow:
-    inset 2px 2px 5px rgba(255, 255, 255, 0.2),
-    0 2px 4px rgba(0, 0, 0, 0.6),
-    0 0 0 rgba(0, 0, 0, 0.9);
-}
-
-.workshop-pegboard-root .workshop-panel-nav__btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.workshop-pegboard-root .workshop-panel-nav__btn.focus-outline:focus-visible {
-  outline-offset: 4px;
 }
 
 .slab-seam {
