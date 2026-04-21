@@ -95,8 +95,10 @@
    * Room for `.pegboard-bg` outer drop (15px 30px 60px) + bracket shadows inside this scrollport.
    * Packing uses the **content** box (`WorkshopPegboard` subtracts padding from clientHeight); without
    * that, `overflow-y: hidden` clips a board that was sized to the full `clientHeight`.
+   * Tighter than the old max(4.5rem, 30+60+24) to reclaim vertical space for the cork; bump up if
+   * shadow clipping returns on a target browser.
    */
-  padding-block: max(4.5rem, calc(30px + 60px + 24px));
+  padding-block: max(2.5rem, calc(22px + 46px + 14px));
   padding-inline: max(1.25rem, calc(15px + 48px + 8px));
   overflow-x: auto;
   overflow-y: hidden;

@@ -1,6 +1,6 @@
 ---
 name: Workshop pegboard responsive
-overview: "Single plan: desktop scaled grid + repack (Phase 1 done). Phase 2 mobile ≤768 — frame/seam/cork snap, scroll-primary + uniform presentation + physics cleanup + visual regression + ADR-001 (done). Phase 3 blueprint-sheet-mask (done). Phase 4 — workshop frame chrome in initial viewport (ADR-003): layout + Playwright ADR-003 describe (viewport + portal-frame screenshots) done. Phase 5 — workshop panel packing (ADR-004): caps + kind-priority backfill + non-progress partial panels; Vitest `npm test`; plan item 8 + Checkpoint A4 reconciled to ADR-004 (done). Phase 6 — **complete:** **6a** site-pages spec + Docker; **6b** shell spacing tokens + tighter chrome; **6c** `npm run check` + `test:visual:update:docker` then `test:visual:docker` green (site-chrome, workshop-pegboard, site-pages) with committed Linux baselines. Phase 7 — **on hold:** reading typography **[ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)** — 7a–7c done; **7d–7e deferred** until **[ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md) Phase 8** shell/container work stabilizes (avoid typography + container churn). Phase 8 — **active track:** ADR-010 site-wide immersive pegboard (viewport stage, URL→scene, item-layer transitions); see Phase 8 heading. (Standalone `shell_spacing_token_unify_*.plan.md` merged here — do not maintain separately.)"
+overview: "Single plan: desktop scaled grid + repack (Phase 1 done). Phase 2 mobile ≤768 — frame/seam/cork snap, scroll-primary + uniform presentation + physics cleanup + visual regression + ADR-001 (done). Phase 3 blueprint-sheet-mask (done). Phase 4 — workshop frame chrome in initial viewport (ADR-003): layout + Playwright ADR-003 (scroll-only chrome; portal-frame baselines removed). Phase 5 — workshop panel packing (ADR-004): caps + kind-priority backfill + non-progress partial panels; Vitest `npm test`; plan item 8 + Checkpoint A4 reconciled to ADR-004 (done). Phase 6 — **complete:** **6a** site-pages spec + Docker; **6b** shell spacing tokens + tighter chrome; **6c** `npm run check` + `test:visual:update:docker` then `test:visual:docker` green (site-chrome, workshop-pegboard, site-pages) with committed Linux baselines. Phase 7 — **on hold:** reading typography **[ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)** — 7a–7c done; **7d–7e deferred** until **[ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md) Phase 8** shell/container work stabilizes (avoid typography + container churn). Phase 8 — **active track:** ADR-010 (viewport stage, URL→scene, item-layer transitions) **plus 8.8–8.12** workshop **layout simplification** (scroll/overflow contract, single packing viewport measure, stack/footer seam, ink gutter tokens, doc hygiene) — see **Tasks 8.8–8.12** under Phase 8 heading. (Standalone `shell_spacing_token_unify_*.plan.md` merged here — do not maintain separately.)"
 todos:
   - id: css-content-box
     content: "Phase 1: Set `.pegboard-bg` to `box-sizing: content-box` (keep 8px border) in workshop-pegboard.css"
@@ -81,10 +81,10 @@ todos:
     content: "Phase 4b: Main fillViewportSlot + RisoBoardShell fillViewportChain (h-svh, no prose on main) + flex chain; pegboard scroll stays inner"
     status: completed
   - id: workshop-frame-verify-breakpoints
-    content: "Phase 4c: Playwright ADR-003 — toBeInViewport nav + pegboard; portal-frame screenshots; short 375×500 smoke (tests/visual/workshop-pegboard.spec.ts)"
+    content: "Phase 4c: Playwright ADR-003 — toBeInViewport nav + pegboard; workshop scroll/snap + pegboard screenshots (tests/visual/workshop-pegboard.spec.ts); obsolete portal-frame baselines removed"
     status: completed
   - id: checkpoint-phase-4
-    content: "Phase 4 checkpoint: no document scroll needed to see bottom arrows at 320, 375, 430, 768, 1024, 1280 — guarded by VR + manual"
+    content: "Phase 4 checkpoint: no document scroll to use workshop peg region at 320, 375, 430, 768, 1024, 1280 — inner peg/slab scroll only; guarded by VR + manual"
     status: completed
   - id: adr-004-plan-crosslink
     content: "Phase 5a: Canonical plan + execution order + spec item 8 / Checkpoint A4 aligned to ADR-004 (packing vs layout)"
@@ -149,6 +149,21 @@ todos:
   - id: phase8-87-rollout-wave-2
     content: "Phase 8.7: Rollout wave 2+ — remaining routes in reviewable PRs (umbrella; split per layout family) (plan Task 8.7)"
     status: pending
+  - id: phase8-88-scroll-layer-simplify
+    content: "Phase 8.8: Workshop desktop — simplify scroll/overflow contract (prefer outer column overflow:visible + inner row overflow-x:auto only; document or remove overflow-y:hidden if still required); reduce nested flex surface area"
+    status: pending
+  - id: phase8-89-pack-viewport-measure
+    content: "Phase 8.9: Single packing viewport contract — scrollport content box (padding-aware) for portalLayout + any panel/strip RO; unit-test size helper; cross-link ADR-003/ADR-011; grep audit clientWidth/clientHeight/getBoundingClientRect"
+    status: pending
+  - id: phase8-8a-stack-footer-chrome
+    content: "Phase 8.10: `.workshop-page-stack` contract — one spec for peg column vs pagination vs site Footer shadow seam (row-gap vs main/board-content bottom breathing room vs strip padding); optional split peg-stage vs chrome wrapper component"
+    status: pending
+  - id: phase8-8b-ink-gutter-tokens
+    content: "Phase 8.11: Tokenize pegboard + metal-bracket ink gutters (`--pegboard-*` in workshop-pegboard.css or root) so strip padding + stack gap + connector math stay one source of truth"
+    status: pending
+  - id: phase8-8c-plan-adr-sync
+    content: "Phase 8.12: Docs hygiene — amend ADR-003/plan Execution §4c (remove portal-frame/nav copy); README pointer if immersive shell notes drift; workshop-pegboard plan cross-links"
+    status: pending
 isProject: false
 ---
 
@@ -170,17 +185,17 @@ This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task
    - **2i (done):** visual regression suite for alignment (Playwright + committed baselines; CI gate).
    - **2j (done):** ADR-001 mobile contract (`docs/decisions/001-workshop-mobile-pegboard-contract.md`) + README pointer + `MobileScalePresentation` @see.
 3. **Phase 3 — Blueprint sheet mask (done):** **`blueprint-sheet-mask`** — CSS variables + `--blueprint-mask-image` with container-query variants (e.g. 260px / 220px); visual regression green (`docker compose run --rm playwright-fast`).
-4. **Phase 4 — Frame chrome in initial viewport (done):** **ADR-003** + **ADR-001 §7**. **`fillViewportSlot`** / **`h-svh`** / **no `prose` on workshop `main`** + pegboard-root column flex. **4c:** Playwright **Workshop frame chrome (ADR-003)** — `toBeInViewport` on `.workshop-panel-nav` + first `.pegboard-bg`; **`portal-frame--w*.png`** screenshots; short **375×500** smoke.
+4. **Phase 4 — Frame chrome in initial viewport (done):** **ADR-003** + **ADR-001 §7**. **`fillViewportSlot`** / **`h-svh`** / **no `prose` on workshop `main`** + pegboard-root column flex. **4c:** Playwright **Workshop in viewport (ADR-003)** — scroll/snap chrome + first `.pegboard-bg` in view; viewport matrix in [`tests/visual/workshop-pegboard.spec.ts`](../../tests/visual/workshop-pegboard.spec.ts) (obsolete **portal-frame** baseline names removed).
 5. **Phase 5 — Workshop panel packing (done):** **[ADR-004](../../docs/decisions/004-workshop-panel-packing.md)** — which CMS entries share a horizontal panel is decided in **`buildWorkshopPanels`** (not viewport CSS): max **3** items; **≤1 work** and **≤1 links** per panel; **demos** fill remaining slots; backfill sorts **work → links → demos**, then **newest first** within a kind; **non-progress** leaves a **partial panel** when the pool cannot add without breaking caps. **Verify:** `npm test` (Vitest), `npm run check`.
 6. **Phase 6 — Site shell vertical budget (done):** **6a** — [`tests/visual/site-pages.spec.ts`](../../tests/visual/site-pages.spec.ts) + `npm run test:visual:site-pages:*:docker`. **6b** — shell tokens in [`tailwind.config.cjs`](../../tailwind.config.cjs) + [`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro) / [`RisoNav.tsx`](../../src/components/RisoNav.tsx) / [`Footer.astro`](../../src/components/Footer.astro). **6c** — `npm run check` + `test:visual:update:docker` + `test:visual:docker` per [`visual-regression-docker.mdc`](../rules/visual-regression-docker.mdc); baselines committed.
 7. **Phase 7 — Reading typography ([ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)) — ON HOLD:** **7a–7c complete** (inventory, theme variant, core layout wiring). **7d–7e deferred** (responsive density + Docker verify) until **Phase 8** immersive shell and container contract stabilize — avoids redoing typography and `site-pages` VR when `RisoBoardShell` / reading columns may still move. **Does not** relax ADR-003 (**no `prose` on workshop `#main-content`**). See Phase 7 heading.
-8. **Phase 8 — Site-wide immersive pegboard ([ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)):** **Active track** ahead of Phase 7 resumption. Normative: persistent viewport-wide **peg stage**, **URL→durable scene**, **item-layer** route transitions, **reading measure** inside full width per ADR-009. **ADR-011** (**accepted**, [DOM contract](../../docs/decisions/011-immersive-shell-dom-contract.md)) amends **ADR-008** for **outer** shell width when **`immersivePegStage`** is true; inner `board` bounds for tape/grain unchanged. **Resume Phase 7d–7e after** a vertical slice of Phase 8 shell lands so prose density aligns to final containers. **Visual regression:** plan for a **broad baseline redo** (`site-pages`, `site-chrome`, `workshop-pegboard`) when the shell stabilizes — see Phase 8 **Order of operations** step 4 below and todo **`phase8-86-visual-regression-redo`**.
+8. **Phase 8 — Site-wide immersive pegboard ([ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)):** **Active track** ahead of Phase 7 resumption. Normative: persistent viewport-wide **peg stage**, **URL→durable scene**, **item-layer** route transitions, **reading measure** inside full width per ADR-009. **ADR-011** (**accepted**, [DOM contract](../../docs/decisions/011-immersive-shell-dom-contract.md)) amends **ADR-008** for **outer** shell width when **`immersivePegStage`** is true; inner `board` bounds for tape/grain unchanged. **Tasks 8.8–8.12** (layout simplification: two-layer scroll contract, content-box **`portalLayout`**, `.workshop-page-stack` vs strip padding vs site footer seam, shadow gutter tokens, stale doc grep) — see **Tasks 8.8–8.12** under the Phase 8 section. **Resume Phase 7d–7e after** a vertical slice of Phase 8 shell lands so prose density aligns to final containers. **Visual regression:** plan for a **broad baseline redo** (`site-pages`, `site-chrome`, `workshop-pegboard`) when the shell stabilizes — see Phase 8 **Order of operations** step 4 below and todo **`phase8-86-visual-regression-redo`**.
 
 ## Phase 4: Workshop frame chrome (initial viewport)
 
-**Problem:** At mobile portal widths (and wider), users must scroll the page to see **bottom frame navigation** (slab arrows). **Goal:** **Chrome always visible** — arrows in the **first paint** viewport; only the **pegboard / slab column** scrolls when content is tall.
+**Problem (historical):** Workshop chrome lived in a TV-style frame; users could need **document scroll** to reach controls. **Goal (current):** **Bounded viewport height** — pegboard / slabs scroll **inside** the shell (`fillViewportSlot` + **`h-svh`** flex chain); no reliance on removed **portal-frame** nav.
 
-**Dependency / clarification:** This does **not** relax ADR-001 **scroll vs drag** (pan-y on the peg stack). It **adds** a **vertical budget**: outer layout must not let peg content height push **frame** controls below the fold. Normative: ADR-003; mobile lattice: ADR-001.
+**Dependency / clarification:** This does **not** relax ADR-001 **scroll vs drag** (pan-y on the peg stack). It **adds** a **vertical budget**: outer layout must not let peg content height push required chrome below the fold. Normative: ADR-003; mobile lattice: ADR-001.
 
 ### Task 4.1: Record decision (ADR)
 
@@ -988,7 +1003,7 @@ flowchart TB
 
 ### Phase 8 — Task breakdown ([`planning-and-task-breakdown`](../skills/planning-and-task-breakdown/SKILL.md))
 
-**Cursor plan todos:** Each task below maps 1:1 to a `todos[]` entry in this file’s YAML frontmatter — ids **`phase8-81-adr011-dom-contract`** through **`phase8-87-rollout-wave-2`**. Mark **completed** in the YAML as you ship so Cursor’s plan/todo UI stays in sync.
+**Cursor plan todos:** Each task below maps 1:1 to a `todos[]` entry in this file’s YAML frontmatter — ids **`phase8-81-adr011-dom-contract`** through **`phase8-87-rollout-wave-2`** (product track), plus **`phase8-88-scroll-layer-simplify`** through **`phase8-8c-plan-adr-sync`** (layout cleanup **8.8–8.12**). Mark **completed** in the YAML as you ship so Cursor’s plan/todo UI stays in sync.
 
 **Overview:** Ship **[ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)** in **vertical slices**: written contracts first → **one pilot surface** proves viewport-wide peg stage + URL→scene + item-layer motion without breaking **ADR-003** / **ADR-001** → **baseline redo** → then widen route coverage in later waves (not all in the first PR).
 
@@ -1065,7 +1080,7 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 
 **Acceptance criteria:**
 - [ ] Pilot route: peg field reads **full-bleed** (or per ADR-011) at **1280px+** without shrinking the “wall” to 1200px.
-- [ ] Workshop (if in pilot): **bottom frame nav** still **ADR-003**-compliant at 320 / 375 / 768 / 1024 / 1280 (no document scroll to reach arrows on first paint).
+- [ ] Workshop (if in pilot): **ADR-003** still holds at 320 / 375 / 768 / 1024 / 1280 — pegboard column fills the bounded viewport height; **horizontal panel scroll / vertical slab scroll** only (no removed **portal-frame** nav to reach; see **Task 8.12** if copy still mentions frame arrows).
 - [ ] Non-pilot routes: **unchanged** OR explicitly behind a flag (document the choice).
 
 **Verification:** `npm run check`; manual pilot breakpoints; if workshop in pilot: `npm run test:visual` for `workshop-pegboard` (may still fail until Task 8.6 — note expected state).
@@ -1180,12 +1195,46 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 | `transition:persist` + new shell fights navigation | Med | Re-test every major route class; document in ADR-011 if persist scope changes. |
 | VR noise hides real regressions | High | Review diffs in small batches; keep ADR-003 locator tests strict. |
 | Phase 7 typography run mid-shell | Med | Keep Phase 7 on hold until Checkpoint “8.4–8.6” done (existing plan note). |
+| Workshop layout “death by padding” | Med | Land **8.9** (single content-box measure) before or with further strip/stack padding tweaks; use **8.11** tokens so gutters do not drift. |
 
 ### Parallelization
 
 - **Sequential:** 8.1 → 8.2 → 8.3 (strong order).
 - **After 8.4 lands:** 8.5 can pair with prep for 8.6 (different files) with care — same pilot route, coordinate.
 - **Parallel safe:** Draft ADR-011 sections while prototyping DOM in a spike branch **if** spikes are throwaway or merged behind pilot flag.
+- **8.8–8.12:** Prefer **after 8.3** when the immersive workshop DOM is stable; **8.9** should precede or accompany any new **padding** on `.workshop-scroll--desktop-strip` so `portalLayout` does not regress; **8.10** may subsume redundant **row-gap** vs strip padding once audited.
+
+---
+
+### Tasks 8.8–8.12 — Workshop layout simplification (engineering cleanup)
+
+**Goal:** Fewer overlapping flex/scroll/padding layers between **`RisoBoardShell`** → **`#main-content`** → **`.workshop-page-stack`** → **`.workshop-scroll--desktop-strip`** → **`.workshop-panel--desktop`**, and **one** definition of the **packing viewport** (scrollport **content box**, padding-aware) so pegboard + connector math cannot drift from CSS again.
+
+**Problem (context):** Immersive workshop stacked **`board-page-outer` / `.board` padding**, **`main.app-layout`** horizontal rules, **`.workshop-page-stack` `row-gap`**, **strip `padding-block` / `padding-inline`**, **`overflow-y: hidden`**, and **`portalLayout` from raw `clientWidth`/`clientHeight`**. Strip padding without **content-box-aware** `layoutW`/`layoutH` oversized the cork vs the flex content area and reproduced **“clipped shadow”** at the bottom. These fixes belong in an explicit cleanup slice so they are not re-learned per incident.
+
+**Cursor todo ids:** `phase8-88-scroll-layer-simplify`, `phase8-89-pack-viewport-measure`, `phase8-8a-stack-footer-chrome`, `phase8-8b-ink-gutter-tokens`, `phase8-8c-plan-adr-sync`.
+
+#### Task 8.8 — Two-layer scroll / overflow contract (desktop)
+
+- Prefer **outer** peg column **`overflow: visible`** + **inner** horizontal track **`overflow-x: auto` only** where engines allow; otherwise **document** why **`overflow-y: hidden`** must stay on one node.
+- Flatten redundant **`min-h-0` / `flex-1`** wrappers where ADR-003 still holds.
+
+#### Task 8.9 — Single “packing viewport” measurement
+
+- Centralize **`workshopScrollContentClientSize`** (or RO **`contentRect`**) in one module; audit **`clientWidth` / `clientHeight` / `getBoundingClientRect`** on strip/panel paths.
+- **Vitest** for padding edge cases; cross-link **ADR-003** / **ADR-011** “measured column” wording.
+
+#### Task 8.10 — `.workshop-page-stack` + footer seam contract
+
+- One written rule: **pagination** vs **peg column** vs **site `Footer`** — who owns **`row-gap`**, who owns **strip padding**, who owns **bottom breathing room** on immersive routes; merge overlapping strategies so the peg field is not **double-shrunk** vertically.
+
+#### Task 8.11 — Ink gutter tokens
+
+- Drive **`.pegboard-bg`** and **`.metal-bracket--band`** minimum gutters from **shared CSS variables**; strip padding + stack gap consume **`max()`** of those tokens (single tuning surface).
+
+#### Task 8.12 — Plan + ADR hygiene
+
+- Grep **`portal-frame`**, **`portal-inner`**, **`workshop-panel-nav`** in `docs/` + this plan; align **ADR-003** Consequences and **Phase 4c** YAML (`workshop-frame-verify-breakpoints`) with **scroll-only** workshop chrome.
 
 **Remove this plan?** **No.** It remains the **canonical history and checklist** for workshop responsive work. Phase 8 **extends** it. If Phase 8 grows large (many routes, new layout package), you may **extract** a second plan file and leave a one-paragraph pointer here — optional, not required yet.
 
