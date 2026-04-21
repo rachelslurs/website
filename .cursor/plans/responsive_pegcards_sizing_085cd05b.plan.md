@@ -133,7 +133,7 @@ todos:
     status: completed
   - id: phase8-82-url-scene-spec
     content: "Phase 8.2: URL→durable scene doc — stable paths/queries, defaults, redirects, SSR vs client (plan Task 8.2)"
-    status: pending
+    status: completed
   - id: phase8-83-shell-pilot
     content: "Phase 8.3: RisoBoardShell/Main — implement ADR-011 for pilot route only; full-bleed peg stage; ADR-003 if workshop (plan Task 8.3)"
     status: pending
@@ -982,7 +982,7 @@ flowchart TB
 **Order of operations (suggested):**
 
 1. **ADR-011** (**done**) — [Immersive shell DOM contract](../../docs/decisions/011-immersive-shell-dom-contract.md): peg field vs reading column vs tape/grain + z-order; amends ADR-008 for pilot **`immersivePegStage`** (ADR-010 Consequences).
-2. **URL → scene** doc or ADR — stable paths/queries, defaults, redirects, SSR + client hydration agreement.
+2. **URL → scene** (**done** for workshop pilot) — [ADR-012: Workshop URL → scene (pagination)](../../docs/decisions/012-workshop-url-scene-pagination.md): path-based `/workshop` / `/workshop/{N}`, SSR + client agreement, v1 out-of-scope + link rot; other routes in later ADRs / **8.7**.
 3. **Vertical slice** — one pilot route: remove outer max-width constraint for the peg field, persistent stage chrome, one item-layer transition pattern; **ADR-003** still applies anywhere the TV frame exists.
 4. **VR + manual** — `site-pages`, `workshop-pegboard`, `site-chrome` per [visual-regression-docker.mdc](../rules/visual-regression-docker.mdc). **Expect a baseline redo:** Phase 8 changes outer layout and chrome enough that most or all committed screenshots in those suites will need an **intentional refresh** (Docker update workflow + **review every diff**). Do not treat VR as small pixel nudges—plan time for a full pass after the immersive shell lands (see YAML todo **`phase8-86-visual-regression-redo`**).
 
@@ -997,7 +997,7 @@ flowchart TB
 ```text
 ADR-011 (DOM bounds: peg field / reading / tape-grain)
         │
-        ├── URL→scene spec (workshop + pilot defaults)
+        ├── URL→scene spec (**done:** [ADR-012](../../docs/decisions/012-workshop-url-scene-pagination.md) workshop pagination)
         │
         ├── RisoBoardShell / Main — new wrapper split (peg-stage vs content slot)
         │         │
@@ -1043,9 +1043,9 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 **Description:** Document **stable** URL shapes for the pilot: path segments and/or query keys, **default** when omitted, **redirect** policy for renamed slugs, and **SSR vs client** ownership (first paint must match hydration). Workshop stack/panel state is the likely first consumer per ADR-010 MVP.
 
 **Acceptance criteria:**
-- [ ] One markdown ADR or spec under `docs/decisions/` (or `docs/` if you prefer non-ADR) with examples (`/workshop/...`, query patterns).
-- [ ] Explicit **“out of scope for v1”** for ephemeral UI in the URL.
-- [ ] **Link rot** mitigation named (redirects or compatibility shims).
+- [x] One markdown ADR or spec under `docs/decisions/` (or `docs/` if you prefer non-ADR) with examples (`/workshop/...`, query patterns).
+- [x] Explicit **“out of scope for v1”** for ephemeral UI in the URL.
+- [x] **Link rot** mitigation named (redirects or compatibility shims).
 
 **Verification:** Walk through 3 URLs on paper: cold load, refresh, share link — state story is unambiguous.
 
@@ -1159,8 +1159,8 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 
 ### Checkpoint: After Tasks 8.1–8.2 (docs only)
 
-- [ ] ADR-011 + URL/scene doc are readable by someone who did not write them.
-- [ ] No open contradiction with ADR-009 / ADR-003 / ADR-001.
+- [x] ADR-011 + URL/scene doc are readable by someone who did not write them.
+- [x] No open contradiction with ADR-009 / ADR-003 / ADR-001.
 
 ### Checkpoint: After Task 8.3 (pilot shell)
 

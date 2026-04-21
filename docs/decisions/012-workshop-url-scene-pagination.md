@@ -12,6 +12,20 @@ Accepted
 
 [ADR-010 §2](010-site-wide-immersive-pegboard-shell.md) requires **durable** workshop arrangement to be **derivable from the URL** so bookmarks and shared links reproduce the same scene. The workshop index is built with Astro’s **`paginate()`** helper ([`src/pages/workshop/[...page].astro`](../../src/pages/workshop/[...page].astro)).
 
+### Scope (Phase 8.2 pilot)
+
+This ADR is the **first URL → scene** slice: **workshop list pagination** only. **Which cards appear on which page** of the workshop index is fully determined by **`/workshop`** and **`/workshop/{N}`**. Per §3, **in-panel** order, drag offsets, and other micro-state are **not** in the URL for v1. **Other routes** (home, posts index, work detail, demos) are **not** specified here; durable scenes for those surfaces are **future ADRs** or rollout work ([ADR-013](013-phase8-rollout-wave-2.md), [responsive plan Phase 8.7](../../.cursor/plans/responsive_pegcards_sizing_085cd05b.plan.md)) unless extended explicitly.
+
+### Examples — cold load, refresh, share
+
+| Step | URL | Expected durable scene |
+|------|-----|---------------------------|
+| 1. Cold load | `/workshop` | Static page for **page 1** from `getStaticPaths` + `paginate()`. |
+| 2. Refresh | `/workshop/2` (if `lastPage` ≥ 2) | Same **page 2** slice after reload; no client-only hidden page index. |
+| 3. Share link | Copy URL bar → open in new tab / private window | Same built route; recipient sees the **same pagination slice**. |
+
+Client navigation via `<a href>` or View Transitions must land on the same scene as a direct request to that path (§2).
+
 ## Decision
 
 1. **Canonical workshop URLs** — Pagination uses **path segments**, not query strings:
