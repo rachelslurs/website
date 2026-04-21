@@ -50,7 +50,8 @@ The **normative layout box** is the inner column that already wraps `RisoNav`, t
 
 ## See also
 
-- [ADR-010: Site-wide immersive pegboard shell](010-site-wide-immersive-pegboard-shell.md) (**Accepted**) — Expect **ADR-011** (or an amendment here) that redefines where the **peg field**, **reading column**, and **tape/grain** may extend (viewport-wide peg vs inner `board` only). Until that lands, this ADR’s inner-column bound remains normative for implementation.
+- [ADR-010: Site-wide immersive pegboard shell](010-site-wide-immersive-pegboard-shell.md) (**Accepted**) — Product direction for viewport-wide peg + URL scenes.
+- [ADR-011: Immersive shell — DOM contract](011-immersive-shell-dom-contract.md) (**Accepted**) — Splits **peg field** (outer `board-page-outer` when `immersivePegStage`) vs **reading** (ADR-009) vs **tape / grain / blobs** (still inner `board` per this ADR). **Amends** the outer max-width story here without repealing inner-column bounds for tape and decoration.
 
 ## Follow-ups (TODO)
 
