@@ -130,7 +130,7 @@ todos:
     status: completed
   - id: phase8-81-adr011-dom-contract
     content: "Phase 8.1: ADR-011 (or amend ADR-008) — DOM contract peg field vs reading measure vs tape/grain + nav/footer z-order (plan Task 8.1)"
-    status: pending
+    status: completed
   - id: phase8-82-url-scene-spec
     content: "Phase 8.2: URL→durable scene doc — stable paths/queries, defaults, redirects, SSR vs client (plan Task 8.2)"
     status: pending
@@ -174,7 +174,7 @@ This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task
 5. **Phase 5 — Workshop panel packing (done):** **[ADR-004](../../docs/decisions/004-workshop-panel-packing.md)** — which CMS entries share a horizontal panel is decided in **`buildWorkshopPanels`** (not viewport CSS): max **3** items; **≤1 work** and **≤1 links** per panel; **demos** fill remaining slots; backfill sorts **work → links → demos**, then **newest first** within a kind; **non-progress** leaves a **partial panel** when the pool cannot add without breaking caps. **Verify:** `npm test` (Vitest), `npm run check`.
 6. **Phase 6 — Site shell vertical budget (done):** **6a** — [`tests/visual/site-pages.spec.ts`](../../tests/visual/site-pages.spec.ts) + `npm run test:visual:site-pages:*:docker`. **6b** — shell tokens in [`tailwind.config.cjs`](../../tailwind.config.cjs) + [`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro) / [`RisoNav.tsx`](../../src/components/RisoNav.tsx) / [`Footer.astro`](../../src/components/Footer.astro). **6c** — `npm run check` + `test:visual:update:docker` + `test:visual:docker` per [`visual-regression-docker.mdc`](../rules/visual-regression-docker.mdc); baselines committed.
 7. **Phase 7 — Reading typography ([ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)) — ON HOLD:** **7a–7c complete** (inventory, theme variant, core layout wiring). **7d–7e deferred** (responsive density + Docker verify) until **Phase 8** immersive shell and container contract stabilize — avoids redoing typography and `site-pages` VR when `RisoBoardShell` / reading columns may still move. **Does not** relax ADR-003 (**no `prose` on workshop `#main-content`**). See Phase 7 heading.
-8. **Phase 8 — Site-wide immersive pegboard ([ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)):** **Active track** ahead of Phase 7 resumption. Normative: persistent viewport-wide **peg stage**, **URL→durable scene**, **item-layer** route transitions, **reading measure** inside full width per ADR-009. **Depends on:** ADR-011 (or ADR-008 amendment) for bounds that supersede the old “everything inside inner `board` only” story where it conflicts; optional split into a dedicated plan if Phase 8 scope grows. **Resume Phase 7d–7e after** a vertical slice of Phase 8 (or ADR-011) lands so prose density aligns to final containers. **Visual regression:** plan for a **broad baseline redo** (`site-pages`, `site-chrome`, `workshop-pegboard`) when the shell stabilizes — see Phase 8 **Order of operations** step 4 below and todo **`phase8-86-visual-regression-redo`**.
+8. **Phase 8 — Site-wide immersive pegboard ([ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)):** **Active track** ahead of Phase 7 resumption. Normative: persistent viewport-wide **peg stage**, **URL→durable scene**, **item-layer** route transitions, **reading measure** inside full width per ADR-009. **ADR-011** (**accepted**, [DOM contract](../../docs/decisions/011-immersive-shell-dom-contract.md)) amends **ADR-008** for **outer** shell width when **`immersivePegStage`** is true; inner `board` bounds for tape/grain unchanged. **Resume Phase 7d–7e after** a vertical slice of Phase 8 shell lands so prose density aligns to final containers. **Visual regression:** plan for a **broad baseline redo** (`site-pages`, `site-chrome`, `workshop-pegboard`) when the shell stabilizes — see Phase 8 **Order of operations** step 4 below and todo **`phase8-86-visual-regression-redo`**.
 
 ## Phase 4: Workshop frame chrome (initial viewport)
 
@@ -981,7 +981,7 @@ flowchart TB
 
 **Order of operations (suggested):**
 
-1. **ADR-011** (or amend **ADR-008**) — single written DOM contract for peg field, reading column, tape/grain (ADR-010 Consequences).
+1. **ADR-011** (**done**) — [Immersive shell DOM contract](../../docs/decisions/011-immersive-shell-dom-contract.md): peg field vs reading column vs tape/grain + z-order; amends ADR-008 for pilot **`immersivePegStage`** (ADR-010 Consequences).
 2. **URL → scene** doc or ADR — stable paths/queries, defaults, redirects, SSR + client hydration agreement.
 3. **Vertical slice** — one pilot route: remove outer max-width constraint for the peg field, persistent stage chrome, one item-layer transition pattern; **ADR-003** still applies anywhere the TV frame exists.
 4. **VR + manual** — `site-pages`, `workshop-pegboard`, `site-chrome` per [visual-regression-docker.mdc](../rules/visual-regression-docker.mdc). **Expect a baseline redo:** Phase 8 changes outer layout and chrome enough that most or all committed screenshots in those suites will need an **intentional refresh** (Docker update workflow + **review every diff**). Do not treat VR as small pixel nudges—plan time for a full pass after the immersive shell lands (see YAML todo **`phase8-86-visual-regression-redo`**).
@@ -1022,9 +1022,9 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 **Description:** Write **`docs/decisions/011-…md`** (number may shift if another ADR lands first) that defines **three boundaries** in implementable terms: (a) **peg field** extent (viewport-wide vs inset), (b) **reading measure** column / `prose` root placement vs ADR-009, (c) **tape / grain / blobs** — which nodes clip them and how that differs from today’s inner `board` rule in [ADR-008](../../docs/decisions/008-riso-board-inner-content-bounds.md). Include **nav + footer z-order** vs peg layer (ADR-010 open questions).
 
 **Acceptance criteria:**
-- [ ] ADR exists with **Status: Accepted** (or **Proposed** with explicit “implement against this draft” if you iterate).
-- [ ] **Supersedes or amends** ADR-008 in plain language (no silent conflict).
-- [ ] **ADR-003** and **ADR-001** referenced where workshop portal height / scroll still apply.
+- [x] ADR exists with **Status: Accepted** (or **Proposed** with explicit “implement against this draft” if you iterate).
+- [x] **Supersedes or amends** ADR-008 in plain language (no silent conflict).
+- [x] **ADR-003** and **ADR-001** referenced where workshop portal height / scroll still apply.
 
 **Verification:** Peer read + grep `ADR-008` / `board-page-outer` in repo; confirm new ADR linked from ADR-010 follow-ups.
 
