@@ -7,21 +7,32 @@
   min-height: 0;
   /* Do not clip ink (pegboard / bracket shadows) — flex defaults are visible; keep explicit. */
   overflow: visible;
-  /*
-   * Pegboard + metal bands cast downward; the pagination row is the next flex sibling and
-   * paints on top in DOM order, which reads as a hard “clip” at the seam. Reserve space so
-   * shadows fall in the gap instead of under the footer chrome.
-   */
-  row-gap: max(4.5rem, calc(30px + 60px + 24px));
 }
 
 /*
- * ADR-003: `workshop-viewport-slot` (Main fillViewportSlot) — stack fills main so
- * the peg scrollport stays in view; only `.workshop-scroll--*` scrolls.
+ * ADR-003: `workshop-viewport-slot` (Main fillViewportSlot) — `workshop-viewport-fill` fills
+ * `#main-content` so the peg scrollport stays in view; only `.workshop-scroll--*` scrolls.
+ * `justify-content: safe center` vertically centers a shorter `.workshop-page-stack` in tall
+ * viewports; when the stack hits `max-height: 100%`, the peg column still flex-shrinks (`min-h-0`).
  */
-#main-content.workshop-viewport-slot .workshop-page-stack {
+#main-content.workshop-viewport-slot > .workshop-viewport-fill {
+  box-sizing: border-box;
+  display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: safe center;
+  width: 100%;
   min-height: 0;
+}
+
+#main-content.workshop-viewport-slot .workshop-viewport-fill > .workshop-page-stack {
+  flex: 0 1 auto;
+  width: 100%;
+  /* Floor height so the peg column does not collapse when intrinsic size is ambiguous; never
+   * exceed the fill region (`min(..., 100%)` is relative to `.workshop-viewport-fill`). */
+  min-height: min(42dvh, 100%);
+  max-height: 100%;
   overflow: visible;
 }
 
@@ -29,10 +40,6 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow: visible;
-}
-
-.workshop-page-stack__footer {
-  flex: 0 0 auto;
 }
 
 .workshop-pegboard-root {
@@ -95,10 +102,10 @@
    * Room for `.pegboard-bg` outer drop (15px 30px 60px) + bracket shadows inside this scrollport.
    * Packing uses the **content** box (`WorkshopPegboard` subtracts padding from clientHeight); without
    * that, `overflow-y: hidden` clips a board that was sized to the full `clientHeight`.
-   * Tighter than the old max(4.5rem, 30+60+24) to reclaim vertical space for the cork; bump up if
-   * shadow clipping returns on a target browser.
+   * Extra `0.625rem` per side: when `.workshop-panel--desktop` block padding is tighter, the cork
+   * is taller and sits closer to this edge — restore ink margin without touching off-stack row-gap.
    */
-  padding-block: max(2.5rem, calc(22px + 46px + 14px));
+  padding-block: max(1.75rem, calc(14px + 30px + 10px + 0.625rem));
   padding-inline: max(1.25rem, calc(15px + 48px + 8px));
   overflow-x: auto;
   overflow-y: hidden;
@@ -135,20 +142,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  /* Tighter block axis than inline: packing uses `paddingTop` for cork height (`desktopPortalInnerH`). */
+  padding-block: 1.25rem;
+  padding-inline: 2rem;
   box-sizing: border-box;
 }
 
-/* Desktop: reclaim vertical space on short viewports (no vertical scrolling). */
+/* Desktop: reclaim more vertical space on short viewports (no vertical scrolling). */
 @media (max-height: 820px) {
   .workshop-panel--desktop {
-    padding: 1.75rem;
+    padding-block: 1rem;
+    padding-inline: 2rem;
   }
 }
 
 @media (max-height: 720px) {
   .workshop-panel--desktop {
-    padding: 1.25rem;
+    padding-block: 0.75rem;
+    padding-inline: 2rem;
   }
 }
 

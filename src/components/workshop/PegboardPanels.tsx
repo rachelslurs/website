@@ -206,7 +206,7 @@ function PegboardPanelDesktop({
     desktopContentInnerW != null && desktopContentInnerW > 0
       ? desktopContentInnerW
       : desktopInnerW(w, desktopPanelPadX ?? 32);
-  const viewportH = desktopPortalInnerH(h, desktopPanelPadY ?? 40);
+  const viewportH = desktopPortalInnerH(h, desktopPanelPadY ?? 20);
 
   const itemsKey = useMemo(() => items.map(i => i.id).join("|"), [items]);
 

@@ -22,7 +22,7 @@ import "../../styles/workshop-pegboard.css";
 const useIsoLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
-/** One side of `.workshop-panel--desktop { padding: 2rem }` in px (tracks `html` font-size, e.g. `md` 125%). */
+/** One side of `.workshop-panel--desktop { padding-inline: 2rem }` in px (tracks `html` font-size). */
 function workshopPanelRemPaddingPx(): number {
   if (typeof document === "undefined") return 32;
   const rootPx = parseFloat(
@@ -30,6 +30,16 @@ function workshopPanelRemPaddingPx(): number {
   );
   const fontPx = Number.isFinite(rootPx) && rootPx > 0 ? rootPx : 16;
   return Math.round(2 * fontPx);
+}
+
+/** One side of `.workshop-panel--desktop { padding-block: 1.25rem }` (default) in px. */
+function workshopPanelRemPaddingBlockPx(): number {
+  if (typeof document === "undefined") return 20;
+  const rootPx = parseFloat(
+    getComputedStyle(document.documentElement).fontSize || "16"
+  );
+  const fontPx = Number.isFinite(rootPx) && rootPx > 0 ? rootPx : 16;
+  return Math.round(1.25 * fontPx);
 }
 
 /** Content-box size for packing — `client*` includes padding; flex children lay out in the content box. */
@@ -93,7 +103,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   const [desktopPegboardContentInnerW, setDesktopPegboardContentInnerW] =
     useState<number | null>(null);
   const [desktopPanelPadY, setDesktopPanelPadY] = useState(() =>
-    workshopPanelRemPaddingPx()
+    workshopPanelRemPaddingBlockPx()
   );
   const [desktopPanelPadX, setDesktopPanelPadX] = useState(() =>
     workshopPanelRemPaddingPx()

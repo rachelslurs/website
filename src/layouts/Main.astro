@@ -108,6 +108,14 @@ const fillViewportSlot = props.fillViewportSlot === true;
         </>
       )
     }
-    <slot />
+    {
+      fillViewportSlot ? (
+        <div class="workshop-viewport-fill">
+          <slot />
+        </div>
+      ) : (
+        <slot />
+      )
+    }
   </main>
 </RisoBoardShell>
