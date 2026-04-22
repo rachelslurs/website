@@ -1,6 +1,6 @@
 ---
 name: Workshop pegboard responsive
-overview: "Single plan: desktop scaled grid + repack (Phase 1 done). Phase 2 mobile ≤768 — frame/seam/cork snap, scroll-primary + uniform presentation + physics cleanup + visual regression + ADR-001 (done). Phase 3 blueprint-sheet-mask (done). Phase 4 — workshop frame chrome in initial viewport (ADR-003): layout + Playwright ADR-003 (scroll-only chrome; portal-frame baselines removed). Phase 5 — workshop panel packing (ADR-004): caps + kind-priority backfill + non-progress partial panels; Vitest `npm test`; plan item 8 + Checkpoint A4 reconciled to ADR-004 (done). Phase 6 — **complete:** **6a** site-pages spec + Docker; **6b** shell spacing tokens + tighter chrome; **6c** `npm run check` + `test:visual:update:docker` then `test:visual:docker` green (site-chrome, workshop-pegboard, site-pages) with committed Linux baselines. Phase 7 — **on hold:** reading typography **[ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)** — 7a–7c done; **7d–7e deferred** until **[ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md) Phase 8** shell/container work stabilizes (avoid typography + container churn). Phase 8 — **active track:** ADR-010 (viewport stage, URL→scene, item-layer transitions) **plus 8.8–8.12** workshop **layout simplification** (scroll/overflow contract, single packing viewport measure, stack/footer seam, ink gutter tokens, doc hygiene) — see **Tasks 8.8–8.12** under Phase 8 heading. (Standalone `shell_spacing_token_unify_*.plan.md` merged here — do not maintain separately.)"
+overview: "Single plan: desktop scaled grid + repack (Phase 1 done). Phase 2 mobile ≤768 — frame/seam/cork snap, scroll-primary + uniform presentation + physics cleanup + visual regression + ADR-001 (done). Phase 3 blueprint-sheet-mask (done). Phase 4 — workshop frame chrome in initial viewport (ADR-003): layout + Playwright ADR-003 (scroll-only chrome; portal-frame baselines removed). Phase 5 — workshop panel packing (ADR-004): caps + kind-priority backfill + non-progress partial panels; Vitest `npm test`; Checkpoint A4 reconciled to ADR-004 (done). **Superseded in-body:** old responsive **§8 / Checkpoint A2** (`.portal-frame` / `.shadowbox-portal`) — replaced by **Phase 8.8–8.11** (immersive strip + ink). Phase 6 — **complete:** **6a** site-pages spec + Docker; **6b** shell spacing tokens + tighter chrome; **6c** `npm run check` + `test:visual:update:docker` then `test:visual:docker` green (site-chrome, workshop-pegboard, site-pages) with committed Linux baselines. Phase 7 — **on hold:** reading typography **[ADR-009](../../docs/decisions/009-reading-typography-prose-and-theme.md)** — 7a–7c done; **7d–7e deferred** until **[ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md) Phase 8** shell/container work stabilizes (avoid typography + container churn). Phase 8 — **active track:** ADR-010 (viewport stage, URL→scene, item-layer transitions) **plus 8.8–8.12** workshop **layout simplification** (scroll/overflow contract, single packing viewport measure, stack/footer seam, ink gutter tokens, doc hygiene) — see **Tasks 8.8–8.12** under Phase 8 heading. (Standalone `shell_spacing_token_unify_*.plan.md` merged here — do not maintain separately.)"
 todos:
   - id: css-content-box
     content: "Phase 1: Set `.pegboard-bg` to `box-sizing: content-box` (keep 8px border) in workshop-pegboard.css"
@@ -156,7 +156,7 @@ todos:
     content: "Phase 8.9: Single packing viewport contract — scrollport content box (padding-aware) for portalLayout + any panel/strip RO; unit-test size helper; cross-link ADR-003/ADR-011; grep audit clientWidth/clientHeight/getBoundingClientRect"
     status: pending
   - id: phase8-8a-stack-footer-chrome
-    content: "Phase 8.10: `.workshop-page-stack` contract — one spec for peg column vs pagination vs site Footer shadow seam (row-gap vs main/board-content bottom breathing room vs strip padding); optional split peg-stage vs chrome wrapper component"
+    content: "Phase 8.10: `.workshop-page-stack` contract — peg column vs site shell (`gap-board-stack-gap`, Footer) vs strip padding/ink; workshop in-page pagination footer removed (URL pages `/workshop/N` unchanged); document single-child stack + strip vs `portalLayout`"
     status: pending
   - id: phase8-8b-ink-gutter-tokens
     content: "Phase 8.11: Tokenize pegboard + metal-bracket ink gutters (`--pegboard-*` in workshop-pegboard.css or root) so strip padding + stack gap + connector math stay one source of truth"
@@ -199,7 +199,7 @@ This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task
 
 ### Task 4.1: Record decision (ADR)
 
-**Description:** Capture the invariant, alternatives, and relationship to ADR-001 so agents do not conflate “scroll-primary” with “whole page scrolls past arrows.”
+**Description:** Capture the invariant, alternatives, and relationship to ADR-001 so agents do not conflate **scroll-primary** (gesture arbitration **inside** the peg column) with **document scroll** hiding workshop chrome — today **bounded `h-svh` flex** + inner scroll (**ADR-003**), not removed bottom **slab arrows**.
 
 **Acceptance criteria:**
 - [x] ADR-003 exists and is linked from README Architecture decisions.
@@ -219,10 +219,10 @@ This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task
 
 ### Task 4.2: Implement bounded scroll region + frame fit
 
-**Description:** Adjust workshop layout (React structure and/or `workshop-pegboard.css` and related workshop shell styles) so the **frame** (including bottom arrows) occupies a **fixed vertical band** in the viewport and the **pegboard stack** lives in a **flex child with `min-height: 0`** (or sticky bottom + scrollable middle, per ADR-003 alternatives). Reconcile with **mobile cork height** rules (ADR-001 §4) so the **sum** frame + scaled cork region **fits** `100dvh` / available portal height where applicable.
+**Description:** Adjust workshop layout (React structure and/or `workshop-pegboard.css` and related workshop shell styles) so the **pegboard column** fits the **bounded viewport height** (`fillViewportSlot` / **`h-svh`** flex chain per **ADR-003**): scroll **inside** `.workshop-scroll--*` / mobile slab column, not the document. **Removed** TV-style **wood `portal-frame` / bottom slab arrows** — multi-panel navigation is **horizontal scroll / swipe** only. Reconcile with **mobile cork height** rules (ADR-001 §4) so the **scaled cork region** fits the slot **below site nav** and **above site `Footer`**.
 
 **Acceptance criteria:**
-- [x] At **320, 375, 430, 768, 1024, 1280** (portal inner width where relevant), **bottom arrows** are visible **without** scrolling the document on first load of the workshop visual fixture or real workshop route — **enforced by flex height chain** (`fillViewportSlot` / `fillViewportChain` + existing `portal-frame` / scroll regions); **confirm manually** (4c).
+- [x] At **320, 375, 430, 768, 1024, 1280** (workshop layout width where relevant), the **peg scroll region** and first **`.pegboard-bg`** are usable **without** scrolling the **document** on first load of the workshop visual fixture or real workshop route — **enforced by** `fillViewportSlot` / `fillViewportChain` + **`min-height: 0`** on the peg column / scroll strips (**ADR-003**); **confirm manually** (4c).
 - [x] When peg content exceeds the middle region, **only** the designated inner region scrolls; frame does not move off-screen.
 - [ ] ADR-001 scroll-primary behavior on the peg strip still holds (manual swipe test — 4c).
 
@@ -242,12 +242,12 @@ This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task
 
 ### Task 4.3: Regression signal (optional follow-up)
 
-**Description:** Playwright encodes ADR-003: **`toBeInViewport`** on `.workshop-panel-nav` and first `.pegboard-bg` at all standard widths; **locator screenshots** on `.portal-frame` (mobile + 1024/1280); **short viewport** `375×500` smoke.
+**Description:** Playwright encodes ADR-003: **`toBeInViewport`** on the **desktop horizontal scroll strip** (or mobile scroll owner) and first **`.pegboard-bg`** at standard widths; **locator** pegboard / scroll chrome screenshots; full-viewport **`workshop-page-with-chrome`** where site shell matters; **short viewport** `375×500` smoke. (**Obsolete:** `.workshop-panel-nav` / `.portal-frame` baselines — wood frame removed.)
 
-**Status:** **Done** (2026-04-16) — see `tests/visual/workshop-pegboard.spec.ts` describe **Workshop frame chrome (ADR-003)**.
+**Status:** **Done** (2026-04-16) — see `tests/visual/workshop-pegboard.spec.ts` describes **Workshop peg viewport (ADR-003)** and **Workshop page with site chrome**.
 
 **Acceptance criteria:**
-- [x] CI encodes nav + pegboard in viewport + portal-frame pixels at key widths.
+- [x] CI encodes peg scroll strip + pegboard in viewport at key widths (+ chrome suite where applicable); no reliance on removed **portal-frame** pixels.
 
 **Verification:**
 - [x] `npm run test:visual` passes.
@@ -258,7 +258,7 @@ This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task
 
 ### Checkpoint: After Phase 4
 
-- [ ] **No document scroll** required to see **bottom slab arrows** at **320, 375, 430, 768, 1024, 1280**.
+- [ ] **No document scroll** on workshop load at **320, 375, 430, 768, 1024, 1280** — peg column uses inner scroll (horizontal panels / vertical slabs); site nav remains in normal flow (**not** “scroll to find removed bottom arrows”).
 - [ ] Inner peg region scrolls when needed; pan-y / drag behavior still matches ADR-001.
 - [ ] `npm run check` clean.
 
@@ -1202,7 +1202,7 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 - **Sequential:** 8.1 → 8.2 → 8.3 (strong order).
 - **After 8.4 lands:** 8.5 can pair with prep for 8.6 (different files) with care — same pilot route, coordinate.
 - **Parallel safe:** Draft ADR-011 sections while prototyping DOM in a spike branch **if** spikes are throwaway or merged behind pilot flag.
-- **8.8–8.12:** Prefer **after 8.3** when the immersive workshop DOM is stable; **8.9** should precede or accompany any new **padding** on `.workshop-scroll--desktop-strip` so `portalLayout` does not regress; **8.10** may subsume redundant **row-gap** vs strip padding once audited.
+- **8.8–8.12:** Prefer **after 8.3** when the immersive workshop DOM is stable; **8.9** should precede or accompany any new **padding** on `.workshop-scroll--desktop-strip` so `portalLayout` does not regress; **8.10** documents **`.workshop-page-stack`** as **peg-only** (in-page pagination footer **removed**; `row-gap` inert) and who owns vertical seam vs **strip padding** / **8.11** ink tokens.
 
 ---
 
@@ -1210,7 +1210,7 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 
 **Goal:** Fewer overlapping flex/scroll/padding layers between **`RisoBoardShell`** → **`#main-content`** → **`.workshop-page-stack`** → **`.workshop-scroll--desktop-strip`** → **`.workshop-panel--desktop`**, and **one** definition of the **packing viewport** (scrollport **content box**, padding-aware) so pegboard + connector math cannot drift from CSS again.
 
-**Problem (context):** Immersive workshop stacked **`board-page-outer` / `.board` padding**, **`main.app-layout`** horizontal rules, **`.workshop-page-stack` `row-gap`**, **strip `padding-block` / `padding-inline`**, **`overflow-y: hidden`**, and **`portalLayout` from raw `clientWidth`/`clientHeight`**. Strip padding without **content-box-aware** `layoutW`/`layoutH` oversized the cork vs the flex content area and reproduced **“clipped shadow”** at the bottom. These fixes belong in an explicit cleanup slice so they are not re-learned per incident.
+**Problem (context):** Immersive workshop stacked **`board-page-outer` / `.board` padding**, **`main.app-layout`** horizontal rules, **`.workshop-page-stack`** (historically **`row-gap`** vs a footer — footer **removed**; gap is inert with a single child), **strip `padding-block` / `padding-inline`**, **`overflow-y: hidden` / `clip` + `overflow-clip-margin`**, and **`portalLayout` from raw `clientWidth`/`clientHeight`**. Strip padding without **content-box-aware** `layoutW`/`layoutH` oversized the cork vs the flex content area and reproduced **“clipped shadow”** at the bottom. These fixes belong in an explicit cleanup slice so they are not re-learned per incident. **Historical:** wood **`portal-frame` / shadowbox** — **removed** (ADR-003); do not reintroduce those layers when simplifying.
 
 **Cursor todo ids:** `phase8-88-scroll-layer-simplify`, `phase8-89-pack-viewport-measure`, `phase8-8a-stack-footer-chrome`, `phase8-8b-ink-gutter-tokens`, `phase8-8c-plan-adr-sync`.
 
@@ -1224,9 +1224,10 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 - Centralize **`workshopScrollContentClientSize`** (or RO **`contentRect`**) in one module; audit **`clientWidth` / `clientHeight` / `getBoundingClientRect`** on strip/panel paths.
 - **Vitest** for padding edge cases; cross-link **ADR-003** / **ADR-011** “measured column” wording.
 
-#### Task 8.10 — `.workshop-page-stack` + footer seam contract
+#### Task 8.10 — `.workshop-page-stack` + shell seam contract
 
-- One written rule: **pagination** vs **peg column** vs **site `Footer`** — who owns **`row-gap`**, who owns **strip padding**, who owns **bottom breathing room** on immersive routes; merge overlapping strategies so the peg field is not **double-shrunk** vertically.
+- One written rule: **peg column** vs **site shell** (`RisoBoardShell` **`gap-board-stack-gap`**, site **`Footer`**) vs **strip `padding-block` / ink** (**Task 8.11**) — who owns vertical breathing room on immersive workshop; merge overlapping strategies so the peg field is not **double-shrunk**.
+- **Note:** In-page **`<Pagination />` footer under the pegboard was removed** from [`workshop/[...page].astro`](../../src/pages/workshop/[...page].astro); Astro **`paginate()`** and **`/workshop/N`** URLs remain. **`.workshop-page-stack` `row-gap`** is **inert** with a single flex child unless a footer slot returns.
 
 #### Task 8.11 — Ink gutter tokens
 
@@ -1234,7 +1235,7 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 
 #### Task 8.12 — Plan + ADR hygiene
 
-- Grep **`portal-frame`**, **`portal-inner`**, **`workshop-panel-nav`** in `docs/` + this plan; align **ADR-003** Consequences and **Phase 4c** YAML (`workshop-frame-verify-breakpoints`) with **scroll-only** workshop chrome.
+- Grep **`portal-frame`**, **`portal-inner`**, **`shadowbox-portal`**, **`workshop-panel-nav`** in `docs/` + this plan; align **ADR-003** Consequences and **Phase 4c** YAML (`workshop-frame-verify-breakpoints`) with **scroll-only** immersive workshop (no wood frame). **Mark superseded** checkpoints that still reference `.portal-frame` / `.shadowbox-portal` (this file: **Checkpoint A2** archive + **Implementation plan** old item **8**); keep **Tasks 8.8–8.11** as the live layout/ink contract.
 
 **Remove this plan?** **No.** It remains the **canonical history and checklist** for workshop responsive work. Phase 8 **extends** it. If Phase 8 grows large (many routes, new layout package), you may **extract** a second plan file and leave a one-paragraph pointer here — optional, not required yet.
 
@@ -1261,7 +1262,7 @@ On desktop (and optionally mobile), when the available pegboard width/height is 
 - Dragging remains snappy and predictable.
 - The pegboard background grid and the drag snap grid stay visually aligned.
 - Card internals adapt for smaller cards primarily via CSS (hide/clamp non-essential text).
-- The portal chrome adapts on smaller screens (narrower frame, less intense shadowbox) to preserve usable content space.
+- **Immersive workshop / site shell** (`RisoBoardShell`, `fillViewportSlot`, shell spacing tokens) preserves usable peg area on smaller viewports — **not** the removed TV **portal-frame / shadowbox** (see ADR-003, ADR-010).
 - Decorative screws remain aligned to the pegboard hole grid at all sizes/layouts.
 - Desktop (horizontal scroll) pegboard height fits the viewport (no vertical scrolling), with CSS-first density adjustments before resorting to layout math changes.
 - Workshop **panel packing** for fit is tuned in **`buildWorkshopPanels`** ([ADR-004](../../docs/decisions/004-workshop-panel-packing.md)) — caps and ordering — rather than growing pegboard height to cram more duplicate kinds on one slab.
@@ -1272,7 +1273,7 @@ On desktop (and optionally mobile), when the available pegboard width/height is 
 - **Dragging still snaps** to the visible grid.
 - **Visual grid alignment**: the cork/peg pattern spacing matches the snap increments.
 - **Content density scales**: blueprint cards tighten spacing/typography at small widths without JS conditionals (description remains visible).
-- **Portal chrome scales down** on small screens: frame padding/border thickness reduce and shadowbox vignette is less aggressive.
+- **Shell vertical budget** tightens responsibly on small screens (shared **`board-*` / `gap-*` tokens**, `min-h-0` chain) so the peg column keeps height without old **shadowbox** density tricks.
 - **Screw alignment**: corner screws sit on a consistent grid position relative to the pegboard holes (no “drift” when grid scales).
 - **Desktop height cap**: on horizontal-scroll layouts, pegboard content stays within the visible viewport height (no vertical scroll), achieved primarily through CSS density changes; only then through grid/card scaling if needed.
 - **Panel packing (ADR-004):** each workshop panel has at most **3** items, **≤1 work**, **≤1 links**, demos fill the rest; kind-priority backfill and partial panels when caps block progress — reducing crowding without needing to grow height.
@@ -1323,7 +1324,7 @@ This makes “reflow/repack” straightforward: when space shrinks, we reduce `g
    - Prefer CSS solutions before changing packing math:
      - Use container queries / media queries to reduce vertical chrome inside cards (padding/gaps) when viewport height is tight.
      - Ensure long text is clamped (description remains visible but can clamp to fewer lines if needed).
-     - Reduce `.workshop-panel--desktop` padding (and keep a “medium gutter”) so the pegboard occupies more of the shadowbox without touching physics.
+     - Reduce `.workshop-panel--desktop` padding (and keep a “medium gutter”) so the pegboard occupies more of the **scrollport** without touching physics.
    - Add a `max-height`/`overflow: hidden` guard on the desktop pegboard viewport region if needed to prevent accidental vertical overflow.
    - Only if CSS density is insufficient: apply JS-based `gridPx` scaling + repack (later tasks).
 
@@ -1337,7 +1338,7 @@ This makes “reflow/repack” straightforward: when space shrinks, we reduce `g
      - Measure `padding-left` (same as right) via `getComputedStyle` in `WorkshopPegboard.tsx`.
      - Pass `desktopPanelPadX` down to `PegboardPanels.tsx` and compute:
        - `innerW = floor((portalInnerW - 2*desktopPanelPadX) / PEG_GRID) * PEG_GRID`
-   - Goal: pegboard uses more of the shadowbox width while preserving a consistent “medium gutter.”
+   - Goal: pegboard uses more of the **available inner width** while preserving a consistent “medium gutter.”
 
 7. **Blueprint sheet mask: keep it scalable + maintainable**
    - Keep the scalable SVG `mask-image` approach for punched holes (avoids clip-path resizing problems).
@@ -1345,11 +1346,9 @@ This makes “reflow/repack” straightforward: when space shrinks, we reduce `g
      - a **small set** of pre-baked mask data-URLs (e.g. r=6, r=8, r=10) selected via container queries, or
      - moving the mask SVG to a real asset so it’s editable without long CSS strings.
 
-8. **Portal frame + shadowbox density (CSS-first)**
-   - Add container/media-query rules in `[src/styles/workshop-pegboard.css](../../src/styles/workshop-pegboard.css)` to reduce portal chrome intensity on small screens:
-     - narrow the `.portal-frame` padding and/or border thickness
-     - reduce `.shadowbox-portal` inset shadows/opacity so content has more perceived space
-   - Keep these changes purely CSS; no physics/layout math changes.
+8. **~~Portal frame + shadowbox density (CSS-first)~~ — superseded**
+   - **Superseded:** TV **`portal-frame` / `.shadowbox-portal`** workshop chrome was **removed** (ADR-003). **Do not implement** this item.
+   - **Replaced by:** **Tasks 8.8–8.11** — scrollport **`portalLayout`**, strip **`padding-*`**, **`overflow-clip-margin`** / clip vs shadow clipping, **ink gutter tokens** on `.workshop-pegboard-root`.
 
 11. **Screws + connector alignment to pegboard grid**
    - Align corner screws to the pegboard hole grid:
@@ -1364,7 +1363,7 @@ This makes “reflow/repack” straightforward: when space shrinks, we reduce `g
    - Manual: confirm peg hole pattern lines up with drag snapping.
    - Manual: confirm blueprint description remains readable when card narrows (container query triggers spacing/typography tweaks).
    - Manual: confirm blueprint sheet holes remain visible and cork shows through at all sizes.
-   - Manual: confirm portal frame feels less “heavy” on small screens and doesn’t steal content width.
+   - Manual: confirm immersive workshop peg area does not feel crushed by shell padding/gaps on small screens (no `.portal-frame` tuning).
    - Manual: confirm corner screws are centered on pegboard holes and connector bars are vertically centered on those screws.
    - Optional: add a small dev-only overlay showing grid size and/or card bounding boxes.
 
@@ -1378,12 +1377,20 @@ These are intentional “pause points” where we stop and you visually approve 
   - Description remains visible + readable at the chosen container width threshold.
   - Grid line weight still looks right at large + small card widths.
 
-### Checkpoint A2: Portal chrome density (CSS-only)
-- Scope: adjust `.portal-frame` + `.shadowbox-portal` styling at small widths (media query and/or container query).
-- Verify (visual):
-  - Portal padding/borders feel narrower on small screens (more room for cards).
-  - Shadowbox vignette is less intense (less “tunnel vision”), but still readable.
-  - No regressions at larger widths.
+### Checkpoint A2: ~~Portal chrome density (CSS-only)~~ — superseded
+
+**Archived (pre–immersive shell):** Scoped **`.portal-frame` + `.shadowbox-portal`** density. Workshop **no longer uses** those selectors (ADR-003; immersive peg stage ADR-010). **Do not execute** the bullets below.
+
+- ~~Scope: adjust `.portal-frame` + `.shadowbox-portal` styling at small widths (media query and/or container query).~~
+- ~~Verify (visual):~~
+  - ~~Portal padding/borders feel narrower on small screens (more room for cards).~~
+  - ~~Shadowbox vignette is less intense (less “tunnel vision”), but still readable.~~
+  - ~~No regressions at larger widths.~~
+
+### Checkpoint A2 (current): Immersive workshop vertical budget + peg ink (CSS-first)
+
+- **Scope:** Same **CSS-first, no packing-math** gate as the old A2, applied to **today’s DOM**: `fillViewportSlot` / `h-svh` chain, **`.workshop-scroll--desktop-strip`** content-box vs **`portalLayout`**, strip **`padding-block` / `padding-inline`**, **`overflow-y: clip` + `overflow-clip-margin`** (and `@supports not` padding fallback), **`.workshop-panel--desktop`**, **`gap-board-stack-gap`** vs peg column — see **Tasks 8.8–8.11**.
+- **Verify (visual):** No document scroll on `/workshop` at target widths; **`.pegboard-bg` / card shadows** read complete; site nav + footer unchanged vs **`workshop-page-with-chrome`** VR.
 
 ### Checkpoint A3: Desktop height fit (CSS-only)
 - Scope: apply CSS-only density reductions so horizontal-scroll desktop view fits viewport height with no vertical scrolling.
@@ -1391,19 +1398,19 @@ These are intentional “pause points” where we stop and you visually approve 
   - No vertical scrollbar on desktop.
   - Cards remain readable; no important content clipped unexpectedly.
   - If clamping is used, it’s consistent and doesn’t break layout.
-  - Pegboard occupies more of the shadowbox (reduced panel padding), while keeping a visible “medium” gutter.
+  - Pegboard occupies more of the **bounded peg viewport** (reduced panel padding), while keeping a visible “medium” gutter.
 
 ### Checkpoint A4: Panel capacity + packing (fit; ADR-004)
-- Scope: **Data layer** — [`buildWorkshopPanels`](../../src/utils/buildWorkshopPanels.ts) per [ADR-004](../../docs/decisions/004-workshop-panel-packing.md): max **3** items; **≤1 work**, **≤1 links**; demos fill remainder; kind-priority backfill; partial panels when caps block progress. Pagination model unchanged (“panels per page”).
+- Scope: **Data layer** — [`buildWorkshopPanels`](../../src/utils/buildWorkshopPanels.ts) per [ADR-004](../../docs/decisions/004-workshop-panel-packing.md): max **3** items; **≤1 work**, **≤1 links**; demos fill remainder; kind-priority backfill; partial panels when caps block progress. Astro **`paginate()`** model unchanged (**panels per URL** `/workshop`, `/workshop/2`, …).
 - Verify (automated + visual):
   - **`npm test`** — `buildWorkshopPanels` caps, ordering, non-progress.
   - Each horizontal **slab** feels less crowded when content respects caps (complements CSS density from Checkpoint A / A3).
-  - Pagination still works as expected (still “panels per page”).
+  - **Pagination slices** still match `getStaticPaths` when `lastPage > 1` (in-page Prev/Next **removed** from workshop UI — deep links only).
 
 ### Checkpoint A5: Desktop width fit (no magic constants)
 - Scope: compute desktop pegboard width from measured panel padding (not a hard-coded `-96`).
 - Verify (visual):
-  - Pegboard occupies more of the shadowbox width while keeping a clear (medium) gutter.
+  - Pegboard occupies more of the **available inner width** while keeping a clear (medium) gutter.
   - Connector bars still bridge cleanly and remain aligned to screws.
 
 ### Checkpoint B: Visual grid alignment (CSS variable)
