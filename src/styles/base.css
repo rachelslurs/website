@@ -325,8 +325,14 @@
   }
 
   /* ===== scrollbar ===== */
+  /*
+   * `overflow-y: auto` — only show a vertical scrollbar when content exceeds the viewport.
+   * `scroll` always reserved a track (“empty white block”) on fixed-height routes like /workshop.
+   * `scrollbar-gutter: stable` keeps width steadier when navigating short → long pages (classic scrollbars).
+   */
   html {
-    overflow-y: scroll;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
   }
 
   /* width */
