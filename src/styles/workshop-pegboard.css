@@ -69,6 +69,18 @@
   --lcd-cast-blur-drag: 11px;
   --lcd-cast-opacity: 0.16;
   --lcd-cast-opacity-drag: 0.22;
+  /*
+   * Desktop strip uses `overflow-y: clip` + `overflow-clip-margin` so cork/card shadows paint past
+   * the scrollport without `overflow-y: visible` (which would compute to `auto` beside `overflow-x: auto`
+   * and allow vertical strip scroll). Values track `.pegboard-bg` slab shadow (15px 30px 60px) and
+   * `--pegboard-card-shadow-drag` (25px 35px 45px); extra rem covers blur tail + root font scaling.
+   */
+  --workshop-strip-clip-ink: max(
+    5.5rem,
+    calc(30px + 60px + 2.5rem),
+    calc(15px + 60px + 2.5rem),
+    calc(35px + 45px + 2.5rem)
+  );
 }
 
 /* Cork “shop floor” behind the portal — matches site .board grain (reference mock). */
@@ -99,11 +111,10 @@
   width: 100%;
   box-sizing: border-box;
   /*
-   * Room for `.pegboard-bg` outer drop (15px 30px 60px) + bracket shadows inside this scrollport.
-   * Packing uses the **content** box (`WorkshopPegboard` subtracts padding from clientHeight); without
-   * that, `overflow-y: hidden` clips a board that was sized to the full `clientHeight`.
-   * Extra `0.625rem` per side: when `.workshop-panel--desktop` block padding is tighter, the cork
-   * is taller and sits closer to this edge — restore ink margin without touching off-stack row-gap.
+   * Padding keeps flex panels off the strip border; packing still uses the **content** box
+   * (`WorkshopPegboard` subtracts padding from `clientHeight`). Vertical ink past that box is handled
+   * by `overflow-y: clip` + `overflow-clip-margin` (see `--workshop-strip-clip-ink`), not by inflating
+   * padding to the full shadow extent (which would over-shrink the cork).
    */
   padding-block: max(1.75rem, calc(14px + 30px + 10px + 0.625rem));
   padding-inline: max(1.25rem, calc(15px + 48px + 8px));
@@ -111,6 +122,21 @@
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+}
+
+@supports (overflow-clip-margin: 0px) {
+  .workshop-pegboard-root .workshop-scroll--desktop-strip {
+    /* `hidden` clips outer `box-shadow`; `clip` + margin extends paint without allowing y-scroll beside `overflow-x: auto`. */
+    overflow-y: clip;
+    overflow-clip-margin: var(--workshop-strip-clip-ink);
+  }
+}
+
+@supports not (overflow-clip-margin: 0px) {
+  .workshop-pegboard-root .workshop-scroll--desktop-strip {
+    /* No clip-margin: reserve strip content-box height so cork/card shadows stay inside `hidden`. */
+    padding-block: max(3rem, calc(14px + 30px + 10px + 30px + 60px + 2.5rem));
+  }
 }
 
 .workshop-pegboard-root .workshop-scroll--mobile {
