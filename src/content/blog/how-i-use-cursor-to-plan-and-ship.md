@@ -145,7 +145,7 @@ I'm not blindly accepting AI suggestions. I'm using AI to explain the landscape 
 
 ## When to Override the AI
 
-Here's the thing: AI can get things wrong. Like any good tech lead, you must:
+Like any good tech lead, you must:
 
 - Review the approach before committing to it
 - Push back when the suggested solution doesn't fit
