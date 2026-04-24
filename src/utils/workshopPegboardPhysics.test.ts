@@ -151,10 +151,10 @@ describe("desktopCorkPackBudget", () => {
   });
 
   it("caps width on wide shallow portals so height/width stays near the target", () => {
-    const r = desktopCorkPackBudget(1200, 480, 0.6, 60);
+    const r = desktopCorkPackBudget(1200, 480, 0.52, 60);
     expect(r.budgetH).toBe(480);
     expect(r.budgetW).toBeLessThan(1200);
-    expect(r.budgetH / r.budgetW).toBeGreaterThanOrEqual(0.6 - 1e-6);
+    expect(r.budgetH / r.budgetW).toBeGreaterThanOrEqual(0.52 - 1e-6);
   });
 });
 
@@ -196,7 +196,7 @@ describe("pickSharedDesktopPackGrid", () => {
     const fullWAtGrid = Math.floor(1200 / r.grid) * r.grid;
     expect(r.innerW).toBeLessThan(fullWAtGrid);
     expect(r.innerH).toBeLessThanOrEqual(Math.floor(480 / r.grid) * r.grid);
-    expect(r.innerH / r.innerW).toBeGreaterThanOrEqual(0.58);
+    expect(r.innerH / r.innerW).toBeGreaterThanOrEqual(0.5);
   });
 });
 

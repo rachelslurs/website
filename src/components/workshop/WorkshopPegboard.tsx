@@ -32,14 +32,14 @@ function workshopPanelRemPaddingPx(): number {
   return Math.round(2 * fontPx);
 }
 
-/** One side of `.workshop-panel--desktop { padding-block: 1.25rem }` (default) in px. */
+/** One side of `.workshop-panel--desktop { padding-block: 1rem }` (default) in px. */
 function workshopPanelRemPaddingBlockPx(): number {
-  if (typeof document === "undefined") return 20;
+  if (typeof document === "undefined") return 16;
   const rootPx = parseFloat(
     getComputedStyle(document.documentElement).fontSize || "16"
   );
   const fontPx = Number.isFinite(rootPx) && rootPx > 0 ? rootPx : 16;
-  return Math.round(1.25 * fontPx);
+  return Math.round(1 * fontPx);
 }
 
 /** Content-box size for packing — `client*` includes padding; flex children lay out in the content box. */

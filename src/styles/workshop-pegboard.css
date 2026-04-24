@@ -139,6 +139,13 @@
       max(4.5rem, var(--workshop-strip-clip-ink))
       max(16rem, calc(var(--workshop-strip-clip-ink) + 5rem))
       max(4.5rem, var(--workshop-strip-clip-ink));
+    /*
+     * Clip-margin carries shadow ink past the scroll box — use modest physical padding so the
+     * scrollport **content box** (what React packs to) stays taller vs the base `padding-bottom`
+     * fallback for engines without `overflow-clip-margin`.
+     */
+    padding-top: 0.75rem;
+    padding-bottom: max(1.25rem, calc(15px + 30px + 50px + 1rem));
   }
 }
 
@@ -191,7 +198,7 @@
   align-items: center;
   justify-content: center;
   /* Tighter block axis than inline: packing uses `paddingTop` for cork height (`desktopPortalInnerH`). */
-  padding-block: 1.25rem;
+  padding-block: 1rem;
   padding-inline: 2rem;
   box-sizing: border-box;
 }
@@ -199,14 +206,14 @@
 /* Desktop: reclaim more vertical space on short viewports (no vertical scrolling). */
 @media (max-height: 820px) {
   .workshop-panel--desktop {
-    padding-block: 1rem;
+    padding-block: 0.875rem;
     padding-inline: 2rem;
   }
 }
 
 @media (max-height: 720px) {
   .workshop-panel--desktop {
-    padding-block: 0.75rem;
+    padding-block: 0.625rem;
     padding-inline: 2rem;
   }
 }
