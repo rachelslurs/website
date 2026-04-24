@@ -155,6 +155,9 @@ todos:
   - id: phase8-8d-strip-shadow-paint-contract
     content: "Phase 8.8d (gate): Desktop strip shadow paint — validate overflow-y clip + --workshop-strip-clip-ink vs worst-case slab/card/drag shadows; document @supports not (overflow-clip-margin) padding fallback; complete before further strip padding-block trims (plan § Workshop vertical budget and shadow ink)"
     status: pending
+  - id: phase8-8e-cork-aspect-target
+    content: "Phase 8.8e (optional product): Target cork aspect ratio / max slab width on wide-but-short viewports (e.g. 1512×828); CSS max-width/center vs pack col bias — after 8.8d; document in 8.10 + cross-check ADR-005"
+    status: pending
   - id: phase8-89-pack-viewport-measure
     content: "Phase 8.9: Single packing viewport contract — scrollport content box (padding-aware) for portalLayout + any panel/strip RO; unit-test size helper; cross-link ADR-003/ADR-011; grep audit clientWidth/clientHeight/getBoundingClientRect"
     status: pending
@@ -1007,7 +1010,7 @@ flowchart TB
 
 ### Phase 8 — Task breakdown ([`planning-and-task-breakdown`](../skills/planning-and-task-breakdown/SKILL.md))
 
-**Cursor plan todos:** Each task below maps 1:1 to a `todos[]` entry in this file’s YAML frontmatter — ids **`phase8-81-adr011-dom-contract`** through **`phase8-87-rollout-wave-2`** (product track), plus **`phase8-88-scroll-layer-simplify`**, **`phase8-8d-strip-shadow-paint-contract`** (shadow/clip **gate** before aggressive strip padding trims), and **`phase8-89-pack-viewport-measure`** through **`phase8-8c-plan-adr-sync`** (layout cleanup **8.8–8.12**). Mark **completed** in the YAML as you ship so Cursor’s plan/todo UI stays in sync.
+**Cursor plan todos:** Each task below maps 1:1 to a `todos[]` entry in this file’s YAML frontmatter — ids **`phase8-81-adr011-dom-contract`** through **`phase8-87-rollout-wave-2`** (product track), plus **`phase8-88-scroll-layer-simplify`**, **`phase8-8d-strip-shadow-paint-contract`** (shadow/clip **gate** before aggressive strip padding trims), **`phase8-8e-cork-aspect-target`** (optional cork aspect / max slab width), and **`phase8-89-pack-viewport-measure`** through **`phase8-8c-plan-adr-sync`** (layout cleanup **8.8–8.12**). Mark **completed** in the YAML as you ship so Cursor’s plan/todo UI stays in sync.
 
 **Overview:** Ship **[ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)** in **vertical slices**: written contracts first → **one pilot surface** proves viewport-wide peg stage + URL→scene + item-layer motion without breaking **ADR-003** / **ADR-001** → **baseline redo** → then widen route coverage in later waves (not all in the first PR).
 
@@ -1104,6 +1107,7 @@ Execution discipline for steps **A→D** above follows [`incremental-implementat
 | **1280 × 900** | `typicalViewport(1280)` | Wide desktop + `portal-inner--desktop` |
 | **375 × 500** | [`workshop-pegboard.spec.ts`](../../tests/visual/workshop-pegboard.spec.ts) short viewport | ADR-003 vertical stress |
 | **1024 × 700** (optional) | Manual only | Short **desktop** — clip + cork under chrome pressure |
+| **1512 × 828** (optional) | Manual / **MacBook-class** (`window.outerWidth` varies) | **Wide-but-short** — cork can look **too wide** vs height (`[workshopDebugCork]` shows packing `innerW×innerH`); drives **8.8e** |
 
 **Routes:**
 
@@ -1134,7 +1138,19 @@ Execution discipline for steps **A→D** above follows [`incremental-implementat
 - **Shadow quality:** No new clipping vs previous screenshot at same viewport; drag state not worse.
 - **No ADR-003 regression:** Document **does not** scroll to see peg scrollport or first slab; nav + footer expectations unchanged for **`workshop-page-with-chrome`** captures.
 
-**Maps to existing tasks:** **A** → **`phase8-8d-strip-shadow-paint-contract`** then **`phase8-8b-ink-gutter-tokens`** (8.11) for token consolidation; **B** → **`phase8-88`**, **`phase8-8a-stack-footer-chrome`** (8.10) as you document shell vs strip ownership; **C** → immersive-only edits in **`RisoBoardShell.astro`** / plan cross-link **6b**; **D** → **`phase8-89-pack-viewport-measure`** **after** **B** (and ideally after **A**) unless a measurement bug blocks work independent of padding.
+#### Target cork aspect ratio / max slab width (optional)
+
+**Symptom:** On a **wide but short** viewport (example **1512×828**), `[workshopDebugCork]` may show a cork like **1242×486** — large **width** from the desktop strip’s **content-box** `layoutW`, while **`layoutH`** stays modest after chrome + strip padding + panel padding. The packing layer then chooses a **grid** and **snapped `innerW`×`innerH`** that fill that box, so the **aspect ratio** can feel “too wide” even though math is consistent.
+
+**When to deal with it (order):**
+
+1. **After `phase8-8d-strip-shadow-paint-contract` (A)** — Any **`max-width`** on the cork slab or new horizontal centering can change how shadows meet the strip edge; don’t stack with unresolved clip issues.
+2. **Prefer layout/CSS first (still mostly step B / 8.10)** — e.g. **`max-width`** on the peg slab within **`.workshop-panel--desktop`**, or **`margin-inline: auto`** so the cork does not use the full strip width; document **who owns max width** vs shell full-bleed (ADR-011).
+3. **Packing / physics (step D / 8.9 + [ADR-005](../../docs/decisions/005-workshop-desktop-cork-layout-acceptance.md))** — Only if the product rule is **“prefer fewer peg columns / taller cork at this class of viewport”** rather than “cap width at N px”. That biases **`pickSharedDesktopPackGrid`** / seeds and must stay aligned with **`portalLayout`** measurement.
+
+**YAML:** **`phase8-8e-cork-aspect-target`** — optional slice; ship independently of shadow gate once **A** is green.
+
+**Maps to existing tasks:** **A** → **`phase8-8d-strip-shadow-paint-contract`** then **`phase8-8b-ink-gutter-tokens`** (8.11) for token consolidation; **B** → **`phase8-88`**, **`phase8-8a-stack-footer-chrome`** (8.10) as you document shell vs strip ownership; **optional aspect** → **`phase8-8e-cork-aspect-target`**; **C** → immersive-only edits in **`RisoBoardShell.astro`** / plan cross-link **6b**; **D** → **`phase8-89-pack-viewport-measure`** **after** **B** (and ideally after **A**) unless a measurement bug blocks work independent of padding.
 
 **Pilot pick (choose one before 8.3):** [ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md) **MVP scope** suggests **workshop or home** — record the choice in Task 8.2 so URL work and shell props stay scoped.
 
