@@ -629,6 +629,41 @@ export function packDesktopPanelAtGrid(
 export const DESKTOP_PACK_GRIDS: readonly number[] = [60, 54, 48, 42, 36, 30];
 
 /**
+ * Minimum cork **content** height ÷ width for desktop packing. Wide, shallow
+ * viewports otherwise use the full panel width and read as an ultra‑wide strip;
+ * capping width (keeping full portal height) restores a board‑like proportion.
+ */
+export const DESKTOP_CORK_MIN_HEIGHT_OVER_WIDTH = 0.6;
+
+/**
+ * Snapped cork **budget** inside the panel (before grid floor in
+ * `pickSharedDesktopPackGrid`). When `viewportH / layoutInnerW` is below
+ * `minHeightOverWidth`, width is capped so the packed board stays taller
+ * relative to its width; the physical cork is centered in the panel via CSS.
+ */
+export function desktopCorkPackBudget(
+  layoutInnerW: number,
+  viewportH: number,
+  minHeightOverWidth: number = DESKTOP_CORK_MIN_HEIGHT_OVER_WIDTH,
+  gridSnap: number = PEG_GRID
+): { budgetW: number; budgetH: number } {
+  const snap = (v: number) =>
+    Math.max(0, Math.floor(Math.max(0, v) / gridSnap) * gridSnap);
+  const W = snap(layoutInnerW);
+  const H = snap(viewportH);
+  if (W <= 0 || H <= 0) return { budgetW: W, budgetH: H };
+  if (H / W >= minHeightOverWidth - 1e-9) {
+    return { budgetW: W, budgetH: H };
+  }
+  const rawMaxW = H / minHeightOverWidth;
+  const cappedSnapped = Math.max(
+    gridSnap,
+    snap(Math.min(layoutInnerW, rawMaxW))
+  );
+  return { budgetW: Math.min(W, cappedSnapped), budgetH: H };
+}
+
+/**
  * One snapped cork size and **`gridPx` for every desktop panel** on the strip,
  * so `--peg-grid-px` (peg hole spacing) matches across boards. Chooses the
  * **coarsest** `grid` in `DESKTOP_PACK_GRIDS` for which `packDesktopPanelAtGrid`
@@ -645,9 +680,11 @@ export function pickSharedDesktopPackGrid(
     ? { ...options, debug: false }
     : options;
 
+  const { budgetW, budgetH } = desktopCorkPackBudget(layoutInnerW, viewportH);
+
   for (const grid of DESKTOP_PACK_GRIDS) {
-    const innerW = Math.floor(layoutInnerW / grid) * grid;
-    const innerH = Math.floor(viewportH / grid) * grid;
+    const innerW = Math.floor(budgetW / grid) * grid;
+    const innerH = Math.floor(budgetH / grid) * grid;
     if (innerW <= 0 || innerH <= 0) continue;
     let allPass = true;
     for (const p of panels) {
@@ -663,8 +700,8 @@ export function pickSharedDesktopPackGrid(
   const grid = 30;
   return {
     grid,
-    innerW: Math.floor(layoutInnerW / grid) * grid,
-    innerH: Math.floor(viewportH / grid) * grid,
+    innerW: Math.floor(budgetW / grid) * grid,
+    innerH: Math.floor(budgetH / grid) * grid,
   };
 }
 

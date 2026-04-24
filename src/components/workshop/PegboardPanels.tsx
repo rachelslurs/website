@@ -9,6 +9,7 @@ import {
 import type { PegboardCardDTO } from "@utils/serializeWorkshopPegboard";
 import {
   DESKTOP_PACK_GRIDS,
+  desktopCorkPackBudget,
   hardwareDimsWithGrid,
   initialPackPositionsColumnFirstWithGrid,
   orderPackItemsClipboardLast,
@@ -221,6 +222,7 @@ function PegboardPanelDesktop({
       ? desktopContentInnerW
       : desktopInnerW(w, desktopPanelPadX ?? 32);
   const viewportH = desktopPortalInnerH(h, desktopPanelPadY ?? 20);
+  const { budgetW, budgetH } = desktopCorkPackBudget(innerW, viewportH);
 
   const itemsKey = useMemo(() => items.map(i => i.id).join("|"), [items]);
 
@@ -301,6 +303,7 @@ function PegboardPanelDesktop({
         console.log(`[workshop-pack:${itemsKey}] inputs`, {
           layoutInnerW: innerW,
           viewportH,
+          packBudgetWxH: { w: budgetW, h: budgetH },
           desktopContentInnerW: desktopContentInnerW ?? null,
           desktopSharedPack: desktopSharedPack ?? null,
         });
@@ -336,8 +339,8 @@ function PegboardPanelDesktop({
       }
 
       for (const grid of DESKTOP_PACK_GRIDS) {
-        const iw = Math.floor(innerW / grid) * grid;
-        const ih = Math.floor(viewportH / grid) * grid;
+        const iw = Math.floor(budgetW / grid) * grid;
+        const ih = Math.floor(budgetH / grid) * grid;
         if (iw <= 0 || ih <= 0) continue;
 
         const packed = packDesktopPanelAtGrid(
@@ -353,7 +356,7 @@ function PegboardPanelDesktop({
             console.log(`[workshop-pack:${itemsKey}] chosen grid`, grid, {
               innerW: iw,
               innerH: ih,
-              snappedFrom: { innerW, viewportH },
+              snappedFrom: { innerW, viewportH, budgetW, budgetH },
             });
           }
           return {
@@ -366,8 +369,8 @@ function PegboardPanelDesktop({
         }
       }
       const grid = 30;
-      const iw = Math.floor(innerW / grid) * grid;
-      const ih = Math.floor(viewportH / grid) * grid;
+      const iw = Math.floor(budgetW / grid) * grid;
+      const ih = Math.floor(budgetH / grid) * grid;
       return fallbackAfterStrictFail(grid, iw, ih);
     };
     return pick();
@@ -376,6 +379,8 @@ function PegboardPanelDesktop({
     items,
     innerW,
     viewportH,
+    budgetW,
+    budgetH,
     debugWorkshopCork,
     desktopContentInnerW,
     desktopPanelIndex,
@@ -405,65 +410,78 @@ function PegboardPanelDesktop({
 
   return (
     <div
+      className="pegboard-desktop-pack-slot"
       style={{
-        width: innerWFinal + PEGBOARD_BORDER_OUTSET,
-        height: innerH + PEGBOARD_BORDER_OUTSET,
-        overflow: "visible",
+        width: "100%",
+        height: "100%",
+        minHeight: 0,
         display: "flex",
+        alignItems: "center",
         justifyContent: "center",
+        boxSizing: "border-box",
       }}
     >
       <div
-        className="pegboard-bg pegboard-bg--desktop-cork"
-        data-peg-cols={Math.round(innerWFinal / grid)}
-        data-peg-rows={Math.round(innerH / grid)}
-        data-peg-grid-px={grid}
         style={{
-          width: innerWFinal,
-          height: innerH,
-          ["--peg-grid-px" as never]: `${grid}px`,
-          ["--peg-cols" as never]: String(Math.round(innerWFinal / grid)),
-          ["--peg-rows" as never]: String(Math.round(innerH / grid)),
-          ...(debugWorkshopCork
-            ? {
-                outline: "3px dashed rgb(192 38 211)",
-                outlineOffset: "-2px",
-              }
-            : {}),
+          width: innerWFinal + PEGBOARD_BORDER_OUTSET,
+          height: innerH + PEGBOARD_BORDER_OUTSET,
+          overflow: "visible",
+          display: "flex",
+          justifyContent: "center",
         }}
-        title={
-          debugWorkshopCork
-            ? `Usable cork (packing): ${innerWFinal}×${innerH}px, grid ${grid}px`
-            : undefined
-        }
       >
-        <span className="heavy-screw heavy-screw--tl" aria-hidden />
-        <span className="heavy-screw heavy-screw--tr" aria-hidden />
-        <span className="heavy-screw heavy-screw--bl" aria-hidden />
-        <span className="heavy-screw heavy-screw--br" aria-hidden />
-        {items.map(it => {
-          const { w, h } = hardwareDimsWithGrid(it.hardware, grid);
-          const pos = positions[it.id];
-          if (!pos) return null;
-          return (
-            <PegCard
-              key={it.id}
-              item={it}
-              x={pos.x}
-              y={pos.y}
-              w={w}
-              h={h}
-              innerW={innerWFinal}
-              innerH={innerH}
-              gridPx={grid}
-              specs={specs}
-              positions={positions}
-              dragDisabled={false}
-              availableWidth={innerWFinal}
-              onDragCommit={onDragCommit}
-            />
-          );
-        })}
+        <div
+          className="pegboard-bg pegboard-bg--desktop-cork"
+          data-peg-cols={Math.round(innerWFinal / grid)}
+          data-peg-rows={Math.round(innerH / grid)}
+          data-peg-grid-px={grid}
+          style={{
+            width: innerWFinal,
+            height: innerH,
+            ["--peg-grid-px" as never]: `${grid}px`,
+            ["--peg-cols" as never]: String(Math.round(innerWFinal / grid)),
+            ["--peg-rows" as never]: String(Math.round(innerH / grid)),
+            ...(debugWorkshopCork
+              ? {
+                  outline: "3px dashed rgb(192 38 211)",
+                  outlineOffset: "-2px",
+                }
+              : {}),
+          }}
+          title={
+            debugWorkshopCork
+              ? `Usable cork (packing): ${innerWFinal}×${innerH}px, grid ${grid}px`
+              : undefined
+          }
+        >
+          <span className="heavy-screw heavy-screw--tl" aria-hidden />
+          <span className="heavy-screw heavy-screw--tr" aria-hidden />
+          <span className="heavy-screw heavy-screw--bl" aria-hidden />
+          <span className="heavy-screw heavy-screw--br" aria-hidden />
+          {items.map(it => {
+            const { w, h } = hardwareDimsWithGrid(it.hardware, grid);
+            const pos = positions[it.id];
+            if (!pos) return null;
+            return (
+              <PegCard
+                key={it.id}
+                item={it}
+                x={pos.x}
+                y={pos.y}
+                w={w}
+                h={h}
+                innerW={innerWFinal}
+                innerH={innerH}
+                gridPx={grid}
+                specs={specs}
+                positions={positions}
+                dragDisabled={false}
+                availableWidth={innerWFinal}
+                onDragCommit={onDragCommit}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
   );

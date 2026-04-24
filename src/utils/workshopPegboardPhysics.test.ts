@@ -12,6 +12,7 @@ import {
   orderPackItemsClipboardLast,
   orderPackItemsClipboardLastReverseNonClipboard,
   packDesktopPanelAtGrid,
+  desktopCorkPackBudget,
   pickSharedDesktopPackGrid,
   resolveLayoutAfterResizeWithGrid,
   sortPackItemsByHeightDesc,
@@ -142,6 +143,21 @@ describe("initialPackPositionsColumnFirstWithGrid", () => {
   });
 });
 
+describe("desktopCorkPackBudget", () => {
+  it("does not cap when the portal is already tall enough vs width", () => {
+    const r = desktopCorkPackBudget(1200, 1000, 0.6, 60);
+    expect(r.budgetW).toBe(1200);
+    expect(r.budgetH).toBe(960);
+  });
+
+  it("caps width on wide shallow portals so height/width stays near the target", () => {
+    const r = desktopCorkPackBudget(1200, 480, 0.6, 60);
+    expect(r.budgetH).toBe(480);
+    expect(r.budgetW).toBeLessThan(1200);
+    expect(r.budgetH / r.budgetW).toBeGreaterThanOrEqual(0.6 - 1e-6);
+  });
+});
+
 describe("pickSharedDesktopPackGrid", () => {
   it("returns the same coarsest grid for every panel when all fit at that grid", () => {
     const trio = [
@@ -167,6 +183,20 @@ describe("pickSharedDesktopPackGrid", () => {
     const easyGrid = pickSharedDesktopPackGrid(easy, 1200, 1000).grid;
     const sharedTight = pickSharedDesktopPackGrid(tight, 520, 520).grid;
     expect(easyGrid).toBeGreaterThanOrEqual(sharedTight);
+  });
+
+  it("uses capped cork width on wide shallow viewports (shared innerW)", () => {
+    const trio = [
+      { id: "work", hardware: "clipboard" as const },
+      { id: "link", hardware: "lcd" as const },
+      { id: "demo", hardware: "blueprint" as const },
+    ];
+    const panels = [{ items: trio }];
+    const r = pickSharedDesktopPackGrid(panels, 1200, 480);
+    const fullWAtGrid = Math.floor(1200 / r.grid) * r.grid;
+    expect(r.innerW).toBeLessThan(fullWAtGrid);
+    expect(r.innerH).toBeLessThanOrEqual(Math.floor(480 / r.grid) * r.grid);
+    expect(r.innerH / r.innerW).toBeGreaterThanOrEqual(0.58);
   });
 });
 
