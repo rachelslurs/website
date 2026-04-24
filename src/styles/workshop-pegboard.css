@@ -70,16 +70,17 @@
   --lcd-cast-opacity: 0.16;
   --lcd-cast-opacity-drag: 0.22;
   /*
-   * Desktop strip uses `overflow-y: clip` + `overflow-clip-margin` so cork/card shadows paint past
-   * the scrollport without `overflow-y: visible` (which would compute to `auto` beside `overflow-x: auto`
-   * and allow vertical strip scroll). Values track `.pegboard-bg` slab shadow (15px 30px 60px) and
-   * `--pegboard-card-shadow-drag` (25px 35px 45px); extra rem covers blur tail + root font scaling.
+   * Desktop strip + mobile scale slot: `overflow-clip-margin` extends paint past scroll/clip boxes.
+   * Tracks `.pegboard-bg` shadow (15px 30px 60px), `--pegboard-card-shadow-drag`, and blur tail;
+   * bumped 2026-04 — field QA still saw clip until margin was generous vs ink.
    */
   --workshop-strip-clip-ink: max(
-    5.5rem,
-    calc(30px + 60px + 2.5rem),
-    calc(15px + 60px + 2.5rem),
-    calc(35px + 45px + 2.5rem)
+    8.5rem,
+    calc(20px + 30px + 60px + 4rem),
+    calc(15px + 30px + 60px + 4rem),
+    calc(30px + 60px + 4rem),
+    calc(35px + 45px + 4rem),
+    calc(15px + 60px + 4rem)
   );
 }
 
@@ -150,6 +151,9 @@
   align-self: stretch;
   min-height: 0;
   width: 100%;
+  box-sizing: border-box;
+  /* Gutters so slab/cork shadows are less likely to hit `overflow-y: auto` clip (no clip-margin on auto). */
+  padding-block: 1rem;
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -202,9 +206,10 @@
   box-sizing: border-box;
 }
 
-/* Slab depth only — wood borders removed so they do not stack outside `.pegboard-bg`. */
+/* Slab chrome: depth comes from `.pegboard-bg` `box-shadow` — avoid a second full slab shadow here
+ * (stacked slabs + mobile scroll clip read as “shadows everywhere” / hard clip at 375×500). */
 .workshop-panel--mobile-slab {
-  box-shadow: 15px 30px 60px rgba(0, 0, 0, 0.7);
+  box-shadow: none;
 }
 
 /* Horizontal bridge strips between viewport-width panels (reference .metal-bracket) */
@@ -415,11 +420,19 @@
 .pegboard-mobile-scale-slot {
   position: relative;
   /* Unscaled `width`/`height` + `transform: scale()` on the surface still occupy the
-   * pre-transform layout box; `visible` lets that box paint over the next mobile slab. */
+   * pre-transform layout box. `hidden` clips cork/card shadows; `clip` + `overflow-clip-margin`
+   * (same token as desktop strip) extends paint without `overflow: visible` fighting flex siblings. */
   overflow: hidden;
   margin-left: auto;
   margin-right: auto;
   touch-action: pan-y;
+}
+
+@supports (overflow-clip-margin: 0px) {
+  .pegboard-mobile-scale-slot {
+    overflow: clip;
+    overflow-clip-margin: var(--workshop-strip-clip-ink);
+  }
 }
 
 .pegboard-mobile-scale-surface {
