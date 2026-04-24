@@ -126,7 +126,7 @@ todos:
     content: "ON HOLD — Phase 7e (resume after Phase 8 shell stable): npm run check + test:visual:docker / update:docker for site-pages (+ site-chrome if nav chrome shifts). Deferred: batch VR with post–Phase 8 baselines."
     status: pending
   - id: phase7-typography-adr
-    content: "ADR-009 — reading typography + prose boundaries + theme vs riso; amend after Phase 7 implementation if split changes"
+    content: ADR-009 — reading typography + prose boundaries + theme vs riso; amend after Phase 7 implementation if split changes
     status: completed
   - id: phase8-81-adr011-dom-contract
     content: "Phase 8.1: ADR-011 (or amend ADR-008) — DOM contract peg field vs reading measure vs tape/grain + nav/footer z-order (plan Task 8.1)"
@@ -152,6 +152,9 @@ todos:
   - id: phase8-88-scroll-layer-simplify
     content: "Phase 8.8: Workshop desktop — simplify scroll/overflow contract (prefer outer column overflow:visible + inner row overflow-x:auto only; document or remove overflow-y:hidden if still required); reduce nested flex surface area"
     status: pending
+  - id: phase8-8d-strip-shadow-paint-contract
+    content: "Phase 8.8d (gate): Desktop strip shadow paint — validate overflow-y clip + --workshop-strip-clip-ink vs worst-case slab/card/drag shadows; document @supports not (overflow-clip-margin) padding fallback; complete before further strip padding-block trims (plan § Workshop vertical budget and shadow ink)"
+    status: pending
   - id: phase8-89-pack-viewport-measure
     content: "Phase 8.9: Single packing viewport contract — scrollport content box (padding-aware) for portalLayout + any panel/strip RO; unit-test size helper; cross-link ADR-003/ADR-011; grep audit clientWidth/clientHeight/getBoundingClientRect"
     status: pending
@@ -173,7 +176,7 @@ isProject: false
 
 ## Planning discipline (task breakdown)
 
-This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task-breakdown/SKILL.md): **dependency order** (frame → interaction model → single presentation transform → physics cleanup → verify), **vertical slices** (each slice leaves the UI shippable), **checkpoints** after each phase, and **`npm run check` + named viewports**. **Merged:** the separate “pegboard scale rethink” narrative (design-resolution + uniform `scale` vs multi-`gridPx` reflow on mobile) now lives **only in this file** under **Phase 2 revision** below. Multi-step delivery within a phase follows [`incremental-implementation`](../skills/incremental-implementation/SKILL.md): implement → **`npm test` / `npm run check`** → verify → next slice. **Phase 7** (reading typography, ADR-009) is **on hold** after **7a–7c** — **7d–7e** deferred until **Phase 8** shell/container direction stabilizes so typography density and VR baselines are not thrown away by `RisoBoardShell` changes. **Phase 8** tracks **[ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)** (site-wide shell); it shares `RisoBoardShell`, visuals, and VR suites with Phase 7.
+This roadmap follows [`planning-and-task-breakdown`](../skills/planning-and-task-breakdown/SKILL.md): **dependency order** (frame → interaction model → single presentation transform → physics cleanup → verify), **vertical slices** (each slice leaves the UI shippable), **checkpoints** after each phase, and **`npm run check` + named viewports**. For **taller workshop pegboard + shadow ink**, Phase 8 adds an explicit **paint-before-height-before-packing** order — see **[§ Workshop vertical budget and shadow ink](#workshop-vertical-budget-and-shadow-ink)** and YAML **`phase8-8d-strip-shadow-paint-contract`**. **Merged:** the separate “pegboard scale rethink” narrative (design-resolution + uniform `scale` vs multi-`gridPx` reflow on mobile) now lives **only in this file** under **Phase 2 revision** below. Multi-step delivery within a phase follows [`incremental-implementation`](../skills/incremental-implementation/SKILL.md): implement → **`npm test` / `npm run check`** → verify → next slice. **Phase 7** (reading typography, ADR-009) is **on hold** after **7a–7c** — **7d–7e** deferred until **Phase 8** shell/container direction stabilizes so typography density and VR baselines are not thrown away by `RisoBoardShell` changes. **Phase 8** tracks **[ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)** (site-wide shell); it shares `RisoBoardShell`, visuals, and VR suites with Phase 7.
 
 ## Execution order (single program)
 
@@ -999,11 +1002,12 @@ flowchart TB
 1. **ADR-011** (**done**) — [Immersive shell DOM contract](../../docs/decisions/011-immersive-shell-dom-contract.md): peg field vs reading column vs tape/grain + z-order; amends ADR-008 for pilot **`immersivePegStage`** (ADR-010 Consequences).
 2. **URL → scene** (**done** for workshop pilot) — [ADR-012: Workshop URL → scene (pagination)](../../docs/decisions/012-workshop-url-scene-pagination.md): path-based `/workshop` / `/workshop/{N}`, SSR + client agreement, v1 out-of-scope + link rot; other routes in later ADRs / **8.7**.
 3. **Vertical slice** — one pilot route: remove outer max-width constraint for the peg field, persistent stage chrome, one item-layer transition pattern; **ADR-003** still applies anywhere the TV frame exists.
+3b. **Workshop height + shadow ink (pilot)** — When chasing a **taller peg column**, follow the ordered slice **[§ Workshop vertical budget and shadow ink](#workshop-vertical-budget-and-shadow-ink)** (shadow/clip **before** aggressive `padding-block` trims; workshop CSS **before** shell; **Task 8.9** packing/measure **after** the CSS box is honest). YAML gate: **`phase8-8d-strip-shadow-paint-contract`**.
 4. **VR + manual** — `site-pages`, `workshop-pegboard`, `site-chrome` per [visual-regression-docker.mdc](../rules/visual-regression-docker.mdc). **Expect a baseline redo:** Phase 8 changes outer layout and chrome enough that most or all committed screenshots in those suites will need an **intentional refresh** (Docker update workflow + **review every diff**). Do not treat VR as small pixel nudges—plan time for a full pass after the immersive shell lands (see YAML todo **`phase8-86-visual-regression-redo`**).
 
 ### Phase 8 — Task breakdown ([`planning-and-task-breakdown`](../skills/planning-and-task-breakdown/SKILL.md))
 
-**Cursor plan todos:** Each task below maps 1:1 to a `todos[]` entry in this file’s YAML frontmatter — ids **`phase8-81-adr011-dom-contract`** through **`phase8-87-rollout-wave-2`** (product track), plus **`phase8-88-scroll-layer-simplify`** through **`phase8-8c-plan-adr-sync`** (layout cleanup **8.8–8.12**). Mark **completed** in the YAML as you ship so Cursor’s plan/todo UI stays in sync.
+**Cursor plan todos:** Each task below maps 1:1 to a `todos[]` entry in this file’s YAML frontmatter — ids **`phase8-81-adr011-dom-contract`** through **`phase8-87-rollout-wave-2`** (product track), plus **`phase8-88-scroll-layer-simplify`**, **`phase8-8d-strip-shadow-paint-contract`** (shadow/clip **gate** before aggressive strip padding trims), and **`phase8-89-pack-viewport-measure`** through **`phase8-8c-plan-adr-sync`** (layout cleanup **8.8–8.12**). Mark **completed** in the YAML as you ship so Cursor’s plan/todo UI stays in sync.
 
 **Overview:** Ship **[ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md)** in **vertical slices**: written contracts first → **one pilot surface** proves viewport-wide peg stage + URL→scene + item-layer motion without breaking **ADR-003** / **ADR-001** → **baseline redo** → then widen route coverage in later waves (not all in the first PR).
 
@@ -1025,6 +1029,112 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
                   │
                   └── Phase 7d–7e resume (typography density + verify)
 ```
+
+### Workshop vertical budget and shadow ink
+
+Structured per [`planning-and-task-breakdown`](../skills/planning-and-task-breakdown/SKILL.md): **separate paint correctness from layout height**, then move **top-down** on the height chain so each change set has one primary failure mode (avoid mixing “taller cork” with “why did the shadow clip?” in the same PR).
+
+**Dependency graph (workshop desktop — cork `layoutH` vs ink):**
+
+```text
+(A) Shadow paint contract
+        │
+        │  overflow-y: clip + overflow-clip-margin + --workshop-strip-clip-ink
+        │  (+ @supports not (overflow-clip-margin) padding fallback documented)
+        ▼
+(B) Workshop CSS height (content box)
+        │
+        │  .workshop-scroll--desktop-strip padding-block → .workshop-panel--desktop padding-block / centering → strip padding-inline last
+        ▼
+(C) Immersive shell only (RisoBoardShell pilot)
+        │
+        │  outer / inner .board padding, gap-board-stack-* — ADR-003 nav+footer first paint
+        ▼
+(D) Packing / measurement (Task 8.9)
+           workshopScrollContentClientSize, portalLayout, Vitest edge cases
+```
+
+| Step | What | Why this order |
+|------|------|----------------|
+| **A** | **Shadow / clip** — On `.workshop-scroll--desktop-strip`, keep **`overflow-x: auto`** and validate **`overflow-y: clip`** + **`overflow-clip-margin: var(--workshop-strip-clip-ink)`** vs worst-case **slab `box-shadow`**, **card rest + drag** shadows, and any **`filter: drop-shadow`**. Prefer **raising `--workshop-strip-clip-ink`** (on `.workshop-pegboard-root`) over re-inflating **`padding-block`** for ink. **`@supports not (overflow-clip-margin)`** keeps a **larger `padding-block` fallback** — do not collapse that path in the same change as aggressive trims. | Taller cork changes **stress** the same overflow edge; if ink clips, every follow-up looks like a “layout” bug. |
+| **B** | **Workshop content-box height** — After **A** is green: tune **strip `padding-block`**, then **`.workshop-panel--desktop`** block padding / flex centering, then **strip `padding-inline`** if needed. React **`workshopScrollContentClientSize`** already subtracts strip padding from **`clientHeight`**. | Maximum height leverage inside the peg stack without touching shell tokens. |
+| **C** | **Shell (`immersivePegStage` + `fillViewportSlot` only)** — Outer / inner **`.board`** padding, **nav ↔ main ↔ footer** stack gaps (`RisoBoardShell.astro`). | Reclaims **`#main-content`** slot height; hits **`workshop-page-with-chrome`** VR; respect **ADR-003**. |
+| **D** | **Task 8.9** — Centralize / test **content-box** measurement when the **CSS box** is correct but packing or grid still mis-reads height/width. | Mixing **D** with **A/B** makes regressions hard to attribute (“packing bug” vs “wrong strip padding”). |
+
+#### Task 8.8d — Strip shadow paint contract (gate)
+
+**Cursor todo id:** `phase8-8d-strip-shadow-paint-contract`
+
+**Description:** Prove the desktop strip’s **paint region** is sufficient for real shadows **before** landing further **`padding-block`** reductions or scroll simplifications that shrink the scrollport. Treat **Chromium/WebKit `overflow-clip-margin`** and the **`@supports not`** padding branch as **two products** of one decision (document both in **Task 8.12** / ADR cross-links if behavior diverges).
+
+**Acceptance criteria:**
+
+- [ ] No visible **shadow clip** on slabs/cards at **1024** and **1280**, plus one **short-height** viewport; include **drag** state if shadows intensify.
+- [ ] **`--workshop-strip-clip-ink`** (or successor token from **8.11**) is justified against the **largest** vertical ink extent used in production CSS (slab + card + bracket), not copy-pasted magic without a comment.
+- [ ] Fallback path without **`overflow-clip-margin`** is **named** (comment or ADR) and still safe if touched in the same file.
+
+**Verification:**
+
+- [ ] Manual matrix above + **`docker compose run --rm playwright-fast` … `tests/visual/workshop-pegboard.spec.ts`** green (update baselines in Docker only per [visual-regression-docker.mdc](../rules/visual-regression-docker.mdc)).
+
+**Dependencies:** **8.3** (immersive workshop DOM stable enough to screenshot).
+
+**Files likely touched:** [`src/styles/workshop-pegboard.css`](../../src/styles/workshop-pegboard.css) (strip overflow + `--workshop-strip-clip-ink`); optionally [`WorkshopPegboard.tsx`](../../src/components/workshop/WorkshopPegboard.tsx) only if readouts must align with token renames.
+
+**Estimated scope:** Small.
+
+#### Checkpoint: After **A** + **B** (height vs ink slice)
+
+- [ ] Shadows stable at agreed **`padding-block`** / panel padding (or explicit deferral with reason).
+- [ ] **ADR-003** Playwright **toBeInViewport** checks still pass; peg region measurably **taller** **or** height work explicitly parked with written rationale.
+
+#### Incremental verification protocol (explicit viewports)
+
+Execution discipline for steps **A→D** above follows [`incremental-implementation`](../skills/incremental-implementation/SKILL.md): **one logical change per increment** → **automated test** → **fixed-viewport visual check** → **commit** → next slice. Do **not** mix **A** (shadow/clip) with **C** (shell gaps) in one commit — if something regresses, you need to know which layer caused it.
+
+**Canonical viewport matrix (use the same sizes every time):**
+
+| Width × height (px) | Source | Primary signal |
+|---------------------|--------|----------------|
+| **320 × 568** | [`typicalViewport(320)`](../../tests/visual/viewportPresets.ts) | Mobile stack + ADR-003 |
+| **375 × 667** | `typicalViewport(375)` | Mobile + slab seam refs |
+| **430 × 844** | `typicalViewport(430)` | Tall mobile |
+| **768 × 1024** | `typicalViewport(768)` | Mobile/desktop boundary |
+| **1024 × 900** | `typicalViewport(1024)` | Desktop strip + cork height |
+| **1280 × 900** | `typicalViewport(1280)` | Wide desktop + `portal-inner--desktop` |
+| **375 × 500** | [`workshop-pegboard.spec.ts`](../../tests/visual/workshop-pegboard.spec.ts) short viewport | ADR-003 vertical stress |
+| **1024 × 700** (optional) | Manual only | Short **desktop** — clip + cork under chrome pressure |
+
+**Routes:**
+
+- **`/workshop/visual-test`** — stable fixture for **`.pegboard-bg`** element screenshots and ADR-003 locators (what CI runs).
+- **`/workshop`** (and `/workshop/2` if paginated) — real content + site chrome; use for “does it feel right” after visual-test is green.
+
+**Per increment (repeat until task done):**
+
+1. **Implement** one slice from **A**, **B**, **C**, or **D** only (see table in [§ Workshop vertical budget and shadow ink](#workshop-vertical-budget-and-shadow-ink)).
+2. **`npm run check`** (or project equivalent) — keep the tree green between slices ([`incremental-implementation`](../skills/incremental-implementation/SKILL.md) Rule 2).
+3. **Automated:** run the workshop visual spec in Docker (Linux parity per [visual-regression-docker.mdc](../rules/visual-regression-docker.mdc)):
+   - Full:  
+     `docker compose run --rm playwright-fast bash -lc "npm ci --prefer-offline --no-audit --no-fund && npx playwright test tests/visual/workshop-pegboard.spec.ts"`
+   - **Faster loop** while iterating: scope with `--grep` (examples):  
+     `… npx playwright test tests/visual/workshop-pegboard.spec.ts --grep "ADR-003"`  
+     `… --grep "pegboard-bg slabs @ 1024"`  
+     `… --grep "portal-inner @ 1280"`
+4. **Visual “are we improving?”** — For the **same** width×height row as above:
+   - **Height:** Compare **element screenshot** size lines in Playwright output (e.g. `.pegboard-bg` **height in px**); or in DevTools select **`.pegboard-bg`** / first slab and read **layout** height. **Larger cork box at fixed viewport = improvement** (until ADR-003 fails).
+   - **Shadows (step A):** At **1024×900** and **1280×900**, hard-pan slabs if needed; **drag** a card and check **bottom** and **side** shadow tails against the strip edge — no hard cut line. Repeat on **375×500** for vertical squeeze.
+   - Optional: use **Chrome DevTools MCP** per [`browser-testing-with-devtools`](../skills/browser-testing-with-devtools/SKILL.md) for screenshots + computed `overflow` on **`.workshop-scroll--desktop-strip`** when debugging.
+5. **Baseline policy:** If pixel diffs are **expected** (taller cork), update PNGs **only** via Docker **`playwright-update-fast`** workflow; **review diff images** before committing ([`incremental-implementation`](../skills/incremental-implementation/SKILL.md) — treat VR as part of verify).
+6. **Commit** this slice; then start the **next** slice.
+
+**Improvement criteria (binary checks):**
+
+- **Taller peg column:** At **1024×900** and **1280×900**, first **`.pegboard-bg`** layout height **≥** pre-change capture (same route, same font load); ADR-003 **`toBeInViewport`** tests still pass.
+- **Shadow quality:** No new clipping vs previous screenshot at same viewport; drag state not worse.
+- **No ADR-003 regression:** Document **does not** scroll to see peg scrollport or first slab; nav + footer expectations unchanged for **`workshop-page-with-chrome`** captures.
+
+**Maps to existing tasks:** **A** → **`phase8-8d-strip-shadow-paint-contract`** then **`phase8-8b-ink-gutter-tokens`** (8.11) for token consolidation; **B** → **`phase8-88`**, **`phase8-8a-stack-footer-chrome`** (8.10) as you document shell vs strip ownership; **C** → immersive-only edits in **`RisoBoardShell.astro`** / plan cross-link **6b**; **D** → **`phase8-89-pack-viewport-measure`** **after** **B** (and ideally after **A**) unless a measurement bug blocks work independent of padding.
 
 **Pilot pick (choose one before 8.3):** [ADR-010](../../docs/decisions/010-site-wide-immersive-pegboard-shell.md) **MVP scope** suggests **workshop or home** — record the choice in Task 8.2 so URL work and shell props stay scoped.
 
@@ -1195,14 +1305,14 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 | `transition:persist` + new shell fights navigation | Med | Re-test every major route class; document in ADR-011 if persist scope changes. |
 | VR noise hides real regressions | High | Review diffs in small batches; keep ADR-003 locator tests strict. |
 | Phase 7 typography run mid-shell | Med | Keep Phase 7 on hold until Checkpoint “8.4–8.6” done (existing plan note). |
-| Workshop layout “death by padding” | Med | Land **8.9** (single content-box measure) before or with further strip/stack padding tweaks; use **8.11** tokens so gutters do not drift. |
+| Workshop layout “death by padding” / shadow clip thrash | Med | Follow **[§ Workshop vertical budget and shadow ink](#workshop-vertical-budget-and-shadow-ink)**: complete **`phase8-8d-strip-shadow-paint-contract`** before aggressive strip **`padding-block`** trims; land **8.9** (single content-box measure) **after** the CSS box is honest; use **8.11** tokens so gutters do not drift. |
 
 ### Parallelization
 
 - **Sequential:** 8.1 → 8.2 → 8.3 (strong order).
 - **After 8.4 lands:** 8.5 can pair with prep for 8.6 (different files) with care — same pilot route, coordinate.
 - **Parallel safe:** Draft ADR-011 sections while prototyping DOM in a spike branch **if** spikes are throwaway or merged behind pilot flag.
-- **8.8–8.12:** Prefer **after 8.3** when the immersive workshop DOM is stable; **8.9** should precede or accompany any new **padding** on `.workshop-scroll--desktop-strip` so `portalLayout` does not regress; **8.10** documents **`.workshop-page-stack`** as **peg-only** (in-page pagination footer **removed**; `row-gap` inert) and who owns vertical seam vs **strip padding** / **8.11** ink tokens.
+- **8.8–8.12:** Prefer **after 8.3** when the immersive workshop DOM is stable. **Order:** **`phase8-8d-strip-shadow-paint-contract`** → **8.8** / **8.10** / **8.11** (height + ink in workshop CSS and tokens) → **8.9** when the **content box** is stable (avoid packing changes while shadow/padding is still in flux). **8.10** documents **`.workshop-page-stack`** as **peg-only** (in-page pagination footer **removed**; `row-gap` inert) and who owns vertical seam vs **strip padding** / **8.11** ink tokens.
 
 ---
 
@@ -1232,6 +1342,7 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 #### Task 8.11 — Ink gutter tokens
 
 - Drive **`.pegboard-bg`** and **`.metal-bracket--band`** minimum gutters from **shared CSS variables**; strip padding + stack gap consume **`max()`** of those tokens (single tuning surface).
+- **Prerequisite:** complete **`phase8-8d-strip-shadow-paint-contract`** (and document **`@supports not`**) before tokenizing trims that **reduce** strip **`padding-block`** — otherwise **A** vs **B** in **[§ Workshop vertical budget and shadow ink](#workshop-vertical-budget-and-shadow-ink)** collapse into one hard-to-review PR.
 
 #### Task 8.12 — Plan + ADR hygiene
 
