@@ -47,11 +47,14 @@ function PegboardPanelMobile({
   vw,
   layoutWidth,
   mobileScalePresentation,
+  debugWorkshopCork,
 }: {
   items: PegboardCardDTO[];
   vw: number;
   layoutWidth?: number;
   mobileScalePresentation?: MobileScalePresentation;
+  /** `?workshopDebugCork=1` — outline mobile cork + match desktop debug affordances. */
+  debugWorkshopCork?: boolean;
 }) {
   const w = Math.round(layoutWidth ?? vw);
   const slotContentW = mobileScalePresentation?.slotContentW ?? mobileInnerW(w);
@@ -134,7 +137,18 @@ function PegboardPanelMobile({
             width: designContentW,
             height: snappedContentH,
             ["--peg-grid-px" as never]: `${PEG_GRID}px`,
+            ...(debugWorkshopCork
+              ? {
+                  outline: "3px dashed rgb(192 38 211)",
+                  outlineOffset: "-2px",
+                }
+              : {}),
           }}
+          title={
+            debugWorkshopCork
+              ? `Usable cork (mobile): ${designContentW}×${snappedContentH}px, grid ${PEG_GRID}px`
+              : undefined
+          }
         >
           <span className="heavy-screw heavy-screw--tl" aria-hidden />
           <span className="heavy-screw heavy-screw--tr" aria-hidden />
@@ -491,6 +505,7 @@ export default function PegboardPanelView({
         vw={vw}
         layoutWidth={layoutWidth}
         mobileScalePresentation={mobileScalePresentation}
+        debugWorkshopCork={debugWorkshopCork}
       />
     );
   }

@@ -91,6 +91,10 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   /** `?workshopDebugCork=1` or `localStorage.workshopDebugCork = "1"` — outlines cork + console packing logs. */
   const [debugWorkshopCork, setDebugWorkshopCork] = useState(false);
+  const debugWorkshopCorkRef = useRef(debugWorkshopCork);
+  debugWorkshopCorkRef.current = debugWorkshopCork;
+  /** Dedupe `[workshopDebugCork]` ResizeObserver logs when dimensions are unchanged. */
+  const lastScrollportDebugDigest = useRef("");
   const [portalLayout, setPortalLayout] = useState<{
     w: number;
     h: number;
@@ -120,6 +124,10 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
       setDebugWorkshopCork(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (debugWorkshopCork) lastScrollportDebugDigest.current = "";
+  }, [debugWorkshopCork]);
 
   const layoutW = Math.round(portalLayout?.w ?? vw);
   const layoutH = Math.round(portalLayout?.h ?? vh);
@@ -293,11 +301,27 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     if (!el) return;
     const apply = (target: HTMLElement) => {
       const { w, h } = workshopScrollContentClientSize(target);
+      const isMobileLayout = Math.round(target.clientWidth) <= 768;
+      if (debugWorkshopCorkRef.current) {
+        const digest = `${w}x${h}@${target.clientWidth}x${target.clientHeight}@${isMobileLayout}`;
+        if (digest !== lastScrollportDebugDigest.current) {
+          lastScrollportDebugDigest.current = digest;
+          // eslint-disable-next-line no-console -- intentional (?workshopDebugCork=1 / localStorage)
+          console.info("[workshopDebugCork] scrollport → packing content box", {
+            packingLayoutWxH: { w, h },
+            scrollportClient: {
+              width: target.clientWidth,
+              height: target.clientHeight,
+            },
+            isMobileLayout,
+          });
+        }
+      }
       setPortalLayout({
         w,
         h,
         /* Breakpoint uses full strip width so padding on the desktop strip does not flip mobile mode. */
-        isMobile: Math.round(target.clientWidth) <= 768,
+        isMobile: isMobileLayout,
       });
     };
     apply(el);
@@ -315,6 +339,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
       <div
         className="workshop-pegboard-root workshop-wall not-prose font-body w-full min-w-0"
         data-pegboard-layout="desktop"
+        {...(debugWorkshopCork ? { "data-workshop-debug-cork": "1" } : {})}
       >
         <div className="flex min-h-[12rem] flex-1 flex-col items-center justify-center px-4">
           <p className="text-sm text-slate-400">Nothing on the pegboard yet.</p>
@@ -349,6 +374,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
           layoutWidth={layoutW}
           layoutHeight={layoutH}
           mobileScalePresentation={mobileScalePresentation}
+          debugWorkshopCork={debugWorkshopCork}
         />
       </div>
     );
@@ -358,6 +384,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     <div
       className="workshop-pegboard-root workshop-wall not-prose font-body w-full min-w-0"
       data-pegboard-layout={isMobile ? "mobile" : "desktop"}
+      {...(debugWorkshopCork ? { "data-workshop-debug-cork": "1" } : {})}
     >
       {!isMobile ? (
         <div
