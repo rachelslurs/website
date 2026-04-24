@@ -23,6 +23,15 @@ const {
   fillViewportChain = false,
   immersivePegStage = false,
 } = Astro.props;
+
+/** Immersive pilot (workshop): reclaim vertical budget for peg column without changing other routes. */
+const boardBlockPadding = immersivePegStage
+  ? "max-sm:py-board-padding-sm max-lg:py-4 lg:pt-5 lg:pb-6"
+  : "max-lg:py-board-padding-y-lg lg:pb-board-pb-lg lg:pt-board-pt-lg";
+
+const stackChromeGap = immersivePegStage
+  ? "gap-board-stack-gap-lg max-sm:gap-board-stack-gap-sm"
+  : "gap-board-stack-gap max-lg:gap-board-stack-gap-lg max-sm:gap-board-stack-gap-sm";
 ---
 
 <a id="skip-to-content" href="#main-content" class="skip-to-content-board">
@@ -32,7 +41,7 @@ const {
   class:list={[
     "board-page-outer w-full",
     immersivePegStage
-      ? "py-board-outer max-sm:py-board-outer-sm px-0"
+      ? "py-board-outer-sm px-0"
       : "p-board-outer max-sm:p-board-outer-sm",
     immersivePegStage && "board-page-outer--immersive-peg-stage",
     immersivePegStage ? "max-w-none" : "mx-auto max-w-[1200px]",
@@ -45,9 +54,10 @@ const {
   <!-- ADR-008 (+ ADR-011): page-owned visuals (tape, edges, etc.) stay inside the inner `board` column. -->
   <div
     class:list={[
-      "board relative flex flex-col gap-board-slab-gap max-lg:py-board-padding-y-lg lg:pb-board-pb-lg lg:pt-board-pt-lg max-sm:gap-board-slab-gap-sm",
+      "board relative flex flex-col gap-board-slab-gap max-sm:gap-board-slab-gap-sm",
+      boardBlockPadding,
       immersivePegStage
-        ? "px-0 max-sm:px-0 max-sm:py-board-padding-sm"
+        ? "px-0 max-sm:px-0"
         : "px-board-padding-x max-sm:p-board-padding-sm",
       fillViewportChain && "min-h-0 flex-1",
     ]}
@@ -65,7 +75,10 @@ const {
     </div>
 
     <div
-      class="relative z-[110] flex min-h-0 flex-1 flex-col gap-board-stack-gap max-lg:gap-board-stack-gap-lg max-sm:gap-board-stack-gap-sm"
+      class:list={[
+        "relative z-[110] flex min-h-0 flex-1 flex-col",
+        stackChromeGap,
+      ]}
     >
       <RisoNav
         client:load
