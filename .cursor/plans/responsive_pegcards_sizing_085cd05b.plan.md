@@ -136,10 +136,10 @@ todos:
     status: completed
   - id: phase8-83-shell-pilot
     content: "Phase 8.3: RisoBoardShell/Main — implement ADR-011 for pilot route only; full-bleed peg stage; ADR-003 if workshop (plan Task 8.3)"
-    status: pending
+    status: completed
   - id: phase8-84-url-state-pilot
     content: "Phase 8.4: Pilot URL drives scene — refresh + share link match; invalid URLs → default/redirect (plan Task 8.4)"
-    status: pending
+    status: completed
   - id: phase8-85-item-layer-transition
     content: "Phase 8.5: Pilot item-layer transition — keyed subtree motion; prefers-reduced-motion path (plan Task 8.5)"
     status: pending
@@ -1079,9 +1079,9 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 **Description:** Implement ADR-011 in [`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro) / [`Main.astro`](../../src/layouts/Main.astro) (and related CSS in [`riso.css`](../../src/styles/riso.css) / Tailwind) for the **pilot route only** first: outer **`board-page-outer` max-width** removed or relocated per contract; **viewport-wide peg background** (or shared stage) lives in the new outer layer; **reading** stays on an inner measured column per **ADR-009**. Preserve **`fillViewportChain`** / **`h-svh` / `min-h-0`** semantics for workshop (**ADR-003**). Revisit [`transition:persist="riso-board-decoration"`](../../src/components/RisoBoardShell.astro) if full-site persistence conflicts with in-page navigation (existing inline comment).
 
 **Acceptance criteria:**
-- [ ] Pilot route: peg field reads **full-bleed** (or per ADR-011) at **1280px+** without shrinking the “wall” to 1200px.
-- [ ] Workshop (if in pilot): **ADR-003** still holds at 320 / 375 / 768 / 1024 / 1280 — pegboard column fills the bounded viewport height; **horizontal panel scroll / vertical slab scroll** only (no removed **portal-frame** nav to reach; see **Task 8.12** if copy still mentions frame arrows).
-- [ ] Non-pilot routes: **unchanged** OR explicitly behind a flag (document the choice).
+- [x] Pilot route: peg field reads **full-bleed** (or per ADR-011) at **1280px+** without shrinking the “wall” to 1200px — `Main` passes **`immersivePegStage={fillViewportSlot}`**; [`RisoBoardShell.astro`](../../src/components/RisoBoardShell.astro) uses **`max-w-none`** + **`board-page-outer--immersive-peg-stage`** when true ([ADR-011](../../docs/decisions/011-immersive-shell-dom-contract.md)).
+- [x] Workshop (if in pilot): **ADR-003** still holds at 320 / 375 / 768 / 1024 / 1280 — pegboard column fills the bounded viewport height; **horizontal panel scroll / vertical slab scroll** only (Playwright `workshop-pegboard.spec.ts` + manual). **Task 8.12** clears stale **portal-frame** copy in docs/plan.
+- [x] Non-pilot routes: **unchanged** — `immersivePegStage` / `fillViewportChain` only when `Main` **`fillViewportSlot`** (workshop + visual-test).
 
 **Verification:** `npm run check`; manual pilot breakpoints; if workshop in pilot: `npm run test:visual` for `workshop-pegboard` (may still fail until Task 8.6 — note expected state).
 
@@ -1100,8 +1100,8 @@ ADR-011 (DOM bounds: peg field / reading / tape-grain)
 **Description:** For the pilot surface, derive **scene state** from the URL on the server and rehydrate the same on the client; internal navigation updates URL and state together. No drift between refresh and client transition.
 
 **Acceptance criteria:**
-- [ ] Hard refresh and **copy-paste URL** reproduce the same visible scene for the pilot.
-- [ ] Invalid / legacy URLs resolve to a defined default or **301/302** per Task 8.2.
+- [x] Hard refresh and **copy-paste URL** reproduce the same visible scene for the pilot — workshop panels come from Astro **`paginate()`** + **`page` prop** on [`workshop/[...page].astro`](../../src/pages/workshop/[...page].astro); `WorkshopPegboard` is **`client:only`** with props derived from that route (no client-only hidden page index).
+- [x] Invalid / legacy URLs — out-of-range **`/workshop/{N}`** yields **404** from static paths (per [ADR-012](../../docs/decisions/012-workshop-url-scene-pagination.md) link-rot note); **`?page=`** not canonical (undefined). Optional **301** shims remain future work.
 
 **Verification:** `npm run check`; manual: refresh mid-scene; Playwright smoke optional (add if cheap).
 

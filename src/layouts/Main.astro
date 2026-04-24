@@ -12,7 +12,8 @@ interface StringTitleProp {
   showPageHeader?: boolean;
   /**
    * When true: board shell + main use a flex height chain so workshop pegboard
-   * scrolls inside the viewport (ADR-003 — frame arrows visible without page scroll).
+   * scrolls inside the viewport (ADR-003). Also enables ADR-011 immersive peg stage
+   * (`immersivePegStage` + `fillViewportChain` on `RisoBoardShell`).
    */
   fillViewportSlot?: boolean;
 }
