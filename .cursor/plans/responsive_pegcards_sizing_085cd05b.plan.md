@@ -1086,6 +1086,8 @@ Structured per [`planning-and-task-breakdown`](../skills/planning-and-task-break
 
 **Estimated scope:** Small.
 
+**Field QA (2026-04-24):** Manual pass reports **shadow clipping still visible** at **1024×900**, **1280×900**, **375×500**, **1512×828** (laptop / wide-but-short), and other **8.8d** matrix sizes — treat **step A acceptance as not yet met** until fixed. **375×500:** shadows appear to involve **multiple paint sources** around stacked **`.workshop-panel--mobile-slab`** (audit separately from desktop strip `overflow-clip-margin`). See **[Observations backlog](#observations-backlog-shadow-and-short-viewport)**.
+
 #### Checkpoint: After **A** + **B** (height vs ink slice)
 
 - [ ] Shadows stable at agreed **`padding-block`** / panel padding (or explicit deferral with reason).
@@ -1149,6 +1151,17 @@ Execution discipline for steps **A→D** above follows [`incremental-implementat
 3. **Packing / physics (step D / 8.9 + [ADR-005](../../docs/decisions/005-workshop-desktop-cork-layout-acceptance.md))** — Only if the product rule is **“prefer fewer peg columns / taller cork at this class of viewport”** rather than “cap width at N px”. That biases **`pickSharedDesktopPackGrid`** / seeds and must stay aligned with **`portalLayout`** measurement.
 
 **YAML:** **`phase8-8e-cork-aspect-target`** — optional slice; ship independently of shadow gate once **A** is green.
+
+#### Observations backlog (shadow and short viewport)
+
+**Logged 2026-04-24** — aligns with **`phase8-8d`** / **`phase8-88`** follow-up; confirm with another pair of eyes before implementation.
+
+- **Shadow clipping (desktop + stress sizes):** Clipping reproduces at **1024×900**, **1280×900**, **375×500**, **1512×828**, and across the rest of the **incremental verification** matrix used for **8.8d**. **Implication:** **Step A is open** — prioritize **clip chain** (`.workshop-scroll--desktop-strip`, `.workshop-panel--desktop`, ancestors with `overflow: hidden`) and **`--workshop-strip-clip-ink`** sufficiency **before** further **`padding-block`** or shell tightening that only masks the symptom.
+- **1512×828 (laptop HTML viewport):** Explicit **author reference size** — same **shadow / clip** investigation as other desktop pairs; also where **`[workshopDebugCork]`** showed a **wide cork** (e.g. **1242×486** packing box) so **aspect / max slab width** (**`phase8-8e`**) may matter **after** **8.8d** is green. Re-verify after any immersive shell or strip change.
+- **375×500 + `.workshop-panel--mobile-slab`:** Shadows read as applying from **multiple** places along the **stacked mobile slabs** — possible **compound** slab/card shadows, **`overflow`** on slab wrappers, or **per-slab** vs **scroll-parent** clip mismatch. **Follow-up:** trace computed `overflow` / `box-shadow` on **`.workshop-scroll--mobile`**, **`.workshop-panel--mobile-slab`**, and **`.pegboard-bg--mobile-flow`**; consider **mobile-specific** `overflow-clip-margin` or padding fallback analogous to desktop strip; optional per-slab debug outline in `?workshopDebugCork=1` mode.
+- **Idea — denser site chrome on very short immersive height:** At **375×500** (and similar), **consider shrinking `RisoNav` + `Footer`** (or a **`max-height`** band / reduced padding) **only for `immersivePegStage` + `fillViewportSlot`** to return vertical budget to **`#main-content`**. **Guardrails:** must still satisfy **ADR-003** (nav + footer discoverable in first paint — re-read ADR text before changing); expect **`workshop-page-with-chrome`** VR updates; likely **Phase 8 step C** (`RisoBoardShell` / nav/footer tokens), not workshop-only CSS alone.
+
+**Sync:** If a duplicate of this plan lives under **`~/.cursor/plans/`**, copy this subsection there.
 
 **Maps to existing tasks:** **A** → **`phase8-8d-strip-shadow-paint-contract`** then **`phase8-8b-ink-gutter-tokens`** (8.11) for token consolidation; **B** → **`phase8-88`**, **`phase8-8a-stack-footer-chrome`** (8.10) as you document shell vs strip ownership; **optional aspect** → **`phase8-8e-cork-aspect-target`**; **C** → immersive-only edits in **`RisoBoardShell.astro`** / plan cross-link **6b**; **D** → **`phase8-89-pack-viewport-measure`** **after** **B** (and ideally after **A**) unless a measurement bug blocks work independent of padding.
 
