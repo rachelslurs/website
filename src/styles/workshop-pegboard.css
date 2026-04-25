@@ -21,13 +21,13 @@
   /*
    * Collapse floor only: when the flex chain would assign a shorter box, keep at least this tall.
    * On normal workshop viewports the stack already stretches (`flex: 1`), so raising this alone
-   * does **not** add height — tune strip shadow padding (`--workshop-strip-shadow-pad-trim-*`) or
-   * immersive shell padding in `RisoBoardShell.astro` for visible cork gains.
+   * does **not** add height — tune `--workshop-strip-scroll-gutter-*` on `.workshop-scroll--desktop-strip`
+   * or immersive shell padding in `RisoBoardShell.astro` for visible cork gains.
    */
   --workshop-page-stack-min-height: min(72dvh, 100%);
   /* Optical bias: keep 0 by default; tune in one place if needed. */
   /* Keep symmetry via flex; tiny bias for nav/footer optical balance. */
-  --workshop-optical-center-offset: 20px;
+  --workshop-optical-center-offset: 10px;
 
   box-sizing: border-box;
   display: flex;
@@ -89,8 +89,8 @@
   --lcd-cast-opacity-drag: 0.22;
   /*
    * Desktop strip + mobile scale slot: `overflow-clip-margin` extends paint past scroll/clip boxes.
-   * Tracks `.pegboard-bg` shadow (15px 30px 60px), `--pegboard-card-shadow-drag`, and blur tail;
-   * bumped 2026-04 — field QA still saw clip until margin was generous vs ink.
+   * Tracks `.pegboard-desktop-cork-drop` slab shadow (15px 30px 60px), `--pegboard-card-shadow-drag`,
+   * and blur tail; bumped 2026-04 — field QA still saw clip until margin was generous vs ink.
    */
   --workshop-strip-clip-ink: max(
     8.5rem,
@@ -131,25 +131,16 @@
   /* Desktop strip: show a hint of adjacent panels (“peek”). */
   /* Larger peek + closer spacing: more adjacent board visible while keeping symmetry. */
   --workshop-desktop-panel-peek: clamp(3.75rem, 8.5vw, 9.5rem);
-  /* Shadow ink budget (centralized): matches `.pegboard-bg` `box-shadow: 15px 30px 60px …`. */
-  --workshop-cork-shadow-blur: 60px;
-  --workshop-cork-shadow-y: 30px;
-  --workshop-cork-shadow-x: 15px;
-  --workshop-cork-shadow-ink-top: calc(var(--workshop-cork-shadow-blur) + 0.5rem);
-  --workshop-cork-shadow-ink-bottom: calc(
-    var(--workshop-cork-shadow-y) + var(--workshop-cork-shadow-blur) + 0.75rem
-  );
-  /* Shaved from ink vars below — `overflow-clip-margin` still paints past the clip box (field QA). */
-  --workshop-strip-shadow-pad-trim-top: 28px;
-  --workshop-strip-shadow-pad-trim-bottom: 22px;
+  /*
+   * Desktop cork depth: heavy drop lives on `.pegboard-desktop-cork-drop` (shadow proxy), not on
+   * `.pegboard-bg`, so strip padding is only for card-drag / bracket ink — `overflow-clip-margin`
+   * still extends paint for the proxy + cards.
+   */
+  --workshop-strip-scroll-gutter-top: max(0.75rem, 12px);
+  --workshop-strip-scroll-gutter-bottom: max(1rem, 16px);
   /*
    * Modest block padding for layout (panels off edges); `WorkshopPegboard` subtracts it from
    * `clientHeight` via `workshopScrollContentClientSize` (content box = strip minus padding).
-   *
-   * Cork `.pegboard-bg` shadow is `15px 30px 60px` — a long downward blur. `overflow-clip-margin`
-   * extends the clip in supporting engines, but **some UAs still clip** when `overflow-x: auto`
-   * pairs with `overflow-y: clip`, so we always reserve a **real bottom padding** band for the
-   * shadow tail (same idea as `.workshop-scroll--mobile`, which cannot use clip-margin on `auto`).
    */
   padding-block: 0.125rem;
   /*
@@ -166,44 +157,21 @@
   .workshop-pegboard-root .workshop-scroll--desktop-strip {
     /* `hidden` clips outer `box-shadow`; `clip` + margin extends paint without allowing y-scroll beside `overflow-x: auto`. */
     overflow-y: clip;
-    /* Cork `box-shadow` uses a large downward blur (60px); extra **bottom** margin so the tail is not
-     * clipped while sides stay modest (field QA: shadow still clipped with uniform margin only). */
+    /* Cork slab shadow is on `.pegboard-desktop-cork-drop`; clip-margin still covers proxy + cards. */
     overflow-clip-margin: max(3.5rem, var(--workshop-strip-clip-ink))
       max(4.5rem, var(--workshop-strip-clip-ink))
       max(16rem, calc(var(--workshop-strip-clip-ink) + 5rem))
       max(4.5rem, var(--workshop-strip-clip-ink));
-    /*
-     * Clip-margin carries shadow ink past the scroll box — use modest physical padding so the
-     * scrollport **content box** (what React packs to) stays taller vs the base `padding-bottom`
-     * fallback for engines without `overflow-clip-margin`.
-     */
-    padding-top: max(
-      0.125rem,
-      calc(
-        var(--workshop-cork-shadow-ink-top) -
-          var(--workshop-strip-shadow-pad-trim-top)
-      )
-    );
-    /*
-     * Chrome still clips `box-shadow` with `overflow-x: auto` even when clip-margin is set.
-     * Keep a real bottom gutter so the cork shadow tail stays inside the scrollport.
-     */
-    padding-bottom: max(
-      0.25rem,
-      calc(
-        var(--workshop-cork-shadow-ink-bottom) -
-          var(--workshop-strip-shadow-pad-trim-bottom)
-      )
-    );
+    padding-top: var(--workshop-strip-scroll-gutter-top);
+    padding-bottom: var(--workshop-strip-scroll-gutter-bottom);
   }
 }
 
 @supports not (overflow-clip-margin: 0px) {
   .workshop-pegboard-root .workshop-scroll--desktop-strip {
-    /* No clip-margin: reserve strip content-box height so cork/card shadows stay inside `hidden`. */
-    padding-block: max(3rem, calc(14px + 30px + 10px + 30px + 60px + 2.5rem));
-    /* Extra bottom for downward shadow blur (same rationale as asymmetric `overflow-clip-margin`). */
-    padding-bottom: max(8rem, calc(14px + 30px + 10px + 30px + 60px + 60px + 4rem));
+    /* No clip-margin: generous bottom for proxy shadow tail; top uses the same gutter token. */
+    padding-top: max(var(--workshop-strip-scroll-gutter-top), 2.5rem);
+    padding-bottom: max(6rem, calc(14px + 30px + 10px + 30px + 60px + 3rem));
   }
 }
 
@@ -446,6 +414,29 @@
   grid-template-rows: repeat(var(--peg-rows), var(--peg-grid-px));
   align-content: start;
   justify-content: start;
+}
+
+/* Border-box shell shared with `.pegboard-bg--desktop-cork` (see PegboardPanels.tsx). */
+.workshop-pegboard-root .pegboard-desktop-cork-outer {
+  position: relative;
+  overflow: visible;
+}
+
+/*
+ * Heavy slab shadow (was on `.pegboard-bg`). Sibling under the cork avoids painting a large
+ * `box-shadow` on the peg layer that participates in overflow coupling with the strip scroller.
+ */
+.workshop-pegboard-root .pegboard-desktop-cork-drop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 2px;
+  box-shadow: 15px 30px 60px rgba(0, 0, 0, 0.7);
+}
+
+.workshop-pegboard-root .pegboard-bg.pegboard-bg--desktop-cork {
+  box-shadow: inset 0 0 0 1px rgba(26, 26, 46, 0.08);
 }
 
 /* Reference hardware screws on pegboard corners */

@@ -411,14 +411,19 @@ function PegboardPanelDesktop({
   return (
     <div className="pegboard-desktop-pack-slot">
       <div
+        className="pegboard-desktop-cork-outer"
         style={{
           width: innerWFinal + PEGBOARD_BORDER_OUTSET,
           height: innerH + PEGBOARD_BORDER_OUTSET,
           overflow: "visible",
-          display: "flex",
-          justifyContent: "center",
         }}
       >
+        {/*
+         * Shadow proxy: same border-box as the cork so the heavy drop-shadow is not painted
+         * on `.pegboard-bg` (avoids overflow coupling with the horizontal strip). Cork keeps a
+         * light inset only — see `workshop-pegboard.css`.
+         */}
+        <div className="pegboard-desktop-cork-drop" aria-hidden />
         <div
           className="pegboard-bg pegboard-bg--desktop-cork"
           data-peg-cols={Math.round(innerWFinal / grid)}
