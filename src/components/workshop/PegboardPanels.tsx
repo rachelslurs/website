@@ -220,8 +220,8 @@ function PegboardPanelDesktop({
   const innerW =
     desktopContentInnerW != null && desktopContentInnerW > 0
       ? desktopContentInnerW
-      : desktopInnerW(w, desktopPanelPadX ?? 32);
-  const viewportH = desktopPortalInnerH(h, desktopPanelPadY ?? 16);
+      : desktopInnerW(w, desktopPanelPadX ?? 24);
+  const viewportH = desktopPortalInnerH(h, desktopPanelPadY ?? 6);
   const { budgetW, budgetH } = desktopCorkPackBudget(innerW, viewportH);
 
   const itemsKey = useMemo(() => items.map(i => i.id).join("|"), [items]);
@@ -409,18 +409,7 @@ function PegboardPanelDesktop({
   }, []);
 
   return (
-    <div
-      className="pegboard-desktop-pack-slot"
-      style={{
-        width: "100%",
-        height: "100%",
-        minHeight: 0,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        boxSizing: "border-box",
-      }}
-    >
+    <div className="pegboard-desktop-pack-slot">
       <div
         style={{
           width: innerWFinal + PEGBOARD_BORDER_OUTSET,

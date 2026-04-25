@@ -26,12 +26,15 @@ const {
 
 /** Immersive pilot (workshop): reclaim vertical budget for peg column without changing other routes. */
 const boardBlockPadding = immersivePegStage
-  ? "max-sm:py-3 max-lg:py-3 lg:pt-4 lg:pb-4"
+  ? "max-sm:py-1.5 max-lg:py-1.5 lg:pt-2 lg:pb-2"
   : "max-lg:py-board-padding-y-lg lg:pb-board-pb-lg lg:pt-board-pt-lg";
 
 const stackChromeGap = immersivePegStage
-  ? "gap-4 max-sm:gap-3"
+  ? "gap-3 max-sm:gap-2.5"
   : "gap-board-stack-gap max-lg:gap-board-stack-gap-lg max-sm:gap-board-stack-gap-sm";
+
+/** Workshop: grain+blobs fill `board-page-outer` so texture sits behind nav + footer (immersive). */
+const risoDecorationBehindChrome = fillViewportChain && immersivePegStage;
 ---
 
 <a id="skip-to-content" href="#main-content" class="skip-to-content-board">
@@ -40,9 +43,7 @@ const stackChromeGap = immersivePegStage
 <div
   class:list={[
     "board-page-outer w-full",
-    immersivePegStage
-      ? "py-board-outer-sm px-0"
-      : "p-board-outer max-sm:p-board-outer-sm",
+    immersivePegStage ? "px-0" : "p-board-outer max-sm:p-board-outer-sm",
     immersivePegStage && "board-page-outer--immersive-peg-stage",
     immersivePegStage ? "max-w-none" : "mx-auto max-w-[1200px]",
     /* min-h-dvh alone leaves height indefinite for flex descendants on some engines;
@@ -51,6 +52,20 @@ const stackChromeGap = immersivePegStage
   ]}
 >
   {immersivePegStage && <div class="peg-stage-underlay" aria-hidden="true" />}
+  {
+    risoDecorationBehindChrome && (
+      <div
+        class="pointer-events-none absolute inset-0 z-[1] overflow-hidden"
+        aria-hidden="true"
+        transition:persist="riso-board-decoration"
+      >
+        <div class="grain" />
+        <div class="blob blob-2" />
+        <div class="blob blob-3" />
+        <div class="blob blob-4" />
+      </div>
+    )
+  }
   <!-- ADR-008 (+ ADR-011): page-owned visuals (tape, edges, etc.) stay inside the inner `board` column. -->
   <div
     class:list={[
@@ -60,19 +75,24 @@ const stackChromeGap = immersivePegStage
         ? "px-0 max-sm:px-0"
         : "px-board-padding-x max-sm:p-board-padding-sm",
       fillViewportChain && "min-h-0 flex-1",
+      risoDecorationBehindChrome && "z-[2]",
     ]}
   >
     <!-- Persist grain + blobs only: full-shell persist breaks in-page link navigation. -->
-    <div
-      class="pointer-events-none absolute inset-0 z-[100] overflow-hidden"
-      aria-hidden="true"
-      transition:persist="riso-board-decoration"
-    >
-      <div class="grain"></div>
-      <div class="blob blob-2"></div>
-      <div class="blob blob-3"></div>
-      <div class="blob blob-4"></div>
-    </div>
+    {
+      !risoDecorationBehindChrome && (
+        <div
+          class="pointer-events-none absolute inset-0 z-[100] overflow-hidden"
+          aria-hidden="true"
+          transition:persist="riso-board-decoration"
+        >
+          <div class="grain" />
+          <div class="blob blob-2" />
+          <div class="blob blob-3" />
+          <div class="blob blob-4" />
+        </div>
+      )
+    }
 
     <div
       class:list={[

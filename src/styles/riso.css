@@ -774,6 +774,11 @@ nav .group:hover .dust-note {
   padding-inline: calc(var(--spacing) * 4);
 }
 
+/* Tighter footer band on workshop so peg field reads less “pinched” under the nav than above the footer. */
+.board-page-outer--immersive-peg-stage footer[role="contentinfo"] {
+  padding-top: calc(var(--spacing) * 2);
+}
+
 @media (max-width: 639px) {
   .board-page-outer--immersive-peg-stage nav[aria-label="Main navigation"],
   .board-page-outer--immersive-peg-stage footer[role="contentinfo"] {

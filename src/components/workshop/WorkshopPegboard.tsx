@@ -22,24 +22,24 @@ import "../../styles/workshop-pegboard.css";
 const useIsoLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
-/** One side of `.workshop-panel--desktop { padding-inline: 2rem }` in px (tracks `html` font-size). */
+/** One side of `.workshop-panel--desktop { padding-inline: 1.5rem }` in px (tracks `html` font-size). */
 function workshopPanelRemPaddingPx(): number {
-  if (typeof document === "undefined") return 32;
+  if (typeof document === "undefined") return 24;
   const rootPx = parseFloat(
     getComputedStyle(document.documentElement).fontSize || "16"
   );
   const fontPx = Number.isFinite(rootPx) && rootPx > 0 ? rootPx : 16;
-  return Math.round(2 * fontPx);
+  return Math.round(1.5 * fontPx);
 }
 
-/** One side of `.workshop-panel--desktop { padding-block: 1rem }` (default) in px. */
+/** One side of `.workshop-panel--desktop { padding-block: 0.375rem }` (default) in px. */
 function workshopPanelRemPaddingBlockPx(): number {
-  if (typeof document === "undefined") return 16;
+  if (typeof document === "undefined") return 6;
   const rootPx = parseFloat(
     getComputedStyle(document.documentElement).fontSize || "16"
   );
   const fontPx = Number.isFinite(rootPx) && rootPx > 0 ? rootPx : 16;
-  return Math.round(1 * fontPx);
+  return Math.round(0.375 * fontPx);
 }
 
 /** Content-box size for packing — `client*` includes padding; flex children lay out in the content box. */
