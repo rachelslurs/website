@@ -17,9 +17,17 @@
  */
 #main-content.workshop-viewport-slot > .workshop-viewport-fill {
   /* Single knobs: prefer named tokens over scattered “magic” paddings. */
-  --workshop-stage-inset: clamp(0.375rem, 1.5dvh, 1rem);
+  --workshop-stage-inset: clamp(0.125rem, 0.55dvh, 0.375rem);
+  /*
+   * Collapse floor only: when the flex chain would assign a shorter box, keep at least this tall.
+   * On normal workshop viewports the stack already stretches (`flex: 1`), so raising this alone
+   * does **not** add height — tune strip shadow padding (`--workshop-strip-shadow-pad-trim-*`) or
+   * immersive shell padding in `RisoBoardShell.astro` for visible cork gains.
+   */
+  --workshop-page-stack-min-height: min(72dvh, 100%);
   /* Optical bias: keep 0 by default; tune in one place if needed. */
-  --workshop-optical-center-offset: 37px;
+  /* Keep symmetry via flex; tiny bias for nav/footer optical balance. */
+  --workshop-optical-center-offset: 20px;
 
   box-sizing: border-box;
   display: flex;
@@ -41,7 +49,7 @@
   transform: translateY(var(--workshop-optical-center-offset));
   /* Floor height so the peg column does not collapse when intrinsic size is ambiguous; never
    * exceed the fill region (`min(..., 100%)` is relative to `.workshop-viewport-fill`). */
-  min-height: min(42dvh, 100%);
+  min-height: var(--workshop-page-stack-min-height);
   max-height: 100%;
   overflow: visible;
 }
@@ -114,14 +122,26 @@
   z-index: 30;
   display: none;
   flex: 1 1 auto;
-  flex-direction: row;
+  flex-direction: column;
   align-items: stretch;
   align-self: stretch;
   min-height: 0;
   width: 100%;
   box-sizing: border-box;
   /* Desktop strip: show a hint of adjacent panels (“peek”). */
-  --workshop-desktop-panel-peek: clamp(2rem, 4.5vw, 5.25rem);
+  /* Larger peek + closer spacing: more adjacent board visible while keeping symmetry. */
+  --workshop-desktop-panel-peek: clamp(3.75rem, 8.5vw, 9.5rem);
+  /* Shadow ink budget (centralized): matches `.pegboard-bg` `box-shadow: 15px 30px 60px …`. */
+  --workshop-cork-shadow-blur: 60px;
+  --workshop-cork-shadow-y: 30px;
+  --workshop-cork-shadow-x: 15px;
+  --workshop-cork-shadow-ink-top: calc(var(--workshop-cork-shadow-blur) + 0.5rem);
+  --workshop-cork-shadow-ink-bottom: calc(
+    var(--workshop-cork-shadow-y) + var(--workshop-cork-shadow-blur) + 0.75rem
+  );
+  /* Shaved from ink vars below — `overflow-clip-margin` still paints past the clip box (field QA). */
+  --workshop-strip-shadow-pad-trim-top: 28px;
+  --workshop-strip-shadow-pad-trim-bottom: 22px;
   /*
    * Modest block padding for layout (panels off edges); `WorkshopPegboard` subtracts it from
    * `clientHeight` via `workshopScrollContentClientSize` (content box = strip minus padding).
@@ -131,20 +151,15 @@
    * pairs with `overflow-y: clip`, so we always reserve a **real bottom padding** band for the
    * shadow tail (same idea as `.workshop-scroll--mobile`, which cannot use clip-margin on `auto`).
    */
-  padding-block: 0.75rem;
-  padding-bottom: max(6rem, calc(15px + 30px + 60px + 3rem));
+  padding-block: 0.125rem;
   /*
-   * Symmetric peek: reserve the same reveal on the left and right when a panel is centered.
-   * Panel width is `100% - 2*peek`, and strip padding provides the end caps.
+   * Symmetric peek: panel width is `100% - 2*peek` (see `.workshop-panel--desktop`).
+   * End caps are **inside** `.workshop-scroll--desktop-strip-inner` as flex spacers so the
+   * horizontal scroller stays full-bleed (no boxed-in strip vs edge-to-edge risograph).
    */
-  padding-inline: max(
-    var(--workshop-desktop-panel-peek),
-    calc(10px + 36px + 6px)
-  );
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
+  padding-inline: 0;
+  /* Outer is the paint container; inner owns horizontal scroll. */
+  overflow: visible;
 }
 
 @supports (overflow-clip-margin: 0px) {
@@ -162,9 +177,24 @@
      * scrollport **content box** (what React packs to) stays taller vs the base `padding-bottom`
      * fallback for engines without `overflow-clip-margin`.
      */
-    padding-top: 0.125rem;
-    /* Keep only a small safety band; `overflow-clip-margin` carries the shadow ink. */
-    padding-bottom: max(0.375rem, calc(8px + 16px + 32px + 0.25rem));
+    padding-top: max(
+      0.125rem,
+      calc(
+        var(--workshop-cork-shadow-ink-top) -
+          var(--workshop-strip-shadow-pad-trim-top)
+      )
+    );
+    /*
+     * Chrome still clips `box-shadow` with `overflow-x: auto` even when clip-margin is set.
+     * Keep a real bottom gutter so the cork shadow tail stays inside the scrollport.
+     */
+    padding-bottom: max(
+      0.25rem,
+      calc(
+        var(--workshop-cork-shadow-ink-bottom) -
+          var(--workshop-strip-shadow-pad-trim-bottom)
+      )
+    );
   }
 }
 
@@ -175,6 +205,32 @@
     /* Extra bottom for downward shadow blur (same rationale as asymmetric `overflow-clip-margin`). */
     padding-bottom: max(8rem, calc(14px + 30px + 10px + 30px + 60px + 60px + 4rem));
   }
+}
+
+/* Inner scroller: horizontal scroll + snap without clipping vertical ink. */
+.workshop-pegboard-root .workshop-scroll--desktop-strip-inner {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  box-sizing: border-box;
+  overflow-x: auto;
+  /* Avoid vertical clipping from the horizontal scroller box. */
+  overflow-y: visible;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Symmetric end caps: same width as peek so first/last panel can center with equal side reveal. */
+.workshop-pegboard-root .workshop-scroll--desktop-strip-inner::before,
+.workshop-pegboard-root .workshop-scroll--desktop-strip-inner::after {
+  content: "";
+  flex: 0 0 var(--workshop-desktop-panel-peek);
+  width: var(--workshop-desktop-panel-peek);
+  scroll-snap-align: none;
+  pointer-events: none;
 }
 
 .workshop-pegboard-root .workshop-scroll--mobile {
@@ -229,7 +285,7 @@
   align-items: stretch;
   justify-content: flex-start;
   /* Tighter block axis than inline: packing uses `paddingTop` for cork height (`desktopPortalInnerH`). */
-  padding-block: 0.375rem;
+  padding-block: 0.0625rem;
   padding-inline: 1.25rem;
   box-sizing: border-box;
 }
@@ -237,14 +293,14 @@
 /* Desktop: reclaim more vertical space on short viewports (no vertical scrolling). */
 @media (max-height: 820px) {
   .workshop-panel--desktop {
-    padding-block: 0.3125rem;
+    padding-block: 0.125rem;
     padding-inline: 1.25rem;
   }
 }
 
 @media (max-height: 720px) {
   .workshop-panel--desktop {
-    padding-block: 0.25rem;
+    padding-block: 0.0625rem;
     padding-inline: 1.25rem;
   }
 }

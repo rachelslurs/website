@@ -200,7 +200,9 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
       setDesktopPegboardContentInnerW(null);
       return;
     }
-    const strip = scrollRef.current;
+    const strip = scrollRef.current?.querySelector(
+      ".workshop-scroll--desktop-strip-inner"
+    ) as HTMLElement | null;
     if (!strip) return;
 
     const readPanelContentInnerW = (panel: HTMLElement) => {
@@ -230,7 +232,9 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
 
   useIsoLayoutEffect(() => {
     if (isMobile) return;
-    const strip = scrollRef.current;
+    const strip = scrollRef.current?.querySelector(
+      ".workshop-scroll--desktop-strip-inner"
+    ) as HTMLElement | null;
     if (!strip) return;
     const n = panels.length;
 
@@ -324,10 +328,24 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
         isMobile: isMobileLayout,
       });
     };
-    apply(el);
+    const measureTarget =
+      !isMobile && el instanceof HTMLElement
+        ? ((el.querySelector(
+            ".workshop-scroll--desktop-strip-inner"
+          ) as HTMLElement | null) ?? el)
+        : el;
+    apply(measureTarget);
     const ro = new ResizeObserver(entries => {
       for (const entry of entries) {
-        if (entry.target instanceof HTMLElement) apply(entry.target);
+        if (!entry.target || !(entry.target instanceof HTMLElement)) continue;
+        if (!isMobile) {
+          const inner = entry.target.querySelector(
+            ".workshop-scroll--desktop-strip-inner"
+          ) as HTMLElement | null;
+          apply(inner ?? entry.target);
+          continue;
+        }
+        apply(entry.target);
       }
     });
     ro.observe(el);
@@ -389,56 +407,58 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
       {!isMobile ? (
         <div
           ref={scrollRef}
-          className="workshop-scroll--desktop-strip hide-scrollbar"
+          className="workshop-scroll--desktop-strip"
           style={{ visibility: isLayoutReady ? "visible" : "hidden" }}
         >
-          {panels.map((panel, i) => (
-            <div key={`panel-${i}`} className="workshop-panel--desktop">
-              <PegboardPanelView
-                key={panel.items.map(x => x.id).join("|")}
-                items={panel.items}
-                isMobile={false}
-                vw={vw}
-                vh={vh}
-                layoutWidth={layoutW}
-                layoutHeight={layoutH}
-                desktopPanelPadY={desktopPanelPadY}
-                desktopPanelPadX={desktopPanelPadX}
-                desktopContentInnerW={desktopPegboardContentInnerW}
-                debugWorkshopCork={debugWorkshopCork}
-                desktopPanelIndex={i}
-                desktopSharedPack={desktopSharedPack}
-              />
-              {i < panels.length - 1 ? (
-                <>
-                  {/*
-                   * Align connector bands to the pegboard corner screw centers.
-                   * Peg hole / screw spacing follows `--peg-grid-px` on `.pegboard-bg`.
-                   */}
-                  <div
-                    aria-hidden
-                    className="metal-bracket--band"
-                    style={{
-                      width: connectorBands[i]?.width ?? sideGap + 80,
-                      left: connectorBands[i]?.left,
-                      top: connectorBands[i]?.top ?? 70,
-                      transform: "translateY(-50%)",
-                    }}
-                  />
-                  <div
-                    aria-hidden
-                    className="metal-bracket--band"
-                    style={{
-                      width: connectorBands[i]?.width ?? sideGap + 80,
-                      left: connectorBands[i]?.left,
-                      bottom: connectorBands[i]?.bottom ?? 70,
-                      transform: "translateY(50%)",
-                    }}
-                  />
-                </>
-              ) : null}
-            </div>
-          ))}
+          <div className="workshop-scroll--desktop-strip-inner hide-scrollbar">
+            {panels.map((panel, i) => (
+              <div key={`panel-${i}`} className="workshop-panel--desktop">
+                <PegboardPanelView
+                  key={panel.items.map(x => x.id).join("|")}
+                  items={panel.items}
+                  isMobile={false}
+                  vw={vw}
+                  vh={vh}
+                  layoutWidth={layoutW}
+                  layoutHeight={layoutH}
+                  desktopPanelPadY={desktopPanelPadY}
+                  desktopPanelPadX={desktopPanelPadX}
+                  desktopContentInnerW={desktopPegboardContentInnerW}
+                  debugWorkshopCork={debugWorkshopCork}
+                  desktopPanelIndex={i}
+                  desktopSharedPack={desktopSharedPack}
+                />
+                {i < panels.length - 1 ? (
+                  <>
+                    {/*
+                     * Align connector bands to the pegboard corner screw centers.
+                     * Peg hole / screw spacing follows `--peg-grid-px` on `.pegboard-bg`.
+                     */}
+                    <div
+                      aria-hidden
+                      className="metal-bracket--band"
+                      style={{
+                        width: connectorBands[i]?.width ?? sideGap + 80,
+                        left: connectorBands[i]?.left,
+                        top: connectorBands[i]?.top ?? 70,
+                        transform: "translateY(-50%)",
+                      }}
+                    />
+                    <div
+                      aria-hidden
+                      className="metal-bracket--band"
+                      style={{
+                        width: connectorBands[i]?.width ?? sideGap + 80,
+                        left: connectorBands[i]?.left,
+                        bottom: connectorBands[i]?.bottom ?? 70,
+                        transform: "translateY(50%)",
+                      }}
+                    />
+                  </>
+                ) : null}
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <div

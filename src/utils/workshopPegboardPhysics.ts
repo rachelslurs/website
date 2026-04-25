@@ -633,7 +633,7 @@ export const DESKTOP_PACK_GRIDS: readonly number[] = [60, 54, 48, 42, 36, 30];
  * viewports otherwise use the full panel width and read as an ultra‑wide strip;
  * capping width (keeping full portal height) restores a board‑like proportion.
  */
-export const DESKTOP_CORK_MIN_HEIGHT_OVER_WIDTH = 0.44;
+export const DESKTOP_CORK_MIN_HEIGHT_OVER_WIDTH = 0.38;
 
 /**
  * Snapped cork **budget** inside the panel (before grid floor in
