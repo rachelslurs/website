@@ -199,6 +199,9 @@
   box-sizing: border-box;
   border-radius: 2px;
   box-shadow: 15px 30px 60px rgba(0, 0, 0, 0.7);
+  left: 0;
+  top: 0;
+  will-change: transform;
 }
 
 /* Inner scroller: horizontal scroll + snap without clipping vertical ink. */

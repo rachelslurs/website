@@ -120,6 +120,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const innerScrollRef = useRef<HTMLDivElement>(null);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
+  const desktopCorkShadowElsRef = useRef<Array<HTMLDivElement | null>>([]);
   /** `?workshopDebugCork=1` or `localStorage.workshopDebugCork = "1"` — outlines cork + console packing logs. */
   const [debugWorkshopCork, setDebugWorkshopCork] = useState(false);
   const debugWorkshopCorkRef = useRef(debugWorkshopCork);
@@ -134,15 +135,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   const [connectorBands, setConnectorBands] = useState<
     Record<number, { left: number; width: number; top: number; bottom: number }>
   >({});
-  /** Slab shadows: absolute proxies vs `.workshop-pegboard-root` — see `measureDesktopCorkSlabShadowRects`. */
-  const [desktopCorkShadowRects, setDesktopCorkShadowRects] = useState<
-    ReadonlyArray<{
-      left: number;
-      top: number;
-      width: number;
-      height: number;
-    } | null>
-  >([]);
+  /** Slab shadows: DOM-updated proxies (avoid React scroll re-render trailing). */
   /** Measured `.workshop-panel--desktop` content width (avoids portal−padding drift at odd viewports). */
   const [desktopPegboardContentInnerW, setDesktopPegboardContentInnerW] =
     useState<number | null>(null);
@@ -341,34 +334,65 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
 
   useIsoLayoutEffect(() => {
     if (isMobile || panels.length === 0 || !isLayoutReady) {
-      setDesktopCorkShadowRects([]);
+      desktopCorkShadowElsRef.current.forEach(el => {
+        if (el) el.style.display = "none";
+      });
       return;
     }
     const strip = scrollRef.current;
     const inner = innerScrollRef.current;
     if (!strip || !inner) {
-      setDesktopCorkShadowRects([]);
+      desktopCorkShadowElsRef.current.forEach(el => {
+        if (el) el.style.display = "none";
+      });
       return;
     }
 
-    const run = () => {
-      setDesktopCorkShadowRects(
-        measureDesktopCorkSlabShadowRects(inner, panels.length)
-      );
+    const apply = () => {
+      const rects = measureDesktopCorkSlabShadowRects(inner, panels.length);
+      const els = desktopCorkShadowElsRef.current;
+      for (let i = 0; i < rects.length; i += 1) {
+        const el = els[i];
+        const r = rects[i];
+        if (!el || !r) {
+          if (el) el.style.display = "none";
+          continue;
+        }
+        el.style.display = "block";
+        el.style.width = `${r.width}px`;
+        el.style.height = `${r.height}px`;
+        el.style.transform = `translate3d(${Math.round(r.left)}px, ${Math.round(
+          r.top
+        )}px, 0)`;
+      }
+      for (let i = rects.length; i < els.length; i += 1) {
+        const el = els[i];
+        if (el) el.style.display = "none";
+      }
     };
 
-    run();
-    const ro = new ResizeObserver(run);
+    let raf = 0;
+    const schedule = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        apply();
+      });
+    };
+
+    schedule();
+    const ro = new ResizeObserver(schedule);
     ro.observe(strip);
     ro.observe(inner);
-    inner.addEventListener("scroll", run, { passive: true });
-    window.addEventListener("resize", run);
-    window.addEventListener("scroll", run, true);
+    inner.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    window.addEventListener("scroll", schedule, true);
     return () => {
       ro.disconnect();
-      inner.removeEventListener("scroll", run);
-      window.removeEventListener("resize", run);
-      window.removeEventListener("scroll", run, true);
+      inner.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      window.removeEventListener("scroll", schedule, true);
+      if (raf) window.cancelAnimationFrame(raf);
     };
   }, [isMobile, panels.length, layoutW, layoutH, isLayoutReady]);
 
@@ -480,20 +504,15 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
       {!isMobile ? (
         <>
           <div className="workshop-desktop-cork-slab-shadow-root" aria-hidden>
-            {desktopCorkShadowRects.map((rect, i) =>
-              rect ? (
-                <div
-                  key={`cork-shadow-${i}`}
-                  className="workshop-desktop-cork-slab-shadow-proxy"
-                  style={{
-                    left: rect.left,
-                    top: rect.top,
-                    width: rect.width,
-                    height: rect.height,
-                  }}
-                />
-              ) : null
-            )}
+            {panels.map((_, i) => (
+              <div
+                key={`cork-shadow-${i}`}
+                ref={el => {
+                  desktopCorkShadowElsRef.current[i] = el;
+                }}
+                className="workshop-desktop-cork-slab-shadow-proxy"
+              />
+            ))}
           </div>
           <div
             ref={scrollRef}
