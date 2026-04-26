@@ -146,10 +146,8 @@
   /* Larger peek + closer spacing: more adjacent board visible while keeping symmetry. */
   --workshop-desktop-panel-peek: clamp(3.75rem, 8.5vw, 9.5rem);
   /*
-   * Desktop cork depth: heavy ink is `filter: drop-shadow()` on `.pegboard-desktop-cork-outer`
-   * (scrolls with the cork). Strip padding is for layout / bracket ink; where supported,
-   * `overflow-y: clip` + `overflow-clip-margin` on this element extends the scrollport clip so
-   * that drop-shadow is not sheared off by `overflow-x: auto`.
+   * Desktop cork depth: a `::before` wash *behind* the cork (see `.pegboard-desktop-cork-outer`),
+   * not painted on the cork face — avoids scroll clipping / shadow-proxy trailing.
    */
   --workshop-strip-scroll-gutter-top: max(0.75rem, 12px);
   --workshop-strip-scroll-gutter-bottom: max(1rem, 16px);
@@ -176,7 +174,10 @@
   .workshop-pegboard-root .workshop-scroll--desktop-strip {
     overflow-x: auto;
     overflow-y: clip;
-    overflow-clip-margin: max(3.5rem, 56px) 0 max(5.5rem, 88px) 0;
+    /*
+     * Extra clip margin for bracket / card ink and cork box-shadow outsets.
+     */
+    overflow-clip-margin: max(5rem, 80px) 0 max(9rem, 144px) 0;
     padding-top: var(--workshop-strip-scroll-gutter-top);
     padding-bottom: var(--workshop-strip-scroll-gutter-bottom);
   }
@@ -190,10 +191,7 @@
   }
 }
 
-/* Desktop slab shadow: use `filter: drop-shadow()` so it scrolls with the cork (no JS proxies). */
-.workshop-pegboard-root .pegboard-desktop-cork-outer {
-  filter: drop-shadow(15px 30px 60px rgba(0, 0, 0, 0.7));
-}
+/* Desktop depth is the `.pegboard-bg--desktop-cork` outer box-shadow (true behind-the-board). */
 
 /* Inner row: flex + end-cap spacers only — scroll + snap are on `.workshop-scroll--desktop-strip`. */
 .workshop-pegboard-root .workshop-scroll--desktop-strip-inner {
@@ -441,7 +439,10 @@
 }
 
 .workshop-pegboard-root .pegboard-bg.pegboard-bg--desktop-cork {
-  box-shadow: inset 0 0 0 1px rgba(26, 26, 46, 0.08);
+  /* Desktop cork: true behind-the-board shadow (no proxy layers). Light from top-left. */
+  box-shadow:
+    18px 26px 56px rgba(0, 0, 0, 0.62),
+    inset 0 0 0 1px rgba(26, 26, 46, 0.08);
 }
 
 /* Reference hardware screws on pegboard corners */
