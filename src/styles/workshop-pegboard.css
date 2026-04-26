@@ -146,9 +146,10 @@
   /* Larger peek + closer spacing: more adjacent board visible while keeping symmetry. */
   --workshop-desktop-panel-peek: clamp(3.75rem, 8.5vw, 9.5rem);
   /*
-   * Desktop cork depth: heavy drop lives on `.pegboard-desktop-cork-drop` (shadow proxy), not on
-   * `.pegboard-bg`, so strip padding is only for card-drag / bracket ink — `overflow-clip-margin`
-   * still extends paint for the proxy + cards.
+   * Desktop cork depth: heavy ink is `filter: drop-shadow()` on `.pegboard-desktop-cork-outer`
+   * (scrolls with the cork). Strip padding is for layout / bracket ink; where supported,
+   * `overflow-y: clip` + `overflow-clip-margin` on this element extends the scrollport clip so
+   * that drop-shadow is not sheared off by `overflow-x: auto`.
    */
   --workshop-strip-scroll-gutter-top: max(0.75rem, 12px);
   --workshop-strip-scroll-gutter-bottom: max(1rem, 16px);
@@ -163,14 +164,19 @@
    * horizontal scroller stays full-bleed (no boxed-in strip vs edge-to-edge risograph).
    */
   padding-inline: 0;
-  /* Outer is the paint container; inner owns horizontal scroll. */
-  overflow: visible;
+  /* Horizontal scroll lives here so `.workshop-scroll--desktop-strip-inner` stays overflow-open
+   * (inner `overflow-x: auto` clips descendant `filter: drop-shadow` outsets). */
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
 @supports (overflow-clip-margin: 0px) {
   .workshop-pegboard-root .workshop-scroll--desktop-strip {
-    /* Outer strip stays paint-open; only `.workshop-scroll--desktop-strip-inner` scrolls on x. */
-    overflow: visible;
+    overflow-x: auto;
+    overflow-y: clip;
+    overflow-clip-margin: max(3.5rem, 56px) 0 max(5.5rem, 88px) 0;
     padding-top: var(--workshop-strip-scroll-gutter-top);
     padding-bottom: var(--workshop-strip-scroll-gutter-bottom);
   }
@@ -178,33 +184,18 @@
 
 @supports not (overflow-clip-margin: 0px) {
   .workshop-pegboard-root .workshop-scroll--desktop-strip {
-    /* No clip-margin: generous bottom for proxy shadow tail; top uses the same gutter token. */
+    /* No clip-margin: generous block padding so cork drop-shadow + bracket ink stay inside the strip. */
     padding-top: max(var(--workshop-strip-scroll-gutter-top), 2.5rem);
     padding-bottom: max(6rem, calc(14px + 30px + 10px + 30px + 60px + 3rem));
   }
 }
 
-/*
- * Slab shadows: `WorkshopPegboard` paints `position: absolute` proxies in
- * `.workshop-desktop-cork-slab-shadow-root` (coords vs `position: relative` `.workshop-pegboard-root`) so
- * `overflow-x: auto` on the strip inner cannot clip the cork slab `box-shadow`.
- */
-.workshop-pegboard-root .workshop-desktop-cork-slab-shadow-root {
-  pointer-events: none;
+/* Desktop slab shadow: use `filter: drop-shadow()` so it scrolls with the cork (no JS proxies). */
+.workshop-pegboard-root .pegboard-desktop-cork-outer {
+  filter: drop-shadow(15px 30px 60px rgba(0, 0, 0, 0.7));
 }
 
-.workshop-pegboard-root .workshop-desktop-cork-slab-shadow-proxy {
-  position: absolute;
-  z-index: 0;
-  box-sizing: border-box;
-  border-radius: 2px;
-  box-shadow: 15px 30px 60px rgba(0, 0, 0, 0.7);
-  left: 0;
-  top: 0;
-  will-change: transform;
-}
-
-/* Inner scroller: horizontal scroll + snap without clipping vertical ink. */
+/* Inner row: flex + end-cap spacers only — scroll + snap are on `.workshop-scroll--desktop-strip`. */
 .workshop-pegboard-root .workshop-scroll--desktop-strip-inner {
   position: relative;
   z-index: 1;
@@ -215,11 +206,7 @@
   flex-direction: row;
   align-items: stretch;
   box-sizing: border-box;
-  overflow-x: auto;
-  /* Avoid vertical clipping from the horizontal scroller box. */
-  overflow-y: visible;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
 }
 
 /* Symmetric end caps: same width as peek so first/last panel can center with equal side reveal. */

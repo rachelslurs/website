@@ -42,36 +42,6 @@ function workshopPanelRemPaddingBlockPx(): number {
   return Math.round(0.375 * fontPx);
 }
 
-/** Slab shadow rects in **`.workshop-pegboard-root`** coordinates (`position: relative` anchor). */
-function measureDesktopCorkSlabShadowRects(
-  inner: HTMLElement,
-  panelCount: number
-): Array<{ left: number; top: number; width: number; height: number } | null> {
-  const next: Array<{
-    left: number;
-    top: number;
-    width: number;
-    height: number;
-  } | null> = Array.from({ length: panelCount }, () => null);
-  const root = inner.closest(".workshop-pegboard-root");
-  if (!(root instanceof HTMLElement)) return next;
-  const rc = root.getBoundingClientRect();
-  const panels = inner.querySelectorAll(".workshop-panel--desktop");
-  panels.forEach((panel, i) => {
-    if (i >= panelCount) return;
-    const outer = panel.querySelector(".pegboard-desktop-cork-outer");
-    if (!(outer instanceof HTMLElement)) return;
-    const r = outer.getBoundingClientRect();
-    next[i] = {
-      left: r.left - rc.left,
-      top: r.top - rc.top,
-      width: r.width,
-      height: r.height,
-    };
-  });
-  return next;
-}
-
 /** Content-box size for packing — `client*` includes padding; flex children lay out in the content box. */
 function workshopScrollContentClientSize(target: HTMLElement): {
   w: number;
@@ -118,9 +88,7 @@ function useViewportPegboard() {
 export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   const { vw, vh } = useViewportPegboard();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const innerScrollRef = useRef<HTMLDivElement>(null);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
-  const desktopCorkShadowElsRef = useRef<Array<HTMLDivElement | null>>([]);
   /** `?workshopDebugCork=1` or `localStorage.workshopDebugCork = "1"` — outlines cork + console packing logs. */
   const [debugWorkshopCork, setDebugWorkshopCork] = useState(false);
   const debugWorkshopCorkRef = useRef(debugWorkshopCork);
@@ -135,7 +103,6 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   const [connectorBands, setConnectorBands] = useState<
     Record<number, { left: number; width: number; top: number; bottom: number }>
   >({});
-  /** Slab shadows: DOM-updated proxies (avoid React scroll re-render trailing). */
   /** Measured `.workshop-panel--desktop` content width (avoids portal−padding drift at odd viewports). */
   const [desktopPegboardContentInnerW, setDesktopPegboardContentInnerW] =
     useState<number | null>(null);
@@ -332,71 +299,7 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     setConnectorBands(next);
   }, [isMobile, panels.length, layoutW, layoutH, desktopInner]);
 
-  useIsoLayoutEffect(() => {
-    if (isMobile || panels.length === 0 || !isLayoutReady) {
-      desktopCorkShadowElsRef.current.forEach(el => {
-        if (el) el.style.display = "none";
-      });
-      return;
-    }
-    const strip = scrollRef.current;
-    const inner = innerScrollRef.current;
-    if (!strip || !inner) {
-      desktopCorkShadowElsRef.current.forEach(el => {
-        if (el) el.style.display = "none";
-      });
-      return;
-    }
-
-    const apply = () => {
-      const rects = measureDesktopCorkSlabShadowRects(inner, panels.length);
-      const els = desktopCorkShadowElsRef.current;
-      for (let i = 0; i < rects.length; i += 1) {
-        const el = els[i];
-        const r = rects[i];
-        if (!el || !r) {
-          if (el) el.style.display = "none";
-          continue;
-        }
-        el.style.display = "block";
-        el.style.width = `${r.width}px`;
-        el.style.height = `${r.height}px`;
-        el.style.transform = `translate3d(${Math.round(r.left)}px, ${Math.round(
-          r.top
-        )}px, 0)`;
-      }
-      for (let i = rects.length; i < els.length; i += 1) {
-        const el = els[i];
-        if (el) el.style.display = "none";
-      }
-    };
-
-    let raf = 0;
-    const schedule = () => {
-      if (raf) return;
-      raf = window.requestAnimationFrame(() => {
-        raf = 0;
-        apply();
-      });
-    };
-
-    schedule();
-    const ro = new ResizeObserver(schedule);
-    ro.observe(strip);
-    ro.observe(inner);
-    inner.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-    window.addEventListener("scroll", schedule, true);
-    return () => {
-      ro.disconnect();
-      inner.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-      window.removeEventListener("scroll", schedule, true);
-      if (raf) window.cancelAnimationFrame(raf);
-    };
-  }, [isMobile, panels.length, layoutW, layoutH, isLayoutReady]);
-
-  /** Peg scrollport (`workshop-scroll--*`) — same box packing used to measure when it lived in `.portal-inner`. */
+  /** Peg scrollport (`workshop-scroll--*`) — desktop uses `.workshop-scroll--desktop-strip` (padding + scroll owner). */
   useIsoLayoutEffect(() => {
     const el = isMobile ? mobileScrollRef.current : scrollRef.current;
     if (!el) return;
@@ -425,23 +328,10 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
         isMobile: isMobileLayout,
       });
     };
-    const measureTarget =
-      !isMobile && el instanceof HTMLElement
-        ? ((el.querySelector(
-            ".workshop-scroll--desktop-strip-inner"
-          ) as HTMLElement | null) ?? el)
-        : el;
-    apply(measureTarget);
+    apply(el);
     const ro = new ResizeObserver(entries => {
       for (const entry of entries) {
         if (!entry.target || !(entry.target instanceof HTMLElement)) continue;
-        if (!isMobile) {
-          const inner = entry.target.querySelector(
-            ".workshop-scroll--desktop-strip-inner"
-          ) as HTMLElement | null;
-          apply(inner ?? entry.target);
-          continue;
-        }
         apply(entry.target);
       }
     });
@@ -502,77 +392,61 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
       {...(debugWorkshopCork ? { "data-workshop-debug-cork": "1" } : {})}
     >
       {!isMobile ? (
-        <>
-          <div className="workshop-desktop-cork-slab-shadow-root" aria-hidden>
-            {panels.map((_, i) => (
-              <div
-                key={`cork-shadow-${i}`}
-                ref={el => {
-                  desktopCorkShadowElsRef.current[i] = el;
-                }}
-                className="workshop-desktop-cork-slab-shadow-proxy"
-              />
+        <div
+          ref={scrollRef}
+          className="workshop-scroll--desktop-strip hide-scrollbar"
+          style={{ visibility: isLayoutReady ? "visible" : "hidden" }}
+        >
+          <div className="workshop-scroll--desktop-strip-inner">
+            {panels.map((panel, i) => (
+              <div key={`panel-${i}`} className="workshop-panel--desktop">
+                <PegboardPanelView
+                  key={panel.items.map(x => x.id).join("|")}
+                  items={panel.items}
+                  isMobile={false}
+                  vw={vw}
+                  vh={vh}
+                  layoutWidth={layoutW}
+                  layoutHeight={layoutH}
+                  desktopPanelPadY={desktopPanelPadY}
+                  desktopPanelPadX={desktopPanelPadX}
+                  desktopContentInnerW={desktopPegboardContentInnerW}
+                  debugWorkshopCork={debugWorkshopCork}
+                  desktopPanelIndex={i}
+                  desktopSharedPack={desktopSharedPack}
+                />
+                {i < panels.length - 1 ? (
+                  <>
+                    {/*
+                     * Align connector bands to the pegboard corner screw centers.
+                     * Peg hole / screw spacing follows `--peg-grid-px` on `.pegboard-bg`.
+                     */}
+                    <div
+                      aria-hidden
+                      className="metal-bracket--band"
+                      style={{
+                        width: connectorBands[i]?.width ?? sideGap + 80,
+                        left: connectorBands[i]?.left,
+                        top: connectorBands[i]?.top ?? 70,
+                        transform: "translateY(-50%)",
+                      }}
+                    />
+                    <div
+                      aria-hidden
+                      className="metal-bracket--band"
+                      style={{
+                        width: connectorBands[i]?.width ?? sideGap + 80,
+                        left: connectorBands[i]?.left,
+                        bottom: connectorBands[i]?.bottom ?? 70,
+                        transform: "translateY(50%)",
+                      }}
+                    />
+                  </>
+                ) : null}
+              </div>
             ))}
           </div>
-          <div
-            ref={scrollRef}
-            className="workshop-scroll--desktop-strip"
-            style={{ visibility: isLayoutReady ? "visible" : "hidden" }}
-          >
-            <div
-              ref={innerScrollRef}
-              className="workshop-scroll--desktop-strip-inner hide-scrollbar"
-            >
-              {panels.map((panel, i) => (
-                <div key={`panel-${i}`} className="workshop-panel--desktop">
-                  <PegboardPanelView
-                    key={panel.items.map(x => x.id).join("|")}
-                    items={panel.items}
-                    isMobile={false}
-                    vw={vw}
-                    vh={vh}
-                    layoutWidth={layoutW}
-                    layoutHeight={layoutH}
-                    desktopPanelPadY={desktopPanelPadY}
-                    desktopPanelPadX={desktopPanelPadX}
-                    desktopContentInnerW={desktopPegboardContentInnerW}
-                    debugWorkshopCork={debugWorkshopCork}
-                    desktopPanelIndex={i}
-                    desktopSharedPack={desktopSharedPack}
-                  />
-                  {i < panels.length - 1 ? (
-                    <>
-                      {/*
-                       * Align connector bands to the pegboard corner screw centers.
-                       * Peg hole / screw spacing follows `--peg-grid-px` on `.pegboard-bg`.
-                       */}
-                      <div
-                        aria-hidden
-                        className="metal-bracket--band"
-                        style={{
-                          width: connectorBands[i]?.width ?? sideGap + 80,
-                          left: connectorBands[i]?.left,
-                          top: connectorBands[i]?.top ?? 70,
-                          transform: "translateY(-50%)",
-                        }}
-                      />
-                      <div
-                        aria-hidden
-                        className="metal-bracket--band"
-                        style={{
-                          width: connectorBands[i]?.width ?? sideGap + 80,
-                          left: connectorBands[i]?.left,
-                          bottom: connectorBands[i]?.bottom ?? 70,
-                          transform: "translateY(50%)",
-                        }}
-                      />
-                    </>
-                  ) : null}
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
+        </div>
       ) : (
         <div
           ref={mobileScrollRef}
