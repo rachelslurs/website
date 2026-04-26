@@ -15,7 +15,12 @@
  * `justify-content: flex-start` + `.workshop-page-stack { flex: 1 1 auto }` lets the stack grow
  * into the slot on tall viewports (no intentional top/bottom slack from `safe center`).
  */
+#main-content.workshop-viewport-slot {
+  overflow: visible;
+}
+
 #main-content.workshop-viewport-slot > .workshop-viewport-fill {
+  overflow: visible;
   /* Single knobs: prefer named tokens over scattered “magic” paddings. */
   --workshop-stage-inset: clamp(0.125rem, 0.55dvh, 0.375rem);
   /*
@@ -41,12 +46,19 @@
 }
 
 #main-content.workshop-viewport-slot .workshop-viewport-fill > .workshop-page-stack {
+  overflow: visible;
   flex: 1 1 auto;
   width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  transform: translateY(var(--workshop-optical-center-offset));
+  /*
+   * Optical nudge: avoid `transform` here — it creates a containing block / stacking boundary
+   * that interacts badly with absolutely positioned cork slab shadows (`WorkshopPegboard`).
+   */
+  position: relative;
+  top: var(--workshop-optical-center-offset);
+  transform: none;
   /* Floor height so the peg column does not collapse when intrinsic size is ambiguous; never
    * exceed the fill region (`min(..., 100%)` is relative to `.workshop-viewport-fill`). */
   min-height: var(--workshop-page-stack-min-height);
@@ -62,6 +74,7 @@
 
 .workshop-pegboard-root {
   /* Column flex: peg scroll strip is flex-1 (ADR-003). */
+  position: relative;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -89,7 +102,8 @@
   --lcd-cast-opacity-drag: 0.22;
   /*
    * Desktop strip + mobile scale slot: `overflow-clip-margin` extends paint past scroll/clip boxes.
-   * Tracks `.pegboard-desktop-cork-drop` slab shadow (15px 30px 60px), `--pegboard-card-shadow-drag`,
+   * Tracks `.workshop-desktop-cork-slab-shadow-proxy` slab shadow (15px 30px 60px),
+   * `--pegboard-card-shadow-drag`,
    * and blur tail; bumped 2026-04 — field QA still saw clip until margin was generous vs ink.
    */
   --workshop-strip-clip-ink: max(
@@ -155,13 +169,8 @@
 
 @supports (overflow-clip-margin: 0px) {
   .workshop-pegboard-root .workshop-scroll--desktop-strip {
-    /* `hidden` clips outer `box-shadow`; `clip` + margin extends paint without allowing y-scroll beside `overflow-x: auto`. */
-    overflow-y: clip;
-    /* Cork slab shadow is on `.pegboard-desktop-cork-drop`; clip-margin still covers proxy + cards. */
-    overflow-clip-margin: max(3.5rem, var(--workshop-strip-clip-ink))
-      max(4.5rem, var(--workshop-strip-clip-ink))
-      max(16rem, calc(var(--workshop-strip-clip-ink) + 5rem))
-      max(4.5rem, var(--workshop-strip-clip-ink));
+    /* Outer strip stays paint-open; only `.workshop-scroll--desktop-strip-inner` scrolls on x. */
+    overflow: visible;
     padding-top: var(--workshop-strip-scroll-gutter-top);
     padding-bottom: var(--workshop-strip-scroll-gutter-bottom);
   }
@@ -175,8 +184,27 @@
   }
 }
 
+/*
+ * Slab shadows: `WorkshopPegboard` paints `position: absolute` proxies in
+ * `.workshop-desktop-cork-slab-shadow-root` (coords vs `position: relative` `.workshop-pegboard-root`) so
+ * `overflow-x: auto` on the strip inner cannot clip the cork slab `box-shadow`.
+ */
+.workshop-pegboard-root .workshop-desktop-cork-slab-shadow-root {
+  pointer-events: none;
+}
+
+.workshop-pegboard-root .workshop-desktop-cork-slab-shadow-proxy {
+  position: absolute;
+  z-index: 0;
+  box-sizing: border-box;
+  border-radius: 2px;
+  box-shadow: 15px 30px 60px rgba(0, 0, 0, 0.7);
+}
+
 /* Inner scroller: horizontal scroll + snap without clipping vertical ink. */
 .workshop-pegboard-root .workshop-scroll--desktop-strip-inner {
+  position: relative;
+  z-index: 1;
   flex: 1 1 auto;
   min-height: 0;
   width: 100%;
@@ -420,19 +448,6 @@
 .workshop-pegboard-root .pegboard-desktop-cork-outer {
   position: relative;
   overflow: visible;
-}
-
-/*
- * Heavy slab shadow (was on `.pegboard-bg`). Sibling under the cork avoids painting a large
- * `box-shadow` on the peg layer that participates in overflow coupling with the strip scroller.
- */
-.workshop-pegboard-root .pegboard-desktop-cork-drop {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  border-radius: 2px;
-  box-shadow: 15px 30px 60px rgba(0, 0, 0, 0.7);
 }
 
 .workshop-pegboard-root .pegboard-bg.pegboard-bg--desktop-cork {

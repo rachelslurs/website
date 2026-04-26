@@ -418,12 +418,6 @@ function PegboardPanelDesktop({
           overflow: "visible",
         }}
       >
-        {/*
-         * Shadow proxy: same border-box as the cork so the heavy drop-shadow is not painted
-         * on `.pegboard-bg` (avoids overflow coupling with the horizontal strip). Cork keeps a
-         * light inset only — see `workshop-pegboard.css`.
-         */}
-        <div className="pegboard-desktop-cork-drop" aria-hidden />
         <div
           className="pegboard-bg pegboard-bg--desktop-cork"
           data-peg-cols={Math.round(innerWFinal / grid)}
