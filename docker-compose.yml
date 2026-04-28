@@ -1,11 +1,64 @@
-version: '3'
-
 services:
+  # Optional: dev server container (not required for Playwright)
   app:
-    image: node:18
+    image: node:20
     ports:
-      - 4321:4321
+      - "4321:4321"
     working_dir: /app
-    command: npm run dev -- --host 0.0.0.0
+    command: npm run dev -- --host 0.0.0.0 --port 4321
     volumes:
       - ./:/app
+      - npm_cache:/root/.npm
+
+  # Run Playwright visual regression in the official image (Linux baselines match CI).
+  playwright:
+    platform: linux/amd64
+    image: mcr.microsoft.com/playwright:v1.59.1-jammy
+    working_dir: /work
+    volumes:
+      - ./:/work
+      - npm_cache:/root/.npm
+      - playwright_node_modules:/work/node_modules
+    # better-sqlite3 (via Tina) may compile from source; install a small build toolchain.
+    command: bash -lc "apt-get update && apt-get install -y --no-install-recommends g++ make python3 && rm -rf /var/lib/apt/lists/* && npm ci --prefer-offline --no-audit --no-fund && npm run test:visual"
+
+  # Local speed: bake build deps into an image (no apt-get every run).
+  # CI should still use the official image path above for parity.
+  playwright-fast:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile.playwright
+    working_dir: /work
+    volumes:
+      - ./:/work
+      - npm_cache:/root/.npm
+      - playwright_node_modules:/work/node_modules
+    command: bash -lc "npm ci --prefer-offline --no-audit --no-fund && npm run test:visual"
+
+  # Regenerate baselines (Linux) and write them into the mounted repo.
+  playwright-update:
+    platform: linux/amd64
+    image: mcr.microsoft.com/playwright:v1.59.1-jammy
+    working_dir: /work
+    volumes:
+      - ./:/work
+      - npm_cache:/root/.npm
+      - playwright_node_modules:/work/node_modules
+    command: bash -lc "apt-get update && apt-get install -y --no-install-recommends g++ make python3 && rm -rf /var/lib/apt/lists/* && npm ci --prefer-offline --no-audit --no-fund && npm run test:visual:update"
+
+  playwright-update-fast:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile.playwright
+    working_dir: /work
+    volumes:
+      - ./:/work
+      - npm_cache:/root/.npm
+      - playwright_node_modules:/work/node_modules
+    command: bash -lc "npm ci --prefer-offline --no-audit --no-fund && npm run test:visual:update"
+
+volumes:
+  npm_cache:
+  playwright_node_modules:

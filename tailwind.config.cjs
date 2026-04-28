@@ -7,6 +7,8 @@ function withOpacity(variableName) {
   };
 }
 
+const typographyAnalog = require("./tailwind.typography-analog.cjs");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{astro,html,js,jsx,md,mdx,ts,tsx}"],
@@ -31,7 +33,29 @@ module.exports = {
         },
       },
       spacing: {
-        "spacing": "var(--spacing)",
+        spacing: "var(--spacing)",
+        /* RisoBoardShell + RisoNav + Footer — calc(var(--spacing)*N); Phase 6b */
+        "board-outer": "calc(var(--spacing) * 4)",
+        "board-outer-sm": "calc(var(--spacing) * 2)",
+        "board-padding-x": "calc(var(--spacing) * 10)",
+        "board-padding-y-lg": "calc(var(--spacing) * 5)",
+        "board-pt-lg": "calc(var(--spacing) * 7)",
+        "board-pb-lg": "calc(var(--spacing) * 9)",
+        "board-padding-sm": "calc(var(--spacing) * 4)",
+        "board-slab-gap": "calc(var(--spacing) * 8)",
+        "board-slab-gap-sm": "calc(var(--spacing) * 4)",
+        "board-stack-gap": "calc(var(--spacing) * 8)",
+        "board-stack-gap-lg": "calc(var(--spacing) * 6)",
+        "board-stack-gap-sm": "calc(var(--spacing) * 4)",
+        "nav-gap": "calc(var(--spacing) * 3)",
+        "nav-y": "calc(var(--spacing) * 5)",
+        "nav-y-lg": "calc(var(--spacing) * 4)",
+        "nav-y-sm": "calc(var(--spacing) * 3)",
+        "nav-links-gap": "calc(var(--spacing) * 2)",
+        "footer-pt": "calc(var(--spacing) * 4)",
+        "footer-pt-sm": "calc(var(--spacing) * 3)",
+        "footer-gap": "calc(var(--spacing) * 3)",
+        "footer-links-gap": "calc(var(--spacing) * 2)",
       },
       textColor: {
         skin: {
@@ -352,6 +376,7 @@ module.exports = {
       },
           },
         },
+        analog: typographyAnalog,
       },
     },
   },

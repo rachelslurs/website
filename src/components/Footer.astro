@@ -11,13 +11,17 @@ const footerSocials = SOCIALS.filter(s => s.active);
 
 <footer
   id="about"
-  class="flex flex-wrap items-center justify-center gap-3 pt-4 sm:justify-end"
+  class="flex flex-wrap items-center justify-center gap-footer-gap pt-footer-pt max-sm:pt-footer-pt-sm sm:justify-end"
   role="contentinfo"
 >
-  <div class="flex gap-1.5" role="list" aria-label="Social links">
+  <ul
+    class="flex list-none flex-wrap items-center justify-center gap-footer-links-gap"
+    role="list"
+    aria-label="Social links"
+  >
     {
       footerSocials.map(social => (
-        <div role="listitem">
+        <li>
           <a
             href={social.href}
             class="dymo is-interactive"
@@ -29,8 +33,8 @@ const footerSocials = SOCIALS.filter(s => s.active);
               {FOOTER_LABEL[social.name] ?? social.name.toUpperCase()}
             </span>
           </a>
-        </div>
+        </li>
       ))
     }
-  </div>
+  </ul>
 </footer>

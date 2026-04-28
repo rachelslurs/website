@@ -10,6 +10,12 @@ interface StringTitleProp {
   showBreadcrumbs?: boolean;
   /** When `false`, skip page h1, description, and RSS row (e.g. posts index). Default: show. */
   showPageHeader?: boolean;
+  /**
+   * When true: board shell + main use a flex height chain so workshop pegboard
+   * scrolls inside the viewport (ADR-003). Also enables ADR-011 immersive peg stage
+   * (`immersivePegStage` + `fillViewportChain` on `RisoBoardShell`).
+   */
+  fillViewportSlot?: boolean;
 }
 
 interface ArrayTitleProp {
@@ -19,6 +25,7 @@ interface ArrayTitleProp {
   includeRss?: boolean;
   showBreadcrumbs?: boolean;
   showPageHeader?: boolean;
+  fillViewportSlot?: boolean;
 }
 
 export type Props = StringTitleProp | ArrayTitleProp;
@@ -26,11 +33,23 @@ export type Props = StringTitleProp | ArrayTitleProp;
 const { props } = Astro;
 const showBreadcrumbs = props.showBreadcrumbs !== false;
 const showPageHeader = props.showPageHeader !== false;
+const fillViewportSlot = props.fillViewportSlot === true;
 ---
 
-<RisoBoardShell>
+<RisoBoardShell
+  fillViewportChain={fillViewportSlot}
+  immersivePegStage={fillViewportSlot}
+>
   {showBreadcrumbs && <Breadcrumbs />}
-  <main id="main-content" class="board-slot app-layout prose max-w-none">
+  <main
+    id="main-content"
+    class:list={[
+      "board-slot app-layout max-w-none",
+      !fillViewportSlot &&
+        "prose prose-analog max-sm:prose-sm prose-img:rounded prose-img:bg-skin-fill",
+      fillViewportSlot && "workshop-viewport-slot flex min-h-0 flex-1 flex-col",
+    ]}
+  >
     {
       showPageHeader && (
         <>
@@ -90,6 +109,14 @@ const showPageHeader = props.showPageHeader !== false;
         </>
       )
     }
-    <slot />
+    {
+      fillViewportSlot ? (
+        <div class="workshop-viewport-fill">
+          <slot />
+        </div>
+      ) : (
+        <slot />
+      )
+    }
   </main>
 </RisoBoardShell>

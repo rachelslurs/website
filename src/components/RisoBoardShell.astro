@@ -6,38 +6,113 @@ import Footer from "@components/Footer.astro";
 export interface Props {
   /** Staggered Dymo nav entrance (homepage only). */
   animateNav?: boolean;
+  /**
+   * When true: shell fills at least the viewport height so nested `min-h-0` + flex
+   * pegboard regions scroll internally (ADR-003). Used by workshop via Main.
+   */
+  fillViewportChain?: boolean;
+  /**
+   * Pilot (ADR-011 / ADR-010): drop outer `max-w-[1200px]` so the peg field can use
+   * the full viewport width; inner `board` column + ADR-008 decoration bounds unchanged.
+   */
+  immersivePegStage?: boolean;
 }
 
-const { animateNav = false } = Astro.props;
+const {
+  animateNav = false,
+  fillViewportChain = false,
+  immersivePegStage = false,
+} = Astro.props;
+
+/** Immersive pilot (workshop): reclaim vertical budget for peg column without changing other routes. */
+const boardBlockPadding = immersivePegStage
+  ? "max-sm:py-1 max-lg:py-1 lg:py-1"
+  : "max-lg:py-board-padding-y-lg lg:pb-board-pb-lg lg:pt-board-pt-lg";
+
+const stackChromeGap = immersivePegStage
+  ? "gap-2 max-sm:gap-2"
+  : "gap-board-stack-gap max-lg:gap-board-stack-gap-lg max-sm:gap-board-stack-gap-sm";
+
+/** Workshop: grain+blobs fill `board-page-outer` so texture sits behind nav + footer (immersive). */
+const risoDecorationBehindChrome = fillViewportChain && immersivePegStage;
 ---
 
 <a id="skip-to-content" href="#main-content" class="skip-to-content-board">
   Skip to content
 </a>
-<div class="board-page-outer mx-auto w-full max-w-[1200px] p-4 max-sm:p-2">
+<div
+  class:list={[
+    "board-page-outer w-full",
+    immersivePegStage ? "px-0" : "p-board-outer max-sm:p-board-outer-sm",
+    immersivePegStage && "board-page-outer--immersive-peg-stage",
+    immersivePegStage ? "max-w-none" : "mx-auto max-w-[1200px]",
+    /* min-h-dvh alone leaves height indefinite for flex descendants on some engines;
+     * h-svh fixes the workshop pegboard column (ADR-003). */
+    fillViewportChain && "flex h-svh min-h-0 flex-col",
+  ]}
+>
+  {immersivePegStage && <div class="peg-stage-underlay" aria-hidden="true" />}
+  {
+    risoDecorationBehindChrome && (
+      <div
+        class="pointer-events-none absolute inset-0 z-[1] overflow-hidden"
+        aria-hidden="true"
+        transition:persist="riso-board-decoration"
+      >
+        <div class="grain" />
+        <div class="blob blob-2" />
+        <div class="blob blob-3" />
+        <div class="blob blob-4" />
+      </div>
+    )
+  }
+  <!-- ADR-008 (+ ADR-011): page-owned visuals (tape, edges, etc.) stay inside the inner `board` column. -->
   <div
-    class="board relative flex flex-col gap-8 px-10 pb-10 pt-8 max-lg:p-6 max-sm:gap-5 max-sm:p-4"
+    class:list={[
+      "board relative flex flex-col gap-board-slab-gap max-sm:gap-board-slab-gap-sm",
+      boardBlockPadding,
+      immersivePegStage
+        ? "px-0 max-sm:px-0"
+        : "px-board-padding-x max-sm:p-board-padding-sm",
+      fillViewportChain && "min-h-0 flex-1",
+      risoDecorationBehindChrome && "z-[2]",
+    ]}
   >
     <!-- Persist grain + blobs only: full-shell persist breaks in-page link navigation. -->
-    <div
-      class="pointer-events-none absolute inset-0 z-[100] overflow-hidden"
-      aria-hidden="true"
-      transition:persist="riso-board-decoration"
-    >
-      <div class="grain"></div>
-      <div class="blob blob-2"></div>
-      <div class="blob blob-3"></div>
-      <div class="blob blob-4"></div>
-    </div>
+    {
+      !risoDecorationBehindChrome && (
+        <div
+          class="pointer-events-none absolute inset-0 z-[100] overflow-hidden"
+          aria-hidden="true"
+          transition:persist="riso-board-decoration"
+        >
+          <div class="grain" />
+          <div class="blob blob-2" />
+          <div class="blob blob-3" />
+          <div class="blob blob-4" />
+        </div>
+      )
+    }
 
-    <div class="relative z-[110] flex min-h-0 flex-1 flex-col gap-8">
+    <div
+      class:list={[
+        "relative z-[110] flex min-h-0 flex-1 flex-col",
+        stackChromeGap,
+      ]}
+    >
       <RisoNav
         client:load
         activePath={Astro.url.pathname}
         siteTitle={SITE.title}
         animateEntrance={animateNav}
       />
-      <div transition:name="board-content" class="min-h-0 flex-1">
+      <div
+        transition:name="board-content"
+        class:list={[
+          "min-h-0 flex-1",
+          fillViewportChain && "flex min-h-0 flex-col",
+        ]}
+      >
         <slot />
       </div>
       <Footer />
