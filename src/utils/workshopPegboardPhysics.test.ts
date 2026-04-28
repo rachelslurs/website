@@ -12,6 +12,7 @@ import {
   orderPackItemsClipboardLast,
   orderPackItemsClipboardLastReverseNonClipboard,
   packDesktopPanelAtGrid,
+  desktopCorkMinWidthOverHeightForLayout,
   desktopCorkPackBudget,
   pickSharedDesktopPackGrid,
   resolveLayoutAfterResizeWithGrid,
@@ -155,6 +156,21 @@ describe("desktopCorkPackBudget", () => {
     expect(r.budgetH).toBe(360);
     expect(r.budgetW).toBeLessThan(1200);
     expect(r.budgetH / r.budgetW).toBeGreaterThanOrEqual(0.35 - 1e-6);
+  });
+
+  it("caps height on tall narrow portals so width/height stays above min width÷height", () => {
+    const r = desktopCorkPackBudget(600, 900, 0.38, 60, 1.15);
+    expect(r.budgetW).toBe(600);
+    expect(r.budgetH).toBeLessThan(900);
+    expect(r.budgetW / r.budgetH).toBeGreaterThanOrEqual(1.15 - 1e-6);
+  });
+});
+
+describe("desktopCorkMinWidthOverHeightForLayout", () => {
+  it("uses a stricter floor on narrow strip widths and a gentler floor on wide strips", () => {
+    expect(desktopCorkMinWidthOverHeightForLayout(960)).toBe(1.22);
+    expect(desktopCorkMinWidthOverHeightForLayout(1080)).toBe(1.19);
+    expect(desktopCorkMinWidthOverHeightForLayout(1200)).toBe(1.17);
   });
 });
 

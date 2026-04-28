@@ -10,6 +10,7 @@ import type { PegboardCardDTO } from "@utils/serializeWorkshopPegboard";
 import {
   DESKTOP_PACK_GRIDS,
   desktopCorkPackBudget,
+  desktopCorkMinWidthOverHeightForLayout,
   hardwareDimsWithGrid,
   initialPackPositionsColumnFirstWithGrid,
   orderPackItemsClipboardLast,
@@ -220,9 +221,15 @@ function PegboardPanelDesktop({
   const innerW =
     desktopContentInnerW != null && desktopContentInnerW > 0
       ? desktopContentInnerW
-      : desktopInnerW(w, desktopPanelPadX ?? 24);
+      : desktopInnerW(w, desktopPanelPadX ?? 4);
   const viewportH = desktopPortalInnerH(h, desktopPanelPadY ?? 6);
-  const { budgetW, budgetH } = desktopCorkPackBudget(innerW, viewportH);
+  const { budgetW, budgetH } = desktopCorkPackBudget(
+    innerW,
+    viewportH,
+    undefined,
+    undefined,
+    desktopCorkMinWidthOverHeightForLayout(innerW)
+  );
 
   const itemsKey = useMemo(() => items.map(i => i.id).join("|"), [items]);
 

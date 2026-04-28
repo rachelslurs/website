@@ -19,20 +19,50 @@
   overflow: visible;
 }
 
+/*
+ * ── Workshop vertical tuning map (read before tweaking) ───────────────────────────
+ *
+ * **Cork height (packing / `workshopScrollContentClientSize`)** — smaller values → taller cork:
+ *   • `.workshop-pegboard-root` `--workshop-strip-shadow-ink-top` / `-bottom` (inputs to real ink).
+ *     Strip uses **symmetric** `--workshop-strip-scroll-block-ink` = `max(top, bottom)` so the
+ *     desktop strip reads vertically centered; lowering *either* input only helps if it was the max.
+ *   • Same root: `--workshop-desktop-cork-shadow` — softer slab = less strip ink required.
+ *   • Same root: `--pegboard-card-shadow-rest` / `--pegboard-card-shadow-drag` — if you shrink
+ *     drag shadow, lower the `calc(… + 35px + 45px …)` term inside `--workshop-strip-shadow-ink-bottom`.
+ *   • This block: `--workshop-stage-inset` — less padding on `#main-content` slot = more height.
+ *   • `.workshop-panel--desktop` `padding-block` (+ `@media (max-height: …)` overrides).
+ *   • `RisoBoardShell.astro`: `boardBlockPadding` / `stackChromeGap` when `immersivePegStage` (py/gap).
+ *   • Desktop cork **rectangle** (budget before grid snap): `workshopPegboardPhysics.ts`
+ *     `DESKTOP_CORK_MIN_WIDTH_OVER_HEIGHT` + `DESKTOP_CORK_MIN_HEIGHT_OVER_WIDTH` in
+ *     `desktopCorkPackBudget` — not expressible in pure CSS while packing stays grid-snapped in JS.
+ *
+ * **“Reads vertically centered” in the viewport** (column is `justify-content: center` here;
+ * cork is centered inside the panel via `.pegboard-desktop-pack-slot`):
+ *   • `--workshop-optical-center-offset` — positive nudges the whole peg **down** (nav vs footer).
+ *   • `--workshop-peg-column-nudge-y` — **adds** to that `top` (negative = lift column). Use when
+ *     heavy **bottom** strip ink makes the slab feel low; start around `-6px` to `-10px`, watch
+ *     nav clearance (shadow is still masked by immersive nav/footer backgrounds in `riso.css`).
+ *
+ * **Header/footer shadow interaction** — not solved by cork height alone: `riso.css` immersive
+ *   nav/footer `background: rgba(255,255,255,0.92)` masks bleed; shrinking strip ink can bring
+ *   shadow closer to chrome — tune mask opacity or strip ink together.
+ */
 #main-content.workshop-viewport-slot > .workshop-viewport-fill {
   overflow: visible;
   /* Single knobs: prefer named tokens over scattered “magic” paddings. */
-  --workshop-stage-inset: clamp(0.125rem, 0.55dvh, 0.375rem);
+  --workshop-stage-inset: clamp(0.125rem, 0.45dvh, 0.25rem);
   /*
    * Collapse floor only: when the flex chain would assign a shorter box, keep at least this tall.
    * On normal workshop viewports the stack already stretches (`flex: 1`), so raising this alone
-   * does **not** add height — tune `--workshop-strip-scroll-gutter-*` on `.workshop-scroll--desktop-strip`
-   * or immersive shell padding in `RisoBoardShell.astro` for visible cork gains.
+   * does **not** add height — tune `--workshop-strip-shadow-ink-*` / `--workshop-desktop-cork-shadow`
+   * on `.workshop-pegboard-root` or immersive shell padding in `RisoBoardShell.astro` for cork gains.
    */
   --workshop-page-stack-min-height: min(72dvh, 100%);
   /* Optical bias: keep 0 by default; tune in one place if needed. */
   /* Keep symmetry via flex; tiny bias for nav/footer optical balance. */
-  --workshop-optical-center-offset: 10px;
+  --workshop-optical-center-offset: 0px;
+  /* See tuning map above: negative lifts peg column when bottom strip ink feels visually “heavy”. */
+  --workshop-peg-column-nudge-y: 0px;
 
   box-sizing: border-box;
   display: flex;
@@ -57,7 +87,9 @@
    * that interacts badly with absolutely positioned cork slab shadows (`WorkshopPegboard`).
    */
   position: relative;
-  top: var(--workshop-optical-center-offset);
+  top: calc(
+    var(--workshop-optical-center-offset) + var(--workshop-peg-column-nudge-y)
+  );
   transform: none;
   /* Floor height so the peg column does not collapse when intrinsic size is ambiguous; never
    * exceed the fill region (`min(..., 100%)` is relative to `.workshop-viewport-fill`). */
@@ -101,6 +133,26 @@
   --lcd-cast-opacity: 0.16;
   --lcd-cast-opacity-drag: 0.22;
   /*
+   * Desktop cork slab shadow (tighter than legacy 18/26/56) — strip block padding must cover
+   * this tail **plus** worst-case peg-card drag ink (`--pegboard-card-shadow-drag`) below the cork.
+   */
+  --workshop-desktop-cork-shadow: 11px 17px 36px rgba(0, 0, 0, 0.58);
+  /* Matches strip `--workshop-strip-scroll-gutter-top` intent (max(0.75rem, 12px)); keep in sync. */
+  --workshop-strip-shadow-ink-top: max(0.75rem, 0.5rem, 8px);
+  /* Bottom strip ink — keep ≥ cork shadow tail (+ card ink if you add terms back to the calc). */
+  --workshop-strip-shadow-ink-bottom: max(
+    2.25rem,
+    calc(36px + 0.75rem)
+  );
+  /*
+   * Symmetric strip block padding = max(top ink, bottom ink) so `.workshop-scroll--desktop-strip`
+   * does not look vertically biased (asymmetric pt/pb shifts the scrollport vs the strip box).
+   */
+  --workshop-strip-scroll-block-ink: max(
+    var(--workshop-strip-shadow-ink-top),
+    var(--workshop-strip-shadow-ink-bottom)
+  );
+  /*
    * Desktop strip + mobile scale slot: `overflow-clip-margin` extends paint past scroll/clip boxes.
    * Tracks `.workshop-desktop-cork-slab-shadow-proxy` slab shadow (15px 30px 60px),
    * `--pegboard-card-shadow-drag`,
@@ -142,20 +194,15 @@
   min-height: 0;
   width: 100%;
   box-sizing: border-box;
-  /* Desktop strip: show a hint of adjacent panels (“peek”). */
-  /* Larger peek + closer spacing: more adjacent board visible while keeping symmetry. */
-  --workshop-desktop-panel-peek: clamp(3.75rem, 8.5vw, 9.5rem);
+  /* Desktop strip: show adjacent panels (“peek”) — larger = more neighbor slab visible. */
+  --workshop-desktop-panel-peek: clamp(5rem, 15vw, 13rem);
   /*
-   * Desktop cork depth: a `::before` wash *behind* the cork (see `.pegboard-desktop-cork-outer`),
-   * not painted on the cork face — avoids scroll clipping / shadow-proxy trailing.
+   * Block padding = shadow “ink” inside the horizontal scrollport (symmetric = `--workshop-strip-scroll-block-ink`).
+   * `WorkshopPegboard` subtracts it from `clientHeight` via `workshopScrollContentClientSize`.
+   * Chromium does not apply `overflow-clip-margin` on this same box as `overflow-x: auto`
+   * (computed `overflow-clip-margin: 0`); padding is the contract.
    */
-  --workshop-strip-scroll-gutter-top: max(0.75rem, 12px);
-  --workshop-strip-scroll-gutter-bottom: max(1rem, 16px);
-  /*
-   * Modest block padding for layout (panels off edges); `WorkshopPegboard` subtracts it from
-   * `clientHeight` via `workshopScrollContentClientSize` (content box = strip minus padding).
-   */
-  padding-block: 0.125rem;
+  padding-block: var(--workshop-strip-scroll-block-ink);
   /*
    * Symmetric peek: panel width is `100% - 2*peek` (see `.workshop-panel--desktop`).
    * End caps are **inside** `.workshop-scroll--desktop-strip-inner` as flex spacers so the
@@ -170,24 +217,10 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/* Where supported, prefer `clip` over `visible`→`auto` so the strip never grows a vertical bar. */
 @supports (overflow-clip-margin: 0px) {
   .workshop-pegboard-root .workshop-scroll--desktop-strip {
-    overflow-x: auto;
     overflow-y: clip;
-    /*
-     * Extra clip margin for bracket / card ink and cork box-shadow outsets.
-     */
-    overflow-clip-margin: max(5rem, 80px) 0 max(9rem, 144px) 0;
-    padding-top: var(--workshop-strip-scroll-gutter-top);
-    padding-bottom: var(--workshop-strip-scroll-gutter-bottom);
-  }
-}
-
-@supports not (overflow-clip-margin: 0px) {
-  .workshop-pegboard-root .workshop-scroll--desktop-strip {
-    /* No clip-margin: generous block padding so cork drop-shadow + bracket ink stay inside the strip. */
-    padding-top: max(var(--workshop-strip-scroll-gutter-top), 2.5rem);
-    padding-bottom: max(6rem, calc(14px + 30px + 10px + 30px + 60px + 3rem));
   }
 }
 
@@ -270,7 +303,8 @@
   justify-content: flex-start;
   /* Tighter block axis than inline: packing uses `paddingTop` for cork height (`desktopPortalInnerH`). */
   padding-block: 0.0625rem;
-  padding-inline: 1.25rem;
+  /* Narrow gutter → wider cork; bridge **width** + centering: `WorkshopPegboard.tsx` (`METAL_BRIDGE_*`). */
+  padding-inline: 0.25rem;
   box-sizing: border-box;
 }
 
@@ -278,14 +312,14 @@
 @media (max-height: 820px) {
   .workshop-panel--desktop {
     padding-block: 0.125rem;
-    padding-inline: 1.25rem;
+    padding-inline: 0.25rem;
   }
 }
 
 @media (max-height: 720px) {
   .workshop-panel--desktop {
     padding-block: 0.0625rem;
-    padding-inline: 1.25rem;
+    padding-inline: 0.25rem;
   }
 }
 
@@ -440,8 +474,7 @@
 
 .workshop-pegboard-root .pegboard-bg.pegboard-bg--desktop-cork {
   /* Desktop cork: true behind-the-board shadow (no proxy layers). Light from top-left. */
-  box-shadow:
-    18px 26px 56px rgba(0, 0, 0, 0.62),
+  box-shadow: var(--workshop-desktop-cork-shadow),
     inset 0 0 0 1px rgba(26, 26, 46, 0.08);
 }
 

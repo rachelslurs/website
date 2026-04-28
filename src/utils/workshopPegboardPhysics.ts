@@ -86,9 +86,9 @@ export function cardInBoardBounds(
   return x >= 0 && y >= 0 && x + w <= innerW && y + h <= innerH;
 }
 
-/** Horizontal slack from one side of centered pegboard to viewport edge (panel has p-10). */
+/** Fallback horizontal slack for connector math when bands are not measured yet. */
 export function desktopPegboardSideGap(vw: number, innerW: number): number {
-  const panelPadX = 80;
+  const panelPadX = 32;
   return Math.max(0, (vw - panelPadX - innerW) / 2);
 }
 
@@ -636,31 +636,61 @@ export const DESKTOP_PACK_GRIDS: readonly number[] = [60, 54, 48, 42, 36, 30];
 export const DESKTOP_CORK_MIN_HEIGHT_OVER_WIDTH = 0.38;
 
 /**
+ * Minimum cork **content** width ÷ height for desktop packing. Tall, narrow
+ * portals otherwise snap to a nearly square board; trimming height (keeping
+ * full panel width) nudges toward a wider rectangle. Paired with
+ * `DESKTOP_CORK_MIN_HEIGHT_OVER_WIDTH` (which can narrow width on shallow strips).
+ */
+export const DESKTOP_CORK_MIN_WIDTH_OVER_HEIGHT = 1.15;
+
+/**
+ * Minimum cork width ÷ height for `desktopCorkPackBudget`, keyed by **panel
+ * content width** (`layoutInnerW`). Narrow desktop strips (~1024-class) need a
+ * stronger floor so the cork does not read as a square; wide strips (~1280)
+ * use a gentler floor so the same rule does not over‑trim height next to the
+ * wider connector treatment in `WorkshopPegboard`.
+ */
+export function desktopCorkMinWidthOverHeightForLayout(
+  layoutInnerW: number
+): number {
+  if (layoutInnerW <= 1000) return 1.22;
+  if (layoutInnerW >= 1160) return 1.17;
+  return 1.19;
+}
+
+/**
  * Snapped cork **budget** inside the panel (before grid floor in
  * `pickSharedDesktopPackGrid`). When `viewportH / layoutInnerW` is below
  * `minHeightOverWidth`, width is capped so the packed board stays taller
- * relative to its width; the physical cork is centered in the panel via CSS.
+ * relative to its width; when `layoutInnerW / viewportH` is below
+ * `minWidthOverHeight`, height is capped so the board stays wider relative to
+ * its height. The physical cork is centered in the panel via CSS.
  */
 export function desktopCorkPackBudget(
   layoutInnerW: number,
   viewportH: number,
   minHeightOverWidth: number = DESKTOP_CORK_MIN_HEIGHT_OVER_WIDTH,
-  gridSnap: number = PEG_GRID
+  gridSnap: number = PEG_GRID,
+  minWidthOverHeight: number = DESKTOP_CORK_MIN_WIDTH_OVER_HEIGHT
 ): { budgetW: number; budgetH: number } {
   const snap = (v: number) =>
     Math.max(0, Math.floor(Math.max(0, v) / gridSnap) * gridSnap);
-  const W = snap(layoutInnerW);
-  const H = snap(viewportH);
-  if (W <= 0 || H <= 0) return { budgetW: W, budgetH: H };
-  if (H / W >= minHeightOverWidth - 1e-9) {
-    return { budgetW: W, budgetH: H };
+  let w = snap(layoutInnerW);
+  let h = snap(viewportH);
+  if (w <= 0 || h <= 0) return { budgetW: w, budgetH: h };
+  if (h / w < minHeightOverWidth - 1e-9) {
+    const rawMaxW = h / minHeightOverWidth;
+    const cappedSnapped = Math.max(
+      gridSnap,
+      snap(Math.min(layoutInnerW, rawMaxW))
+    );
+    w = Math.min(w, cappedSnapped);
   }
-  const rawMaxW = H / minHeightOverWidth;
-  const cappedSnapped = Math.max(
-    gridSnap,
-    snap(Math.min(layoutInnerW, rawMaxW))
-  );
-  return { budgetW: Math.min(W, cappedSnapped), budgetH: H };
+  if (w / h < minWidthOverHeight - 1e-9) {
+    const maxH = w / minWidthOverHeight;
+    h = Math.min(h, Math.max(gridSnap, snap(maxH)));
+  }
+  return { budgetW: w, budgetH: h };
 }
 
 /**
@@ -680,7 +710,14 @@ export function pickSharedDesktopPackGrid(
     ? { ...options, debug: false }
     : options;
 
-  const { budgetW, budgetH } = desktopCorkPackBudget(layoutInnerW, viewportH);
+  const minWOh = desktopCorkMinWidthOverHeightForLayout(layoutInnerW);
+  const { budgetW, budgetH } = desktopCorkPackBudget(
+    layoutInnerW,
+    viewportH,
+    DESKTOP_CORK_MIN_HEIGHT_OVER_WIDTH,
+    PEG_GRID,
+    minWOh
+  );
 
   for (const grid of DESKTOP_PACK_GRIDS) {
     const innerW = Math.floor(budgetW / grid) * grid;

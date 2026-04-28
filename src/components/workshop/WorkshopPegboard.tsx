@@ -19,17 +19,33 @@ import type { MobileScalePresentation } from "./pegboardTypes";
 
 import "../../styles/workshop-pegboard.css";
 
+/** Pixels past each cork edge included in the bridge span (`width ≈ gap + 2×overlap`). */
+const METAL_BRIDGE_OVERLAP_PX = 9;
+
+/**
+ * Multiplier on the measured horizontal span between corks (after overlap).
+ * `1` matches geometry; lower values shorten **bar width** only; bars stay centered in the gap.
+ */
+const METAL_BRIDGE_WIDTH_SCALE = 1;
+
+/** Extra bar width on wide strip layouts (~1280); ~1024 keeps `1` so bars stay as‑measured. */
+function metalBridgeWidthScaleForStripLayoutW(layoutW: number): number {
+  if (layoutW >= 1180) return 1.08;
+  if (layoutW <= 1060) return 1;
+  return 1.04;
+}
+
 const useIsoLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
-/** One side of `.workshop-panel--desktop { padding-inline: 1.5rem }` in px (tracks `html` font-size). */
+/** One side of `.workshop-panel--desktop { padding-inline: 0.25rem }` in px (tracks `html` font-size). */
 function workshopPanelRemPaddingPx(): number {
-  if (typeof document === "undefined") return 24;
+  if (typeof document === "undefined") return 4;
   const rootPx = parseFloat(
     getComputedStyle(document.documentElement).fontSize || "16"
   );
   const fontPx = Number.isFinite(rootPx) && rootPx > 0 ? rootPx : 16;
-  return Math.round(1.5 * fontPx);
+  return Math.round(0.25 * fontPx);
 }
 
 /** One side of `.workshop-panel--desktop { padding-block: 0.375rem }` (default) in px. */
@@ -133,6 +149,9 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
   const layoutH = Math.round(portalLayout?.h ?? vh);
   const isMobile = portalLayout?.isMobile ?? false;
   const isLayoutReady = portalLayout !== null;
+  const metalBridgeLayoutWScale = metalBridgeWidthScaleForStripLayoutW(layoutW);
+  const metalBridgeWidthCombinedScale =
+    METAL_BRIDGE_WIDTH_SCALE * metalBridgeLayoutWScale;
 
   const desktopInner = useMemo(
     () => desktopInnerW(layoutW, desktopPanelPadX),
@@ -284,10 +303,14 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
           window.getComputedStyle(boardEl).getPropertyValue("--peg-grid-px")
         ) || 60;
       const screwCenterInset = borderW + gridPx / 2;
-      const overlap = 10;
-
-      const left = boardRect.right - panelRect.left - overlap;
-      const width = nextBoardRect.left - boardRect.right + overlap * 2;
+      const rawSpan =
+        nextBoardRect.left - boardRect.right + METAL_BRIDGE_OVERLAP_PX * 2;
+      const width = Math.max(
+        24,
+        Math.round(rawSpan * metalBridgeWidthCombinedScale)
+      );
+      const gapCenterPx = (boardRect.right + nextBoardRect.left) / 2;
+      const left = gapCenterPx - panelRect.left - width / 2;
       const top = boardRect.top - panelRect.top + screwCenterInset;
       const bottom = panelRect.bottom - boardRect.bottom + screwCenterInset;
 
@@ -297,7 +320,14 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
     }
 
     setConnectorBands(next);
-  }, [isMobile, panels.length, layoutW, layoutH, desktopInner]);
+  }, [
+    isMobile,
+    panels.length,
+    layoutW,
+    layoutH,
+    desktopInner,
+    metalBridgeWidthCombinedScale,
+  ]);
 
   /** Peg scrollport (`workshop-scroll--*`) — desktop uses `.workshop-scroll--desktop-strip` (padding + scroll owner). */
   useIsoLayoutEffect(() => {
@@ -425,7 +455,11 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
                       aria-hidden
                       className="metal-bracket--band"
                       style={{
-                        width: connectorBands[i]?.width ?? sideGap + 80,
+                        width:
+                          connectorBands[i]?.width ??
+                          Math.round(
+                            (sideGap + 64) * metalBridgeWidthCombinedScale
+                          ),
                         left: connectorBands[i]?.left,
                         top: connectorBands[i]?.top ?? 70,
                         transform: "translateY(-50%)",
@@ -435,7 +469,11 @@ export default function WorkshopPegboard({ panels }: WorkshopPegboardProps) {
                       aria-hidden
                       className="metal-bracket--band"
                       style={{
-                        width: connectorBands[i]?.width ?? sideGap + 80,
+                        width:
+                          connectorBands[i]?.width ??
+                          Math.round(
+                            (sideGap + 64) * metalBridgeWidthCombinedScale
+                          ),
                         left: connectorBands[i]?.left,
                         bottom: connectorBands[i]?.bottom ?? 70,
                         transform: "translateY(50%)",
