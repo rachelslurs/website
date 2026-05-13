@@ -1320,10 +1320,10 @@ a.skip-to-content-board:focus {
   position: relative;
   box-sizing: border-box;
   background: #fff;
-  padding: 12px 12px 40px 12px;
+  /* padding: 12px 12px 40px 12px; */
   box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
   margin: var(--baseline) auto calc(var(--baseline) * 2) auto;
-  max-width: 80%;
+  /* max-width: 80%; */
 }
 
 .analog-prose p:has(> img:only-child)::before {
