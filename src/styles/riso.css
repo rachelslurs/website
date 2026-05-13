@@ -1345,8 +1345,6 @@ a.skip-to-content-board:focus {
   height: auto;
   display: block;
   margin: 0;
-  filter: grayscale(100%) contrast(120%) sepia(100%) hue-rotate(170deg);
-  mix-blend-mode: multiply;
 }
 
 /* Tag row: stamp label + linked Dymo labels (riso hover on .dymo.is-interactive) */
