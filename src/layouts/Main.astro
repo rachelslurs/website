@@ -30,7 +30,10 @@ const showPageHeader = props.showPageHeader !== false;
 
 <RisoBoardShell>
   {showBreadcrumbs && <Breadcrumbs />}
-  <main id="main-content" class="board-slot app-layout prose max-w-none">
+  <main
+    id="main-content"
+    class="board-slot app-layout prose flex min-h-[12rem] flex-1 flex-col max-w-none"
+  >
     {
       showPageHeader && (
         <>
