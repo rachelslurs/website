@@ -13,6 +13,7 @@ const DymoLabel = React.memo(
     onClick,
     grain = "vertical",
     title: titleAttr,
+    className = "",
   }: {
     text: string;
     size?: "normal" | "large" | "section";
@@ -25,6 +26,7 @@ const DymoLabel = React.memo(
     /** `vertical` = ‖ ribs; `horizontal` = ≡ striations along tape length */
     grain?: "vertical" | "horizontal";
     title?: string;
+    className?: string;
   }) => {
     const chars = useMemo(() => {
       return text
@@ -56,6 +58,7 @@ const DymoLabel = React.memo(
       isActive && "active",
       color && `dymo-${color}`,
       isInteractive ? "is-interactive" : "no-interactive",
+      className,
     ]
       .filter(Boolean)
       .join(" ");

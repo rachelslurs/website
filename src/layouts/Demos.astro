@@ -15,7 +15,7 @@ const { page } = Astro.props;
 ---
 
 <Layout title={`Demos | ${SITE.title}`}>
-  <Main pageTitle="Demos" pageDesc="UI patterns and animations">
+  <Main pageTitle="Demos" showBreadcrumbs={false}>
     <ul class="list-none pl-0">
       {
         page.data.map(({ data, slug }) => (

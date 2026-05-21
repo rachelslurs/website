@@ -1130,6 +1130,86 @@ a.skip-to-content-board:focus {
   }
 }
 
+.analog-prose hr {
+  margin: var(--baseline) 0;
+  border: none;
+  border-top: 1px dashed rgba(26, 26, 46, 0.35);
+}
+
+/* Polaroids: explicit figure, or a lone image in a paragraph */
+.analog-prose figure.polaroid {
+  background: #fff;
+  padding: 12px 12px 40px 12px;
+  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
+  margin: var(--baseline) auto calc(var(--baseline) * 2) auto;
+  max-width: 80%;
+  position: relative;
+}
+
+.analog-prose figure.polaroid::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 15px;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  z-index: 2;
+}
+
+.analog-prose .polaroid-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: grayscale(100%) contrast(120%) sepia(100%) hue-rotate(170deg);
+  mix-blend-mode: multiply;
+}
+
+.analog-prose .polaroid-caption {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  @apply font-mono;
+  font-size: var(--riso-type-md);
+  line-height: var(--baseline);
+  color: var(--blue);
+}
+
+.analog-prose p:has(> img:only-child) {
+  position: relative;
+  box-sizing: border-box;
+  background: #fff;
+  /* padding: 12px 12px 40px 12px; */
+  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
+  margin: var(--baseline) auto calc(var(--baseline) * 2) auto;
+  /* max-width: 80%; */
+}
+
+.analog-prose p:has(> img:only-child)::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 15px;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  z-index: 2;
+}
+
+.analog-prose p:has(> img:only-child) img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0;
+}
 /* Tag row: stamp label + linked Dymo labels (riso hover on .dymo.is-interactive) */
 .analog-post .post-tags {
   display: flex;
