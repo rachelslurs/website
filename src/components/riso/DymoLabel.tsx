@@ -11,6 +11,7 @@ const DymoLabel = React.memo(
     href,
     isInteractive = true,
     onClick,
+    className = "",
   }: {
     text: string;
     size?: "normal" | "large" | "section";
@@ -20,6 +21,7 @@ const DymoLabel = React.memo(
     href?: string;
     isInteractive?: boolean;
     onClick?: () => void;
+    className?: string;
   }) => {
     const chars = useMemo(() => {
       return text
@@ -50,6 +52,7 @@ const DymoLabel = React.memo(
       isActive && "active",
       color && `dymo-${color}`,
       isInteractive ? "is-interactive" : "no-interactive",
+      className,
     ]
       .filter(Boolean)
       .join(" ");
