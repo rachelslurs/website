@@ -1,0 +1,71 @@
+---
+import WorkshopPegboard from "@components/workshop/WorkshopPegboard";
+import Layout from "@layouts/Layout.astro";
+import Main from "@layouts/Main.astro";
+import type { PegboardPanelDTO } from "@utils/serializeWorkshopPegboard";
+
+/**
+ * Three panels × **one card each** (clipboard, LCD, blueprint) so Playwright can
+ * snapshot each hardware in isolation. Multi-card packing is covered in Vitest
+ * (`workshopPegboardPhysics.test.ts`); add items here if we need multi-card *visual* baselines.
+ */
+const pegboardPanels: PegboardPanelDTO[] = [
+  {
+    items: [
+      {
+        id: "vt:clipboard:1",
+        hardware: "clipboard",
+        title: "Case Study Fixture",
+        href: "/work/example",
+        dateLabel: "Jan 2026",
+        description:
+          "Deterministic workshop fixture card for visual regression testing.",
+        caseStudyYear: "2026",
+        caseStudyLabel: "Case Study",
+      },
+    ],
+  },
+  {
+    items: [
+      {
+        id: "vt:lcd:1",
+        hardware: "lcd",
+        title: "External Link Fixture",
+        href: "https://example.com",
+        subtitle: "Video link",
+        dateLabel: "Jan 2026",
+      },
+    ],
+  },
+  {
+    items: [
+      {
+        id: "vt:blueprint:1",
+        hardware: "blueprint",
+        title: "Demo Fixture",
+        href: "/demos/example",
+        subtitle: "Blueprint demo",
+        tags: ["fixture"],
+        dateLabel: "Jan 2026",
+        description:
+          "A stable blueprint description long enough to test wrapping and density.",
+        subtitleColor: "var(--blue)",
+      },
+    ],
+  },
+];
+---
+
+<Layout title="Workshop Visual Test">
+  <Main
+    showPageHeader={false}
+    showBreadcrumbs={false}
+    fillViewportSlot
+    pageTitle="Workshop Visual Test"
+    pageDesc="Deterministic fixture for Playwright screenshot tests."
+  >
+    <div transition:name="workshop-pegboard-stage" class="workshop-page-stack">
+      <WorkshopPegboard client:only="react" panels={pegboardPanels} />
+    </div>
+  </Main>
+</Layout>

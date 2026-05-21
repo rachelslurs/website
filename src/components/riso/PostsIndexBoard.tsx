@@ -639,25 +639,19 @@ export default function PostsIndexBoard({
             stagger={stagger}
             tapeClass={tapeClass}
           >
-            <article className="card flex flex-col">
+            <article className="card flex flex-col prose">
               <h2
-                className="post-title m-0 mb-2 font-semibold"
+                className="post-title m-0 mb-1"
                 style={{ viewTransitionName: post.slug }}
               >
-                <a
-                  href={post.href}
-                  title={post.title}
-                  className="hover:text-[var(--red)] transition-colors focus-visible:outline-none"
-                >
+                <a href={post.href} title={post.title}>
                   {post.title}
                 </a>
               </h2>
               <time className="post-date" dateTime={post.dateTime}>
                 {post.dateLabel}
               </time>
-              {post.desc ? (
-                <p className="post-excerpt m-0">{post.desc}</p>
-              ) : null}
+              {post.desc ? <p className="post-excerpt">{post.desc}</p> : null}
 
               <div className="mt-auto flex items-center justify-between pt-4">
                 <DymoLabel

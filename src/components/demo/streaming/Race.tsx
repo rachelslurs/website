@@ -5,13 +5,6 @@ import DemoPrimaryButton from "./DemoPrimaryButton";
 import DemoSecondaryButton from "./DemoSecondaryButton";
 import StreamingChatBubble from "./StreamingChatBubble";
 
-interface ChatMessageProps {
-  role: "user" | "assistant";
-  content: string;
-  isPartial?: boolean;
-  tag?: string;
-}
-
 interface RadioOptionProps {
   label: string;
   value: string;

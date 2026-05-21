@@ -164,10 +164,7 @@
     @apply w-full max-w-none;
   }
 
-  /* Work / demo MDX: Tailwind Typography defaults + comfortable measure */
-  .entry-body {
-    @apply prose min-w-0 max-w-prose prose-img:rounded prose-img:bg-skin-fill;
-  }
+
 
   /*
    * Hide remark-toc output inside the article so it never duplicates the sidebar TOC.
@@ -328,8 +325,14 @@
   }
 
   /* ===== scrollbar ===== */
+  /*
+   * `overflow-y: auto` — only show a vertical scrollbar when content exceeds the viewport.
+   * `scroll` always reserved a track (“empty white block”) on fixed-height routes like /workshop.
+   * `scrollbar-gutter: stable` keeps width steadier when navigating short → long pages (classic scrollbars).
+   */
   html {
-    overflow-y: scroll;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
   }
 
   /* width */
@@ -562,5 +565,13 @@
   /* Active section: accent tab + weight (scroll-spy sets .active on li) */
   .toc-item.active .toc-link {
     @apply border-skin-accent font-semibold text-skin-accent;
+  }
+}
+
+/* Phase 8.5: workshop pegboard item layer — named View Transition (Layout.astro enables ViewTransitions). */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(workshop-pegboard-stage),
+  ::view-transition-new(workshop-pegboard-stage) {
+    animation-duration: 0.001ms !important;
   }
 }

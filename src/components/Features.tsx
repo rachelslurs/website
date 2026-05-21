@@ -68,7 +68,7 @@ function FeaturesDesktop(props: FeaturesProps) {
 
             <div className="relative z-10">
               <Tab className="text-left ui-not-focus-visible:outline-none p-8 w-full">
-                {({ selected }) => (
+                {({ selected: _isSelected }) => (
                   <div className="group rounded-2xl transition-colors hover:bg-skin-base">
                     <p className="text-left font-mono text-sm tracking-wide text-skin-placeholder ui-not-focus-visible:outline-none">
                       {feature.caption}

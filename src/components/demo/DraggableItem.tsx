@@ -23,7 +23,7 @@ export default function DraggableItem({
       drag
       dragMomentum={false}
       onDragStart={() => setIsDragging(true)}
-      onDragEnd={(event, info) => {
+      onDragEnd={(_event, info) => {
         setIsDragging(false);
         // Use info.point which gives us viewport coordinates
         onDragEnd(id, info.point.x, info.point.y);

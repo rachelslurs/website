@@ -59,6 +59,17 @@ const work = defineCollection({
     }),
 });
 
+const demoPegboardIcon = z.enum([
+  "terminal",
+  "cpu",
+  "code",
+  "link",
+  "monitor",
+  "zap",
+  "database",
+  "wrench",
+]);
+
 const demos = defineCollection({
   type: "content_layer",
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/demos" }),
@@ -70,6 +81,7 @@ const demos = defineCollection({
       title: z.string(),
       featured: z.boolean().optional(),
       draft: z.boolean().optional(),
+      tags: z.array(z.string()).default(["others"]),
       ogImage: image()
         .refine(img => img.width >= 1200 && img.height >= 630, {
           message: "OpenGraph image must be at least 1200 X 630 pixels!",
@@ -78,8 +90,33 @@ const demos = defineCollection({
         .optional(),
       description: z.string().optional(),
       summary: z.string().optional(),
+      /** Workshop pegboard: which Heroicon to show on the blueprint card */
+      pegboardIcon: demoPegboardIcon.optional(),
       canonicalURL: z.string().optional(),
     }),
 });
 
-export const collections = { blog, work, demos };
+const links = defineCollection({
+  type: "content_layer",
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/links" }),
+  schema: ({ image }) =>
+    z.object({
+      author: z.string().default(SITE.author),
+      pubDatetime: z.coerce.date(),
+      modDatetime: z.coerce.date().optional().nullable(),
+      title: z.string(),
+      subtitle: z.string().optional(),
+      /** Destination URL (video, article, tool, etc.). */
+      url: z.string().url(),
+      /**
+       * Optional preview (GIF/WebP). Tina image field → `/uploads/...` string;
+       * can also be a remote URL or colocated image via `image()`.
+       */
+      gifLink: image().or(z.string()).optional(),
+      /** Controls how the workshop / future UI renders this entry. */
+      linkType: z.enum(["default", "video"]).default("default"),
+      draft: z.boolean().optional(),
+    }),
+});
+
+export const collections = { blog, work, demos, links };

@@ -21,3 +21,10 @@ export const demoFilter = ({ data }: CollectionEntry<"demos">) => {
     new Date(data.pubDatetime).getTime() - SITE.scheduledPostMargin;
   return !data.draft && (import.meta.env.DEV || isPublishTimePassed);
 };
+
+export const linkFilter = ({ data }: CollectionEntry<"links">) => {
+  const isPublishTimePassed =
+    Date.now() >
+    new Date(data.pubDatetime).getTime() - SITE.scheduledPostMargin;
+  return !data.draft && (import.meta.env.DEV || isPublishTimePassed);
+};

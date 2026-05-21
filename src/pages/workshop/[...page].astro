@@ -1,0 +1,55 @@
+---
+import WorkshopPegboard from "@components/workshop/WorkshopPegboard";
+import Layout from "@layouts/Layout.astro";
+import Main from "@layouts/Main.astro";
+import { SITE } from "@config";
+import type { GetStaticPaths, Page } from "astro";
+import { getCollection } from "astro:content";
+import getSortedWork from "@utils/getSortedWork";
+import getSortedDemos from "@utils/getSortedDemos";
+import getSortedLinks from "@utils/getSortedLinks";
+import buildWorkshopPanels, {
+  type WorkshopPanel,
+} from "@utils/buildWorkshopPanels";
+import { serializeWorkshopPanelsForPegboard } from "@utils/serializeWorkshopPegboard";
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const work = getSortedWork(await getCollection("work"));
+  const demos = getSortedDemos(await getCollection("demos"));
+  const links = getSortedLinks(await getCollection("links"));
+
+  const panels = buildWorkshopPanels(work, demos, links);
+  const toPaginate = panels.length > 0 ? panels : [[]];
+
+  return paginate(toPaginate, {
+    pageSize: SITE.postPerPage,
+  });
+}) satisfies GetStaticPaths;
+
+interface Props {
+  page: Page<WorkshopPanel>;
+}
+
+const { page } = Astro.props;
+
+const pegboardPanels = serializeWorkshopPanelsForPegboard(page.data ?? []);
+
+const layoutTitle =
+  page.currentPage > 1
+    ? `Workshop (page ${page.currentPage}) | ${SITE.title}`
+    : `Workshop | ${SITE.title}`;
+---
+
+<Layout title={layoutTitle}>
+  <Main
+    showPageHeader={false}
+    showBreadcrumbs={false}
+    fillViewportSlot
+    pageTitle="Workshop"
+    pageDesc="Drag cards on the pegboard (desktop). Panels scroll horizontally; under 768px slabs stack with scale-to-fit. Extra pages use /workshop/2 etc. when content spans more than one page."
+  >
+    <div transition:name="workshop-pegboard-stage" class="workshop-page-stack">
+      <WorkshopPegboard client:only="react" panels={pegboardPanels} />
+    </div>
+  </Main>
+</Layout>

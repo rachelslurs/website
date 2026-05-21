@@ -35,3 +35,9 @@ pnpm-debug.log*
 .pnp.*
 
 node_modules
+
+# playwright
+test-results/
+playwright-report/
+
+.cursor/debug*
