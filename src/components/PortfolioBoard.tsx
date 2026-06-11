@@ -6,7 +6,11 @@ import React, {
   useState,
 } from "react";
 import DymoLabel from "@components/riso/DymoLabel";
-import { NAV_LINK_STAGGER_S } from "@components/RisoNav";
+import {
+  NAV_ENTER_DURATION_S,
+  NAV_LINK_COUNT,
+  NAV_LINK_STAGGER_S,
+} from "@components/RisoNav";
 import {
   boardCardEntranceExtraRotateDeg,
   boardCardRestRotationDeg,
@@ -87,9 +91,10 @@ const DEFAULT_SKILLS = [
 
 /**
  * Delay before board cards / section dividers start their entrance, so nav
- * finishes animating first (last nav item stagger + spring settle buffer).
+ * finishes animating first (last nav item's stagger + animation duration).
  */
-const CONTENT_ENTRANCE_DELAY_S = NAV_LINK_STAGGER_S * 4 + 0.28;
+const CONTENT_ENTRANCE_DELAY_S =
+  NAV_LINK_STAGGER_S * NAV_LINK_COUNT + NAV_ENTER_DURATION_S;
 
 type EntrancePhase =
   /** SSR + pre-hydration: CSS entrance plays at load (content never hidden behind JS). */
@@ -98,6 +103,21 @@ type EntrancePhase =
   | "armed"
   /** Observer fired: re-run the entrance now, without the nav-clearing delay. */
   | "go";
+
+/** Document-space top of `el`'s layout box. offset* geometry ignores CSS
+ *  transforms, so this is the *resting* position even while the entrance
+ *  animation's translateY/scale (fill-mode both) is mid-flight. */
+function restingDocumentTop(el: HTMLElement): number {
+  let top = 0;
+  for (
+    let node: Element | null = el;
+    node instanceof HTMLElement;
+    node = node.offsetParent
+  ) {
+    top += node.offsetTop;
+  }
+  return top;
+}
 
 /**
  * Re-arms the load-time CSS entrance as a scroll-triggered one. Before
@@ -113,9 +133,16 @@ function useScrollEntrance(rootMargin: string) {
     const el = ref.current;
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    // Anything at least partially on screen stays in the load-time flow —
-    // hiding it post-hydration would flash already-visible content.
-    if (el.getBoundingClientRect().top <= window.innerHeight) return;
+    // If the user scrolled before hydration they may already have seen any
+    // element, wherever it sits now — re-hiding would replay an entrance
+    // they watched (the framer version was viewport: { once: true }).
+    if (window.scrollY > 0) return;
+    // Resting geometry, not getBoundingClientRect: at client:idle time the
+    // entrance animation often hasn't finished, and its translateY(30px)
+    // from-state would misclassify a fold-straddling element as below the
+    // viewport — arming it into the observer's negative-margin dead zone
+    // where it never un-hides.
+    if (restingDocumentTop(el) <= window.innerHeight) return;
 
     setPhase("armed");
     const io = new IntersectionObserver(

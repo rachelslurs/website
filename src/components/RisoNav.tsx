@@ -9,6 +9,9 @@ const NAV_LINKS = [
 ];
 
 export const NAV_LINK_STAGGER_S = 0.065;
+export const NAV_LINK_COUNT = NAV_LINKS.length;
+/** Duration of the `.riso-nav-enter` animation — keep in sync with riso.css. */
+export const NAV_ENTER_DURATION_S = 0.45;
 
 const useActivePath = (activePath?: string) => {
   const [path, setPath] = useState(() => activePath || "");
