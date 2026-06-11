@@ -43,8 +43,11 @@ const { animateNav = false, readingProgress = false } = Astro.props;
     </div>
 
     <div class="relative z-[110] flex min-h-0 flex-1 flex-col gap-8">
+      <!-- client:idle — the nav is fully server-rendered (active state from
+           activePath, entrance via CSS); hydration only adds the
+           astro:page-load active-link sync, so it can wait out the LCP. -->
       <RisoNav
-        client:load
+        client:idle
         activePath={Astro.url.pathname}
         siteTitle={SITE.title}
         animateEntrance={animateNav}

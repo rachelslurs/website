@@ -53,29 +53,55 @@
       return header ? header.offsetHeight + 20 : 80;
     }
 
+    // Layout reads (offsetHeight/offsetTop/scrollHeight) are cached here and
+    // re-read only when geometry actually changes — doing them per scroll
+    // frame, interleaved with setActive's class writes, forced a reflow on
+    // every frame (28 ms flagged on mobile PSI).
+    let measurements = null;
+
+    function measure() {
+      const tops = [];
+      for (const item of items) {
+        const el = document.getElementById(item.id);
+        if (el) tops.push({ id: item.id, top: el.offsetTop });
+      }
+      measurements = {
+        offset: headerOffset(),
+        tops,
+        scrollHeight: document.documentElement.scrollHeight,
+        clientHeight: document.documentElement.clientHeight,
+      };
+    }
+
+    const invalidateMeasurements = () => {
+      measurements = null;
+    };
+    window.addEventListener("resize", invalidateMeasurements, {
+      passive: true,
+      signal,
+    });
+    // Content height changes after load (images, font swaps) move headings.
+    const resizeObserver = new ResizeObserver(invalidateMeasurements);
+    resizeObserver.observe(document.body);
+    signal.addEventListener("abort", () => resizeObserver.disconnect());
+
     function handleScroll() {
       if (isScrolling) return;
 
-      const offset = headerOffset();
+      if (!measurements) measure();
+      const { offset, tops, scrollHeight, clientHeight } = measurements;
       const scrollPosition = window.scrollY + offset;
       let currentSectionId = items[0].id;
 
-      for (const item of items) {
-        const el = document.getElementById(item.id);
-        if (!el) continue;
-        const offsetTop = el.offsetTop;
-        if (scrollPosition >= offsetTop) {
-          currentSectionId = item.id;
+      for (const t of tops) {
+        if (scrollPosition >= t.top) {
+          currentSectionId = t.id;
         } else {
           break;
         }
       }
 
-      const scrollHeight = document.documentElement.scrollHeight;
-      const scrollTop =
-        document.documentElement.scrollTop || document.body.scrollTop;
-      const clientHeight = document.documentElement.clientHeight;
-      if (scrollTop + clientHeight >= scrollHeight - 50) {
+      if (window.scrollY + clientHeight >= scrollHeight - 50) {
         currentSectionId = items[items.length - 1].id;
       }
 
@@ -85,7 +111,13 @@
     if (window.location.hash) {
       setActive(window.location.hash.slice(1));
     }
-    handleScroll();
+    // Defer the first measured pass past first paint: running it eagerly
+    // forces layout while the document is still parsing.
+    const idle = window.requestIdleCallback || (cb => window.setTimeout(cb, 1));
+    idle(() => {
+      if (generation !== runGeneration) return;
+      handleScroll();
+    });
 
     let ticking = false;
     window.addEventListener(

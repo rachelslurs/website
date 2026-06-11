@@ -2,20 +2,29 @@
 import { LOCALE, SITE } from "@config";
 import "@styles/base.css";
 import "@styles/riso.css";
-import "@fontsource/archivo-black/400.css";
-import "@fontsource/lora/400.css";
-import "@fontsource/lora/400-italic.css";
-import "@fontsource/lora/700.css";
-import "@fontsource/lora/700-italic.css";
-import "@fontsource/zilla-slab/400.css";
-import "@fontsource/zilla-slab/500.css";
-import "@fontsource/zilla-slab/600.css";
-import "@fontsource/zilla-slab/700.css";
-import "@fontsource/zilla-slab/500-italic.css";
-import "@fontsource/zilla-slab/600-italic.css";
-import "@fontsource/ibm-plex-mono/400.css";
-import "@fontsource/ibm-plex-mono/700.css";
-import "@fontsource/ibm-plex-mono/400-italic.css";
+// Latin subsets only: the all-subset entries (`lora/400.css` etc.) inline 57
+// @font-face blocks (cyrillic, math, symbols…) into every page head. Content
+// is English; anything outside latin falls back to system fonts.
+import "@fontsource/archivo-black/latin-400.css";
+import "@fontsource/lora/latin-400.css";
+import "@fontsource/lora/latin-400-italic.css";
+import "@fontsource/lora/latin-700.css";
+import "@fontsource/lora/latin-700-italic.css";
+import "@fontsource/zilla-slab/latin-400.css";
+import "@fontsource/zilla-slab/latin-500.css";
+import "@fontsource/zilla-slab/latin-600.css";
+import "@fontsource/zilla-slab/latin-700.css";
+import "@fontsource/zilla-slab/latin-500-italic.css";
+import "@fontsource/zilla-slab/latin-600-italic.css";
+import "@fontsource/ibm-plex-mono/latin-400.css";
+import "@fontsource/ibm-plex-mono/latin-700.css";
+import "@fontsource/ibm-plex-mono/latin-400-italic.css";
+// Preloaded below: above-the-fold on every page (prose body = LCP element,
+// display headline, dymo-label mono). ?url resolves to the same hashed asset
+// the Fontsource CSS references.
+import loraLatin400Url from "@fontsource/lora/files/lora-latin-400-normal.woff2?url";
+import archivoBlackLatin400Url from "@fontsource/archivo-black/files/archivo-black-latin-400-normal.woff2?url";
+import plexMonoLatin700Url from "@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-700-normal.woff2?url";
 
 import { ViewTransitions } from "astro:transitions";
 import { getBreadcrumbItems } from "@utils/breadcrumbItems";
@@ -101,6 +110,19 @@ const serializeSchema = (schema: Record<string, unknown>) =>
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="canonical" href={canonicalURL} />
+    {
+      [loraLatin400Url, archivoBlackLatin400Url, plexMonoLatin700Url].map(
+        href => (
+          <link
+            rel="preload"
+            as="font"
+            type="font/woff2"
+            href={href}
+            crossorigin
+          />
+        )
+      )
+    }
     <meta name="generator" content={Astro.generator} />
 
     <!-- General Meta Tags -->
@@ -197,17 +219,32 @@ const serializeSchema = (schema: Record<string, unknown>) =>
       // target (#myBar from RisoBoardShell's readingProgress prop, .copy-code
       // buttons from rehype-copy-code), and both handlers query the live DOM
       // per event, so they never need re-binding or rerun guards.
+      // Scrollable range is cached and invalidated by the body
+      // ResizeObserver below: reading scrollHeight/clientHeight right after
+      // the previous frame's width write forces a reflow on every scroll
+      // frame otherwise.
+      let scrollRange = -1;
+      const invalidateScrollRange = () => {
+        scrollRange = -1;
+      };
+      new ResizeObserver(invalidateScrollRange).observe(document.body);
+      // Body height doesn't change on a long page when only the window
+      // resizes, but clientHeight does.
+      window.addEventListener("resize", invalidateScrollRange, {
+        passive: true,
+      });
       document.addEventListener(
         "scroll",
         () => {
           const bar = document.getElementById("myBar");
           if (!bar) return;
-          const height =
-            document.documentElement.scrollHeight -
-            document.documentElement.clientHeight;
-          const top =
-            document.documentElement.scrollTop || document.body.scrollTop;
-          bar.style.width = height > 0 ? `${(top / height) * 100}%` : "0%";
+          if (scrollRange < 0) {
+            scrollRange =
+              document.documentElement.scrollHeight -
+              document.documentElement.clientHeight;
+          }
+          bar.style.width =
+            scrollRange > 0 ? `${(window.scrollY / scrollRange) * 100}%` : "0%";
         },
         { passive: true }
       );

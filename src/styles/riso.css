@@ -53,8 +53,29 @@ nav .group:hover .dust-note {
   animation: dustWiggleHorizontal 4s infinite ease-in-out;
 }
 
+/* Nav entrance stagger (homepage): one-shot CSS replacement for the old
+   framer-motion spring, so the nav doesn't need the motion bundle. The
+   back-out bezier approximates the spring overshoot; `both` keeps items
+   hidden through their stagger delay. */
+@keyframes risoNavEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.riso-nav-enter {
+  animation: risoNavEnter 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   nav .group:hover .dust-note {
+    animation: none;
+  }
+  .riso-nav-enter {
     animation: none;
   }
 }
@@ -88,6 +109,9 @@ nav .group:hover .dust-note {
 }
 
 /* ── BLOBS ── */
+/* Anchors must not depend on .board height (px/svh only, never bottom/%):
+   the board grows as HTML streams in and fonts swap, and a height-relative
+   blob moves with every growth — 0.335 CLS on mobile PSI. */
 .blob {
   position: absolute;
   mix-blend-mode: multiply;
@@ -106,7 +130,7 @@ nav .group:hover .dust-note {
   width: 400px;
   height: 250px;
   background: var(--red);
-  top: 55%;
+  top: 55svh;
   left: 15%;
   border-radius: 40%;
 }
@@ -114,7 +138,8 @@ nav .group:hover .dust-note {
   width: 300px;
   height: 300px;
   background: var(--green);
-  bottom: 15%;
+  /* ≈ old `bottom: 15%` on a viewport-height board (homepage). */
+  top: calc(85svh - 300px);
   right: 5%;
 }
 
@@ -508,8 +533,11 @@ nav .group:hover .dust-note {
 .tp-green::before {
   background: var(--green);
   opacity: 0.75;
-  background-image:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.3) 2px, transparent 2px),
+  background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.3) 2px,
+      transparent 2px
+    ),
     linear-gradient(0deg, rgba(255, 255, 255, 0.3) 2px, transparent 2px);
   background-size: 8px 8px;
 }
@@ -651,7 +679,12 @@ nav .group:hover .dust-note {
   background-image: linear-gradient(180deg, #444 0%, #2a2a2a 40%, #111 100%);
 }
 .dymo.active {
-  background-image: linear-gradient(180deg, #ff5e56 0%, var(--red) 40%, #cc3d35 100%);
+  background-image: linear-gradient(
+    180deg,
+    #ff5e56 0%,
+    var(--red) 40%,
+    #cc3d35 100%
+  );
 }
 .dymo-lg {
   padding: 7px 14px 6px;
@@ -1095,7 +1128,9 @@ a.skip-to-content-board:focus {
   background-size: 100% 100%;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
-  transition: background-image 0.2s, color 0.2s;
+  transition:
+    background-image 0.2s,
+    color 0.2s;
 }
 
 .prose.analog-prose a:hover {
