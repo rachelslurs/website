@@ -51,6 +51,7 @@
     "@typescript-eslint/parser": "^8.5.0",
     "astro-eslint-parser": "^1.0.3",
     "autoprefixer": "^10.4.19",
+    "beasties": "^0.4.2",
     "commitizen": "^4.3.0",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.56.0",
