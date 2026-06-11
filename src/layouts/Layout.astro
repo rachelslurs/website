@@ -36,6 +36,9 @@ export interface Props {
   structuredData?: Record<string, unknown>[];
   noindex?: boolean;
   tags?: string[];
+  /** Human-readable name for the current page's breadcrumb (e.g. the post
+   *  title); without it the URL slug is used. */
+  breadcrumbName?: string;
 }
 
 /** Ensure canonical URL has no trailing slash for directory-like pages (SEO consistency) */
@@ -62,6 +65,7 @@ const {
   structuredData = [],
   noindex = false,
   tags = [],
+  breadcrumbName,
 } = Astro.props;
 
 const pathname = Astro.url.pathname;
@@ -75,13 +79,23 @@ const socialImageAlt = ogImageAlt ?? title;
 
 const ogLocale = (LOCALE.langTag?.[0] ?? "en-US").replace("-", "_");
 
-const showBreadcrumbSchema = !noindex && !pathname.startsWith("/404");
+const breadcrumbItems = getBreadcrumbItems(pathname);
+const lastCrumb = breadcrumbItems[breadcrumbItems.length - 1];
+if (breadcrumbName && lastCrumb) {
+  lastCrumb.name = breadcrumbName;
+}
+// Single-item trails (homepage) carry no information; noindex pages
+// (404, search) should not advertise structured data.
+const showBreadcrumbSchema = !noindex && breadcrumbItems.length >= 2;
 const schemas: Record<string, unknown>[] = [
-  ...(showBreadcrumbSchema
-    ? [breadcrumbSchema(getBreadcrumbItems(pathname))]
-    : []),
+  ...(showBreadcrumbSchema ? [breadcrumbSchema(breadcrumbItems)] : []),
   ...structuredData,
 ];
+
+/** `<` must be escaped inside an inline <script>: a title or description
+ *  containing "</script>" would otherwise terminate the element early. */
+const serializeSchema = (schema: Record<string, unknown>) =>
+  JSON.stringify(schema).replace(/</g, "\\u003c");
 ---
 
 <!doctype html>
@@ -154,7 +168,7 @@ const schemas: Record<string, unknown>[] = [
     <!-- JSON-LD Structured data (BreadcrumbList + page-specific schemas) -->
     {
       schemas.map(schema => (
-        <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+        <script type="application/ld+json" set:html={serializeSchema(schema)} />
       ))
     }
 

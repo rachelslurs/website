@@ -1,11 +1,12 @@
 import type { APIRoute } from "astro";
 import { SITE } from "@config";
 
+// /search is deliberately NOT disallowed here: it carries a noindex meta tag,
+// which crawlers can only see if they are allowed to fetch the page.
 const robots = `
 User-agent: *
 Allow: /
 Disallow: /admin
-Disallow: /search
 Disallow: /cdn-cgi/zaraz/
 
 Sitemap: ${new URL("sitemap.xml", SITE.website).href}
