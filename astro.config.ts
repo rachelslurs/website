@@ -2,7 +2,6 @@ import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import react from "@astrojs/react";
 import remarkToc from "remark-toc";
-import sitemap from "@astrojs/sitemap";
 import { SITE } from "./src/config";
 import risoAnalogTheme, {
   risoAnalogSyntaxTransformer,
@@ -19,7 +18,6 @@ export default defineConfig({
       applyBaseStyles: false,
     }),
     react(),
-    sitemap(),
     mdx(),
   ],
   markdown: {
