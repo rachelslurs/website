@@ -1,6 +1,7 @@
 ---
 export interface Props {
-  href: string;
+  /** Optional because the disabled state renders a <span> without a link. */
+  href?: string;
   className?: string;
   ariaLabel?: string;
   title?: string;
