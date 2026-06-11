@@ -19,14 +19,16 @@ function stripTrailingSlash(url: string | undefined): string | undefined {
 
 const prevUrl = stripTrailingSlash(page.url.prev as string | undefined);
 const nextUrl = stripTrailingSlash(page.url.next as string | undefined);
+
+const prevProps = prevUrl ? { href: prevUrl } : { disabled: true as const };
+const nextProps = nextUrl ? { href: nextUrl } : { disabled: true as const };
 ---
 
 {
   page.lastPage > 1 && (
     <nav class="pagination-wrapper" aria-label="Pagination">
       <LinkButton
-        disabled={!prevUrl}
-        href={prevUrl}
+        {...prevProps}
         className={`mr-4 select-none flex items-center gap-1 ${prevUrl ? "" : "disabled"}`}
         ariaLabel="Previous"
       >
@@ -43,8 +45,7 @@ const nextUrl = stripTrailingSlash(page.url.next as string | undefined);
         {page.currentPage} / {page.lastPage}
       </span>
       <LinkButton
-        disabled={!nextUrl}
-        href={nextUrl}
+        {...nextProps}
         className={`mx-4 select-none flex items-center gap-1 ${nextUrl ? "" : "disabled"}`}
         ariaLabel="Next"
       >

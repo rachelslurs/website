@@ -26,8 +26,13 @@ export function personSchema(): Schema {
   };
 }
 
-/** Site-wide WebSite schema (homepage). No SearchAction: Google retired the
- *  sitelinks search box rich result; `/search?q=` exists if ever wanted. */
+/** Reference to the Person node defined elsewhere on the same page —
+ *  JSON-LD consumers merge nodes by @id across script tags. */
+const personRef = (): Schema => ({ "@id": PERSON_ID });
+
+/** Site-wide WebSite schema (homepage). Pair with personSchema() on the same
+ *  page — publisher is only an @id reference. No SearchAction: Google retired
+ *  the sitelinks search box rich result; `/search?q=` exists if ever wanted. */
 export function websiteSchema(): Schema {
   return {
     "@context": "https://schema.org",
@@ -35,7 +40,7 @@ export function websiteSchema(): Schema {
     name: SITE.title,
     url: SITE.website,
     description: SITE.desc,
-    publisher: personEntity(),
+    publisher: personRef(),
   };
 }
 
@@ -59,13 +64,8 @@ interface ArticleSchemaInput {
   wordCount?: number;
 }
 
-/** Frontmatter `author` defaults to SITE.author; only a guest author needs a
- *  standalone Person without the site-wide @id. */
-function authorEntity(author?: string): Schema {
-  return author && author !== SITE.author
-    ? { "@type": "Person", name: author }
-    : personEntity();
-}
+const isGuestAuthor = (author?: string) =>
+  Boolean(author) && author !== SITE.author;
 
 function articleFields({
   url,
@@ -84,8 +84,12 @@ function articleFields({
     ...(description && { description }),
     ...(pubDatetime && { datePublished: pubDatetime.toISOString() }),
     ...(modDatetime && { dateModified: modDatetime.toISOString() }),
-    author: authorEntity(author),
-    publisher: personEntity(),
+    // The full Person node appears once per page; the second mention is an
+    // @id reference. A guest author flips which slot carries the full node.
+    author: isGuestAuthor(author)
+      ? { "@type": "Person", name: author }
+      : personEntity(),
+    publisher: isGuestAuthor(author) ? personEntity() : personRef(),
     ...(tags && tags.length > 0 && { keywords: tags.join(", ") }),
     ...(wordCount && { wordCount }),
   };

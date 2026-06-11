@@ -19,6 +19,10 @@ const fontRegular = loadFont("ibm-plex-mono-latin-400-normal.woff");
 // The 700 weight matches the bold TTF this previously fetched; it stays
 // declared as 600 below so template font-weight resolution is unchanged.
 const fontBold = loadFont("ibm-plex-mono-latin-700-normal.woff");
+// latin-ext keeps accented titles (Łukasz, Škoda…) from rendering as blanks;
+// satori falls back across same-family entries per glyph.
+const fontRegularExt = loadFont("ibm-plex-mono-latin-ext-400-normal.woff");
+const fontBoldExt = loadFont("ibm-plex-mono-latin-ext-700-normal.woff");
 
 const options: SatoriOptions = {
   width: 1200,
@@ -33,7 +37,19 @@ const options: SatoriOptions = {
     },
     {
       name: "IBM Plex Mono",
+      data: fontRegularExt,
+      weight: 400,
+      style: "normal",
+    },
+    {
+      name: "IBM Plex Mono",
       data: fontBold,
+      weight: 600,
+      style: "normal",
+    },
+    {
+      name: "IBM Plex Mono",
+      data: fontBoldExt,
       weight: 600,
       style: "normal",
     },

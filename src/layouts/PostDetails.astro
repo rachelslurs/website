@@ -12,6 +12,8 @@ import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import { filterTocHeadings } from "@utils/filterTocHeadings";
 import { blogPostingSchema } from "@utils/structuredData";
+import { getCanonicalURL } from "@utils/canonicalURL";
+import { resolveOgImage } from "@utils/ogImage";
 import { SITE } from "@config";
 export interface Props {
   post: CollectionEntry<"blog">;
@@ -33,13 +35,13 @@ const {
 
 const { Content, headings } = await post.render();
 
-const ogImageUrl = typeof ogImage === "string" ? ogImage : ogImage?.src;
-const ogUrl = new URL(
-  ogImageUrl ?? `/posts/${slugifyStr(title)}.png`,
+const og = resolveOgImage(
+  ogImage,
+  `/posts/${slugifyStr(title)}.png`,
   Astro.url.origin
-).href;
+);
 
-const pageUrl = canonicalURL ?? new URL(Astro.url.pathname, SITE.website).href;
+const pageUrl = canonicalURL ?? getCanonicalURL(Astro.url.pathname);
 const wordCount = post.body?.trim().split(/\s+/).length;
 
 const layoutProps = {
@@ -49,7 +51,9 @@ const layoutProps = {
   pubDatetime,
   modDatetime,
   canonicalURL,
-  ogImage: ogUrl,
+  ogImage: og.url,
+  ogImageWidth: og.width,
+  ogImageHeight: og.height,
   ogImageAlt: title,
   pageType: "article" as const,
   tags,
@@ -59,7 +63,7 @@ const layoutProps = {
       title,
       description,
       url: pageUrl,
-      image: ogUrl,
+      image: og.url,
       author,
       pubDatetime,
       modDatetime,
