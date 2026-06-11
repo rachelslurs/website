@@ -10,8 +10,11 @@ const NAV_LINKS = [
 
 export const NAV_LINK_STAGGER_S = 0.065;
 export const NAV_LINK_COUNT = NAV_LINKS.length;
-/** Duration of the `.riso-nav-enter` animation — keep in sync with riso.css. */
-export const NAV_ENTER_DURATION_S = 0.45;
+/** Duration of the `.riso-nav-enter` animation — keep in sync with riso.css.
+ *  0.28s matches the settle time of the framer spring this replaced, and
+ *  keeps the board entrance (derived from it) at the original 0.54s so the
+ *  homepage LCP floor doesn't move. */
+export const NAV_ENTER_DURATION_S = 0.28;
 
 const useActivePath = (activePath?: string) => {
   const [path, setPath] = useState(() => activePath || "");
