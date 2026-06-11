@@ -1,7 +1,6 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import RisoBoardShell from "@components/RisoBoardShell.astro";
-import DetailPageScripts from "@components/DetailPageScripts.astro";
 import CollectionEntryHeader from "@components/CollectionEntryHeader.astro";
 import GhostEntryBack from "@components/riso/GhostEntryBack";
 import PostPagination from "@components/riso/PostPagination";
@@ -80,7 +79,7 @@ const nextDemo =
 ---
 
 <Layout {...layoutProps}>
-  <RisoBoardShell>
+  <RisoBoardShell readingProgress>
     <main id="main-content" class="app-layout board-slot">
       <article
         id="article"
@@ -139,5 +138,3 @@ const nextDemo =
     @apply pb-12;
   }
 </style>
-
-<DetailPageScripts />

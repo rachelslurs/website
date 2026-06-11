@@ -1102,6 +1102,14 @@ a.skip-to-content-board:focus {
   color: var(--red);
 }
 
+/* Build-time anchors (src/plugins/rehype-heading-links.ts) carry no text
+   node — Astro's TOC heading collector would absorb it — so the "#" glyph
+   is generated here. aria-label on the anchor names it for screen readers;
+   hover-reveal styling for the span lives in base.css. */
+a.heading-link span::before {
+  content: "#";
+}
+
 .prose.analog-prose h2 a.heading-link,
 .prose.analog-prose h3 a.heading-link,
 .prose.analog-prose h4 a.heading-link {
