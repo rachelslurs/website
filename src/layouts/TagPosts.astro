@@ -14,9 +14,15 @@ export interface Props {
 }
 
 const { page, tag, tagName } = Astro.props;
+
+const pageSuffix = page.currentPage > 1 ? ` (page ${page.currentPage})` : "";
 ---
 
-<Layout title={`Tag: ${tagName} | ${SITE.title}`}>
+<Layout
+  title={`Tag: ${tagName}${pageSuffix} | ${SITE.title}`}
+  description={`All the posts with the tag "${tagName}".`}
+  breadcrumbName={page.currentPage === 1 ? tagName : undefined}
+>
   <Main
     pageTitle={[`Tag:`, `${tagName}`]}
     titleTransition={tag}

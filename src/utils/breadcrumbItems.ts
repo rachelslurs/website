@@ -1,85 +1,77 @@
-/** Breadcrumb segments for Dymo trail; labels are uppercase for tape styling. */
+/** Breadcrumb segments for Dymo trail; `label` is uppercase for tape styling,
+ *  `name` keeps the human-readable form for BreadcrumbList JSON-LD. */
 
-export type BreadcrumbItem = { label: string; href: string | null };
+export type BreadcrumbItem = {
+  label: string;
+  name: string;
+  href: string | null;
+};
 
-function labelForSegment(segment: string): string {
+function nameForSegment(segment: string): string {
+  let decoded = segment;
   try {
-    return decodeURIComponent(segment).toUpperCase();
+    decoded = decodeURIComponent(segment);
   } catch {
-    return segment.toUpperCase();
+    // keep the raw segment
   }
+  return decoded.charAt(0).toUpperCase() + decoded.slice(1);
 }
 
-/**
- * Builds display list + hrefs from pathname.
- * Merges `/posts` and `/posts/N` into "Posts (page N)"; keeps `/posts/slug` as two crumbs.
- */
+/** Numeric tail on a route that actually paginates: /work/2, /demos/2
+ *  (arity 2) and /tags/x/2, /tech/x/2 (arity 3). Other numeric tails
+ *  (e.g. a post slug like /posts/2024) are content, not pagination.
+ *  A numeric DETAIL slug like /work/2048 is indistinguishable from
+ *  pagination by pathname alone; the detail layouts' breadcrumbName
+ *  override restores the real title for the final crumb in that case. */
+function paginationNumber(segments: string[]): string | null {
+  const last = segments[segments.length - 1] ?? "";
+  if (!/^\d+$/.test(last)) return null;
+  const base = segments[0];
+  if (segments.length === 2 && (base === "work" || base === "demos")) {
+    return last;
+  }
+  if (segments.length === 3 && (base === "tags" || base === "tech")) {
+    return last;
+  }
+  return null;
+}
+
+/** Builds display list + hrefs from pathname. Pagination pages keep every
+ *  ancestor crumb linked and end on an unlinked "Page N" crumb. */
 export function getBreadcrumbItems(pathname: string): BreadcrumbItem[] {
-  const currentUrlPath = pathname.replace(/\/+$/, "");
-  const raw = currentUrlPath.split("/").filter(Boolean);
+  const segments = pathname.replace(/\/+$/, "").split("/").filter(Boolean);
 
-  if (raw.length === 0) {
-    return [{ label: "HOME", href: null }];
+  if (segments.length === 0) {
+    return [{ label: "HOME", name: "Home", href: null }];
   }
 
-  const breadcrumbList = currentUrlPath.split("/").slice(1);
-
-  if (breadcrumbList[0] === "posts") {
-    if (breadcrumbList.length === 1) {
-      breadcrumbList.splice(0, 1, `Posts (page 1)`);
-    } else if (
-      breadcrumbList.length === 2 &&
-      /^\d+$/.test(breadcrumbList[1] ?? "")
-    ) {
-      breadcrumbList.splice(0, 2, `Posts (page ${breadcrumbList[1]})`);
-    }
+  const pageNumber = paginationNumber(segments);
+  if (pageNumber) {
+    segments.pop();
   }
 
-  if (
-    (breadcrumbList[0] === "tags" || breadcrumbList[0] === "tech") &&
-    breadcrumbList.length >= 3 &&
-    !isNaN(Number(breadcrumbList[2]))
-  ) {
-    const tagName = breadcrumbList[1] ?? "";
-    const pagePart =
-      breadcrumbList[2] === "" || Number(breadcrumbList[2]) === 1
-        ? ""
-        : `(page ${breadcrumbList[2]})`;
-    breadcrumbList.splice(1, 3, pagePart ? `${tagName} ${pagePart}` : tagName);
+  const items: BreadcrumbItem[] = [{ label: "HOME", name: "Home", href: "/" }];
+
+  for (let i = 0; i < segments.length; i++) {
+    const name = nameForSegment(segments[i] ?? "");
+    items.push({
+      label: name.toUpperCase(),
+      name,
+      href: `/${segments.slice(0, i + 1).join("/")}`,
+    });
   }
 
-  const items: BreadcrumbItem[] = [{ label: "HOME", href: "/" }];
-
-  for (let i = 0; i < breadcrumbList.length; i++) {
-    const isLast = i === breadcrumbList.length - 1;
-    const segment = breadcrumbList[i] ?? "";
-    const label = labelForSegment(segment);
-
-    if (isLast) {
-      items.push({ label, href: null });
-      continue;
+  if (pageNumber) {
+    items.push({
+      label: `PAGE ${pageNumber}`,
+      name: `Page ${pageNumber}`,
+      href: null,
+    });
+  } else {
+    const last = items[items.length - 1];
+    if (last) {
+      last.href = null;
     }
-
-    let href: string;
-    if (breadcrumbList.length === raw.length) {
-      href = `/${raw.slice(0, i + 1).join("/")}`;
-    } else if (
-      segment.startsWith("Posts") &&
-      raw[0] === "posts" &&
-      raw.length >= 2
-    ) {
-      href = `/${raw.slice(0, 2).join("/")}`;
-    } else if (
-      breadcrumbList.length === 2 &&
-      raw.length === 3 &&
-      (raw[0] === "tags" || raw[0] === "tech")
-    ) {
-      href = i === 0 ? `/${raw[0]}` : `/${raw.slice(0, 3).join("/")}`;
-    } else {
-      href = `/${raw.slice(0, i + 1).join("/")}`;
-    }
-
-    items.push({ label, href });
   }
 
   return items;

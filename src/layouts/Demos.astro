@@ -12,9 +12,14 @@ export interface Props {
 }
 
 const { page } = Astro.props;
+
+const pageSuffix = page.currentPage > 1 ? ` (page ${page.currentPage})` : "";
 ---
 
-<Layout title={`Demos | ${SITE.title}`}>
+<Layout
+  title={`Demos${pageSuffix} | ${SITE.title}`}
+  description={`Interactive UI demos by ${SITE.author} — accessible patterns built with React.`}
+>
   <Main pageTitle="Demos" showBreadcrumbs={false}>
     <ul class="list-none pl-0">
       {

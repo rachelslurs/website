@@ -13,7 +13,10 @@ export interface Props {
 const { portfolioPosts, pageSize } = Astro.props;
 ---
 
-<Layout title={`Posts | ${SITE.title}`}>
+<Layout
+  title={`Posts | ${SITE.title}`}
+  description={`All blog posts by ${SITE.author} — frontend architecture, design systems, and production UI.`}
+>
   <Main pageTitle="Posts" showPageHeader={false} showBreadcrumbs={false}>
     <PostsIndexBoard client:load posts={portfolioPosts} pageSize={pageSize} />
   </Main>

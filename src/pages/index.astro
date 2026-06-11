@@ -8,6 +8,7 @@ import getSortedPosts from "@utils/getSortedPosts";
 import { mapBlogEntryToPortfolioPost } from "@utils/mapBlogToPortfolioPost";
 import getSortedWork from "@utils/getSortedWork";
 import getSortedDemos from "@utils/getSortedDemos";
+import { personSchema, websiteSchema } from "@utils/structuredData";
 
 const posts = await getCollection("blog");
 const sortedPosts = getSortedPosts(posts);
@@ -52,7 +53,7 @@ const portfolioDemos = homeDemosRaw.map(entry => ({
 }));
 ---
 
-<Layout>
+<Layout structuredData={[websiteSchema(), personSchema()]}>
   <RisoBoardShell animateNav>
     <main id="main-content" class="board-slot">
       <PortfolioBoard

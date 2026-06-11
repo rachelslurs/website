@@ -1,11 +1,7 @@
 ---
-export interface Props {
-  href: string;
-  className?: string;
-  ariaLabel?: string;
-  title?: string;
-  disabled?: boolean;
-}
+import type { LinkButtonProps } from "../types";
+
+export type Props = LinkButtonProps;
 
 const { href, className, ariaLabel, title, disabled = false } = Astro.props;
 ---

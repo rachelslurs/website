@@ -18,73 +18,81 @@ import "@fontsource/ibm-plex-mono/700.css";
 import "@fontsource/ibm-plex-mono/400-italic.css";
 
 import { ViewTransitions } from "astro:transitions";
+import { getBreadcrumbItems } from "@utils/breadcrumbItems";
+import { breadcrumbSchema } from "@utils/structuredData";
+import { getCanonicalURL } from "@utils/canonicalURL";
 
 const googleSiteVerification = import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION;
 
 export interface Props {
   title?: string;
   author?: string;
-  profile?: string;
   description?: string;
   ogImage?: string;
+  ogImageAlt?: string;
+  /** Intrinsic ogImage dimensions; omit when unknown (arbitrary URL paths). */
+  ogImageWidth?: number;
+  ogImageHeight?: number;
   canonicalURL?: string;
   pubDatetime?: Date;
   modDatetime?: Date | null;
-}
-
-/** Ensure canonical URL has no trailing slash for directory-like pages (SEO consistency) */
-function getCanonicalURL(): string {
-  const pathname = Astro.url.pathname;
-  const isFile = /\.(xml|txt|json|html?|webmanifest)$/i.test(pathname);
-  const path =
-    pathname && pathname.endsWith("/") && pathname.length > 1 && !isFile
-      ? pathname.slice(0, -1)
-      : pathname;
-  return new URL(path, Astro.site).href;
+  pageType?: "website" | "article";
+  structuredData?: Record<string, unknown>[];
+  noindex?: boolean;
+  tags?: string[];
+  /** Human-readable name for the current page's breadcrumb (e.g. the post
+   *  title); without it the URL slug is used. */
+  breadcrumbName?: string;
 }
 
 const {
   title = SITE.title,
   author = SITE.author,
-  profile = SITE.profile,
   description = SITE.desc,
-  ogImage = SITE.ogImage,
-  canonicalURL = getCanonicalURL(),
+  ogImage,
+  ogImageAlt,
+  // Without an explicit ogImage the page uses the generated /og.png (1200x630).
+  ogImageWidth = ogImage ? undefined : 1200,
+  ogImageHeight = ogImage ? undefined : 630,
+  canonicalURL = getCanonicalURL(Astro.url.pathname, Astro.site),
   pubDatetime,
   modDatetime,
+  pageType = "website",
+  structuredData = [],
+  noindex = false,
+  tags = [],
+  breadcrumbName,
 } = Astro.props;
 
 const pathname = Astro.url.pathname;
-const isPostsIndex = pathname === "/posts" || pathname === "/posts/";
-const isPostDetail = pathname.startsWith("/posts/") && !isPostsIndex;
+const isArticle = pageType === "article";
 
-const socialImageURL = new URL(
-  ogImage ?? SITE.ogImage ?? "og.png",
-  Astro.url.origin
-).href;
+const socialImageURL = new URL(ogImage ?? "og.png", Astro.url.origin).href;
+const socialImageAlt = ogImageAlt ?? title;
 
-const structuredData =
-  isPostDetail && pubDatetime
-    ? {
-        "@context": "https://schema.org",
-        "@type": "BlogPosting",
-        headline: `${title}`,
-        image: `${socialImageURL}`,
-        datePublished: pubDatetime.toISOString(),
-        ...(modDatetime && { dateModified: modDatetime.toISOString() }),
-        author: [
-          {
-            "@type": "Person",
-            name: `${author}`,
-            url: `${profile}`,
-          },
-        ],
-      }
-    : null;
+const ogLocale = (LOCALE.langTag?.[0] ?? "en-US").replace("-", "_");
+
+const breadcrumbItems = getBreadcrumbItems(pathname);
+const lastCrumb = breadcrumbItems[breadcrumbItems.length - 1];
+if (breadcrumbName && lastCrumb) {
+  lastCrumb.name = breadcrumbName;
+}
+// Single-item trails (homepage) carry no information; noindex pages
+// (404, search) should not advertise structured data.
+const showBreadcrumbSchema = !noindex && breadcrumbItems.length >= 2;
+const schemas: Record<string, unknown>[] = [
+  ...(showBreadcrumbSchema ? [breadcrumbSchema(breadcrumbItems)] : []),
+  ...structuredData,
+];
+
+/** `<` must be escaped inside an inline <script>: a title or description
+ *  containing "</script>" would otherwise terminate the element early. */
+const serializeSchema = (schema: Record<string, unknown>) =>
+  JSON.stringify(schema).replace(/</g, "\\u003c");
 ---
 
 <!doctype html>
-<html lang=`${LOCALE.lang ?? "en"}`>
+<html lang={LOCALE.lang ?? "en"}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
@@ -100,20 +108,38 @@ const structuredData =
     <meta name="title" content={title} />
     <meta name="description" content={description} />
     <meta name="author" content={author} />
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <link rel="sitemap" href="/sitemap.xml" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={SITE.title}
+      href={new URL("rss.xml", Astro.site)}
+    />
 
     <!-- Open Graph / Facebook -->
+    <meta property="og:site_name" content={SITE.title} />
+    <meta property="og:locale" content={ogLocale} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
-    {isPostDetail && <meta property="og:type" content="article" />}
-    {!isPostDetail && <meta property="og:type" content="website" />}
-
+    <meta property="og:type" content={isArticle ? "article" : "website"} />
     <meta property="og:image" content={socialImageURL} />
+    {
+      ogImageWidth && (
+        <meta property="og:image:width" content={String(ogImageWidth)} />
+      )
+    }
+    {
+      ogImageHeight && (
+        <meta property="og:image:height" content={String(ogImageHeight)} />
+      )
+    }
+    <meta property="og:image:alt" content={socialImageAlt} />
 
     <!-- Article Published/Modified time -->
     {
-      pubDatetime && isPostDetail && (
+      pubDatetime && isArticle && (
         <meta
           property="article:published_time"
           content={pubDatetime.toISOString()}
@@ -121,29 +147,30 @@ const structuredData =
       )
     }
     {
-      modDatetime && isPostDetail && (
+      modDatetime && isArticle && (
         <meta
           property="article:modified_time"
           content={modDatetime.toISOString()}
         />
       )
     }
+    {
+      isArticle &&
+        tags.map(tag => <meta property="article:tag" content={tag} />)
+    }
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={canonicalURL} />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={socialImageURL} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageURL} />
+    <meta name="twitter:image:alt" content={socialImageAlt} />
 
-    <!-- Google JSON-LD Structured data -->
+    <!-- JSON-LD Structured data (BreadcrumbList + page-specific schemas) -->
     {
-      structuredData && (
-        <script
-          type="application/ld+json"
-          set:html={JSON.stringify(structuredData)}
-        />
-      )
+      schemas.map(schema => (
+        <script type="application/ld+json" set:html={serializeSchema(schema)} />
+      ))
     }
 
     <meta name="theme-color" content="#FFFFFF" />

@@ -10,8 +10,11 @@ export async function GET() {
     title: SITE.title,
     description: SITE.desc,
     site: SITE.website,
+    // Without this, @astrojs/rss re-appends the trailing slash the site's
+    // trailingSlash:"never" config (and vercel.json 301) strips.
+    trailingSlash: false,
     items: sortedPosts.map(({ data, slug }) => ({
-      link: `posts/${slug}/`,
+      link: `posts/${slug}`,
       title: data.title,
       description: data.description,
       pubDate: new Date(data.modDatetime ?? data.pubDatetime),
