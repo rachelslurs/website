@@ -1,12 +1,17 @@
-/** Breadcrumb segments for Dymo trail; labels are uppercase for tape styling. */
+/** Breadcrumb segments for Dymo trail; `label` is uppercase for tape styling,
+ *  `name` keeps the human-readable form for BreadcrumbList JSON-LD. */
 
-export type BreadcrumbItem = { label: string; href: string | null };
+export type BreadcrumbItem = {
+  label: string;
+  name: string;
+  href: string | null;
+};
 
-function labelForSegment(segment: string): string {
+function nameForSegment(segment: string): string {
   try {
-    return decodeURIComponent(segment).toUpperCase();
+    return decodeURIComponent(segment);
   } catch {
-    return segment.toUpperCase();
+    return segment;
   }
 }
 
@@ -19,7 +24,7 @@ export function getBreadcrumbItems(pathname: string): BreadcrumbItem[] {
   const raw = currentUrlPath.split("/").filter(Boolean);
 
   if (raw.length === 0) {
-    return [{ label: "HOME", href: null }];
+    return [{ label: "HOME", name: "Home", href: null }];
   }
 
   const breadcrumbList = currentUrlPath.split("/").slice(1);
@@ -48,15 +53,16 @@ export function getBreadcrumbItems(pathname: string): BreadcrumbItem[] {
     breadcrumbList.splice(1, 3, pagePart ? `${tagName} ${pagePart}` : tagName);
   }
 
-  const items: BreadcrumbItem[] = [{ label: "HOME", href: "/" }];
+  const items: BreadcrumbItem[] = [{ label: "HOME", name: "Home", href: "/" }];
 
   for (let i = 0; i < breadcrumbList.length; i++) {
     const isLast = i === breadcrumbList.length - 1;
     const segment = breadcrumbList[i] ?? "";
-    const label = labelForSegment(segment);
+    const name = nameForSegment(segment);
+    const label = name.toUpperCase();
 
     if (isLast) {
-      items.push({ label, href: null });
+      items.push({ label, name, href: null });
       continue;
     }
 
@@ -79,7 +85,7 @@ export function getBreadcrumbItems(pathname: string): BreadcrumbItem[] {
       href = `/${raw.slice(0, i + 1).join("/")}`;
     }
 
-    items.push({ label, href });
+    items.push({ label, name, href });
   }
 
   return items;
