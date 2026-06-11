@@ -35,6 +35,7 @@ export interface Props {
   pageType?: "website" | "article";
   structuredData?: Record<string, unknown>[];
   noindex?: boolean;
+  tags?: string[];
 }
 
 /** Ensure canonical URL has no trailing slash for directory-like pages (SEO consistency) */
@@ -60,6 +61,7 @@ const {
   pageType = "website",
   structuredData = [],
   noindex = false,
+  tags = [],
 } = Astro.props;
 
 const pathname = Astro.url.pathname;
@@ -136,6 +138,10 @@ const schemas: Record<string, unknown>[] = [
           content={modDatetime.toISOString()}
         />
       )
+    }
+    {
+      isArticle &&
+        tags.map(tag => <meta property="article:tag" content={tag} />)
     }
 
     <!-- Twitter -->
