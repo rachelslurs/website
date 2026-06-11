@@ -4,6 +4,9 @@ import type { CollectionEntry } from "astro:content";
 
 export interface Props {
   href?: string;
+  /** Collection entry slug; pairs the card title with the detail page's
+   *  `transition:name={slug}` h1. Falls back to the slugified title. */
+  slug?: string;
   frontmatter:
     | CollectionEntry<"blog">["data"]
     | CollectionEntry<"work">["data"]
@@ -14,6 +17,7 @@ export interface Props {
 
 export default function CollectionCard({
   href,
+  slug,
   frontmatter,
   secHeading = true,
   showDatetime = false,
@@ -25,7 +29,7 @@ export default function CollectionCard({
       : null;
 
   const headerProps = {
-    style: { viewTransitionName: slugifyStr(title) },
+    style: { viewTransitionName: slug ?? slugifyStr(title) },
   };
 
   const linkContent = (
