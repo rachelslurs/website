@@ -1,0 +1,396 @@
+/* Posts index (/posts) only: twine, RSS shipping tag, pull-to-load cord,
+   and the index card typography overrides. Split from riso.css so other
+   pages don’t ship it. */
+
+/* Posts index (/posts): title → date → snippet rhythm; homepage cards keep base .post-* */
+.posts-index-board .post-title {
+  font-weight: 600;
+  /* Fixed row grid: cap title height so cards don’t overlap neighbors (see rowStep in PostsIndexBoard). */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+}
+.posts-index-board .post-date {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+}
+.posts-index-board .post-excerpt {
+  margin-top: 0;
+  flex: 1;
+}
+
+/* ── POSTS INDEX (twine + cards) ── */
+.posts-index-board {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  /* Pull up under RisoBoardShell’s gap-8 so twine sits closer to the nav. */
+  margin-top: -0.5rem;
+  overflow-x: clip;
+  overflow-y: visible;
+  color: var(--black);
+}
+
+/* Single-column layout: avoid clipping full-width cards at the viewport edge. */
+.posts-index-board--stacked {
+  overflow-x: visible;
+}
+
+/* Position (left + translateX) set in JS to match right-column card right edge. */
+.posts-rss-anchor {
+  position: absolute;
+  z-index: 2;
+  width: max-content;
+}
+
+.posts-twine {
+  position: absolute;
+  left: 50%;
+  width: 4px;
+  transform: translateX(-50%);
+  isolation: isolate;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--cream),
+    var(--cream) 4px,
+    var(--red) 4px,
+    var(--red) 8px
+  );
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  border-radius: 2px;
+  transition: height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Manila shipping tag — upper right; pushpin head (::before) sits in punched hole; ring (::after). */
+.rss-tag {
+  --rss-tag-w: 52px;
+  --rss-tag-h: 68px;
+  --rss-hole-r: 5px;
+  --rss-hole-x: 26px;
+  --rss-hole-y: 14px;
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  width: var(--rss-tag-w);
+  height: var(--rss-tag-h);
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 10px;
+  transform-origin: var(--rss-hole-x) var(--rss-hole-y);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  @apply font-mono;
+  font-size: var(--riso-type-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: rgba(0, 0, 0, 0.55);
+  clip-path: polygon(
+    0 0.75rem,
+    0.75rem 0,
+    calc(100% - 0.75rem) 0,
+    100% 0.75rem,
+    100% 100%,
+    0 100%
+  );
+  background: radial-gradient(
+    circle at var(--rss-hole-x) var(--rss-hole-y),
+    transparent var(--rss-hole-r),
+    #e6d5b8 calc(var(--rss-hole-r) + 0.5px)
+  );
+  filter: drop-shadow(2px 3px 5px rgba(0, 0, 0, 0.28));
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Pushpin head — matches .pushpin look, centered on hole */
+.rss-tag::before {
+  content: "";
+  position: absolute;
+  left: var(--rss-hole-x);
+  top: var(--rss-hole-y);
+  z-index: 2;
+  width: 16px;
+  height: 16px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--blue);
+  pointer-events: none;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.35),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.25);
+}
+
+.rss-tag:hover {
+  transform: rotate(-6deg);
+}
+
+.rss-tag:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rss-tag {
+    transition: none;
+  }
+  .rss-tag:hover {
+    transform: none;
+  }
+}
+
+.rss-tag::after {
+  content: "";
+  position: absolute;
+  left: var(--rss-hole-x);
+  top: var(--rss-hole-y);
+  z-index: 1;
+  width: calc(var(--rss-hole-r) * 2 + 4px);
+  height: calc(var(--rss-hole-r) * 2 + 4px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.15),
+    inset 0 0 3px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.twine-knot {
+  position: absolute;
+  width: 8px;
+  height: 10px;
+  left: -2px;
+  background: repeating-linear-gradient(
+    135deg,
+    var(--cream),
+    var(--cream) 4px,
+    var(--red) 4px,
+    var(--red) 8px
+  );
+  box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.4);
+  z-index: 2;
+}
+.knot-top {
+  top: -3px;
+  border-radius: 60% 40% 50% 50%;
+  transform: rotate(15deg);
+}
+.knot-bottom {
+  bottom: -4px;
+  border-radius: 40% 60% 40% 60%;
+  transform: rotate(-10deg);
+}
+.knot-bottom::before {
+  content: "";
+  position: absolute;
+  top: 7px;
+  left: 2px;
+  width: 4px;
+  height: 45px;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--cream),
+    var(--cream) 4px,
+    var(--red) 4px,
+    var(--red) 8px
+  );
+  border-radius: 2px;
+  transform: rotate(8deg);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+.knot-top::before {
+  content: "";
+  position: absolute;
+  bottom: 7px;
+  left: 2px;
+  width: 4px;
+  /* Keep in sync with KNOT_TOP_TAIL_PX in PostsIndexBoard.tsx (RSS tag top alignment). */
+  height: 45px;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--cream),
+    var(--cream) 4px,
+    var(--red) 4px,
+    var(--red) 8px
+  );
+  border-radius: 2px;
+  transform-origin: bottom center;
+  transform: rotate(-25deg);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes pullBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+@keyframes pullBounceCoarse {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+.pull-container {
+  position: absolute;
+  left: 50%;
+  /* Below card pins (see PostsIndexBoard stackZ); matches twine layer. */
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-50%);
+  transition: top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* Let the cord pull gesture win over page scroll / touch gestures (all pointer types). */
+  touch-action: none;
+}
+
+/* Inner stack: knot + CTA — bounce only affects Y so pull-drag translateY can compose. */
+.pull-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  animation: pullBounce 2s infinite ease-in-out;
+}
+
+/*
+ * Wider invisible row for dragging; the painted cord is only `.pull-connector` (4px).
+ * Padding on the cord element made a tall pull show a wide shadow/stripe — avoid that.
+ */
+.pull-connector-track {
+  display: flex;
+  flex-shrink: 0;
+  align-self: stretch;
+  justify-content: center;
+  align-items: flex-start;
+  min-width: 3rem;
+}
+
+.pull-connector {
+  width: 4px;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--cream),
+    var(--cream) 4px,
+    var(--red) 4px,
+    var(--red) 8px
+  );
+  border-radius: 2px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@media (pointer: coarse), (hover: none) {
+  .pull-stack:not(.pull-stack--dragging) {
+    animation: pullBounceCoarse 2.5s infinite ease-in-out;
+  }
+}
+
+.pull-stack--dragging {
+  animation: none !important;
+  cursor: grabbing !important;
+}
+
+.pull-container .pull-stack {
+  cursor: grab;
+}
+
+.pull-container--no-motion .pull-stack {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pull-stack {
+    animation: none;
+  }
+}
+
+/* Extra vertical grab slop on coarse pointers only (horizontal handled on `.pull-stack`). */
+@media (pointer: coarse), (hover: none) {
+  .pull-container {
+    padding-block: 12px;
+    margin-block: -12px;
+  }
+}
+
+/*
+ * Invisible row wider than the knot for easier grabs; knot keeps default .twine-knot size/paint.
+ */
+.pull-knot-hit {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: flex-start;
+  min-width: 3rem;
+}
+
+/* Bottom knot + dangling string live in the pull stack so they bounce with the button. */
+.pull-container .twine-knot.knot-bottom {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  flex-shrink: 0;
+}
+/* Button sits below the main stripe: knot + ::before tail, then CTA. */
+.pull-container .pull-action {
+  margin-top: 42px;
+}
+.pull-action {
+  background: transparent;
+  border: none;
+  cursor: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 20px;
+  transition: transform 0.15s;
+  /* Inherit pull-container touch-action so drag works from the label, not only tap. */
+  touch-action: none;
+  user-select: none;
+}
+
+@media (pointer: coarse), (hover: none) {
+  .pull-action {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 14px 22px;
+  }
+}
+
+.pull-action:active:not(:disabled) {
+  transform: translateY(15px);
+}
+
+@media (pointer: coarse), (hover: none) {
+  .pull-action:active:not(:disabled) {
+    transform: translateY(10px);
+  }
+}
+.pull-tag-text {
+  @apply font-mono;
+  font-size: var(--riso-type-xs);
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: var(--red);
+  background: var(--cream);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px dashed var(--red);
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
+}
