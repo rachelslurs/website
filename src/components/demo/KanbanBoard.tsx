@@ -6,7 +6,7 @@ import {
   forwardRef,
   useEffect,
 } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import DemoLayout from "@components/DemoLayout";
 
 interface KanbanItem {
@@ -27,6 +27,7 @@ interface Columns {
 }
 
 export default function KanbanBoard() {
+  const prefersReducedMotion = useReducedMotion();
   // Hydration fix states
   const [hasMounted, setHasMounted] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -127,9 +128,10 @@ export default function KanbanBoard() {
       <AnimatePresence>
         {hasMounted && isTouchDevice && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
+            initial={prefersReducedMotion ? false : { height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
+            transition={prefersReducedMotion ? { duration: 0 } : undefined}
             className="overflow-hidden"
           >
             <div className="mb-6 p-4 border border-amber-500/50 bg-amber-400/10 rounded-lg text-sm text-amber-900">
@@ -256,13 +258,16 @@ interface KanbanCardProps {
 const KanbanCard = memo(
   forwardRef<HTMLDivElement, KanbanCardProps>(
     ({ item, columnId, onDragStart, onDragEnd }, ref) => {
+      const prefersReducedMotion = useReducedMotion();
       return (
         <motion.div
           ref={ref}
-          layout
-          initial={{ opacity: 0, y: -10 }}
+          layout={!prefersReducedMotion}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9 }}
+          exit={
+            prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.9 }
+          }
           draggable
           onDragStart={() => onDragStart(item, columnId)}
           onDragEnd={onDragEnd}

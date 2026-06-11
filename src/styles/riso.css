@@ -801,10 +801,16 @@ a.skip-to-content-board:focus {
   }
 }
 
+/* Browsers do NOT disable view transitions for reduced motion on their own.
+   Universal so it also covers the per-slug title-morph groups (CollectionCard
+   ↔ CollectionEntryHeader) and Astro's default root crossfade — navigation
+   stays client-side, the swap is just instant. */
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(board-content),
-  ::view-transition-new(board-content) {
-    animation-duration: 0.01ms !important;
+  ::view-transition-group(*),
+  ::view-transition-image-pair(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
 

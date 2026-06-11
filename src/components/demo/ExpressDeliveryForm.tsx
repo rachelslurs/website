@@ -1,5 +1,4 @@
-import React from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   PlayIcon,
   ArrowPathIcon,
@@ -32,6 +31,7 @@ function ExpressDeliveryForm({
   onAction,
 }: ExpressDeliveryFormProps) {
   const isConfirmed = step === 6;
+  const prefersReducedMotion = useReducedMotion();
 
   return (
     <div
@@ -42,9 +42,9 @@ function ExpressDeliveryForm({
           <motion.div
             key="drift-notification"
             className="absolute top-1.5 left-1.5 right-1.5 md:top-3 md:left-3 md:right-3 z-50"
-            initial={{ opacity: 0, y: -16 }}
+            initial={{ opacity: 0, y: prefersReducedMotion ? 0 : -16 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
+            exit={{ opacity: 0, y: prefersReducedMotion ? 0 : -16 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
             <div className="bg-skin-card text-skin-base p-1 md:p-1.5 rounded-md md:rounded-lg shadow-lg flex items-center gap-1.5 md:gap-2 border border-skin-line">
