@@ -764,6 +764,13 @@ a.skip-to-content-board:focus {
 }
 
 /* View Transitions: animate only the “pinned” slot (see RisoBoardShell.astro) */
+/* No geometry morph: scroll offsets differ wildly between pages (e.g. prev/next
+   at the bottom of a long post), so the default group animation reads as content
+   flying across the page. Snap to the new position and let the fades below play. */
+::view-transition-group(board-content) {
+  animation: none;
+}
+
 ::view-transition-old(board-content) {
   animation: board-content-out 0.32s cubic-bezier(0.33, 1, 0.68, 1) both;
 }
