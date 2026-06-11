@@ -227,7 +227,16 @@ const serializeSchema = (schema: Record<string, unknown>) =>
       const invalidateScrollRange = () => {
         scrollRange = -1;
       };
-      new ResizeObserver(invalidateScrollRange).observe(document.body);
+      const bodyResizeObserver = new ResizeObserver(invalidateScrollRange);
+      bodyResizeObserver.observe(document.body);
+      // View transitions replace the <body> element, which would leave the
+      // observer watching a detached node — re-observe the new body (and
+      // invalidate: the new page has a different height).
+      document.addEventListener("astro:after-swap", () => {
+        invalidateScrollRange();
+        bodyResizeObserver.disconnect();
+        bodyResizeObserver.observe(document.body);
+      });
       // Body height doesn't change on a long page when only the window
       // resizes, but clientHeight does.
       window.addEventListener("resize", invalidateScrollRange, {

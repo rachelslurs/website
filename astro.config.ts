@@ -21,6 +21,9 @@ function fontainePlugin() {
   const { handler } = plugin.transform;
   plugin.transform = function (code: string, id: string) {
     if (!/\.css(\?|$)/.test(id)) return;
+    // Most CSS modules (Astro scoped styles) declare no fonts; skip the
+    // css-tree parse + MagicString allocation the handler always pays.
+    if (!code.includes("font-face") && !code.includes("font-family")) return;
     return handler.call(this, code, id);
   };
   return plugin;

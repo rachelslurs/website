@@ -69,17 +69,25 @@
         offset: headerOffset(),
         tops,
         scrollHeight: document.documentElement.scrollHeight,
-        clientHeight: document.documentElement.clientHeight,
       };
     }
 
     const invalidateMeasurements = () => {
       measurements = null;
     };
-    window.addEventListener("resize", invalidateMeasurements, {
-      passive: true,
-      signal,
-    });
+    // Heading tops only move when flow layout changes, i.e. on width
+    // changes — height-only resizes (mobile URL-bar show/hide, repeatedly
+    // mid-scroll) must not force a full re-measure.
+    let lastInnerWidth = window.innerWidth;
+    window.addEventListener(
+      "resize",
+      () => {
+        if (window.innerWidth === lastInnerWidth) return;
+        lastInnerWidth = window.innerWidth;
+        invalidateMeasurements();
+      },
+      { passive: true, signal }
+    );
     // Content height changes after load (images, font swaps) move headings.
     const resizeObserver = new ResizeObserver(invalidateMeasurements);
     resizeObserver.observe(document.body);
@@ -89,7 +97,7 @@
       if (isScrolling) return;
 
       if (!measurements) measure();
-      const { offset, tops, scrollHeight, clientHeight } = measurements;
+      const { offset, tops, scrollHeight } = measurements;
       const scrollPosition = window.scrollY + offset;
       let currentSectionId = items[0].id;
 
@@ -101,7 +109,9 @@
         }
       }
 
-      if (window.scrollY + clientHeight >= scrollHeight - 50) {
+      // innerHeight is a reflow-free read; caching it would only add a
+      // staleness window during URL-bar transitions.
+      if (window.scrollY + window.innerHeight >= scrollHeight - 50) {
         currentSectionId = items[items.length - 1].id;
       }
 
