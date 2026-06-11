@@ -18,11 +18,13 @@ interface SitemapEntry {
 // drift out of the sitemap. Dynamic ([param]) routes are enumerated below;
 // noindex pages are excluded.
 const EXCLUDED_PATHS = new Set(["/search", "/404"]);
-const staticPageFiles = import.meta.glob("./**/*.{astro,mdx}");
+// Every page extension Astro routes (.ts endpoints are deliberately absent).
+const staticPageFiles = import.meta.glob("./**/*.{astro,mdx,md,html}");
 const STATIC_PATHS = Object.keys(staticPageFiles)
   .filter(file => !file.includes("["))
   .map(file => {
-    const route = "/" + file.replace(/^\.\//, "").replace(/\.(astro|mdx)$/, "");
+    const route =
+      "/" + file.replace(/^\.\//, "").replace(/\.(astro|mdx|md|html)$/, "");
     return route === "/index" ? "/" : route.replace(/\/index$/, "");
   })
   .filter(path => !EXCLUDED_PATHS.has(path))

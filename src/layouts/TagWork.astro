@@ -21,7 +21,7 @@ const pageSuffix = page.currentPage > 1 ? ` (page ${page.currentPage})` : "";
 <Layout
   title={`Tech: ${tagName}${pageSuffix} | ${SITE.title}`}
   description={`All the work with the tag "${tagName}".`}
-  breadcrumbName={`${tagName}${pageSuffix}`}
+  breadcrumbName={page.currentPage === 1 ? tagName : undefined}
 >
   <Main
     pageTitle={[`Tech:`, `${tagName}`]}
