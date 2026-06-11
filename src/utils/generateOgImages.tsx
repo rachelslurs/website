@@ -4,6 +4,7 @@ import { type CollectionEntry } from "astro:content";
 import postOgImage from "./og-templates/post";
 import siteOgImage from "./og-templates/site";
 import workOgImage from "./og-templates/work";
+import demoOgImage from "./og-templates/demo";
 
 const fetchFonts = async () => {
   // Regular Font
@@ -56,6 +57,11 @@ export async function generateOgImageForPost(post: CollectionEntry<"blog">) {
 
 export async function generateOgImageForWork(work: CollectionEntry<"work">) {
   const svg = await satori(workOgImage(work), options);
+  return svgBufferToPngBuffer(svg);
+}
+
+export async function generateOgImageForDemo(demo: CollectionEntry<"demos">) {
+  const svg = await satori(demoOgImage(demo), options);
   return svgBufferToPngBuffer(svg);
 }
 
