@@ -59,8 +59,10 @@ const portfolioDemos = homeDemosRaw.map(entry => ({
 >
   <RisoBoardShell animateNav>
     <main id="main-content" class="board-slot">
+      <!-- client:idle — entrances are CSS-driven and content is SSR-visible,
+           so hydration (drag/hover/scroll-rearm) can wait out the LCP. -->
       <PortfolioBoard
-        client:load
+        client:idle
         heroHeadline="I turn design intent into production UI"
         heroBody={SITE.desc}
         quote="Available for senior frontend roles"

@@ -71,12 +71,60 @@ nav .group:hover .dust-note {
   animation: risoNavEnter 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
+/* Board entrance (homepage cards + section dividers): CSS-first so the
+   SSR'd content paints without JS. framer-motion SSR'd its `initial`
+   opacity:0 and gated the reveal on hydrating the whole island chain —
+   the homepage was invisible for seconds on slow connections and LCP
+   fell to the grain texture. Cards below the viewport at hydration get
+   re-armed by useScrollEntrance (PortfolioBoard) to keep the
+   scroll-triggered reveal. */
+@keyframes boardCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95) rotate(var(--enter-rot, 0deg));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+}
+.board-enter {
+  animation: boardCardEnter 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: var(--enter-delay, 0s);
+}
+@keyframes dividerEnter {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.divider-enter {
+  animation: dividerEnter 0.4s ease-out both;
+  animation-delay: var(--enter-delay, 0s);
+}
+/* Hidden while waiting for the IntersectionObserver to fire; only ever
+   applied after hydration, to elements fully below the viewport. */
+.board-enter-armed {
+  opacity: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   nav .group:hover .dust-note {
     animation: none;
   }
   .riso-nav-enter {
     animation: none;
+  }
+  .board-enter,
+  .divider-enter {
+    animation: none;
+  }
+  .board-enter-armed {
+    opacity: 1;
   }
 }
 

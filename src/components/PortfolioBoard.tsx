@@ -1,13 +1,10 @@
 import React, {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { motion, useReducedMotion } from "framer-motion";
 import DymoLabel from "@components/riso/DymoLabel";
 import { NAV_LINK_STAGGER_S } from "@components/RisoNav";
 import {
@@ -94,12 +91,48 @@ const DEFAULT_SKILLS = [
  */
 const CONTENT_ENTRANCE_DELAY_S = NAV_LINK_STAGGER_S * 4 + 0.28;
 
-/** After this, board entrance delay drops to 0 so scroll-triggered items don’t wait. */
-const BOARD_DELAY_CLEAR_MS = Math.round(
-  (CONTENT_ENTRANCE_DELAY_S + 0.15) * 1000
-);
+type EntrancePhase =
+  /** SSR + pre-hydration: CSS entrance plays at load (content never hidden behind JS). */
+  | "auto"
+  /** Below the viewport at hydration: hidden, waiting on the observer. */
+  | "armed"
+  /** Observer fired: re-run the entrance now, without the nav-clearing delay. */
+  | "go";
 
-const BoardEntranceDelayContext = createContext(CONTENT_ENTRANCE_DELAY_S);
+/**
+ * Re-arms the load-time CSS entrance as a scroll-triggered one. Before
+ * hydration everything is visible (the CSS animation runs by itself); on
+ * mount, elements still fully below the viewport are hidden and revealed
+ * by an IntersectionObserver, matching the old framer `whileInView` feel.
+ */
+function useScrollEntrance(rootMargin: string) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [phase, setPhase] = useState<EntrancePhase>("auto");
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Anything at least partially on screen stays in the load-time flow —
+    // hiding it post-hydration would flash already-visible content.
+    if (el.getBoundingClientRect().top <= window.innerHeight) return;
+
+    setPhase("armed");
+    const io = new IntersectionObserver(
+      entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          setPhase("go");
+          io.disconnect();
+        }
+      },
+      { rootMargin }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [rootMargin]);
+
+  return { ref, phase };
+}
 
 const BoardCard = React.memo(
   ({
@@ -142,8 +175,8 @@ const BoardCard = React.memo(
     const [z, setZ] = useState(10);
     const dragRef = useRef<HTMLDivElement | null>(null);
     const [isTouchDevice, setIsTouchDevice] = useState(false);
-    const prefersReducedMotion = useReducedMotion();
-    const boardEntranceDelayS = useContext(BoardEntranceDelayContext);
+    const { ref: entranceRef, phase: entrancePhase } =
+      useScrollEntrance("-10% 0px");
 
     useEffect(() => {
       setIsTouchDevice(
@@ -186,34 +219,22 @@ const BoardCard = React.memo(
     const currentRot = dragRot !== null ? dragRot : rot;
     const scale = isDragging ? 1.01 : 1;
 
-    const entranceVariants = useMemo(
-      () => ({
-        hidden: {
-          opacity: 0,
-          y: 30,
-          rotate: flat
-            ? 0
-            : rot +
-              (rotationSlug
-                ? boardCardEntranceExtraRotateDeg(rotationSlug)
-                : seededOffset(index * 31, 6)),
-          scale: 0.95,
-        },
-        visible: {
-          opacity: 1,
-          y: 0,
-          rotate: 0,
-          scale: 1,
-          transition: {
-            type: "spring" as const,
-            stiffness: 260,
-            damping: 25,
-            delay: boardEntranceDelayS + stagger * 0.08,
-          },
-        },
-      }),
-      [flat, rot, index, stagger, boardEntranceDelayS, rotationSlug]
+    const entranceRotDeg = useMemo(
+      () =>
+        flat
+          ? 0
+          : rot +
+            (rotationSlug
+              ? boardCardEntranceExtraRotateDeg(rotationSlug)
+              : seededOffset(index * 31, 6)),
+      [flat, rot, index, rotationSlug]
     );
+    // Scroll-triggered re-runs skip the nav-clearing delay (the old code
+    // cleared it with a timeout for the same reason).
+    const entranceDelayS =
+      entrancePhase === "go"
+        ? stagger * 0.08
+        : CONTENT_ENTRANCE_DELAY_S + stagger * 0.08;
 
     const shadowClass = isDragging
       ? "is-dragging"
@@ -243,38 +264,46 @@ const BoardCard = React.memo(
           willChange: isDragging ? "transform" : "auto",
         }}
       >
-        <motion.div
-          className={`board-card relative flex h-full flex-col select-none ${pin} ${shadowClass} ${className}`}
-          initial={prefersReducedMotion ? "visible" : "hidden"}
-          whileInView="visible"
-          viewport={{ once: true, margin: "-10% 0px" }}
-          variants={entranceVariants}
+        <div
+          ref={entranceRef}
+          className={`board-card relative flex h-full flex-col select-none ${pin} ${shadowClass} ${className} ${
+            entrancePhase === "armed" ? "board-enter-armed" : "board-enter"
+          }`}
+          style={
+            {
+              "--enter-rot": `${entranceRotDeg}deg`,
+              "--enter-delay": `${entranceDelayS}s`,
+            } as React.CSSProperties
+          }
         >
           {children}
-        </motion.div>
+        </div>
       </div>
     );
   }
 );
 
 const SectionDivider = ({ label, id }: { label: string; id: string }) => {
-  const prefersReducedMotion = useReducedMotion();
-  const boardEntranceDelayS = useContext(BoardEntranceDelayContext);
-  const delay = prefersReducedMotion ? 0 : boardEntranceDelayS;
+  const { ref, phase } = useScrollEntrance("-5% 0px");
   return (
-    <motion.div
-      className="mb-6 mt-16 flex items-center gap-3 py-2"
+    <div
+      ref={ref}
+      className={`mb-6 mt-16 flex items-center gap-3 py-2 ${
+        phase === "armed" ? "board-enter-armed" : "divider-enter"
+      }`}
       id={id}
-      initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, x: -20 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, margin: "-5% 0px" }}
-      transition={{ duration: 0.4, ease: "easeOut", delay }}
+      style={
+        {
+          "--enter-delay":
+            phase === "go" ? "0s" : `${CONTENT_ENTRANCE_DELAY_S}s`,
+        } as React.CSSProperties
+      }
     >
       <h2 className="shrink-0">
         <DymoLabel text={label} size="section" isInteractive={false} />
       </h2>
       <span className="h-px flex-1 bg-[var(--black)]/15" aria-hidden="true" />
-    </motion.div>
+    </div>
   );
 };
 
@@ -309,274 +338,248 @@ export default function PortfolioBoard({
   work,
   demos,
 }: PortfolioBoardProps) {
-  const prefersReducedMotion = useReducedMotion();
-
-  const [boardEntranceDelayS, setBoardEntranceDelayS] = useState(() =>
-    prefersReducedMotion ? 0 : CONTENT_ENTRANCE_DELAY_S
-  );
-  useEffect(() => {
-    if (prefersReducedMotion) {
-      setBoardEntranceDelayS(0);
-      return;
-    }
-    const id = window.setTimeout(() => {
-      setBoardEntranceDelayS(0);
-    }, BOARD_DELAY_CLEAR_MS);
-    return () => window.clearTimeout(id);
-  }, [prefersReducedMotion]);
-
   return (
-    <BoardEntranceDelayContext.Provider value={boardEntranceDelayS}>
-      <div className="flex flex-col">
-        <section className="zone-hero relative" aria-label="Introduction">
+    <div className="flex flex-col">
+      <section className="zone-hero relative" aria-label="Introduction">
+        <BoardCard
+          index={0}
+          pin="tape-top tp-yellow"
+          className="hero-card"
+          stagger={0}
+        >
+          <div className="card h-full hero-card-inner border-[3px] border-[var(--black)] justify-center">
+            <h1 className="hero-headline mb-4 mt-0">{heroHeadline}</h1>
+            <p className="hero-body max-w-[480px]">{heroBody}</p>
+          </div>
+        </BoardCard>
+
+        <div className="hero-sidebar">
           <BoardCard
-            index={0}
-            pin="tape-top tp-yellow"
-            className="hero-card"
-            stagger={0}
+            index={1}
+            pin="pushpin pp-green"
+            className="skills-card"
+            wrapperClassName="max-sm:flex-1 max-sm:min-w-[140px]"
+            stagger={1}
           >
-            <div className="card h-full hero-card-inner border-[3px] border-[var(--black)] justify-center">
-              <h1 className="hero-headline mb-4 mt-0">{heroHeadline}</h1>
-              <p className="hero-body max-w-[480px]">{heroBody}</p>
+            <div
+              className="card flex flex-wrap content-center justify-center gap-[5px] p-4"
+              role="list"
+              aria-label="Technical skills"
+            >
+              {skills.map((tag, i) => {
+                const highlight = ["React", "a11y"].includes(tag)
+                  ? "tag-yellow"
+                  : tag === "UI Animation"
+                    ? "tag-pink"
+                    : "";
+                return (
+                  <span
+                    key={tag}
+                    role="listitem"
+                    className={`skill-tag inline-block ${highlight}`}
+                    style={{
+                      transform: `rotate(${seededOffset(i * 11, 1.5)}deg)`,
+                    }}
+                  >
+                    {tag}
+                  </span>
+                );
+              })}
             </div>
           </BoardCard>
 
-          <div className="hero-sidebar">
+          <BoardCard
+            index={2}
+            pin="pushpin pp-red"
+            className="quote-card"
+            wrapperClassName="max-sm:flex-1 max-sm:min-w-[140px]"
+            stagger={2}
+          >
+            <blockquote className="card m-0 flex min-h-[100px] items-center justify-center border-2 border-dashed border-[var(--black)] p-5">
+              <p className="quote-text">{quote}</p>
+            </blockquote>
+          </BoardCard>
+        </div>
+
+        <Swatch
+          color="var(--yellow)"
+          pattern="stripe"
+          index={0}
+          style={{
+            gridArea: "auto",
+            position: "absolute",
+            top: "-10px",
+            right: "40%",
+          }}
+        />
+      </section>
+
+      <SectionDivider label="Recent Posts" id="posts" />
+      <section
+        className="relative grid grid-cols-3 gap-8 max-lg:grid-cols-2 max-sm:grid-cols-1"
+        aria-label="Blog posts"
+      >
+        {posts.map((post, i) => {
+          const pins = [
+            "tape-c tc-pink",
+            "pushpin pp-yellow",
+            "pushpin pp-green",
+            "tape-top tp-blue",
+            "tape-c tc-yellow",
+            "pushpin pp-blue",
+          ];
+          return (
             <BoardCard
-              index={1}
-              pin="pushpin pp-green"
-              className="skills-card"
-              wrapperClassName="max-sm:flex-1 max-sm:min-w-[140px]"
-              stagger={1}
+              key={post.id}
+              index={i + 10}
+              flat
+              pin={pins[i % pins.length]}
+              className={`post-item ${i === 0 ? "featured-post-tape" : ""}`}
+              wrapperClassName={i === 0 ? "col-span-2 max-sm:col-span-1" : ""}
+              stagger={i}
             >
-              <div
-                className="card flex flex-wrap content-center justify-center gap-[5px] p-4"
-                role="list"
-                aria-label="Technical skills"
-              >
-                {skills.map((tag, i) => {
-                  const highlight = ["React", "a11y"].includes(tag)
-                    ? "tag-yellow"
-                    : tag === "UI Animation"
-                      ? "tag-pink"
-                      : "";
-                  return (
-                    <span
-                      key={tag}
-                      role="listitem"
-                      className={`skill-tag inline-block ${highlight}`}
-                      style={{
-                        transform: `rotate(${seededOffset(i * 11, 1.5)}deg)`,
-                      }}
-                    >
-                      {tag}
-                    </span>
-                  );
-                })}
-              </div>
-            </BoardCard>
-
-            <BoardCard
-              index={2}
-              pin="pushpin pp-red"
-              className="quote-card"
-              wrapperClassName="max-sm:flex-1 max-sm:min-w-[140px]"
-              stagger={2}
-            >
-              <blockquote className="card m-0 flex min-h-[100px] items-center justify-center border-2 border-dashed border-[var(--black)] p-5">
-                <p className="quote-text">{quote}</p>
-              </blockquote>
-            </BoardCard>
-          </div>
-
-          <Swatch
-            color="var(--yellow)"
-            pattern="stripe"
-            index={0}
-            style={{
-              gridArea: "auto",
-              position: "absolute",
-              top: "-10px",
-              right: "40%",
-            }}
-          />
-        </section>
-
-        <SectionDivider label="Recent Posts" id="posts" />
-        <section
-          className="relative grid grid-cols-3 gap-8 max-lg:grid-cols-2 max-sm:grid-cols-1"
-          aria-label="Blog posts"
-        >
-          {posts.map((post, i) => {
-            const pins = [
-              "tape-c tc-pink",
-              "pushpin pp-yellow",
-              "pushpin pp-green",
-              "tape-top tp-blue",
-              "tape-c tc-yellow",
-              "pushpin pp-blue",
-            ];
-            return (
-              <BoardCard
-                key={post.id}
-                index={i + 10}
-                flat
-                pin={pins[i % pins.length]}
-                className={`post-item ${i === 0 ? "featured-post-tape" : ""}`}
-                wrapperClassName={i === 0 ? "col-span-2 max-sm:col-span-1" : ""}
-                stagger={i}
-              >
-                <article className="card h-full flex flex-col">
-                  <time className="post-date" dateTime={post.dateTime}>
-                    {post.dateLabel}
-                  </time>
-                  <h3
-                    className={`post-title ${i === 0 ? "post-title-lg" : ""}`}
-                    style={{ viewTransitionName: post.slug }}
+              <article className="card h-full flex flex-col">
+                <time className="post-date" dateTime={post.dateTime}>
+                  {post.dateLabel}
+                </time>
+                <h3
+                  className={`post-title ${i === 0 ? "post-title-lg" : ""}`}
+                  style={{ viewTransitionName: post.slug }}
+                >
+                  <a
+                    href={post.href}
+                    className="hover:text-[var(--red)] transition-colors focus-visible:outline-none"
                   >
+                    {post.title}
+                  </a>
+                </h3>
+                {post.desc ? <p className="post-excerpt">{post.desc}</p> : null}
+                <div className="mt-auto flex items-center justify-between pt-4">
+                  <DymoLabel
+                    text={post.tag}
+                    size="section"
+                    color={post.tagColor}
+                    isInteractive={false}
+                  />
+                  <a href={post.href} className="card-link card-link-circle">
+                    <ArrowRightCircle className="h-[1.15rem] w-[1.15rem]" />
+                    <span className="sr-only">Read: {post.title}</span>
+                  </a>
+                </div>
+              </article>
+            </BoardCard>
+          );
+        })}
+      </section>
+
+      <div className="flex justify-center gap-4 py-2" aria-hidden="true">
+        <Swatch color="var(--red)" pattern="dot" index={3} />
+        <Swatch color="var(--blue)" pattern="dot" index={4} />
+        <Swatch color="var(--green)" pattern="stripe" index={5} />
+      </div>
+
+      <SectionDivider label="Featured Work" id="work" />
+      <section
+        className="relative grid grid-cols-3 gap-8 max-lg:grid-cols-2 max-sm:grid-cols-1"
+        aria-label="Selected work"
+      >
+        {work.map((w, i) => {
+          const pins = ["bclip", "tape-c tc-pink", "pushpin pp-yellow"];
+          return (
+            <BoardCard
+              key={w.id}
+              index={i + 20}
+              pin={pins[i % pins.length]}
+              className="work-item"
+              wrapperClassName={
+                i === work.length - 1
+                  ? "max-lg:col-span-2 max-sm:col-span-1"
+                  : ""
+              }
+              stagger={i}
+            >
+              <article className="card h-full flex flex-col">
+                <div className="flex flex-1 flex-col mb-4">
+                  <div className="work-label">{w.label}</div>
+                  <h3 className="work-name m-0">
                     <a
-                      href={post.href}
+                      href={w.href}
                       className="hover:text-[var(--red)] transition-colors focus-visible:outline-none"
                     >
-                      {post.title}
+                      {w.name}
                     </a>
                   </h3>
-                  {post.desc ? (
-                    <p className="post-excerpt">{post.desc}</p>
-                  ) : null}
-                  <div className="mt-auto flex items-center justify-between pt-4">
-                    <DymoLabel
-                      text={post.tag}
-                      size="section"
-                      color={post.tagColor}
-                      isInteractive={false}
-                    />
-                    <a href={post.href} className="card-link card-link-circle">
-                      <ArrowRightCircle className="h-[1.15rem] w-[1.15rem]" />
-                      <span className="sr-only">Read: {post.title}</span>
+                  <p className="work-desc !flex-none mt-1.5 mb-0 leading-relaxed">
+                    {w.desc}
+                  </p>
+                </div>
+                <a href={w.href} className="card-link self-start mt-auto !mb-1">
+                  <span aria-hidden="true">&rarr;</span> Case study
+                  <span className="sr-only">: {w.name}</span>
+                </a>
+              </article>
+            </BoardCard>
+          );
+        })}
+      </section>
+
+      <SectionDivider label="DEMOS" id="demos" />
+      <section
+        className="relative grid grid-cols-4 gap-8 max-lg:grid-cols-2"
+        aria-label="Interactive demos"
+      >
+        {demos.map((d, i) => {
+          const pins = [
+            "pushpin pp-red",
+            "tape-top tp-yellow",
+            "pushpin pp-blue",
+            "tape-top tp-green",
+          ];
+          return (
+            <BoardCard
+              key={d.id}
+              index={i + 30}
+              pin={pins[i % pins.length]}
+              className="demo-item"
+              stagger={i}
+            >
+              <article className="card h-full card-demo flex min-h-[130px] flex-col items-center text-center">
+                <div className="flex flex-1 w-full flex-col items-center pt-0 pb-3">
+                  <h3 className="demo-title m-0">
+                    <a
+                      href={d.href}
+                      className="hover:text-[var(--yellow)] transition-colors focus-visible:outline-none"
+                    >
+                      {d.title}
                     </a>
-                  </div>
-                </article>
-              </BoardCard>
-            );
-          })}
-        </section>
+                  </h3>
+                  <p className="demo-sub mt-auto pt-3 mb-0 leading-tight">
+                    {d.sub}
+                  </p>
+                </div>
+                <a href={d.href} className="card-link demo-link mt-auto !mb-1">
+                  <span aria-hidden="true">&rarr;</span> Launch
+                  <span className="sr-only">: {d.title} demo</span>
+                </a>
+              </article>
+            </BoardCard>
+          );
+        })}
+      </section>
 
-        <div className="flex justify-center gap-4 py-2" aria-hidden="true">
-          <Swatch color="var(--red)" pattern="dot" index={3} />
-          <Swatch color="var(--blue)" pattern="dot" index={4} />
-          <Swatch color="var(--green)" pattern="stripe" index={5} />
-        </div>
-
-        <SectionDivider label="Featured Work" id="work" />
-        <section
-          className="relative grid grid-cols-3 gap-8 max-lg:grid-cols-2 max-sm:grid-cols-1"
-          aria-label="Selected work"
-        >
-          {work.map((w, i) => {
-            const pins = ["bclip", "tape-c tc-pink", "pushpin pp-yellow"];
-            return (
-              <BoardCard
-                key={w.id}
-                index={i + 20}
-                pin={pins[i % pins.length]}
-                className="work-item"
-                wrapperClassName={
-                  i === work.length - 1
-                    ? "max-lg:col-span-2 max-sm:col-span-1"
-                    : ""
-                }
-                stagger={i}
-              >
-                <article className="card h-full flex flex-col">
-                  <div className="flex flex-1 flex-col mb-4">
-                    <div className="work-label">{w.label}</div>
-                    <h3 className="work-name m-0">
-                      <a
-                        href={w.href}
-                        className="hover:text-[var(--red)] transition-colors focus-visible:outline-none"
-                      >
-                        {w.name}
-                      </a>
-                    </h3>
-                    <p className="work-desc !flex-none mt-1.5 mb-0 leading-relaxed">
-                      {w.desc}
-                    </p>
-                  </div>
-                  <a
-                    href={w.href}
-                    className="card-link self-start mt-auto !mb-1"
-                  >
-                    <span aria-hidden="true">&rarr;</span> Case study
-                    <span className="sr-only">: {w.name}</span>
-                  </a>
-                </article>
-              </BoardCard>
-            );
-          })}
-        </section>
-
-        <SectionDivider label="DEMOS" id="demos" />
-        <section
-          className="relative grid grid-cols-4 gap-8 max-lg:grid-cols-2"
-          aria-label="Interactive demos"
-        >
-          {demos.map((d, i) => {
-            const pins = [
-              "pushpin pp-red",
-              "tape-top tp-yellow",
-              "pushpin pp-blue",
-              "tape-top tp-green",
-            ];
-            return (
-              <BoardCard
-                key={d.id}
-                index={i + 30}
-                pin={pins[i % pins.length]}
-                className="demo-item"
-                stagger={i}
-              >
-                <article className="card h-full card-demo flex min-h-[130px] flex-col items-center text-center">
-                  <div className="flex flex-1 w-full flex-col items-center pt-0 pb-3">
-                    <h3 className="demo-title m-0">
-                      <a
-                        href={d.href}
-                        className="hover:text-[var(--yellow)] transition-colors focus-visible:outline-none"
-                      >
-                        {d.title}
-                      </a>
-                    </h3>
-                    <p className="demo-sub mt-auto pt-3 mb-0 leading-tight">
-                      {d.sub}
-                    </p>
-                  </div>
-                  <a
-                    href={d.href}
-                    className="card-link demo-link mt-auto !mb-1"
-                  >
-                    <span aria-hidden="true">&rarr;</span> Launch
-                    <span className="sr-only">: {d.title} demo</span>
-                  </a>
-                </article>
-              </BoardCard>
-            );
-          })}
-        </section>
-
-        <div
-          className="flex flex-wrap justify-center gap-4 py-2"
-          aria-hidden="true"
-        >
-          <Swatch color="var(--pink)" pattern="stripe" index={6} />
-          <Swatch
-            color="var(--violet)"
-            pattern="dot"
-            index={7}
-            style={{ borderRadius: "50%" }}
-          />
-          <Swatch color="var(--orange)" pattern="dot" index={8} />
-        </div>
+      <div
+        className="flex flex-wrap justify-center gap-4 py-2"
+        aria-hidden="true"
+      >
+        <Swatch color="var(--pink)" pattern="stripe" index={6} />
+        <Swatch
+          color="var(--violet)"
+          pattern="dot"
+          index={7}
+          style={{ borderRadius: "50%" }}
+        />
+        <Swatch color="var(--orange)" pattern="dot" index={8} />
       </div>
-    </BoardEntranceDelayContext.Provider>
+    </div>
   );
 }
