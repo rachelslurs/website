@@ -24,7 +24,11 @@ const pageSuffix = page.currentPage > 1 ? ` (page ${page.currentPage})` : "";
     <ul class="list-none pl-0">
       {
         page.data.map(({ data, slug }) => (
-          <CollectionCard href={`/demos/${slug}`} frontmatter={data} />
+          <CollectionCard
+            href={`/demos/${slug}`}
+            slug={slug}
+            frontmatter={data}
+          />
         ))
       }
     </ul>

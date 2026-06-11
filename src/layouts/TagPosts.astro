@@ -34,6 +34,7 @@ const pageSuffix = page.currentPage > 1 ? ` (page ${page.currentPage})` : "";
         page.data.map(({ data, slug }) => (
           <CollectionCard
             href={`/posts/${slug}`}
+            slug={slug}
             frontmatter={data}
             showDatetime={true}
           />

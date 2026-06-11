@@ -17,7 +17,6 @@ export default function PostFooterTagLinks({
           key={slug}
           href={`${basePath}/${slug}`}
           className="post-tag-dymo-link"
-          style={{ viewTransitionName: slug }}
         >
           <DymoLabel
             text={label}

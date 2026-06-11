@@ -114,6 +114,7 @@ export default function SearchBar({ searchList }: Props) {
           searchResults.map(({ item, refIndex }) => (
             <CollectionCard
               href={`/posts/${item.slug}`}
+              slug={item.slug}
               frontmatter={item.data}
               showDatetime={true}
               key={`${refIndex}-${item.slug}`}
