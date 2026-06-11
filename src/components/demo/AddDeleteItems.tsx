@@ -1,5 +1,5 @@
 import { useState, memo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import DemoLayout from "@components/DemoLayout";
 import {
   ArrowPathIcon,
@@ -16,6 +16,7 @@ interface Item {
 }
 
 export default memo(function AddDeleteItems() {
+  const prefersReducedMotion = useReducedMotion();
   const [items, setItems] = useState<Item[]>([
     { id: 1, text: "Task 1", synced: true },
     { id: 2, text: "Task 2", synced: true },
@@ -88,9 +89,11 @@ export default memo(function AddDeleteItems() {
           {items.map(item => (
             <motion.div
               key={item.id}
-              initial={{ opacity: 0, x: -20 }}
+              initial={prefersReducedMotion ? false : { opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
+              exit={
+                prefersReducedMotion ? { opacity: 0 } : { opacity: 0, x: 20 }
+              }
               className="flex items-center justify-between p-4 bg-skin-card border border-skin-line rounded-lg"
             >
               <div className="flex items-center gap-3">

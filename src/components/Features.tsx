@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/react";
 import { useDebouncedCallback } from "use-debounce";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 import Device from "./Device.tsx";
 
@@ -31,6 +31,7 @@ function classNames(...classes: string[]) {
 
 function FeaturesDesktop(props: FeaturesProps) {
   const { features } = props;
+  const prefersReducedMotion = useReducedMotion();
   let [changeCount, setChangeCount] = useState(0);
   let [selectedIndex, setSelectedIndex] = useState(0);
   let prevIndex = usePrevious(selectedIndex);
@@ -60,7 +61,7 @@ function FeaturesDesktop(props: FeaturesProps) {
           >
             {featureIndex === selectedIndex && (
               <motion.div
-                layoutId="activeBackground"
+                layoutId={prefersReducedMotion ? undefined : "activeBackground"}
                 className="absolute inset-2 bg-skin-card text-skin-inverted"
                 initial={{ borderRadius: 16 }}
               />
@@ -147,7 +148,7 @@ function FeaturesMobile(props: FeaturesProps) {
     <>
       <div
         ref={slideContainerRef}
-        className="-mb-4 flex w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="-mb-4 flex w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain motion-safe:scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {features.map((feature, featureIndex) => (
           <div
