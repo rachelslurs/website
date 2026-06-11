@@ -28,6 +28,25 @@ function fontainePlugin() {
   };
   return plugin;
 }
+
+/** Fontsource hardcodes font-display: swap. Body copy (Lora) is the post
+ *  pages' LCP element, and with swap the paragraph repaints when the webfont
+ *  lands — Chrome re-stamps LCP at that repaint (PSI: 1,410ms render delay
+ *  on slow 4G, the whole remaining post LCP gap). `optional` commits to the
+ *  metric-matched Georgia fallback when Lora misses the ~100ms block window,
+ *  so the first paint is the only paint and LCP ≈ FCP. All four Lora faces
+ *  flip together — a partial flip would mix fallback body text with real
+ *  Lora bold/italic mid-paragraph. Display/mono faces keep swap so the
+ *  stamped headlines still upgrade. */
+function loraFontDisplayOptional() {
+  return {
+    name: "lora-font-display-optional",
+    transform(code: string, id: string) {
+      if (!id.includes("@fontsource/lora")) return;
+      return code.replace(/font-display:\s*swap/g, "font-display: optional");
+    },
+  };
+}
 /** Inline each page's used CSS and load the stylesheets async (media swap).
  *  The render-blocking shared sheet was the whole LCP render delay on mobile
  *  (~1.1s est. by Lighthouse): nothing painted until ~20KB gz of CSS arrived.
@@ -139,6 +158,7 @@ export default defineConfig({
       // for each @font-face, so the swap to the web font doesn't reflow
       // text — kills font CLS and the late LCP repaint of the first <p>.
       fontainePlugin(),
+      loraFontDisplayOptional(),
     ],
   },
   scopedStyleStrategy: "where",
