@@ -26,7 +26,6 @@
     "@fontsource/lora": "^5.2.5",
     "@fontsource/zilla-slab": "^5.2.5",
     "@headlessui/react": "^2.1.1",
-    "@headlessui/tailwindcss": "0.2.1",
     "@heroicons/react": "^2.2.0",
     "@resvg/resvg-js": "^2.6.0",
     "astro": "^4.16.3",
@@ -42,7 +41,6 @@
   },
   "devDependencies": {
     "@astrojs/react": "^3.6.2",
-    "@astrojs/sitemap": "3.1.6",
     "@astrojs/tailwind": "^5.1.1",
     "@tailwindcss/forms": "0.5.7",
     "@tailwindcss/typography": "^0.5.15",
