@@ -1,6 +1,26 @@
 import { defineConfig } from "astro/config";
 import tailwind from "@astrojs/tailwind";
 import react from "@astrojs/react";
+import { FontaineTransform } from "fontaine";
+
+/** Fontaine 0.8 declares its transform as `{ filter, handler }`, a hook form
+ *  Vite 5 silently skips — unwrap it to a plain function so it runs. */
+function fontainePlugin() {
+  const plugin = FontaineTransform.vite({
+    fallbacks: {
+      Lora: ["Georgia"],
+      "Zilla Slab": ["Georgia"],
+      "Archivo Black": ["Arial"],
+      "IBM Plex Mono": ["Courier New"],
+    },
+  }) as any;
+  const { handler } = plugin.transform;
+  plugin.transform = function (code: string, id: string) {
+    if (!/\.css(\?|$)/.test(id)) return;
+    return handler.call(this, code, id);
+  };
+  return plugin;
+}
 import remarkToc from "remark-toc";
 import { SITE } from "./src/config";
 import risoAnalogTheme, {
@@ -44,12 +64,21 @@ export default defineConfig({
       include: ["framer-motion"],
       exclude: ["@resvg/resvg-js"],
     },
+    plugins: [
+      // Metric-matched local fallback faces (size-adjust/ascent-override…)
+      // for each @font-face, so the swap to the web font doesn't reflow
+      // text — kills font CLS and the late LCP repaint of the first <p>.
+      fontainePlugin(),
+    ],
   },
   scopedStyleStrategy: "where",
   experimental: {
     contentLayer: true,
   },
   build: {
-    inlineStylesheets: "always",
+    // "always" inlined ~150 KB of CSS (incl. all @font-face) into every
+    // page head — nothing painted until it downloaded. "auto" keeps the
+    // shared sheet external and cacheable across pages.
+    inlineStylesheets: "auto",
   },
 });

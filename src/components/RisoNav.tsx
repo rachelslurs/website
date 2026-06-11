@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useState } from "react";
 import DymoLabel from "@components/riso/DymoLabel";
 
 const NAV_LINKS = [
@@ -38,24 +37,19 @@ export default function RisoNav({
 }: {
   activePath?: string;
   siteTitle: string;
-  /** Staggered spring entrance (homepage). */
+  /** Staggered entrance (homepage); pure CSS so it runs before hydration
+   *  and respects prefers-reduced-motion via the stylesheet. */
   animateEntrance?: boolean;
 }) {
   const currentPath = useActivePath(activePath);
-  const prefersReducedMotion = useReducedMotion();
-  const navSpring = { type: "spring" as const, stiffness: 380, damping: 28 };
-  const showNavMotion = animateEntrance && !prefersReducedMotion;
+  const entranceClass = animateEntrance ? "riso-nav-enter" : undefined;
 
   return (
-    <motion.nav
+    <nav
       className="relative z-50 flex w-full flex-wrap items-center justify-center gap-3 py-5 md:justify-between"
       aria-label="Main navigation"
     >
-      <motion.div
-        initial={showNavMotion ? { opacity: 0, y: -12 } : { opacity: 1, y: 0 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={navSpring}
-      >
+      <div className={entranceClass}>
         <div className="group relative inline-flex items-center">
           <DymoLabel
             text={siteTitle.toUpperCase().replace(/\s+/g, " ")}
@@ -73,22 +67,20 @@ export default function RisoNav({
             I&apos;m doing it live! 🚧
           </div>
         </div>
-      </motion.div>
+      </div>
       <ul
         className="flex list-none flex-wrap items-center justify-center gap-1.5 md:justify-start"
         role="list"
       >
         {NAV_LINKS.map(({ label, href }, i) => (
-          <motion.li
+          <li
             key={href}
-            initial={
-              showNavMotion ? { opacity: 0, y: -12 } : { opacity: 1, y: 0 }
+            className={entranceClass}
+            style={
+              animateEntrance
+                ? { animationDelay: `${NAV_LINK_STAGGER_S * (i + 1)}s` }
+                : undefined
             }
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              ...navSpring,
-              delay: showNavMotion ? NAV_LINK_STAGGER_S * (i + 1) : 0,
-            }}
           >
             <DymoLabel
               text={label}
@@ -96,9 +88,9 @@ export default function RisoNav({
               href={href}
               isActive={isNavActive(currentPath, href)}
             />
-          </motion.li>
+          </li>
         ))}
       </ul>
-    </motion.nav>
+    </nav>
   );
 }

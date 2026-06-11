@@ -155,11 +155,26 @@ module.exports = {
           '"Segoe UI Symbol"',
           '"Noto Color Emoji"',
         ],
-        serif: ["Zilla Slab", "Georgia", "serif"],
-        display: ["Archivo Black", "ui-sans-serif", "system-ui", "sans-serif"],
-        heading: ["Zilla Slab", "Georgia", "serif"],
-        body: ["Lora", "Georgia", "ui-serif", "serif"],
-        mono: ["IBM Plex Mono", "ui-monospace", "SFMono-Regular", "monospace"],
+        /* "<Family> fallback" faces are metric-matched local fonts generated
+         * by fontaine (astro.config.ts) — they hold the web font's geometry
+         * before it loads, so the swap doesn't shift text. */
+        serif: ["Zilla Slab", "Zilla Slab fallback", "Georgia", "serif"],
+        display: [
+          "Archivo Black",
+          "Archivo Black fallback",
+          "ui-sans-serif",
+          "system-ui",
+          "sans-serif",
+        ],
+        heading: ["Zilla Slab", "Zilla Slab fallback", "Georgia", "serif"],
+        body: ["Lora", "Lora fallback", "Georgia", "ui-serif", "serif"],
+        mono: [
+          "IBM Plex Mono",
+          "IBM Plex Mono fallback",
+          "ui-monospace",
+          "SFMono-Regular",
+          "monospace",
+        ],
       },
 
       /* Modular scale — major third (1.25); rem values harmonize display vs body */
@@ -193,7 +208,7 @@ module.exports = {
             maxWidth: 'var(--max-3xl)',
             lineHeight: '1.65',
             fontSize: '1rem',
-            fontFamily: "'Lora', Georgia, ui-serif, serif",
+            fontFamily: "'Lora', 'Lora fallback', Georgia, ui-serif, serif",
             color: 'rgb(var(--color-text-base))',
             'a:hover': {
               color: 'rgb(var(--color-accent))',
@@ -211,7 +226,7 @@ module.exports = {
             h1: {
               fontWeight: '400',
               letterSpacing: '-0.02em',
-              fontFamily: 'Archivo Black, ui-sans-serif, system-ui, sans-serif',
+              fontFamily: 'Archivo Black, Archivo Black fallback, ui-sans-serif, system-ui, sans-serif',
               marginTop: '1.25em',
               marginBottom: '0.5em',
             },
@@ -221,7 +236,7 @@ module.exports = {
             h2: {
               fontWeight: '600',
               letterSpacing: '-0.01em',
-              fontFamily: 'Zilla Slab, Georgia, serif',
+              fontFamily: 'Zilla Slab, Zilla Slab fallback, Georgia, serif',
               marginTop: '1.25em',
               marginBottom: '0.5em',
             },
@@ -231,7 +246,7 @@ module.exports = {
             h3: {
               fontWeight: '600',
               letterSpacing: '-0.01em',
-              fontFamily: 'Zilla Slab, Georgia, serif',
+              fontFamily: 'Zilla Slab, Zilla Slab fallback, Georgia, serif',
               marginTop: '1.25em',
               marginBottom: '0.5em',
             },
@@ -241,7 +256,7 @@ module.exports = {
             h4: {
               fontWeight: '600',
               letterSpacing: '-0.01em',
-              fontFamily: 'Zilla Slab, Georgia, serif',
+              fontFamily: 'Zilla Slab, Zilla Slab fallback, Georgia, serif',
               marginTop: '1.25em',
               marginBottom: '0.5em',
             },
@@ -251,7 +266,7 @@ module.exports = {
             h5: {
               fontWeight: '600',
               letterSpacing: '-0.01em',
-              fontFamily: 'Zilla Slab, Georgia, serif',
+              fontFamily: 'Zilla Slab, Zilla Slab fallback, Georgia, serif',
               marginTop: '1.25em',
               marginBottom: '0.5em',
             },
@@ -261,7 +276,7 @@ module.exports = {
             h6: {
               fontWeight: '600',
               letterSpacing: '-0.01em',
-              fontFamily: 'Zilla Slab, Georgia, serif',
+              fontFamily: 'Zilla Slab, Zilla Slab fallback, Georgia, serif',
               marginTop: '1.25em',
               marginBottom: '0.5em',
             },
@@ -269,7 +284,7 @@ module.exports = {
               marginTop: '0',
             },
             code: {
-              fontFamily: 'IBM Plex Mono, monospace',
+              fontFamily: 'IBM Plex Mono, IBM Plex Mono fallback, monospace',
               fontSize: '0.9em',
               backgroundColor: 'rgba(var(--color-text-base), 0.05)',
               padding: '0.2em 0.4em',
@@ -277,7 +292,7 @@ module.exports = {
               fontWeight: '400',
             },
             pre: {
-              fontFamily: 'IBM Plex Mono, monospace',
+              fontFamily: 'IBM Plex Mono, IBM Plex Mono fallback, monospace',
               fontSize: '0.9em',
             },
             strong: {
@@ -296,7 +311,7 @@ module.exports = {
               fontSize: '0.95rem',
             },
             'blockquote > p, blockquote > ul > li, blockquote > ol > li': {
-              fontFamily: 'IBM Plex Mono, monospace',
+              fontFamily: 'IBM Plex Mono, IBM Plex Mono fallback, monospace',
             },
 
             'hr': {
