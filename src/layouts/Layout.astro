@@ -191,5 +191,69 @@ const serializeSchema = (schema: Record<string, unknown>) =>
   </head>
   <body>
     <slot />
+    <script>
+      // Content-page enhancements, bound once per hard load on the
+      // persistent document. View-transition swaps replace the markup these
+      // target (#myBar from RisoBoardShell's readingProgress prop, .copy-code
+      // buttons from rehype-copy-code), and both handlers query the live DOM
+      // per event, so they never need re-binding or rerun guards.
+      document.addEventListener(
+        "scroll",
+        () => {
+          const bar = document.getElementById("myBar");
+          if (!bar) return;
+          const height =
+            document.documentElement.scrollHeight -
+            document.documentElement.clientHeight;
+          const top =
+            document.documentElement.scrollTop || document.body.scrollTop;
+          bar.style.width = height > 0 ? `${(top / height) * 100}%` : "0%";
+        },
+        { passive: true }
+      );
+
+      // Make the detail-title ↔ list-card morph directional. Forward navs
+      // away from a detail page (e.g. end-of-post tag click onto a tag page
+      // listing that post) would morph the h1 "backwards" into the card —
+      // reads as a flash. Back navigations keep the morph, but only when the
+      // title is on screen; from deep in a long post the snapshot would fly
+      // across the viewport (the same scroll-offset artifact the
+      // board-content snap fixes). Runs before the old page is captured;
+      // the swap discards the inline override, so nothing needs restoring.
+      document.addEventListener("astro:before-preparation", event => {
+        const title = document.querySelector(".collection-entry-title");
+        if (!(title instanceof HTMLElement)) return;
+        const direction = (event as Event & { direction?: string }).direction;
+        const rect = title.getBoundingClientRect();
+        const visible = rect.bottom > 0 && rect.top < window.innerHeight;
+        if (direction !== "back" || !visible) {
+          title.style.setProperty("view-transition-name", "none");
+        }
+      });
+
+      const COPY_LABEL = "Copy";
+      const copyTimers = new WeakMap<HTMLElement, number>();
+      document.addEventListener("click", async event => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        const button = target.closest<HTMLElement>("button.copy-code");
+        if (!button) return;
+        const code = button.closest("pre")?.querySelector("code");
+        if (!code) return;
+        try {
+          await navigator.clipboard.writeText(code.innerText);
+          button.innerText = "Copied";
+        } catch {
+          button.innerText = "Copy failed";
+        }
+        clearTimeout(copyTimers.get(button));
+        copyTimers.set(
+          button,
+          window.setTimeout(() => {
+            button.innerText = COPY_LABEL;
+          }, 700)
+        );
+      });
+    </script>
   </body>
 </html>

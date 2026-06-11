@@ -6,14 +6,24 @@ import Footer from "@components/Footer.astro";
 export interface Props {
   /** Staggered Dymo nav entrance (homepage only). */
   animateNav?: boolean;
+  /** Reading-progress bar for detail layouts; width is driven by the
+   *  scroll handler in Layout.astro. */
+  readingProgress?: boolean;
 }
 
-const { animateNav = false } = Astro.props;
+const { animateNav = false, readingProgress = false } = Astro.props;
 ---
 
 <a id="skip-to-content" href="#main-content" class="skip-to-content-board">
   Skip to content
 </a>
+{
+  readingProgress && (
+    <div class="progress-container pointer-events-none fixed top-0 z-[9999] h-1 w-full bg-transparent">
+      <div class="progress-bar h-1 w-0 bg-skin-accent" id="myBar" />
+    </div>
+  )
+}
 <div
   class="board-page-outer mx-auto flex min-h-0 w-full max-w-[1200px] flex-1 flex-col p-4 max-sm:p-2"
 >
