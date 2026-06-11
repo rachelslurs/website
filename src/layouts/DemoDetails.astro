@@ -6,6 +6,7 @@ import GhostEntryBack from "@components/riso/GhostEntryBack";
 import PostPagination from "@components/riso/PostPagination";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
+import { creativeWorkSchema } from "@utils/structuredData";
 import { SITE } from "@config";
 export interface Props {
   demo: CollectionEntry<"demos">;
@@ -33,6 +34,8 @@ const ogUrl = new URL(
   Astro.url.origin
 ).href;
 
+const pageUrl = canonicalURL ?? new URL(Astro.url.pathname, SITE.website).href;
+
 const layoutProps = {
   title: `${title} | ${SITE.title}`,
   author,
@@ -41,6 +44,19 @@ const layoutProps = {
   modDatetime,
   canonicalURL,
   ogImage: ogUrl,
+  ogImageAlt: title,
+  pageType: "article" as const,
+  structuredData: [
+    creativeWorkSchema({
+      title,
+      description: description ?? summary,
+      url: pageUrl,
+      image: ogUrl,
+      author,
+      pubDatetime,
+      modDatetime,
+    }),
+  ],
 };
 
 const allDemos = demos.map(({ data: { title: t }, slug }) => ({

@@ -11,6 +11,7 @@ import PostPagination from "@components/riso/PostPagination";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import { filterTocHeadings } from "@utils/filterTocHeadings";
+import { creativeWorkSchema } from "@utils/structuredData";
 import { SITE } from "@config";
 export interface Props {
   work: CollectionEntry<"work">;
@@ -40,6 +41,8 @@ const ogUrl = new URL(
   Astro.url.origin
 ).href;
 
+const pageUrl = canonicalURL ?? new URL(Astro.url.pathname, SITE.website).href;
+
 const layoutProps = {
   title: `${title} | ${SITE.title}`,
   author,
@@ -48,6 +51,20 @@ const layoutProps = {
   modDatetime,
   canonicalURL,
   ogImage: ogUrl,
+  ogImageAlt: title,
+  pageType: "article" as const,
+  structuredData: [
+    creativeWorkSchema({
+      title,
+      description: description ?? summary,
+      url: pageUrl,
+      image: ogUrl,
+      author,
+      pubDatetime,
+      modDatetime,
+      tags,
+    }),
+  ],
 };
 
 const allWorks = works.map(({ data: { title: t }, slug }) => ({

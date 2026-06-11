@@ -11,6 +11,7 @@ import PostPagination from "@components/riso/PostPagination";
 import type { CollectionEntry } from "astro:content";
 import { slugifyStr } from "@utils/slugify";
 import { filterTocHeadings } from "@utils/filterTocHeadings";
+import { blogPostingSchema } from "@utils/structuredData";
 import { SITE } from "@config";
 export interface Props {
   post: CollectionEntry<"blog">;
@@ -38,6 +39,9 @@ const ogUrl = new URL(
   Astro.url.origin
 ).href;
 
+const pageUrl = canonicalURL ?? new URL(Astro.url.pathname, SITE.website).href;
+const wordCount = post.body?.trim().split(/\s+/).length;
+
 const layoutProps = {
   title: `${title} | ${SITE.title}`,
   author,
@@ -46,6 +50,21 @@ const layoutProps = {
   modDatetime,
   canonicalURL,
   ogImage: ogUrl,
+  ogImageAlt: title,
+  pageType: "article" as const,
+  structuredData: [
+    blogPostingSchema({
+      title,
+      description,
+      url: pageUrl,
+      image: ogUrl,
+      author,
+      pubDatetime,
+      modDatetime,
+      tags,
+      wordCount,
+    }),
+  ],
 };
 
 /* ========== Prev/Next Posts ========== */
