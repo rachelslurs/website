@@ -36,6 +36,11 @@
   --riso-leading-normal: 1.5;
   --riso-leading-relaxed: 1.55;
   --riso-leading-loose: 1.6;
+
+  /* House overshoot curve — the springy back-out used by every board
+     entrance, card transition, and cord snap. TSX inline styles reference
+     it via var(--ease-spring) too; never paste the literal. */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* “Pardon the dust” tape wiggle — keyframes + group-hover (see RisoNav) */
@@ -73,7 +78,7 @@ nav .group:hover .dust-note {
 .riso-nav-enter {
   /* Duration mirrored by NAV_ENTER_DURATION_S in RisoNav.tsx (the board
      entrance delay is derived from it) — change both together. */
-  animation: risoNavEnter 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  animation: risoNavEnter 0.28s var(--ease-spring) backwards;
 }
 
 /* Board entrance (homepage cards + section dividers): CSS-first so the
@@ -94,7 +99,7 @@ nav .group:hover .dust-note {
   }
 }
 .board-enter {
-  animation: boardCardEnter 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  animation: boardCardEnter 0.55s var(--ease-spring) backwards;
   animation-delay: var(--enter-delay, 0s);
 }
 @keyframes dividerEnter {

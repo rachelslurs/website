@@ -1,29 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import ArrowRightCircle from "@components/ArrowRightCircle";
 import DymoLabel from "@components/riso/DymoLabel";
+import { usePrefersReducedMotion } from "@utils/usePrefersReducedMotion";
 import type { PortfolioPost } from "@components/PortfolioBoard";
-
-const ArrowRightCircle = ({
-  className,
-  ...props
-}: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    aria-hidden="true"
-    className={className}
-    {...props}
-  >
-    {/* Chunky chevron right, centered for use inside the circular button */}
-    <path
-      d="M10.25 8.25 14 12l-3.75 3.75"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 /** Seconds between each card's entrance — clearer than PortfolioBoard's 0.08s step. */
 const STAGGER_STEP_S = 0.14;
@@ -48,22 +27,7 @@ const PULL_CORD_THRESHOLD_PX = 28;
 /** Pulls above this offset suppress the button click (avoids duplicate after a drag). */
 const PULL_DRAG_SUPPRESS_CLICK_PX = 10;
 /** Snap-back duration for the cord stretch (matches riso.css easing). */
-const PULL_SNAP_TRANSITION = "height 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)";
-
-/** matchMedia-backed replacement for framer's useReducedMotion (the entrance
- *  animations are CSS and gate themselves; this only drives the pull cord's
- *  snap-back suppression). */
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setReduced(e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-  return reduced;
-}
+const PULL_SNAP_TRANSITION = "height 0.35s var(--ease-spring)";
 
 function DraggableCard({
   index,
@@ -175,6 +139,14 @@ function PullMoreCord({
   onLoadMore: () => void;
 }) {
   const reduced = prefersReducedMotion;
+  /** The cord's pull/click handlers are React-bound, so pre-hydration (and
+   *  with JS off) the SSR'd cord is a dead control — keep it hidden until
+   *  mount so it never invites an interaction that does nothing. Older
+   *  posts stay reachable without JS via the paginated tag pages. */
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
   const [stretchPx, setStretchPx] = useState(0);
   const [pullDragActive, setPullDragActive] = useState(false);
   const [snapping, setSnapping] = useState(false);
@@ -312,7 +284,9 @@ function PullMoreCord({
 
   return (
     <div
-      className={`pull-container ${reduced ? "pull-container--no-motion" : ""}`}
+      className={`pull-container${hydrated ? " pull-container--ready" : ""}${
+        reduced ? " pull-container--no-motion" : ""
+      }`}
     >
       <div
         className={stackClass}
