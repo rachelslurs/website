@@ -23,34 +23,169 @@
   flex: 1;
 }
 
-/* ── POSTS INDEX (twine + cards) ── */
-.posts-index-board {
-  position: relative;
+/* ── POSTS INDEX (twine + cards) ──
+ *
+ * The whole board geometry is CSS so the SSR HTML is correctly laid out at
+ * every width before any JS runs (the old JS layout assumed a 1200px board
+ * until hydration measured it — harmless only while framer-motion hid the
+ * cards). The component contributes two inputs:
+ *   --n                  visible card count (inline style; load-more bumps it)
+ *   --complete modifier  all posts shown (affects twine tail length)
+ * Cards carry --i (their index) and a left/right column class. Everything
+ * else derives below. Derivations mirror the old PostsIndexBoard constants:
+ *   card width 360, twine gap 45, half-twine 2, edge pad 8
+ *   two-col leftX  = center − 2 − 45 − 360            → 50% − 407px (min 8px)
+ *   two-col rightX = center + 2 + 45                  → 50% + 47px
+ *                    (clamped to width − 8 − 360      → 100% − 368px)
+ *   stacked when board < 854px (two 360 cols + gaps no longer fit)
+ *   string tail: pull pending → +10 − 168 + 250 = 92px
+ *                complete     → −52 + 250      = 198px
+ */
+.posts-index-frame {
+  container-type: inline-size;
   width: 100%;
   max-width: 1200px;
   margin-inline: auto;
+}
+
+.posts-index-board {
+  /* Two-column band (default). */
+  --card-w: 360px;
+  --row-step: 270px;
+  --base-y: 104px;
+  --twine-top: 52px;
+  --est-h: 320px;
+  --bottom-pad: 260px;
+  --string-tail: 92px;
+  --card-left-left: max(8px, calc(50% - 407px));
+  --card-left-right: min(calc(50% + 47px), calc(100% - 368px));
+  --rss-left: min(calc(50% + 407px), calc(100% - 8px));
+  --board-overflow-x: clip;
+
+  /* Derived. */
+  --top-gap: calc(var(--base-y) - var(--twine-top));
+  --string-h: max(
+    120px,
+    calc(
+      2 * var(--top-gap) + (var(--n, 1) - 1) * var(--row-step) + var(--est-h) +
+        var(--string-tail)
+    )
+  );
+
+  position: relative;
+  width: 100%;
   /* Pull up under RisoBoardShell’s gap-8 so twine sits closer to the nav. */
   margin-top: -0.5rem;
-  overflow-x: clip;
+  overflow-x: var(--board-overflow-x);
   overflow-y: visible;
   color: var(--black);
+  height: max(
+    800px,
+    calc(var(--twine-top) + var(--string-h) + var(--bottom-pad)),
+    calc(
+      var(--base-y) + (var(--n, 1) - 1) * var(--row-step) + var(--est-h) +
+        var(--bottom-pad)
+    )
+  );
+  transition: height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Single-column layout: avoid clipping full-width cards at the viewport edge. */
-.posts-index-board--stacked {
-  overflow-x: visible;
+.posts-index-board--complete {
+  --string-tail: 198px;
 }
 
-/* Position (left + translateX) set in JS to match right-column card right edge. */
+/* Stacked band: one centered column; cards shrink to fit narrow boards.
+ * Media-query fallback first (board ≈ viewport − 80px page chrome, kept
+ * conservatively low so it never disagrees with the container query), then
+ * the container queries re-assert BOTH bands so supporting browsers always
+ * use the true board width. */
+@media (max-width: 930px) {
+  .posts-index-board {
+    --card-w: min(360px, calc(100% - 16px));
+    --row-step: 360px;
+    --base-y: 140px;
+    --twine-top: 66px;
+    --est-h: 350px;
+    --card-left-left: calc(50% - var(--card-w) / 2);
+    --card-left-right: calc(50% - var(--card-w) / 2);
+    --rss-left: calc(50% + var(--card-w) / 2);
+    /* Avoid clipping full-width cards at the viewport edge. */
+    --board-overflow-x: visible;
+  }
+}
+@media (max-width: 710px) {
+  .posts-index-board {
+    --bottom-pad: 300px;
+  }
+}
+@container (width < 854px) {
+  .posts-index-board {
+    --card-w: min(360px, calc(100% - 16px));
+    --row-step: 360px;
+    --base-y: 140px;
+    --twine-top: 66px;
+    --est-h: 350px;
+    --card-left-left: calc(50% - var(--card-w) / 2);
+    --card-left-right: calc(50% - var(--card-w) / 2);
+    --rss-left: calc(50% + var(--card-w) / 2);
+    --board-overflow-x: visible;
+  }
+}
+@container (width >= 854px) {
+  .posts-index-board {
+    --card-w: 360px;
+    --row-step: 270px;
+    --base-y: 104px;
+    --twine-top: 52px;
+    --est-h: 320px;
+    --card-left-left: max(8px, calc(50% - 407px));
+    --card-left-right: min(calc(50% + 47px), calc(100% - 368px));
+    --rss-left: min(calc(50% + 407px), calc(100% - 8px));
+    --board-overflow-x: clip;
+  }
+}
+@container (width < 640px) {
+  .posts-index-board {
+    --bottom-pad: 300px;
+  }
+}
+@container (width >= 640px) {
+  .posts-index-board {
+    --bottom-pad: 260px;
+  }
+}
+
+/* Card column slots; a dragged card gets inline left/top (which win) until
+ * the next resize snaps it back into the flow. */
+.posts-card {
+  position: absolute;
+  width: var(--card-w);
+  top: calc(var(--base-y) + var(--i, 0) * var(--row-step));
+  left: var(--card-left-left);
+  transition:
+    left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.posts-card--right {
+  left: var(--card-left-right);
+}
+
+/* Right edge lines up with the right card column (translateX pulls it back). */
 .posts-rss-anchor {
   position: absolute;
   z-index: 2;
   width: max-content;
+  top: calc(var(--twine-top) - 45px);
+  left: var(--rss-left);
+  transform: translateX(-100%);
 }
 
 .posts-twine {
   position: absolute;
   left: 50%;
+  top: var(--twine-top);
+  height: var(--string-h);
   width: 4px;
   transform: translateX(-50%);
   isolation: isolate;
@@ -210,7 +345,8 @@
   bottom: 7px;
   left: 2px;
   width: 4px;
-  /* Keep in sync with KNOT_TOP_TAIL_PX in PostsIndexBoard.tsx (RSS tag top alignment). */
+  /* Keep in sync with the 45px in `.posts-rss-anchor { top }` (tag top
+     aligns with the top of this dangling tail). */
   height: 45px;
   background: repeating-linear-gradient(
     45deg,
@@ -248,6 +384,8 @@
 .pull-container {
   position: absolute;
   left: 50%;
+  /* Knot overlaps the twine end by 10px (old TWINE_PULL_STACK_OVERLAP). */
+  top: calc(var(--twine-top) + var(--string-h) - 10px);
   /* Below card pins (see PostsIndexBoard stackZ); matches twine layer. */
   z-index: 1;
   display: flex;
