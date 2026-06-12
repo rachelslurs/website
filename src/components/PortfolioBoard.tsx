@@ -5,6 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import ArrowRightCircle from "@components/ArrowRightCircle";
 import DymoLabel from "@components/riso/DymoLabel";
 import {
   NAV_ENTER_DURATION_S,
@@ -18,29 +19,6 @@ import {
 import { seededOffset } from "@utils/seededOffset";
 
 export type TagColor = "red" | "blue" | "green";
-
-const ArrowRightCircle = ({
-  className,
-  ...props
-}: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    aria-hidden="true"
-    className={className}
-    {...props}
-  >
-    {/* Chunky chevron right, centered for use inside the circular button */}
-    <path
-      d="M10.25 8.25 14 12l-3.75 3.75"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 export interface PortfolioPost {
   id: string;
@@ -284,9 +262,7 @@ const BoardCard = React.memo(
           transform: `translate(${offset.x}px, ${offset.y}px) rotate(${currentRot}deg) scale(${scale})`,
           zIndex: isDragging ? 9999 : z,
           cursor: isTouchDevice ? "default" : isDragging ? "grabbing" : "grab",
-          transition: isDragging
-            ? "none"
-            : "transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+          transition: isDragging ? "none" : "transform 0.3s var(--ease-spring)",
           touchAction: "auto",
           willChange: isDragging ? "transform" : "auto",
         }}

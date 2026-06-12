@@ -84,7 +84,7 @@
         var(--bottom-pad)
     )
   );
-  transition: height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: height 0.5s var(--ease-spring);
 }
 
 .posts-index-board--complete {
@@ -92,25 +92,28 @@
 }
 
 /* Stacked band: one centered column; cards shrink to fit narrow boards.
- * Media-query fallback first (board ≈ viewport − 80px page chrome, kept
- * conservatively low so it never disagrees with the container query), then
- * the container queries re-assert BOTH bands so supporting browsers always
- * use the true board width. */
-@media (max-width: 930px) {
-  .posts-index-board {
-    --card-w: min(360px, calc(100% - 16px));
-    --row-step: 360px;
-    --base-y: 140px;
-    --twine-top: 66px;
-    --est-h: 350px;
-    --card-left-left: calc(50% - var(--card-w) / 2);
-    --card-left-right: calc(50% - var(--card-w) / 2);
-    --rss-left: calc(50% + var(--card-w) / 2);
+ * Each band is declared once per path: container queries for supporting
+ * browsers; viewport approximations (board ≈ viewport − ~100px page chrome,
+ * thresholds kept low so any mismatch resolves to stacked, which always
+ * fits) inside @supports-not for the rest. The two paths can never both
+ * apply, so they cannot drift apart. */
+@supports not (container-type: inline-size) {
+  @media (max-width: 930px) {
+    .posts-index-board {
+      --card-w: min(360px, calc(100% - 16px));
+      --row-step: 360px;
+      --base-y: 140px;
+      --twine-top: 66px;
+      --est-h: 350px;
+      --card-left-left: calc(50% - var(--card-w) / 2);
+      --card-left-right: calc(50% - var(--card-w) / 2);
+      --rss-left: calc(50% + var(--card-w) / 2);
+    }
   }
-}
-@media (max-width: 710px) {
-  .posts-index-board {
-    --bottom-pad: 300px;
+  @media (max-width: 710px) {
+    .posts-index-board {
+      --bottom-pad: 300px;
+    }
   }
 }
 @container (width < 854px) {
@@ -125,26 +128,9 @@
     --rss-left: calc(50% + var(--card-w) / 2);
   }
 }
-@container (width >= 854px) {
-  .posts-index-board {
-    --card-w: 360px;
-    --row-step: 270px;
-    --base-y: 104px;
-    --twine-top: 52px;
-    --est-h: 320px;
-    --card-left-left: max(8px, calc(50% - 407px));
-    --card-left-right: min(calc(50% + 47px), calc(100% - 368px));
-    --rss-left: min(calc(50% + 407px), calc(100% - 8px));
-  }
-}
 @container (width < 640px) {
   .posts-index-board {
     --bottom-pad: 300px;
-  }
-}
-@container (width >= 640px) {
-  .posts-index-board {
-    --bottom-pad: 260px;
   }
 }
 
@@ -158,9 +144,9 @@
   top: calc(var(--base-y) + var(--i, 0) * var(--row-step));
   left: var(--card-left-left);
   transition:
-    left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
-    top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
-    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    left 0.5s var(--ease-spring),
+    top 0.5s var(--ease-spring),
+    transform 0.3s var(--ease-spring);
 }
 .posts-card--right {
   left: var(--card-left-right);
@@ -194,7 +180,7 @@
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 1;
   border-radius: 2px;
-  transition: height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: height 0.5s var(--ease-spring);
 }
 
 /* Manila shipping tag — upper right; pushpin head (::before) sits in punched hole; ring (::after). */
@@ -235,7 +221,7 @@
     #e6d5b8 calc(var(--rss-hole-r) + 0.5px)
   );
   filter: drop-shadow(2px 3px 5px rgba(0, 0, 0, 0.28));
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.35s var(--ease-spring);
 }
 
 /* Pushpin head — matches .pushpin look, centered on hole */
@@ -387,9 +373,16 @@
   flex-direction: column;
   align-items: center;
   transform: translateX(-50%);
-  transition: top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: top 0.5s var(--ease-spring);
   /* Let the cord pull gesture win over page scroll / touch gestures (all pointer types). */
   touch-action: none;
+  /* Hidden until hydration adds --ready (PullMoreCord): the handlers are
+     React-bound, so the SSR'd cord is a dead control until then — and
+     forever with JS off. Space is still reserved (twine math unchanged). */
+  visibility: hidden;
+}
+.pull-container--ready {
+  visibility: visible;
 }
 
 /* Inner stack: knot + CTA — bounce only affects Y so pull-drag translateY can compose. */

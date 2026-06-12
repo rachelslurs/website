@@ -54,7 +54,7 @@ export default function PostPagination({
       display: flex;
       flex-direction: column;
       justify-content: center;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), z-index 0s 0.3s;
+      transition: transform 0.3s var(--ease-spring), z-index 0s 0.3s;
 
       /* Ruled index card top line using the base ink color */
       border-top: 2px solid rgb(var(--color-text-base));
@@ -83,7 +83,7 @@ export default function PostPagination({
       /* Cards "slide out" from under the paper on hover */
       transform: translateY(16px) rotate(0deg);
       z-index: 15; /* Lift above the paper edge temporarily */
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), z-index 0s;
+      transition: transform 0.3s var(--ease-spring), z-index 0s;
     }
 
     /* ── CARD CONTENT ── */
