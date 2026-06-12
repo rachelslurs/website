@@ -52,7 +52,13 @@ const { animateNav = false, readingProgress = false } = Astro.props;
         siteTitle={SITE.title}
         animateEntrance={animateNav}
       />
-      <div transition:name="board-content" class="flex min-h-0 flex-1 flex-col">
+      <!-- z-[60]: content paints above the nav (z-50) and footer, so a
+           dragged board card (z-9999, trapped in this wrapper's stacking
+           context by its view-transition-name) is never covered. -->
+      <div
+        transition:name="board-content"
+        class="z-[60] flex min-h-0 flex-1 flex-col"
+      >
         <slot />
       </div>
       <Footer />

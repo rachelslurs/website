@@ -60,7 +60,6 @@
   --card-left-left: max(8px, calc(50% - 407px));
   --card-left-right: min(calc(50% + 47px), calc(100% - 368px));
   --rss-left: min(calc(50% + 407px), calc(100% - 8px));
-  --board-overflow-x: clip;
 
   /* Derived. */
   --top-gap: calc(var(--base-y) - var(--twine-top));
@@ -76,8 +75,6 @@
   width: 100%;
   /* Pull up under RisoBoardShell’s gap-8 so twine sits closer to the nav. */
   margin-top: -0.5rem;
-  overflow-x: var(--board-overflow-x);
-  overflow-y: visible;
   color: var(--black);
   height: max(
     800px,
@@ -109,8 +106,6 @@
     --card-left-left: calc(50% - var(--card-w) / 2);
     --card-left-right: calc(50% - var(--card-w) / 2);
     --rss-left: calc(50% + var(--card-w) / 2);
-    /* Avoid clipping full-width cards at the viewport edge. */
-    --board-overflow-x: visible;
   }
 }
 @media (max-width: 710px) {
@@ -128,7 +123,6 @@
     --card-left-left: calc(50% - var(--card-w) / 2);
     --card-left-right: calc(50% - var(--card-w) / 2);
     --rss-left: calc(50% + var(--card-w) / 2);
-    --board-overflow-x: visible;
   }
 }
 @container (width >= 854px) {
@@ -141,7 +135,6 @@
     --card-left-left: max(8px, calc(50% - 407px));
     --card-left-right: min(calc(50% + 47px), calc(100% - 368px));
     --rss-left: min(calc(50% + 407px), calc(100% - 8px));
-    --board-overflow-x: clip;
   }
 }
 @container (width < 640px) {
@@ -155,8 +148,10 @@
   }
 }
 
-/* Card column slots; a dragged card gets inline left/top (which win) until
- * the next resize snaps it back into the flow. */
+/* Card column slots; a dragged card gets inline left/top (which win) and
+ * springs back into the slot on release via this transition. No ancestor
+ * may clip: a mid-drag card can hang outside the board (and, via the
+ * z-[60] content wrapper in RisoBoardShell, paints above nav/footer). */
 .posts-card {
   position: absolute;
   width: var(--card-w);
