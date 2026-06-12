@@ -21,6 +21,8 @@ const { portfolioPosts, pageSize } = Astro.props;
   <Main pageTitle="Posts" showPageHeader={false} showBreadcrumbs={false}>
     <!-- The board is purely visual (cards are h2s); pages need exactly one h1. -->
     <h1 class="sr-only">Posts</h1>
-    <PostsIndexBoard client:load posts={portfolioPosts} pageSize={pageSize} />
+    <!-- client:idle — layout and entrances are CSS-driven and SSR-visible;
+         hydration only adds drag and the pull-to-load cord. -->
+    <PostsIndexBoard client:idle posts={portfolioPosts} pageSize={pageSize} />
   </Main>
 </Layout>
