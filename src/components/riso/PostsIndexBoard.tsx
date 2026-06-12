@@ -31,8 +31,15 @@ const STAGGER_STEP_S = 0.14;
 /* Board geometry (card columns, twine length, board height) lives entirely in
    riso-posts-index.css as container-query-driven custom properties, so the
    SSR HTML is correctly laid out at every width before any JS runs. The
-   component only feeds it `--n` (visible card count) and the
-   `--complete` class. */
+   component feeds the CSS five inputs, all stringly-typed (a dropped one
+   fails silently — e.g. no `--i` stacks every card on row one):
+     --n            visible card count (board inline style; load-more bumps it)
+     --complete     class modifier on the board (twine tail length)
+     --i            per-card index (row position)
+     posts-card--right  per-card column class
+     --enter-delay  per-card entrance stagger (consumed by riso.css
+                    `.board-enter`, whose 0.55s duration this STAGGER_STEP_S
+                    is tuned against — change them together) */
 
 /** Max downward pull (px) for the “load more” cord gesture. */
 const PULL_CORD_MAX_PX = 56;
@@ -63,15 +70,15 @@ function DraggableCard({
   side,
   zIndex,
   dragDisabled,
-  stagger,
   tapeClass,
   children,
 }: {
+  /** Display index: row position (--i) and entrance stagger both derive
+   *  from it — unlike the homepage BoardCard, the two never diverge here. */
   index: number;
   side: "left" | "right";
   zIndex: number;
   dragDisabled: boolean;
-  stagger: number;
   tapeClass: string;
   children: React.ReactNode;
 }) {
@@ -148,7 +155,7 @@ function DraggableCard({
         className={`board-card board-enter relative flex h-full min-h-0 min-w-0 flex-col select-none ${tapeClass} ${shadowClass}`}
         style={
           {
-            "--enter-delay": `${stagger * STAGGER_STEP_S}s`,
+            "--enter-delay": `${index * STAGGER_STEP_S}s`,
           } as React.CSSProperties
         }
       >
@@ -436,7 +443,6 @@ export default function PostsIndexBoard({
               side={isLeft ? "left" : "right"}
               zIndex={stackZ}
               dragDisabled={dragDisabled}
-              stagger={displayIdx}
               tapeClass={tapeClass}
             >
               <article className="card flex flex-col">
