@@ -452,7 +452,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pull-stack {
+  /* Must match the coarse-pointer rule's specificity (0,2,0) and follow it
+     in source order, or pullBounceCoarse wins and touch users with reduced
+     motion get an infinitely bouncing cord pre-hydration / with JS off. */
+  .pull-stack:not(.pull-stack--dragging) {
     animation: none;
   }
 }

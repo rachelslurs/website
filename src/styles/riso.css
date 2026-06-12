@@ -55,8 +55,11 @@ nav .group:hover .dust-note {
 
 /* Nav entrance stagger (homepage): one-shot CSS replacement for the old
    framer-motion spring, so the nav doesn't need the motion bundle. The
-   back-out bezier approximates the spring overshoot; `both` keeps items
-   hidden through their stagger delay. */
+   back-out bezier approximates the spring overshoot; `backwards` keeps
+   items hidden through their stagger delay, then releases the fill — the
+   to-frame equals the natural style, and a `forwards` fill would pin the
+   animated transform/opacity at the animations cascade origin forever
+   (blocking future author rules and keeping a live Animation per node). */
 @keyframes risoNavEnter {
   from {
     opacity: 0;
@@ -70,7 +73,7 @@ nav .group:hover .dust-note {
 .riso-nav-enter {
   /* Duration mirrored by NAV_ENTER_DURATION_S in RisoNav.tsx (the board
      entrance delay is derived from it) — change both together. */
-  animation: risoNavEnter 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: risoNavEnter 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 
 /* Board entrance (homepage cards + section dividers): CSS-first so the
@@ -91,7 +94,7 @@ nav .group:hover .dust-note {
   }
 }
 .board-enter {
-  animation: boardCardEnter 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: boardCardEnter 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
   animation-delay: var(--enter-delay, 0s);
 }
 @keyframes dividerEnter {
@@ -105,7 +108,7 @@ nav .group:hover .dust-note {
   }
 }
 .divider-enter {
-  animation: dividerEnter 0.4s ease-out both;
+  animation: dividerEnter 0.4s ease-out backwards;
   animation-delay: var(--enter-delay, 0s);
 }
 /* Hidden while waiting for the IntersectionObserver to fire; only ever

@@ -75,25 +75,14 @@ function DraggableCard({
   tapeClass: string;
   children: React.ReactNode;
 }) {
-  /** null → the card sits at its CSS-computed column position; set on first
-   *  drag (seeded from offsetLeft/offsetTop) and cleared on resize so cards
-   *  snap back into the responsive layout, as the old JS layout did. */
+  /** Inline drag position; non-null only mid-drag (seeded from
+   *  offsetLeft/offsetTop on grab). Cleared on release so the card springs
+   *  back to its CSS column slot via the .posts-card left/top transition —
+   *  the same spring-home the old JS layout produced by resetting pos. */
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const dragRef = useRef<HTMLDivElement>(null);
-  const isDraggingRef = useRef(false);
-  isDraggingRef.current = isDragging;
-
-  const hasDragPos = pos !== null;
-  useEffect(() => {
-    if (!hasDragPos) return;
-    const onResize = () => {
-      if (!isDraggingRef.current) setPos(null);
-    };
-    window.addEventListener("resize", onResize, { passive: true });
-    return () => window.removeEventListener("resize", onResize);
-  }, [hasDragPos]);
 
   const scale = isDragging ? 1.01 : 1;
   const shadowClass = isDragging
@@ -127,6 +116,9 @@ function DraggableCard({
   const onPointerUp = (e: React.PointerEvent) => {
     if (!isDragging) return;
     setIsDragging(false);
+    // Spring home: dropping the inline position hands the card back to the
+    // CSS slot, animated by the .posts-card left/top transition.
+    setPos(null);
     dragRef.current?.releasePointerCapture(e.pointerId);
   };
 
@@ -359,17 +351,18 @@ export default function PostsIndexBoard({
 }) {
   const [visibleCount, setVisibleCount] = useState(pageSize);
   const [loadMoreStatus, setLoadMoreStatus] = useState("");
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  /** null = unknown (SSR / pre-hydration). Treated as touch so the static
+   *  HTML never ships touch-action:none — cards are SSR-visible and tile
+   *  most of a phone viewport, so a pre-hydration scroll dead-zone is worse
+   *  than a briefly disabled drag. */
+  const [isTouchDevice, setIsTouchDevice] = useState<boolean | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    setIsTouchDevice(
-      typeof window !== "undefined" &&
-        ("ontouchstart" in window || navigator.maxTouchPoints > 0)
-    );
+    setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
   }, []);
 
-  const dragDisabled = isTouchDevice;
+  const dragDisabled = isTouchDevice !== false;
 
   const displayedPosts = posts.slice(0, visibleCount);
   const hasMore = visibleCount < posts.length;
