@@ -20,13 +20,11 @@ import Race from "@components/demo/streaming/Race";
 import Scroll from "@components/demo/streaming/Scroll";
 import Combined from "@components/demo/streaming/Combined";
 
-I recently had a technical recruiter screen with a company whose product you've probably used today. One of the questions: when would you reach for `useRef` versus `useState` in a streaming context?
+When would you reach for `useRef` versus `useState` in a streaming context? It has an easy textbook answer and a much harder real one.
 
-I gave a textbook answer. `useState` triggers re-renders, `useRef` doesn't. The interviewer waited for more. I didn't have more. The screen didn't go well.
+The textbook version is a one-liner about which hook triggers a re-render. I knew that part cold. What I hadn't internalized was what the difference actually _costs_ you when chunks are arriving every 50 milliseconds. So I did what I always do when something doesn't fully click: I built it until it did.
 
-The thing is, I knew the API difference. I just hadn't internalized what that difference _costs_ you when chunks are arriving every 50 milliseconds. So I did what I always do when something doesn't click: I built it until it did.
-
-This post is the answer I should have given.
+This post is that build, start to finish.
 
 `useState` triggers a re-render when it updates. `useRef` stores a value that persists across renders without triggering one. In most React code, it barely matters which one you pick for values the user never sees. But in a streaming context, where state updates fire 20 times per second, picking wrong means jumbled output, race conditions, and scroll jank.
 
