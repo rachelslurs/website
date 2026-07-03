@@ -406,8 +406,8 @@ nav .group:hover .dust-note {
   --toptal-pair-gap: 0.4rem;
   --toptal-stars-w: calc(var(--toptal-tag-w) * 0.34);
   /* Fixed gaps — rule spacer and CTA spacer don't share free space */
-  --toptal-section-gap: 1.02rem;
-  --toptal-cta-gap: 0.48rem;
+  --toptal-section-gap: 1.56rem;
+  --toptal-cta-gap: 0.9rem;
   /* Pin lives above the grid */
   --toptal-pin-zone: calc(
     var(--toptal-hole-y) + var(--toptal-pin-size) / 2 + var(--toptal-pin-gap)
@@ -448,7 +448,10 @@ nav .group:hover .dust-note {
   transition: transform 0.35s var(--ease-spring);
 }
 .is-hovered:not(.is-dragging) .toptal-badge-tag {
-  transform: rotate(-6deg);
+  transform: rotate(6deg);
+}
+.is-dragging .toptal-badge-tag {
+  transform: rotate(10deg);
 }
 .toptal-badge-tag::before {
   content: "";
@@ -559,7 +562,8 @@ nav .group:hover .dust-note {
   .toptal-badge-tag {
     transition: none;
   }
-  .is-hovered .toptal-badge-tag {
+  .is-hovered .toptal-badge-tag,
+  .is-dragging .toptal-badge-tag {
     transform: none;
   }
 }
