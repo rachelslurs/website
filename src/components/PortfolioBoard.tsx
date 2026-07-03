@@ -406,7 +406,6 @@ export default function PortfolioBoard({
           <BoardCard
             index={2}
             invertRotation
-            pin="pushpin pp-red"
             className="toptal-badge-card"
             wrapperClassName="max-sm:flex-1 max-sm:min-w-[140px]"
             stagger={3}
