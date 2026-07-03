@@ -405,12 +405,9 @@ nav .group:hover .dust-note {
   --toptal-pin-gap: 0.7rem;
   --toptal-pair-gap: 0.4rem;
   --toptal-stars-w: calc(var(--toptal-tag-w) * 0.34);
-  /* Minimum equal gap between content groups (rule sits in the first) */
-  --toptal-section-gap: 0.85rem;
-  /* Extra height is split evenly across both spacers */
-  --toptal-tag-h: calc(
-    var(--toptal-tag-w) * 68 / 52 + 2 * var(--toptal-section-gap)
-  );
+  /* Fixed gaps — rule spacer and CTA spacer don't share free space */
+  --toptal-section-gap: 1.02rem;
+  --toptal-cta-gap: 0.48rem;
   /* Pin lives above the grid */
   --toptal-pin-zone: calc(
     var(--toptal-hole-y) + var(--toptal-pin-size) / 2 + var(--toptal-pin-gap)
@@ -418,10 +415,15 @@ nav .group:hover .dust-note {
   position: relative;
   box-sizing: border-box;
   display: grid;
-  /* content | spacer | content | spacer | content — spacers share free space equally */
-  grid-template-rows: auto 1fr auto 1fr auto;
+  /* content | rule gap | content | tighter CTA gap | hire me */
+  grid-template-rows:
+    auto
+    var(--toptal-section-gap)
+    auto
+    var(--toptal-cta-gap)
+    auto;
   width: var(--toptal-tag-w);
-  height: var(--toptal-tag-h);
+  height: auto;
   padding:
     var(--toptal-pin-zone)
     calc(4px * var(--toptal-scale))
@@ -487,11 +489,13 @@ nav .group:hover .dust-note {
   justify-content: center;
   gap: var(--toptal-pair-gap);
 }
+.toptal-badge-third:nth-child(3) {
+  gap: 0.2rem;
+}
 .toptal-badge-spacer {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: var(--toptal-section-gap);
 }
 .toptal-badge-rule {
   width: var(--toptal-stars-w);
@@ -536,7 +540,7 @@ nav .group:hover .dust-note {
 }
 .toptal-badge-logo {
   display: block;
-  width: 6.25rem;
+  width: 4.5rem;
 }
 .toptal-badge-logo-mark {
   fill: #204ecf;
