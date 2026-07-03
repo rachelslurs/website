@@ -54,7 +54,10 @@ export default function ToptalBadge() {
             <span className="toptal-badge-vetted">Vetted by</span>
             <ToptalLogo />
           </div>
-          <div className="toptal-badge-spacer" aria-hidden="true" />
+          <div
+            className="toptal-badge-spacer toptal-badge-spacer-cta"
+            aria-hidden="true"
+          />
           <div className="toptal-badge-third">
             <a
               href={RESUME_URL}
