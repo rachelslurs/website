@@ -52,7 +52,7 @@ export interface PortfolioDemo {
 export interface PortfolioBoardProps {
   heroHeadline: string;
   heroBody: string;
-  quote: string;
+  quote?: string;
   skills?: string[];
   posts: PortfolioPost[];
   work: PortfolioWork[];
@@ -391,21 +391,23 @@ export default function PortfolioBoard({
             </div>
           </BoardCard>
 
-          <BoardCard
-            index={2}
-            pin="pushpin pp-red"
-            className="quote-card"
-            wrapperClassName="max-sm:flex-1 max-sm:min-w-[140px]"
-            stagger={2}
-          >
-            <blockquote className="card m-0 flex min-h-[100px] items-center justify-center border-2 border-dashed border-[var(--black)] p-5">
-              <p className="quote-text">{quote}</p>
-            </blockquote>
-          </BoardCard>
+          {quote ? (
+            <BoardCard
+              index={2}
+              pin="pushpin pp-red"
+              className="quote-card"
+              wrapperClassName="max-sm:flex-1 max-sm:min-w-[140px]"
+              stagger={2}
+            >
+              <blockquote className="card m-0 flex min-h-[100px] items-center justify-center border-2 border-dashed border-[var(--black)] p-5">
+                <p className="quote-text">{quote}</p>
+              </blockquote>
+            </BoardCard>
+          ) : null}
 
           <BoardCard
             index={2}
-            invertRotation
+            flat
             className="toptal-badge-card"
             wrapperClassName="max-sm:flex-1 max-sm:min-w-[140px]"
             stagger={3}
@@ -415,18 +417,6 @@ export default function PortfolioBoard({
             </div>
           </BoardCard>
         </div>
-
-        <Swatch
-          color="var(--yellow)"
-          pattern="stripe"
-          index={0}
-          style={{
-            gridArea: "auto",
-            position: "absolute",
-            top: "-10px",
-            right: "40%",
-          }}
-        />
       </section>
 
       <SectionDivider label="Recent Posts" id="posts" />
