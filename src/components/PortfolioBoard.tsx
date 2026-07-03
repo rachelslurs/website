@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import ArrowRightCircle from "@components/ArrowRightCircle";
 import DymoLabel from "@components/riso/DymoLabel";
+import ToptalBadge from "@components/ToptalBadge";
 import {
   NAV_ENTER_DURATION_S,
   NAV_LINK_COUNT,
@@ -151,6 +152,8 @@ const BoardCard = React.memo(
     stagger = 0,
     /** When set (blog cards), tilt matches `/posts` board and post header. */
     rotationSlug,
+    /** Mirror the seeded rest/entrance tilt (e.g. pair with another hero card). */
+    invertRotation = false,
     /** No rest or entrance rotation (blog cards on index). */
     flat = false,
   }: {
@@ -162,17 +165,17 @@ const BoardCard = React.memo(
     style?: React.CSSProperties;
     stagger?: number;
     rotationSlug?: string;
+    invertRotation?: boolean;
     flat?: boolean;
   }) => {
-    const rot = useMemo(
-      () =>
-        flat
-          ? 0
-          : rotationSlug
-            ? boardCardRestRotationDeg(rotationSlug)
-            : seededOffset(index * 17, 2.5),
-      [flat, rotationSlug, index]
-    );
+    const rot = useMemo(() => {
+      if (flat) return 0;
+      const base =
+        rotationSlug != null
+          ? boardCardRestRotationDeg(rotationSlug)
+          : seededOffset(index * 17, 2.5);
+      return invertRotation ? -base : base;
+    }, [flat, rotationSlug, index, invertRotation]);
     const [dragRot, setDragRot] = useState<number | null>(null);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
     const [isDragging, setIsDragging] = useState(false);
@@ -224,16 +227,13 @@ const BoardCard = React.memo(
     const currentRot = dragRot !== null ? dragRot : rot;
     const scale = isDragging ? 1.01 : 1;
 
-    const entranceRotDeg = useMemo(
-      () =>
-        flat
-          ? 0
-          : rot +
-            (rotationSlug
-              ? boardCardEntranceExtraRotateDeg(rotationSlug)
-              : seededOffset(index * 31, 6)),
-      [flat, rot, index, rotationSlug]
-    );
+    const entranceRotDeg = useMemo(() => {
+      if (flat) return 0;
+      const extra = rotationSlug
+        ? boardCardEntranceExtraRotateDeg(rotationSlug)
+        : seededOffset(index * 31, 6);
+      return rot + (invertRotation ? -extra : extra);
+    }, [flat, rot, index, rotationSlug, invertRotation]);
     // Scroll-triggered re-runs skip the nav-clearing delay (the old code
     // cleared it with a timeout for the same reason).
     const entranceDelayS =
@@ -401,6 +401,19 @@ export default function PortfolioBoard({
             <blockquote className="card m-0 flex min-h-[100px] items-center justify-center border-2 border-dashed border-[var(--black)] p-5">
               <p className="quote-text">{quote}</p>
             </blockquote>
+          </BoardCard>
+
+          <BoardCard
+            index={2}
+            invertRotation
+            pin="pushpin pp-red"
+            className="toptal-badge-card"
+            wrapperClassName="max-sm:flex-1 max-sm:min-w-[140px]"
+            stagger={3}
+          >
+            <div className="toptal-badge-surface">
+              <ToptalBadge />
+            </div>
           </BoardCard>
         </div>
 

@@ -368,6 +368,122 @@ nav .group:hover .dust-note {
   opacity: 0.85;
 }
 
+/* ── TOPTAL BADGE ── */
+.toptal-badge-card.pushpin::before {
+  top: 0;
+}
+.toptal-badge-surface {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 0 0 0.25rem;
+}
+.toptal-badge-wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+.toptal-badge-shadow {
+  --toptal-hex: polygon(50% 0, 100% 24%, 100% 76%, 50% 100%, 0 76%, 0 24%);
+  display: inline-block;
+  filter: drop-shadow(2px 3px 8px rgba(0, 0, 0, 0.18));
+  transition: filter 0.25s ease;
+}
+.is-hovered .toptal-badge-shadow {
+  filter: drop-shadow(4px 8px 16px rgba(0, 0, 0, 0.22));
+}
+.is-dragging .toptal-badge-shadow {
+  filter: drop-shadow(8px 16px 24px rgba(0, 0, 0, 0.28));
+}
+.toptal-badge-hex {
+  position: relative;
+  display: inline-block;
+  width: 200px;
+}
+.toptal-badge-hex-border {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+.toptal-badge-hex-shape {
+  fill: none;
+  stroke: var(--black);
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 5px 3px;
+}
+.toptal-badge-hex-inner {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  padding: 1.35rem 0 2.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  text-align: center;
+  color: var(--cream);
+  background: var(--black);
+  clip-path: var(--toptal-hex);
+}
+.toptal-badge-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+}
+.toptal-badge-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+.toptal-badge-brand .toptal-badge-vetted {
+  margin-top: 0.1rem;
+}
+.toptal-badge-stars {
+  color: var(--yellow);
+  line-height: 0;
+}
+.toptal-badge-title {
+  @apply font-mono;
+  margin: 0;
+  font-size: var(--riso-type-xs);
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--cream);
+}
+.toptal-badge-rule {
+  width: 5rem;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.25);
+}
+.toptal-badge-vetted {
+  @apply font-sans;
+  font-size: var(--riso-type-lg);
+  line-height: 1.2;
+  color: var(--cream);
+  opacity: 0.85;
+}
+.toptal-badge-logo {
+  width: 6.25rem;
+  color: var(--cream);
+}
+.toptal-badge-cta {
+  margin: 0;
+}
+.toptal-badge-cta:focus-visible {
+  outline: 2px solid var(--yellow);
+  outline-offset: 2px;
+}
+
 /* ── QUOTE ── */
 .quote-text {
   @apply font-heading;
@@ -468,8 +584,8 @@ nav .group:hover .dust-note {
   );
 }
 .demo-link {
-  color: rgba(255, 255, 255, 0.5);
-  border-bottom-color: rgba(255, 255, 255, 0.25);
+  color: var(--cream);
+  border-bottom-color: rgba(245, 240, 232, 0.55);
 }
 .demo-link:hover {
   color: var(--yellow);
