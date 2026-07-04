@@ -403,7 +403,7 @@ nav .group:hover .dust-note {
 }
 .toptal-badge-tag {
   --toptal-tag-w: 168px;
-  --toptal-scale: calc(var(--toptal-tag-w) / 52px);
+  --toptal-scale: calc(168 / 52); /* scale factor for 52px reference tag */
   /* RSS chamfer: 0.75rem (12px) on 52×52 top edge — scaled, mirrored left/right */
   --toptal-chamfer: calc(12px * var(--toptal-scale));
   --toptal-hole-r: 5px;
