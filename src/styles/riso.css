@@ -12,6 +12,7 @@
   --black: #1a1a2e;
   --cream: #f5f0e8;
   --cork: #c4a97d;
+  --manila: #e6d5b8; /* shipping-tag stock — .rss-tag (/posts) + toptal badge */
   --ink-muted: #6b5c4c; /* warm medium brown — replaces #555 */
   --ink-secondary: #292524; /* warm dark brown — replaces #222 */
 
@@ -41,6 +42,14 @@
      entrance, card transition, and cord snap. TSX inline styles reference
      it via var(--ease-spring) too; never paste the literal. */
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Card lift shadows: rest → hovered → dragging. Shared by .card
+     box-shadows and drop-shadow() on clip-path cutouts (toptal badge),
+     so pinned things rise off the board in one rhythm — never paste
+     the literals. */
+  --shadow-card: 2px 3px 8px rgba(0, 0, 0, 0.18);
+  --shadow-card-hover: 4px 8px 16px rgba(0, 0, 0, 0.22);
+  --shadow-card-drag: 8px 16px 24px rgba(0, 0, 0, 0.28);
 }
 
 /* “Pardon the dust” tape wiggle — keyframes + group-hover (see RisoNav) */
@@ -217,17 +226,17 @@ nav .group:hover .dust-note {
   height: 100%;
   display: flex;
   flex-direction: column;
-  box-shadow: 2px 3px 8px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--shadow-card);
   transition: box-shadow 0.25s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 .is-hovered .card {
-  box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.22);
+  box-shadow: var(--shadow-card-hover);
 }
 .is-dragging .card {
-  box-shadow: 8px 16px 24px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--shadow-card-drag);
 }
 .hero-card-inner {
   padding: 1.25rem;
@@ -267,7 +276,7 @@ nav .group:hover .dust-note {
 /* ── HERO TYPOGRAPHY ── */
 .hero-headline {
   @apply font-display;
-  @apply text-4xl sm:text-5xl md:text-6xl break-words leading-tight md:leading-[1.15];
+  @apply break-words text-4xl leading-tight sm:text-5xl md:text-6xl md:leading-[1.15];
   font-weight: 400;
 }
 .hero-body {
@@ -284,12 +293,12 @@ nav .group:hover .dust-note {
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--ink-muted);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.375rem;
   font-weight: 700;
 }
 .post-title {
   @apply font-display;
-  @apply mt-4 text-xl sm:text-2xl md:text-3xl break-words leading-tight md:leading-[1.15];
+  @apply mt-4 break-words text-xl leading-tight sm:text-2xl md:text-3xl md:leading-[1.15];
   color: var(--black);
   font-weight: 400;
 }
@@ -300,7 +309,7 @@ nav .group:hover .dust-note {
 /* Blog post page h1: same family/weight/color as .post-title, scaled up */
 .post-page-title {
   @apply font-display;
-  @apply text-2xl sm:text-3xl md:text-4xl break-words leading-tight md:leading-[1.15];
+  @apply break-words text-2xl leading-tight sm:text-3xl md:text-4xl md:leading-[1.15];
   color: var(--black);
   font-weight: 400;
 }
@@ -308,7 +317,7 @@ nav .group:hover .dust-note {
 /* Editorial “looseleaf” post layout: stamped title (outside `.analog-prose`). */
 .analog-post-title {
   @apply font-display;
-  @apply mt-4 text-2xl sm:text-3xl md:text-4xl break-words leading-tight md:leading-[1.15];
+  @apply mt-4 break-words text-2xl leading-tight sm:text-3xl md:text-4xl md:leading-[1.15];
   color: var(--black);
   font-weight: 400;
 }
@@ -330,14 +339,14 @@ nav .group:hover .dust-note {
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--ink-muted);
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.375rem;
   font-weight: 700;
 }
 .work-name {
   @apply font-body;
   font-size: var(--riso-type-title);
   font-weight: 700;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.375rem;
   color: var(--black);
 }
 .work-desc {
@@ -383,14 +392,14 @@ nav .group:hover .dust-note {
 }
 .toptal-badge-shadow {
   display: inline-block;
-  filter: drop-shadow(2px 3px 8px rgba(0, 0, 0, 0.18));
+  filter: drop-shadow(var(--shadow-card));
   transition: filter 0.25s ease;
 }
 .is-hovered .toptal-badge-shadow {
-  filter: drop-shadow(4px 8px 16px rgba(0, 0, 0, 0.22));
+  filter: drop-shadow(var(--shadow-card-hover));
 }
 .is-dragging .toptal-badge-shadow {
-  filter: drop-shadow(8px 16px 24px rgba(0, 0, 0, 0.28));
+  filter: drop-shadow(var(--shadow-card-drag));
 }
 .toptal-badge-tag {
   --toptal-tag-w: 168px;
@@ -402,12 +411,14 @@ nav .group:hover .dust-note {
   /* Vertically centered on the chamfer cut (midpoint of diagonal) */
   --toptal-hole-y: calc(var(--toptal-chamfer) / 2);
   --toptal-pin-size: 16px;
-  --toptal-pin-gap: 0.7rem;
-  --toptal-pair-gap: 0.4rem;
+  --toptal-pin-gap: 0.75rem;
+  --toptal-pair-gap: 0.375rem;
   --toptal-stars-w: calc(var(--toptal-tag-w) * 0.34);
-  /* Fixed gaps — rule spacer and CTA spacer don't share free space */
-  --toptal-section-gap: 1.56rem;
-  --toptal-cta-gap: 0.9rem;
+  --toptal-logo-w: calc(var(--toptal-tag-w) * 0.43);
+  /* Fixed gaps (Tailwind 6 / 3.5 steps) — rule spacer and CTA spacer
+     don't share free space */
+  --toptal-section-gap: 1.5rem;
+  --toptal-cta-gap: 0.875rem;
   /* Pin lives above the grid */
   --toptal-pin-zone: calc(
     var(--toptal-hole-y) + var(--toptal-pin-size) / 2 + var(--toptal-pin-gap)
@@ -424,9 +435,7 @@ nav .group:hover .dust-note {
     auto;
   width: var(--toptal-tag-w);
   height: auto;
-  padding:
-    var(--toptal-pin-zone)
-    calc(4px * var(--toptal-scale))
+  padding: var(--toptal-pin-zone) calc(4px * var(--toptal-scale))
     calc(6px * var(--toptal-scale));
   transform-origin: var(--toptal-hole-x) var(--toptal-hole-y);
   text-align: center;
@@ -439,11 +448,11 @@ nav .group:hover .dust-note {
     0 100%
   );
   /* Manila + punched hole — same technique as .rss-tag, all dims scaled */
-  background-color: #e6d5b8;
+  background-color: var(--manila);
   background-image: radial-gradient(
     circle at var(--toptal-hole-x) var(--toptal-hole-y),
     transparent var(--toptal-hole-r),
-    #e6d5b8 calc(var(--toptal-hole-r) + 0.5px)
+    var(--manila) calc(var(--toptal-hole-r) + 0.5px)
   );
   transition: transform 0.35s var(--ease-spring);
 }
@@ -493,7 +502,7 @@ nav .group:hover .dust-note {
   gap: var(--toptal-pair-gap);
 }
 .toptal-badge-third:nth-child(3) {
-  gap: 0.2rem;
+  gap: 0.25rem;
 }
 .toptal-badge-spacer {
   display: flex;
@@ -543,7 +552,7 @@ nav .group:hover .dust-note {
 }
 .toptal-badge-logo {
   display: block;
-  width: 4.5rem;
+  width: var(--toptal-logo-w);
 }
 .toptal-badge-logo-mark {
   fill: #204ecf;
@@ -553,10 +562,6 @@ nav .group:hover .dust-note {
 }
 .toptal-badge-cta {
   margin: 0;
-}
-.toptal-badge-cta:focus-visible {
-  outline: 2px solid var(--yellow);
-  outline-offset: 2px;
 }
 @media (prefers-reduced-motion: reduce) {
   .toptal-badge-tag {
@@ -669,7 +674,8 @@ nav .group:hover .dust-note {
 }
 .demo-link {
   color: var(--cream);
-  border-bottom-color: rgba(245, 240, 232, 0.55);
+  /* --color-card is cream as an r,g,b triplet (base.css) */
+  border-bottom-color: rgba(var(--color-card), 0.55);
 }
 .demo-link:hover {
   color: var(--yellow);

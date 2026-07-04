@@ -152,8 +152,6 @@ const BoardCard = React.memo(
     stagger = 0,
     /** When set (blog cards), tilt matches `/posts` board and post header. */
     rotationSlug,
-    /** Mirror the seeded rest/entrance tilt (e.g. pair with another hero card). */
-    invertRotation = false,
     /** No rest or entrance rotation (blog cards on index). */
     flat = false,
   }: {
@@ -165,17 +163,17 @@ const BoardCard = React.memo(
     style?: React.CSSProperties;
     stagger?: number;
     rotationSlug?: string;
-    invertRotation?: boolean;
     flat?: boolean;
   }) => {
-    const rot = useMemo(() => {
-      if (flat) return 0;
-      const base =
-        rotationSlug != null
-          ? boardCardRestRotationDeg(rotationSlug)
-          : seededOffset(index * 17, 2.5);
-      return invertRotation ? -base : base;
-    }, [flat, rotationSlug, index, invertRotation]);
+    const rot = useMemo(
+      () =>
+        flat
+          ? 0
+          : rotationSlug
+            ? boardCardRestRotationDeg(rotationSlug)
+            : seededOffset(index * 17, 2.5),
+      [flat, rotationSlug, index]
+    );
     const [dragRot, setDragRot] = useState<number | null>(null);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
     const [isDragging, setIsDragging] = useState(false);
@@ -227,13 +225,16 @@ const BoardCard = React.memo(
     const currentRot = dragRot !== null ? dragRot : rot;
     const scale = isDragging ? 1.01 : 1;
 
-    const entranceRotDeg = useMemo(() => {
-      if (flat) return 0;
-      const extra = rotationSlug
-        ? boardCardEntranceExtraRotateDeg(rotationSlug)
-        : seededOffset(index * 31, 6);
-      return rot + (invertRotation ? -extra : extra);
-    }, [flat, rot, index, rotationSlug, invertRotation]);
+    const entranceRotDeg = useMemo(
+      () =>
+        flat
+          ? 0
+          : rot +
+            (rotationSlug
+              ? boardCardEntranceExtraRotateDeg(rotationSlug)
+              : seededOffset(index * 31, 6)),
+      [flat, rot, index, rotationSlug]
+    );
     // Scroll-triggered re-runs skip the nav-clearing delay (the old code
     // cleared it with a timeout for the same reason).
     const entranceDelayS =
@@ -269,7 +270,7 @@ const BoardCard = React.memo(
       >
         <div
           ref={entranceRef}
-          className={`board-card relative flex h-full flex-col select-none ${pin} ${shadowClass} ${className} ${
+          className={`board-card relative flex h-full select-none flex-col ${pin} ${shadowClass} ${className} ${
             entrancePhase === "armed" ? "board-enter-armed" : "board-enter"
           }`}
           style={
@@ -305,7 +306,7 @@ const SectionDivider = ({ label, id }: { label: string; id: string }) => {
       <h2 className="shrink-0">
         <DymoLabel text={label} size="section" isInteractive={false} />
       </h2>
-      <span className="h-px flex-1 bg-[var(--black)]/15" aria-hidden="true" />
+      <span className="bg-[var(--black)]/15 h-px flex-1" aria-hidden="true" />
     </div>
   );
 };
@@ -350,7 +351,7 @@ export default function PortfolioBoard({
           className="hero-card"
           stagger={0}
         >
-          <div className="card h-full hero-card-inner border-[3px] border-[var(--black)] justify-center">
+          <div className="card hero-card-inner h-full justify-center border-[3px] border-[var(--black)]">
             <h1 className="hero-headline mb-4 mt-0">{heroHeadline}</h1>
             <p className="hero-body max-w-[480px]">{heroBody}</p>
           </div>
@@ -443,7 +444,7 @@ export default function PortfolioBoard({
               wrapperClassName={i === 0 ? "col-span-2 max-sm:col-span-1" : ""}
               stagger={i}
             >
-              <article className="card h-full flex flex-col">
+              <article className="card flex h-full flex-col">
                 <time className="post-date" dateTime={post.dateTime}>
                   {post.dateLabel}
                 </time>
@@ -453,7 +454,7 @@ export default function PortfolioBoard({
                 >
                   <a
                     href={post.href}
-                    className="hover:text-[var(--red)] transition-colors focus-visible:outline-none"
+                    className="transition-colors hover:text-[var(--red)] focus-visible:outline-none"
                   >
                     {post.title}
                   </a>
@@ -503,22 +504,22 @@ export default function PortfolioBoard({
               }
               stagger={i}
             >
-              <article className="card h-full flex flex-col">
-                <div className="flex flex-1 flex-col mb-4">
+              <article className="card flex h-full flex-col">
+                <div className="mb-4 flex flex-1 flex-col">
                   <div className="work-label">{w.label}</div>
                   <h3 className="work-name m-0">
                     <a
                       href={w.href}
-                      className="hover:text-[var(--red)] transition-colors focus-visible:outline-none"
+                      className="transition-colors hover:text-[var(--red)] focus-visible:outline-none"
                     >
                       {w.name}
                     </a>
                   </h3>
-                  <p className="work-desc !flex-none mt-1.5 mb-0 leading-relaxed">
+                  <p className="work-desc mb-0 mt-1.5 !flex-none leading-relaxed">
                     {w.desc}
                   </p>
                 </div>
-                <a href={w.href} className="card-link self-start mt-auto !mb-1">
+                <a href={w.href} className="card-link !mb-1 mt-auto self-start">
                   <span aria-hidden="true">&rarr;</span> Case study
                   <span className="sr-only">: {w.name}</span>
                 </a>
@@ -548,21 +549,21 @@ export default function PortfolioBoard({
               className="demo-item"
               stagger={i}
             >
-              <article className="card h-full card-demo flex min-h-[130px] flex-col items-center text-center">
-                <div className="flex flex-1 w-full flex-col items-center pt-0 pb-3">
+              <article className="card card-demo flex h-full min-h-[130px] flex-col items-center text-center">
+                <div className="flex w-full flex-1 flex-col items-center pb-3 pt-0">
                   <h3 className="demo-title m-0">
                     <a
                       href={d.href}
-                      className="hover:text-[var(--yellow)] transition-colors focus-visible:outline-none"
+                      className="transition-colors hover:text-[var(--yellow)] focus-visible:outline-none"
                     >
                       {d.title}
                     </a>
                   </h3>
-                  <p className="demo-sub mt-auto pt-3 mb-0 leading-tight">
+                  <p className="demo-sub mb-0 mt-auto pt-3 leading-tight">
                     {d.sub}
                   </p>
                 </div>
-                <a href={d.href} className="card-link demo-link mt-auto !mb-1">
+                <a href={d.href} className="card-link demo-link !mb-1 mt-auto">
                   <span aria-hidden="true">&rarr;</span> Launch
                   <span className="sr-only">: {d.title} demo</span>
                 </a>
