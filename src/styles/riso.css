@@ -564,7 +564,8 @@ nav .group:hover .dust-note {
   margin: 0;
 }
 @media (prefers-reduced-motion: reduce) {
-  .toptal-badge-tag {
+  .toptal-badge-tag,
+  .toptal-badge-shadow {
     transition: none;
   }
   .is-hovered .toptal-badge-tag,
