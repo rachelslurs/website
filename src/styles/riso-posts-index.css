@@ -218,7 +218,7 @@
   background: radial-gradient(
     circle at var(--rss-hole-x) var(--rss-hole-y),
     transparent var(--rss-hole-r),
-    #e6d5b8 calc(var(--rss-hole-r) + 0.5px)
+    var(--manila) calc(var(--rss-hole-r) + 0.5px)
   );
   filter: drop-shadow(2px 3px 5px rgba(0, 0, 0, 0.28));
   transition: transform 0.35s var(--ease-spring);
