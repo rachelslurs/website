@@ -410,8 +410,10 @@ export default function PortfolioBoard({
             index={2}
             flat
             className="toptal-badge-card"
-            wrapperClassName="max-sm:flex-1 max-sm:min-w-[140px]"
-            stagger={3}
+            /* min-w matches the fixed tag width so the 168px badge never
+               overhangs its flex slot on narrow viewports */
+            wrapperClassName="max-sm:flex-1 max-sm:min-w-[168px]"
+            stagger={quote ? 3 : 2}
           >
             <div className="toptal-badge-surface">
               <ToptalBadge />
