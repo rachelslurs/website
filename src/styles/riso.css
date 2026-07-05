@@ -568,9 +568,20 @@ nav .group:hover .dust-note {
   .toptal-badge-shadow {
     transition: none;
   }
-  .is-hovered .toptal-badge-tag,
+  /* Must match the specificity of the hover rule above (its :not() counts),
+     or the 6deg hover rotation still applies here — see .rss-tag's block. */
+  .is-hovered:not(.is-dragging) .toptal-badge-tag,
   .is-dragging .toptal-badge-tag {
     transform: none;
+  }
+  /* The board-wide reduced-motion rule forces a drop-shadow onto the whole
+     .board-card (see the .board media block below) — a parent drop-shadow
+     re-shadows the child's painted shadow, so drop the tag's own filter to
+     avoid a doubled shadow. */
+  .toptal-badge-shadow,
+  .is-hovered .toptal-badge-shadow,
+  .is-dragging .toptal-badge-shadow {
+    filter: none;
   }
 }
 
