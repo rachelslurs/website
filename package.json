@@ -77,5 +77,8 @@
     "*.{js,jsx,ts,tsx,md,mdx,json,astro}": [
       "prettier --write --plugin=prettier-plugin-astro"
     ]
+  },
+  "overrides": {
+    "better-sqlite3": "^12.11.1"
   }
 }
