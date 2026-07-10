@@ -74,7 +74,7 @@ That guidance lived in each story's `parameters.docs.description.component`, the
 
 So the tool I had wired up specifically to stop the agent reinventing components was showing it everything except the one thing that would have stopped it. The agent wasn't being careless. It was working from a manifest where the answer did not exist.
 
-![](/uploads/storybookmcp.png)
+![How a human reads your docs vs how an agent reads your docs](/uploads/storybookmcp.png)
 
 The fix was not clever. I moved that guidance somewhere the agent reads on every session: our `CLAUDE.md`. The cleaner long-term answer is to write it where the pipeline already looks, but the pragmatic one was to stop relying on a field that never makes the trip.
 
