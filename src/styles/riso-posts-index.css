@@ -141,6 +141,11 @@
 .posts-card {
   position: absolute;
   width: var(--card-w);
+  /* SSR / no-JS fallback: fixed row grid so the pre-hydration HTML is laid out.
+     After hydration, JS (PostsIndexBoard) measures real card heights and sets an
+     inline `top` (a real property, so it transitions — a transitioned `top`
+     reading a var() custom property stays stuck in Chrome) to stack cards with
+     an even gap regardless of content height; that inline value overrides this. */
   top: calc(var(--base-y) + var(--i, 0) * var(--row-step));
   left: var(--card-left-left);
   transition:
@@ -150,6 +155,13 @@
 }
 .posts-card--right {
   left: var(--card-left-right);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Snap to the measured slot instead of animating the hydration correction. */
+  .posts-card {
+    transition: none;
+  }
 }
 
 /* Right edge lines up with the right card column (translateX pulls it back). */

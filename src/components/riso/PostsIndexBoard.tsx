@@ -7,6 +7,10 @@ import type { PortfolioPost } from "@components/PortfolioBoard";
 /** Seconds between each card's entrance — clearer than PortfolioBoard's 0.08s step. */
 const STAGGER_STEP_S = 0.14;
 
+/** Even vertical gap (px) between two cards stacked in the same column, applied
+ *  by the measured layout so differing card heights never overlap. */
+const COLUMN_GAP_PX = 56;
+
 /* Board geometry (card columns, twine length, board height) lives entirely in
    riso-posts-index.css as container-query-driven custom properties, so the
    SSR HTML is correctly laid out at every width before any JS runs. The
@@ -35,6 +39,7 @@ function DraggableCard({
   zIndex,
   dragDisabled,
   tapeClass,
+  topPx,
   children,
 }: {
   /** Display index: row position (--i) and entrance stagger both derive
@@ -44,6 +49,9 @@ function DraggableCard({
   zIndex: number;
   dragDisabled: boolean;
   tapeClass: string;
+  /** Measured slot top (px), applied as inline `top`. null pre-measure → CSS
+   *  falls back to the row grid (`.posts-card { top: calc(…) }`). */
+  topPx: number | null;
   children: React.ReactNode;
 }) {
   /** Inline drag position; non-null only mid-drag (seeded from
@@ -105,6 +113,9 @@ function DraggableCard({
       className={`posts-card${side === "right" ? " posts-card--right" : ""}`}
       style={{
         ...({ "--i": index } as React.CSSProperties),
+        // Measured slot top overrides the CSS row-grid fallback; set as a real
+        // `top` (not a var) so the spring transition fires. `pos` (drag) wins.
+        ...(topPx != null ? { top: topPx } : null),
         ...(pos ? { left: Math.round(pos.x), top: Math.round(pos.y) } : null),
         zIndex: isDragging ? 9999 : zIndex,
         transform: `scale(${scale})`,
@@ -339,6 +350,17 @@ export default function PostsIndexBoard({
   const [isTouchDevice, setIsTouchDevice] = useState<boolean | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
 
+  const boardRef = useRef<HTMLDivElement>(null);
+  /** Measured layout: per-card slot tops plus the board/twine extents derived
+   *  from real content heights. null until the first measure (SSR / pre-JS uses
+   *  the CSS row-grid fallback). */
+  const [layout, setLayout] = useState<{
+    tops: number[];
+    boardHeight: number;
+    stringH: number;
+  } | null>(null);
+  const lastWidthRef = useRef(0);
+
   useEffect(() => {
     setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
   }, []);
@@ -358,13 +380,115 @@ export default function PostsIndexBoard({
 
   const nPosts = displayedPosts.length;
 
+  /** Measure each card's real height and stack cards within their visual column
+   *  (grouped by resolved offsetLeft, so it works in both the two-column and
+   *  stacked bands without a hard-coded breakpoint) using an even gap. Then size
+   *  the board and twine (--string-h) to the tallest column so they follow the
+   *  real content instead of the --n/--est-h estimate. */
+  const measureAndLayout = useCallback(() => {
+    const board = boardRef.current;
+    if (!board) return;
+    const cards = Array.from(
+      board.querySelectorAll<HTMLElement>(".posts-card")
+    );
+    if (!cards.length) return;
+
+    const cs = getComputedStyle(board);
+    const num = (name: string, fallback: number) => {
+      const v = parseFloat(cs.getPropertyValue(name));
+      return Number.isFinite(v) ? v : fallback;
+    };
+    const baseY = num("--base-y", 104);
+    const twineTop = num("--twine-top", 52);
+    const bottomPad = num("--bottom-pad", 260);
+    const stringTail = num("--string-tail", 92);
+    // Right column starts one row-step lower, preserving the board's diagonal
+    // stagger; single-column (stacked) has one column, so it never applies.
+    const rowStep = num("--row-step", 270);
+
+    // Column assignment mirrors the CSS bands: below the container-query
+    // breakpoint everything is one centered column (chronological order),
+    // otherwise cards alternate left/right. Key off board width — NOT live
+    // offsetLeft, which animates via the `.posts-card` `left` transition and
+    // would misgroup cards mid-resize. Keep 854 in sync with the
+    // `@container (width < 854px)` rule in riso-posts-index.css.
+    const stacked = board.getBoundingClientRect().width < 854;
+
+    let cursorLeft = baseY;
+    let cursorRight = baseY + rowStep;
+    let cursorSingle = baseY;
+    const tops = cards.map((card, i) => {
+      const h = card.offsetHeight;
+      let top: number;
+      if (stacked) {
+        top = cursorSingle;
+        cursorSingle = top + h + COLUMN_GAP_PX;
+      } else if (i % 2 === 0) {
+        top = cursorLeft;
+        cursorLeft = top + h + COLUMN_GAP_PX;
+      } else {
+        top = cursorRight;
+        cursorRight = top + h + COLUMN_GAP_PX;
+      }
+      return top;
+    });
+
+    // Cursors now hold each column's next slot = last card bottom + gap.
+    const maxBottom =
+      (stacked ? cursorSingle : Math.max(cursorLeft, cursorRight)) -
+      COLUMN_GAP_PX;
+    const boardHeight = Math.max(800, maxBottom + bottomPad);
+    const stringH = Math.max(120, maxBottom - twineTop + stringTail);
+
+    setLayout({ tops, boardHeight, stringH });
+  }, []);
+
+  // Re-measure after render and load-more, and once web fonts settle (font swap
+  // changes card heights).
+  useEffect(() => {
+    measureAndLayout();
+    let cancelled = false;
+    document.fonts?.ready.then(() => {
+      if (!cancelled) measureAndLayout();
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [measureAndLayout, visibleCount]);
+
+  // Re-measure on width change (flips column membership between bands). Ignore
+  // height-only changes — those come from our own board resize and would loop.
+  useEffect(() => {
+    const board = boardRef.current;
+    if (!board || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(entries => {
+      const w = Math.round(entries[0]!.contentRect.width);
+      if (w === lastWidthRef.current) return;
+      lastWidthRef.current = w;
+      measureAndLayout();
+    });
+    ro.observe(board);
+    return () => ro.disconnect();
+  }, [measureAndLayout]);
+
   return (
     <div className="posts-index-frame">
       <div
+        ref={boardRef}
         className={`posts-index-board not-prose${
           hasMore ? "" : " posts-index-board--complete"
         }`}
-        style={{ "--n": nPosts } as React.CSSProperties}
+        style={
+          {
+            "--n": nPosts,
+            ...(layout
+              ? {
+                  height: layout.boardHeight,
+                  "--string-h": `${layout.stringH}px`,
+                }
+              : null),
+          } as React.CSSProperties
+        }
       >
         <div className="posts-rss-anchor">
           <a
@@ -418,6 +542,7 @@ export default function PostsIndexBoard({
               zIndex={stackZ}
               dragDisabled={dragDisabled}
               tapeClass={tapeClass}
+              topPx={layout?.tops[displayIdx] ?? null}
             >
               <article className="card flex flex-col">
                 <h2
