@@ -1,7 +1,9 @@
 ---
-title: "Your Agent Is Reading a Different Design System"
+title: Your Agent Is Reading a Different Design System
 description: >-
-  An agent reads your design system through the Storybook components manifest, and the manifest is a lossy copy. Oversight is an addon that lints it and tells you what never made it in.
+  An agent reads your design system through the Storybook components manifest,
+  and the manifest is a lossy copy. Oversight is an addon that lints it and
+  tells you what never made it in.
 featured: true
 draft: false
 author: Rachel Cantor
@@ -60,6 +62,8 @@ That's a redirect: a markdown link inside a component's description that points 
 Oversight lints the documentation the MCP consumes, and the pipeline that decides whether the MCP ever sees it.
 
 Most of what goes wrong goes wrong in the extractor, more commonly called a documentation generator, or docgen. It reads your component's TypeScript and turns your props and JSDoc into the structured data the manifest is built from. Storybook ships two of them, and they do not agree.
+
+![Oversight addon panel with some of the lint rules failing](</uploads/Screenshot 2026-07-14 at 12.31.23 PM.png>)
 
 **docgen-missing** (error): the manifest entry has no docgen payload at all. Extraction failed outright, and your agent is looking at a component with no props.
 
