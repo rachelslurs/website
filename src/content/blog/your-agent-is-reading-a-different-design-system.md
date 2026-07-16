@@ -21,7 +21,7 @@ When an agent tried to build two components from scratch instead of referencing 
 
 [I fixed it](https://rachel.fyi/posts/storybook-mcp-reads-your-manifest-not-your-docs-tab). What stayed with me was that I only caught it because I happened to be looking. Nothing in the pipeline flagged anything. It built cleanly, served a manifest, and answered the agent's question with a confident, incomplete answer. It would have done the same thing the next time. And I had no way to know how many components were already invisible to it.
 
-So I built a Storybook addon that checks each component for the gaps that leave an agent guessing. It's called Oversight. The [source is on GitHub](https://github.com/rachelslurs/storybook-addon-oversight), and there's a [live demo](https://rachelslurs.github.io/storybook-addon-oversight).
+So I built a Storybook addon that checks each component for the gaps that leave an agent guessing. It's called Oversight. The [source is on GitHub](https://github.com/rachelslurs/storybook-oversight), and there's a [live demo](https://rachelslurs.github.io/storybook-oversight).
 
 > **TL;DR**: Oversight is a Storybook addon that lints the components manifest, the file `get-documentation` reads to answer your agent. It flags failed docgen extraction, the wrong docgen extractor, undocumented required props, missing component descriptions, and dangling redirect links. Findings show up per component while you work. It does not write your docs for you. It tells you when the pipeline dropped them.
 
@@ -127,4 +127,4 @@ It's a linter, not a transform. It will not move your Docs tab prose into the co
 
 Your Storybook serves it at `/manifests/components.json`, and the debugger renders it at `manifests/components.html`. Pick a component you documented carefully. Read what the agent actually gets back.
 
-I built Oversight because I didn't want to do that by hand, once per component, forever. The [source is on GitHub](https://github.com/rachelslurs/storybook-addon-oversight), and the [demo Storybook](https://rachelslurs.github.io/storybook-addon-oversight) ships components rigged to trip every rule.
+I built Oversight because I didn't want to do that by hand, once per component, forever. The [source is on GitHub](https://github.com/rachelslurs/storybook-oversight), and the [demo Storybook](https://rachelslurs.github.io/storybook-oversight) ships components rigged to trip every rule.
