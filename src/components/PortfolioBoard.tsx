@@ -18,6 +18,7 @@ import {
   boardCardRestRotationDeg,
 } from "@utils/cardRotation";
 import { seededOffset } from "@utils/seededOffset";
+import { SITE } from "@config";
 
 export type TagColor = "red" | "blue" | "green";
 
@@ -422,63 +423,80 @@ export default function PortfolioBoard({
         </div>
       </section>
 
-      <SectionDivider label="Recent Posts" id="posts" />
-      <section
-        className="relative grid grid-cols-3 gap-8 max-lg:grid-cols-2 max-sm:grid-cols-1"
-        aria-label="Blog posts"
-      >
-        {posts.map((post, i) => {
-          const pins = [
-            "tape-c tc-pink",
-            "pushpin pp-yellow",
-            "pushpin pp-green",
-            "tape-top tp-blue",
-            "tape-c tc-yellow",
-            "pushpin pp-blue",
-          ];
-          return (
-            <BoardCard
-              key={post.id}
-              index={i + 10}
-              flat
-              pin={pins[i % pins.length]}
-              className={`post-item ${i === 0 ? "featured-post-tape" : ""}`}
-              wrapperClassName={i === 0 ? "col-span-2 max-sm:col-span-1" : ""}
-              stagger={i}
-            >
-              <article className="card flex h-full flex-col">
-                <time className="post-date" dateTime={post.dateTime}>
-                  {post.dateLabel}
-                </time>
-                <h3
-                  className={`post-title ${i === 0 ? "post-title-lg" : ""}`}
-                  style={{ viewTransitionName: post.slug }}
-                >
-                  <a
-                    href={post.href}
-                    className="transition-colors hover:text-[var(--red)] focus-visible:outline-none"
+      <div className="h-feed">
+        <SectionDivider label="Recent Posts" id="posts" />
+        <p className="p-name" hidden>
+          Recent Posts
+        </p>
+        <a className="p-author h-card" href={SITE.website} hidden>
+          {SITE.author}
+        </a>
+        <section
+          className="relative grid grid-cols-3 gap-8 max-lg:grid-cols-2 max-sm:grid-cols-1"
+          aria-label="Blog posts"
+        >
+          {posts.map((post, i) => {
+            const pins = [
+              "tape-c tc-pink",
+              "pushpin pp-yellow",
+              "pushpin pp-green",
+              "tape-top tp-blue",
+              "tape-c tc-yellow",
+              "pushpin pp-blue",
+            ];
+            return (
+              <BoardCard
+                key={post.id}
+                index={i + 10}
+                flat
+                pin={pins[i % pins.length]}
+                className={`post-item ${i === 0 ? "featured-post-tape" : ""}`}
+                wrapperClassName={i === 0 ? "col-span-2 max-sm:col-span-1" : ""}
+                stagger={i}
+              >
+                <article className="h-entry card flex h-full flex-col">
+                  <time
+                    className="dt-published post-date"
+                    dateTime={post.dateTime}
                   >
-                    {post.title}
-                  </a>
-                </h3>
-                {post.desc ? <p className="post-excerpt">{post.desc}</p> : null}
-                <div className="mt-auto flex items-center justify-between pt-4">
-                  <DymoLabel
-                    text={post.tag}
-                    size="section"
-                    color={post.tagColor}
-                    isInteractive={false}
-                  />
-                  <a href={post.href} className="card-link card-link-circle">
-                    <ArrowRightCircle className="h-[1.15rem] w-[1.15rem]" />
-                    <span className="sr-only">Read: {post.title}</span>
-                  </a>
-                </div>
-              </article>
-            </BoardCard>
-          );
-        })}
-      </section>
+                    {post.dateLabel}
+                  </time>
+                  <h3
+                    className={`post-title ${i === 0 ? "post-title-lg" : ""}`}
+                    style={{ viewTransitionName: post.slug }}
+                  >
+                    <a
+                      href={post.href}
+                      className="p-name u-url transition-colors hover:text-[var(--red)] focus-visible:outline-none"
+                    >
+                      {post.title}
+                    </a>
+                  </h3>
+                  {post.desc ? (
+                    <p className="p-summary post-excerpt">{post.desc}</p>
+                  ) : null}
+                  <div className="mt-auto flex items-center justify-between pt-4">
+                    <span className="p-category sr-only">{post.tag}</span>
+                    <DymoLabel
+                      text={post.tag}
+                      size="section"
+                      color={post.tagColor}
+                      isInteractive={false}
+                    />
+                    <a
+                      href={post.href}
+                      className="card-link card-link-circle u-url"
+                    >
+                      <ArrowRightCircle className="h-[1.15rem] w-[1.15rem]" />
+                      <span className="sr-only">Read: {post.title}</span>
+                    </a>
+                  </div>
+                </article>
+              </BoardCard>
+            );
+          })}
+        </section>
+      </div>
 
       <div className="flex justify-center gap-4 py-2" aria-hidden="true">
         <Swatch color="var(--red)" pattern="dot" index={3} />

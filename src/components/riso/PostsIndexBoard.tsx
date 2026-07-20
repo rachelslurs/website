@@ -544,7 +544,7 @@ export default function PostsIndexBoard({
               tapeClass={tapeClass}
               topPx={layout?.tops[displayIdx] ?? null}
             >
-              <article className="card flex flex-col">
+              <article className="h-entry card flex flex-col">
                 <h2
                   className="post-title m-0 mb-2 font-semibold"
                   style={{ viewTransitionName: post.slug }}
@@ -552,26 +552,33 @@ export default function PostsIndexBoard({
                   <a
                     href={post.href}
                     title={post.title}
-                    className="hover:text-[var(--red)] transition-colors focus-visible:outline-none"
+                    className="p-name u-url hover:text-[var(--red)] transition-colors focus-visible:outline-none"
                   >
                     {post.title}
                   </a>
                 </h2>
-                <time className="post-date" dateTime={post.dateTime}>
+                <time
+                  className="dt-published post-date"
+                  dateTime={post.dateTime}
+                >
                   {post.dateLabel}
                 </time>
                 {post.desc ? (
-                  <p className="post-excerpt m-0">{post.desc}</p>
+                  <p className="p-summary post-excerpt m-0">{post.desc}</p>
                 ) : null}
 
                 <div className="mt-auto flex items-center justify-between pt-4">
+                  <span className="p-category sr-only">{post.tag}</span>
                   <DymoLabel
                     text={post.tag}
                     size="section"
                     color={post.tagColor}
                     isInteractive={false}
                   />
-                  <a href={post.href} className="card-link card-link-circle">
+                  <a
+                    href={post.href}
+                    className="card-link card-link-circle u-url"
+                  >
                     <ArrowRightCircle className="h-[1.15rem] w-[1.15rem]" />
                     <span className="sr-only">Read: {post.title}</span>
                   </a>
