@@ -1,0 +1,19 @@
+---
+import { SITE, SOCIALS } from "@config";
+
+/** Representative h-card for the site identity. Hidden: parsers need the
+ *  markup; the visible brand lives in nav/hero already. */
+const socials = SOCIALS.filter(s => s.active);
+---
+
+<div class="h-card" hidden>
+  <a class="p-name u-url u-uid" href={SITE.website}>{SITE.author}</a>
+  <p class="p-note">{SITE.desc}</p>
+  {
+    socials.map(social => (
+      <a class="u-url" href={social.href} rel={social.relMe ? "me" : undefined}>
+        {social.name}
+      </a>
+    ))
+  }
+</div>
