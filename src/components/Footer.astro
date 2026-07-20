@@ -21,7 +21,9 @@ const footerSocials = SOCIALS.filter(s => s.active);
           <a
             href={social.href}
             class="dymo is-interactive"
-            rel="noopener noreferrer"
+            rel={
+              social.relMe ? "me noopener noreferrer" : "noopener noreferrer"
+            }
             target="_blank"
             aria-label={social.linkTitle.trim()}
           >

@@ -28,4 +28,6 @@ export type SocialObjects = {
   href: string;
   active: boolean;
   linkTitle: string;
+  /** Bidirectional identity link for RelMeAuth / IndieLogin */
+  relMe?: boolean;
 }[];
