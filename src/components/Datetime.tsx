@@ -3,6 +3,8 @@ import { LOCALE } from "@config";
 interface DatetimesProps {
   pubDatetime: Date;
   modDatetime: string | Date | undefined | null;
+  /** Emit dt-published / dt-updated for h-entry. */
+  hEntry?: boolean;
 }
 
 interface Props extends DatetimesProps {
@@ -12,12 +14,21 @@ interface Props extends DatetimesProps {
   variant?: "default" | "analog";
 }
 
+function formatDate(date: Date) {
+  return date.toLocaleDateString(LOCALE.langTag, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 export default function Datetime({
   pubDatetime,
   modDatetime,
   size = "sm",
   className = "",
   variant = "default",
+  hEntry = false,
 }: Props) {
   if (variant === "analog") {
     return (
@@ -25,6 +36,7 @@ export default function Datetime({
         <FormattedDatetime
           pubDatetime={pubDatetime}
           modDatetime={modDatetime}
+          hEntry={hEntry}
         />
       </div>
     );
@@ -48,31 +60,41 @@ export default function Datetime({
         <FormattedDatetime
           pubDatetime={pubDatetime}
           modDatetime={modDatetime}
+          hEntry={hEntry}
         />
       </span>
     </div>
   );
 }
 
-const FormattedDatetime = ({ pubDatetime, modDatetime }: DatetimesProps) => {
-  const myDatetime = new Date(
-    modDatetime && modDatetime > pubDatetime ? modDatetime : pubDatetime
-  );
+const FormattedDatetime = ({
+  pubDatetime,
+  modDatetime,
+  hEntry = false,
+}: DatetimesProps) => {
+  const pub = new Date(pubDatetime);
+  const mod =
+    modDatetime && new Date(modDatetime) > pub ? new Date(modDatetime) : null;
+  const display = mod ?? pub;
 
-  const date = myDatetime.toLocaleDateString(LOCALE.langTag, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-
-  // const time = myDatetime.toLocaleTimeString(LOCALE.langTag, {
-  //   hour: "2-digit",
-  //   minute: "2-digit",
-  // });
+  if (!hEntry) {
+    return <time dateTime={display.toISOString()}>{formatDate(display)}</time>;
+  }
 
   return (
     <>
-      <time dateTime={myDatetime.toISOString()}>{date}</time>
+      <time
+        className="dt-published"
+        dateTime={pub.toISOString()}
+        {...(mod ? { hidden: true } : {})}
+      >
+        {formatDate(pub)}
+      </time>
+      {mod && (
+        <time className="dt-updated" dateTime={mod.toISOString()}>
+          {formatDate(mod)}
+        </time>
+      )}
     </>
   );
 };
